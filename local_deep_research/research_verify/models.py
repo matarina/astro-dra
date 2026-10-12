@@ -20,6 +20,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from .contracts import ClaimEvidence
+
 
 class VerifyResult(BaseModel):
     """Outcome of a DOI/PMID authenticity check (requirement 1)."""
@@ -77,10 +79,27 @@ class KeywordCov(BaseModel):
     basis: str = "unavailable"  # fulltext | abstract | unavailable
 
 
+class CitationSupport(BaseModel):
+    """One cited work's outcome; missing citations remain explicit audit rows."""
+    citation_index: int
+    paper_id: str | None = None
+    artifact_id: str | None = None
+    basis: str | None = None
+    source_field: str | None = None
+    text_version: str = "raw-text-v1"
+    assessed_chars: int = 0
+    verdict: str = "unverifiable"
+    reason_code: str = "unresolved_citation"
+    model_reason: str = ""
+    evidence: ClaimEvidence | None = None
+
+
 class ClaimCheck(BaseModel):
     """Support verdict for one report claim and its citations (requirement 4)."""
 
     claim: str
+    claim_id: str = ""
+    citation_checks: list[CitationSupport] = Field(default_factory=list)
     citations: list[int] = Field(default_factory=list)
     sources: list[str] = Field(default_factory=list)
     verdict: str = "unverifiable"  # supported | partial | unsupported | unverifiable

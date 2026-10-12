@@ -8,7 +8,7 @@ from research_verify.config import VerifyConfig
 
 class FakeCollector:
     def __init__(self, mapping):
-        self._m = mapping
+        self._m = {index: {"paper_id": f"synthetic:{index}", **source} for index, source in mapping.items()}
 
     def find_by_index(self, idx):
         return self._m.get(idx)
@@ -59,7 +59,7 @@ def test_check_unverifiable_when_no_fragment():
 
 
 def test_check_supported_via_judge():
-    qc = CitationQc(judge_model=FakeJudge('{"verdict":"supported","reason":"ok"}'))
+    qc = CitationQc(judge_model=FakeJudge('{"verdict":"supported","supporting_fragment":"m6A drives HCC","reason":"ok"}'))
     collector = FakeCollector({1: {"index": "1", "abstract": "m6A drives HCC"}})
     checks = qc.check([Claim("x [1]", [1])], collector)
     assert checks[0].verdict == "supported"

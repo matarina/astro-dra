@@ -79,3 +79,7 @@ pytest -q tests/
 ## 依据
 
 `LDR-四需求-实施方案.md`、`LDR-四需求-行动文档.md`、`LDR-四需求-详细执行规划.md`。
+
+## 逐引用证据定位（2026-10-12）
+
+CitationQc 已改为逐篇检查，supported/partial 须有程序验证存在的原文短引。新增 evidence.py 和 citation_checks 审计字段；详情见 [阶段记录](../../docs/claim-evidence-step1-20261012.md)。仍使用1500字窗口，全文获取、无引用句检测、严格发布控制和真实模型验收尚未完成。
