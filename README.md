@@ -56,3 +56,7 @@ PYTHONPATH=local_deep_research .venv/bin/python -m pytest -q local_deep_research
 ## 严格文献验证工程计划
 
 后续开发与验收参见 [工程计划](docs/ldr-verification-engineering-plan.md)。默认使用最新已发布年度的 JIF，关键词仅统计正文并排除参考文献。
+
+## 开发接续
+
+每次开发先读 [开发进度记录](docs/development-progress.md) 与 [M0 工程基线](docs/verification-foundation-20261012.md)。当前优先实现结论可溯源，再推进真实性、条件匹配和正文关键词。
