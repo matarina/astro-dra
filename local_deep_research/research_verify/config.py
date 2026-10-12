@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -50,7 +51,16 @@ class VerifyConfig(BaseSettings):
 
     # --- requirement 4: citation QC ---
     qc_batch_size: int = 5
+    qc_passage_chars: int = Field(default=1600, ge=128, le=8192)
+    qc_max_passages: int = Field(default=3, ge=1, le=8)
+    qc_passage_overlap_chars: int = Field(default=200, ge=0, le=1024)
     judge_temperature: float = 0.0
+
+    @model_validator(mode="after")
+    def validate_passage_budget(self):
+        if self.qc_passage_overlap_chars >= self.qc_passage_chars:
+            raise ValueError("passage overlap must be smaller than passage size")
+        return self
 
     def module_enabled(self, name: str) -> bool:
         """Return True only if the master switch AND the module switch are on.

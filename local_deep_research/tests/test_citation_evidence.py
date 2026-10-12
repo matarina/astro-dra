@@ -143,11 +143,11 @@ def test_marked_fulltext_keeps_fulltext_provenance():
     assert result.citation_checks[0].evidence.locator.basis == "fulltext"
 
 
-def test_quote_outside_model_window_is_not_accepted():
+def test_relevant_quote_beyond_opening_window_is_retrieved():
     source = paper("A"*1600 + " The trial observed a 12% reduction.")
     result = check(source, payload())
-    assert result.verdict == "unverifiable"
-    assert result.citation_checks[0].reason_code == "quote_outside_presented_text"
+    assert result.verdict == "supported"
+    assert result.citation_checks[0].evidence.locator.start > 1500
 
 
 def test_stable_identity_and_artifact_survive_citation_renumbering():

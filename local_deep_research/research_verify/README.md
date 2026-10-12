@@ -83,3 +83,7 @@ pytest -q tests/
 ## 逐引用证据定位（2026-10-12）
 
 CitationQc 已改为逐篇检查，supported/partial 须有程序验证存在的原文短引。新增 evidence.py 和 citation_checks 审计字段；详情见 [阶段记录](../../docs/claim-evidence-step1-20261012.md)。仍使用1500字窗口，全文获取、无引用句检测、严格发布控制和真实模型验收尚未完成。
+
+## 相关片段与无引用候选（2026-10-12）
+
+新增 passages.py 与 claims.py，默认按词项从整个供应文本选取最多3个1600字符片段；引用绑定选中的原文范围。无引用事实候选进入 missing_citation 审计。配置使用 LDR_VERIFY_QC_PASSAGE_CHARS / QC_MAX_PASSAGES / QC_PASSAGE_OVERLAP_CHARS。详情见 [第2项记录](../../docs/claim-evidence-step2-20261012.md)。候选检测为保守规则，严格语义分类和最终发布控制尚未完成。

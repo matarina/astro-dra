@@ -39,11 +39,12 @@ Another supported claim here [3].
 """
 
 
-def test_extract_claims_only_cited_sentences():
+def test_extract_claims_includes_uncited_candidates():
     claims = CitationQc().extract_claims(REPORT)
     texts = [c.text for c in claims]
     assert any("[1]" in t for t in texts)
-    assert all("no citation" not in t for t in texts)
+    assert any("no citation" in t for t in texts)
+    assert any(not c.citations for c in claims)
     # multi-citation parsing
     multi = [c for c in claims if c.citations == [1, 2]]
     assert multi

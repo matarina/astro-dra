@@ -20,31 +20,39 @@ class SourceArtifact:
     source_url: str | None
     field: str
 
-    def locate(self, quote: str | None) -> EvidenceLocator | None:
-        """Match exact text or whitespace differences; preserve raw offsets.
+    def locate(self, quote: str | None, *,
+               within: tuple[tuple[int, int], ...] | None = None) -> EvidenceLocator | None:
+        """Locate a contiguous quote inside one allowed range, using raw offsets.
 
-        No case, punctuation, numbers, negation or ellipsis are rewritten.
-        Hash and offsets always refer to the untouched source field.
+        Whitespace differences are allowed; no case, punctuation, numbers,
+        negation or ellipsis are rewritten. A quote cannot bridge passage gaps.
         """
         if not isinstance(quote, str) or not quote.strip():
             return None
         quote = quote.strip()
-        start = self.text.find(quote)
-        if start >= 0:
-            end = start + len(quote)
-        else:
-            normalized, offsets = _whitespace_map(self.text)
-            needle = re.sub(r"\s+", " ", quote)
-            pos = normalized.find(needle)
-            if pos < 0:
-                return None
-            start = offsets[pos][0]
-            end = offsets[pos + len(needle) - 1][1]
-        return EvidenceLocator(
-            paper_id=self.paper_id, artifact_id=self.artifact_id,
-            content_sha256=self.content_sha256, source_url=self.source_url,
-            basis=self.basis, start=start, end=end, quote=self.text[start:end],
-        )
+        ranges = ((0, len(self.text)),) if within is None else within
+        for begin, finish in ranges:
+            if not 0 <= begin < finish <= len(self.text):
+                continue
+            segment = self.text[begin:finish]
+            start = segment.find(quote)
+            if start >= 0:
+                end = start + len(quote)
+            else:
+                normalized, offsets = _whitespace_map(segment)
+                needle = re.sub(r"\s+", " ", quote)
+                pos = normalized.find(needle)
+                if pos < 0:
+                    continue
+                start = offsets[pos][0]
+                end = offsets[pos + len(needle) - 1][1]
+            start, end = begin + start, begin + end
+            return EvidenceLocator(
+                paper_id=self.paper_id, artifact_id=self.artifact_id,
+                content_sha256=self.content_sha256, source_url=self.source_url,
+                basis=self.basis, start=start, end=end, quote=self.text[start:end],
+            )
+        return None
 
 
 def _whitespace_map(text: str) -> tuple[str, list[tuple[int, int]]]:

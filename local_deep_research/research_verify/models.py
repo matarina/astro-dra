@@ -79,6 +79,13 @@ class KeywordCov(BaseModel):
     basis: str = "unavailable"  # fulltext | abstract | unavailable
 
 
+class RetrievedPassage(BaseModel):
+    """A range in the source artifact actually presented to the judge."""
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+    score: float = Field(ge=0)
+
+
 class CitationSupport(BaseModel):
     """One cited work's outcome; missing citations remain explicit audit rows."""
     citation_index: int
@@ -88,6 +95,8 @@ class CitationSupport(BaseModel):
     source_field: str | None = None
     text_version: str = "raw-text-v1"
     assessed_chars: int = 0
+    retrieval_method: str = ""
+    retrieved_passages: list[RetrievedPassage] = Field(default_factory=list)
     verdict: str = "unverifiable"
     reason_code: str = "unresolved_citation"
     model_reason: str = ""
@@ -99,6 +108,10 @@ class ClaimCheck(BaseModel):
 
     claim: str
     claim_id: str = ""
+    report_start: int | None = None
+    report_end: int | None = None
+    claim_kind: str = "factual_candidate"
+    claim_context: str = ""
     citation_checks: list[CitationSupport] = Field(default_factory=list)
     citations: list[int] = Field(default_factory=list)
     sources: list[str] = Field(default_factory=list)

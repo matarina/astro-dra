@@ -13,27 +13,20 @@ import json
 from hashlib import sha256
 from html import escape
 import re
-from dataclasses import dataclass, field
 
 from loguru import logger
 
 from .config import VerifyConfig, get_config
-from .models import ClaimCheck, CitationSupport
+from .models import ClaimCheck, CitationSupport, RetrievedPassage
+from .claims import CITE_RE, Claim, extract_report_claims
+from .passages import retrieve_passages
 from .contracts import ClaimEvidence
 from .evidence import paper_identity, source_artifacts
 from .textutil import extract_doi
 
-# A claim line carries one or more [N] / [N, M] citation markers.
-_CITE_RE = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\]")
-_SENT_SPLIT = re.compile(r"(?<=[。.!?！？])\s+")
-
+# Numeric references, including inline links, share one parser.
+_CITE_RE = CITE_RE
 VERDICTS = {"supported", "partial", "unsupported", "unverifiable"}
-
-
-@dataclass
-class Claim:
-    text: str
-    citations: list[int] = field(default_factory=list)
 
 
 class CitationQc:
@@ -45,28 +38,8 @@ class CitationQc:
 
     # -- extraction ---------------------------------------------------------
     def extract_claims(self, report_text: str) -> list[Claim]:
-        """Return sentence-level claims that carry at least one citation."""
-        claims: list[Claim] = []
-        # Drop the auto-appended Sources/verification sections to avoid noise.
-        body = re.split(r"\n##\s+Sources\b", report_text or "")[0]
-        for line in body.splitlines():
-            stripped = line.strip()
-            if not stripped or stripped.startswith("#"):
-                continue
-            for sentence in _SENT_SPLIT.split(stripped):
-                cites = _CITE_RE.findall(sentence)
-                if not cites:
-                    continue
-                nums: list[int] = []
-                for group in cites:
-                    for n in group.split(","):
-                        n = n.strip()
-                        if n.isdigit():
-                            nums.append(int(n))
-                if not nums:
-                    continue
-                claims.append(Claim(text=sentence.strip(), citations=sorted(set(nums))))
-        return claims
+        """Return conservative factual candidates, including uncited prose."""
+        return extract_report_claims(report_text or "")
 
     # -- checking -----------------------------------------------------------
     def check(
@@ -83,10 +56,12 @@ class CitationQc:
         return out
 
     def _check_one(self, claim: Claim, collector) -> ClaimCheck:
-        claim_id = "claim:" + sha256(_CITE_RE.sub("", claim.text).strip().encode()).hexdigest()
+        claim_id = "claim:" + sha256(_CITE_RE.sub("", claim.context + "\n" + claim.text).strip().encode()).hexdigest()
         per_citation = [self._check_citation(claim, claim_id, n, collector)
                         for n in sorted(set(claim.citations))]
         check = ClaimCheck(claim=claim.text, claim_id=claim_id,
+                           report_start=claim.report_start, report_end=claim.report_end,
+                           claim_kind=claim.kind, claim_context=claim.context,
                            citations=sorted(set(claim.citations)),
                            sources=[c.paper_id for c in per_citation if c.paper_id],
                            citation_checks=per_citation)
@@ -139,26 +114,35 @@ class CitationQc:
             result.reason_code = "source_text_unavailable"
             return result
         artifact = min(artifacts, key=lambda a: {"fulltext": 0, "abstract": 1, "snippet": 2}[a.basis])
-        # Related passage retrieval is a subsequent task. Keep the existing bounded window explicit.
-        presented = artifact.text[:1500]
+        passages = retrieve_passages(
+            artifact.text, _CITE_RE.sub("", claim.context + "\n" + claim.text),
+            window_chars=self._cfg.qc_passage_chars,
+            max_passages=self._cfg.qc_max_passages,
+            overlap_chars=self._cfg.qc_passage_overlap_chars,
+        )
         result.source_field = artifact.field
         result.artifact_id = artifact.artifact_id
         result.basis = artifact.basis
-        result.assessed_chars = len(presented)
+        result.assessed_chars = sum(len(p.text) for p in passages)
+        result.retrieved_passages = [RetrievedPassage(start=p.start, end=p.end, score=p.score) for p in passages]
+        result.retrieval_method = "lexical-v1" if any(p.score > 0 for p in passages) else "opening_fallback-v1"
+        if not passages:
+            result.reason_code = "no_retrievable_passages"
+            return result
         if self._judge is None:
             result.reason_code = "judge_unavailable"
             return result
-        verdict, quote, reason = self._judge_claim(claim.text, [presented])
+        verdict, quote, reason = self._judge_claim(claim.context + "\n" + claim.text, [p.text for p in passages])
         result.model_reason = reason
         if verdict not in VERDICTS:
             result.reason_code = "invalid_verdict"
             return result
-        locator = artifact.locate(quote)
+        locator = artifact.locate(quote, within=tuple((p.start, p.end) for p in passages))
         if verdict in {"supported", "partial"} and locator is None:
-            result.reason_code = "quote_missing" if not quote else "quote_not_found"
-            return result
-        if locator and locator.end > len(presented):
-            result.reason_code = "quote_outside_presented_text"
+            if quote and artifact.locate(quote) is not None:
+                result.reason_code = "quote_outside_presented_text"
+            else:
+                result.reason_code = "quote_missing" if not quote else "quote_not_found"
             return result
         # Search snippets can be located but cannot establish original-paper support.
         if artifact.basis == "snippet" and verdict in {"supported", "partial"}:
@@ -225,7 +209,7 @@ class CitationQc:
             cites = ",".join(str(n) for n in c.citations)
             reason = (c.reason or "").replace("|", "/")[:100]
             lines.append(
-                f"| {claim} | [{cites}] | {badge.get(c.verdict, c.verdict)} | {reason} |"
+                f"| {escape(claim)} | {'[' + cites + ']' if cites else '无引用'} | {badge.get(c.verdict, c.verdict)} | {reason} |"
             )
         details = [(check.claim_id, item) for check in checks for item in check.citation_checks]
         if details:
