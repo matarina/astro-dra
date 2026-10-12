@@ -6,3 +6,7 @@
 **/node_modules/
 **/.venv/
 *.log
+**/*.local.yml
+**/*.local.yaml
+**/*.pyc
+**/.coverage

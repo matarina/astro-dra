@@ -1,5 +1,7 @@
 # research_verify —— 科研验证链（四需求）
 
+本页描述现有标注式核验实现，不能作为严格证据准入的验收证明。严格流程、已知缺口与后续任务见 [工程计划](../../docs/ldr-verification-engineering-plan.md)；通用部署入口见 [项目 README](../../README.md)。下文的旧回滚快照与部分内部依据文件未随仓库提供，请以 [部署说明](../../docs/deployment.md) 为准。
+
 > 在「检索到 → 写报告」之间插入验证，在报告产出后做后置 QC。
 > 全部走 hot-patch：新代码集中在 `research_verify/`，入口只改
 > `langgraph_agent_strategy.py::_finalize` 一两处，不动上游检索内核。
