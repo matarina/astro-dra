@@ -40,7 +40,7 @@ M3-B 在 M1/M2 后将可溯源与四需求严格准入整合。完整全文获�
 - M3-A 第1、2项已接入 CitationQc：逐篇映射与短引核验、相关段落检索、无引用候选审计；完整反幻觉流程仍未完成，生产尚未部署。
 - 最新全量143 passed（0.52s）；本步新增34项，含策略入口接口测试和T04验收样本。AST、JSON回放、git diff --check通过。
 - 固定反例为合成数据，尚无真实文献语义准确率。
-- 生产服务未重启，未新增数据迁移，未推送本次成果。
+- 生产服务未重启，未新增数据迁移；工程基础与结论溯源第1、2项代码已推送到 origin/work/ldr-20261012，远程代码提交已核对为95aa770。
 - 工程基础6a5eae8；第1项0dccb48；第2项提交标题：Retrieve relevant evidence passages and audit uncited claim candidates；提交ID通过 git log 查阅。
 - 最新结果与限制见 claim-evidence-step2-20261012.md：默认最多3段各1600字符；事实候选为保守规则检测，语义增强/发布控制未完成。
 - 尚未完成：依赖完整锁定、自然语言规则界面、线上预算测量、真实研究与导出验收。
@@ -50,3 +50,11 @@ M3-B 在 M1/M2 后将可溯源与四需求严格准入整合。完整全文获�
 记录修改文件、测试结果、提交ID（如有）、未完成依赖、下一步与生产是否改变。
 不保存密钥、用户原始研究数据或生产全文缓存，不依赖聊天记忆判定完成。
 M0 完成只指工程基础；只有实际实现并验收的功能才能变更为完成。
+
+## GitHub 推送记录（2026-10-12）
+
+代码提交：95aa77056e8c9c3e2423efde616960af64e6c167。目标分支：work/ldr-20261012。首次推送后通过 git ls-remote 确认远程提交一致；本条记录另作同步提交。未合并main、未部署。
+
+英文推送说明：
+
+Add verification contracts, per-citation source mapping, and verbatim quote validation. Retrieve relevant evidence passages and audit uncited claim candidates. All 143 tests pass. Semantic validation and report publication controls remain pending.
