@@ -1,0 +1,127 @@
+{
+  "date": "2026-10-26",
+  "status": "deployed_and_restarted",
+  "deployment": {
+    "containers": [
+      {
+        "name": "/astro-dra-test-5002-local-deep-research-1",
+        "id": "890cda7c8ee6ea6f5ba8501b74e5c3b90457c1a9a507cd0187cb066b10b794d2",
+        "image": "astro-dra:abstract-context-20261021",
+        "image_id": "sha256:401b63e33e5794b60917cc745a4d46c903a73e102901cc8e8c6d8c5691297370",
+        "started": "2026-10-26T02:23:04.808777289Z",
+        "health": "healthy",
+        "restarted": true,
+        "same_image": true,
+        "same_mounts": true
+      },
+      {
+        "name": "/local_deep_research-local-deep-research-1",
+        "id": "3cd64119d61e68c91b31b0011eb43db47beda07ca23b6cf17188b92aa73945ab",
+        "image": "localdeepresearch/local-deep-research:astro-dra-d7d874b",
+        "image_id": "sha256:e94a4b527a6f61778da2aa7b2994722562fbfadac0dda9c6b499f64a16a5b1b2",
+        "started": "2026-10-15T08:59:54.908821447Z",
+        "health": "healthy",
+        "restarted": false,
+        "same_image": true,
+        "same_mounts": true
+      },
+      {
+        "name": "/astro-dra-test-5002-searxng-1",
+        "id": "9655738081a5fad292ecc54fa731aa706d9f53e14de1d61db61f36060efcd735",
+        "image": "searxng/searxng@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+        "image_id": "sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+        "started": "2026-10-16T07:57:47.700526115Z",
+        "health": "healthy",
+        "restarted": false,
+        "same_image": true,
+        "same_mounts": true
+      },
+      {
+        "name": "/astro-dra-test-5002-proxy-relay-1",
+        "id": "41ef5cc8f21f718d545f79b011c8f48c44e323aeb41c48c0ba08bf1b17ac904d",
+        "image": "astro-dra:search-stability-20261016-v2",
+        "image_id": "sha256:fc50ef18b85cc5943cf5965be121dd36d1fe01e3fb14403a73a0a29731220bad",
+        "started": "2026-10-16T07:26:42.115715988Z",
+        "health": "healthy",
+        "restarted": false,
+        "same_image": true,
+        "same_mounts": true
+      }
+    ],
+    "http_status": 200,
+    "backup": "/data/ningh/nh/ldr-test-5002-backups/azure-gpt56-20261026-101806",
+    "settings": {
+      "LDR_LLM_MODEL": "gpt-5.6-sol",
+      "LDR_LLM_PROVIDER": "openai_endpoint",
+      "LDR_LLM_OPENAI_ENDPOINT_URL": "https://admin-mm9x74i6-eastus2.services.ai.azure.com/openai/v1/",
+      "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": "500",
+      "LDR_GENERAL_ENABLE_FACT_CHECKING": "true",
+      "LDR_VERIFY_ENABLE_CITATION_QC": "false"
+    },
+    "credential_configured": true
+  },
+  "candidate_smoke": {
+    "model": "gpt-5.6-sol",
+    "provider": "openai_endpoint",
+    "checks_passed": true,
+    "temperature": 0.7,
+    "max_tokens_setting": 30000,
+    "consistency_enabled": true,
+    "configured_host": "admin-mm9x74i6-eastus2.services.ai.azure.com",
+    "checks": [
+      "environment_default_and_native_provider",
+      "ldr_get_llm_chinese_completion",
+      "streaming",
+      "structured_tool_call",
+      "tool_result_roundtrip",
+      "relevance_filter",
+      "native_consistency_and_final_writer"
+    ],
+    "timings": {
+      "completion_s": 5.467,
+      "stream_s": 1.145,
+      "tool_roundtrip_s": 4.302,
+      "relevance_s": 1.086,
+      "writer_s": 2.992
+    },
+    "elapsed_s": 14.993,
+    "scope": "Backend integration smoke; no full research or account changes."
+  },
+  "deployed_smoke": {
+    "model": "gpt-5.6-sol",
+    "provider": "openai_endpoint",
+    "checks_passed": true,
+    "temperature": 0.7,
+    "max_tokens_setting": 30000,
+    "consistency_enabled": true,
+    "configured_host": "admin-mm9x74i6-eastus2.services.ai.azure.com",
+    "checks": [
+      "environment_default_and_native_provider",
+      "ldr_get_llm_chinese_completion",
+      "streaming",
+      "structured_tool_call",
+      "tool_result_roundtrip",
+      "relevance_filter",
+      "native_consistency_and_final_writer"
+    ],
+    "timings": {
+      "completion_s": 3.396,
+      "stream_s": 0.872,
+      "tool_roundtrip_s": 3.567,
+      "relevance_s": 1.108,
+      "writer_s": 3.71
+    },
+    "elapsed_s": 12.653,
+    "scope": "Backend integration smoke; no full research or account changes."
+  },
+  "changed_files": [
+    ".env.test-5002 (ignored private config; credential omitted from this record)",
+    "scripts/check_openai_backend.py"
+  ],
+  "scope": "Temporary 5002 default backend switch; user will test research quality. No full research, user DB changes, image rebuild or default search changes.",
+  "credential_storage": "Private .env.test-5002 permissions 0600; no credential in source code or this report.",
+  "rollback": {
+    "private_backup_directory": "/data/ningh/nh/ldr-test-5002-backups/azure-gpt56-20261026-101806",
+    "restore": "Restore the previous .env.test-5002 from backup, validate Compose, recreate only the 5002 application with the same project name; no volume deletion."
+  }
+}

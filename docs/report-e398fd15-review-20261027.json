@@ -1,0 +1,140 @@
+{
+  "research_id": "e398fd15-454b-4114-a423-98fad2f7ca87",
+  "runtime_image": "astro-dra:generic-sources-20261026",
+  "model": "deepseek-v4-flash",
+  "native_model": "deepseek-v4-flash",
+  "trace_integrity": {
+    "artifacts": 121,
+    "sha256_and_bytes_all_passed": true,
+    "omitted_events": 0,
+    "lead_tool_records": 24
+  },
+  "source_flow": {
+    "collected": 218,
+    "writer_selected": 91,
+    "writer_material_chars": 199124,
+    "selection_batches": 10,
+    "selection_replay_exact_match": true,
+    "source_capacity": 500
+  },
+  "cases": {
+    "11": {
+      "original_index": 117,
+      "pmid": "42759406",
+      "doi": "10.1016/j.tranon.2026.103049",
+      "source_disease": "renal cell carcinoma",
+      "report_disease": "thyroid cancer",
+      "abstract_chars": 2836,
+      "source_selected": true,
+      "draft_cites_source": false,
+      "first_explicit_wrong_binding_in_saved_chain": "writer_response",
+      "native_disease_correction": false,
+      "possible_context_blend_with_source28": "Hypothesis only; the model internal mechanism is not observable."
+    },
+    "29": {
+      "original_index": 195,
+      "pmid": "42393057",
+      "doi": "10.1038/s41467-026-74954-5",
+      "actual_platform": "Stereo-seq",
+      "writer_section": "low-resolution Visium/CytAssist applications",
+      "source_selected": true,
+      "abstract_chars": 1233,
+      "abstract_names_platform": false,
+      "fetched_content_present": false,
+      "draft_cites_source": false,
+      "first_explicit_wrong_classification": "writer_response"
+    },
+    "HD3prime": {
+      "first_available_signal": "subresearch: cannot establish separate product nomenclature",
+      "draft": "cannot confirm specific naming; sources consistently use Visium HD",
+      "native_check": "technical description, not a product name; use only Visium HD",
+      "writer": "asserts not an independent product name",
+      "official_documents_found_in_supplied_sources": false,
+      "flattened_table_present_in_source1": true,
+      "superscript_fix_code_proven_to_cause_this": false,
+      "official_urls": [
+        "https://www.10xgenomics.com/products/hd-wt-panel-gene-expression",
+        "https://www.10xgenomics.com/products/hd-3-prime-gene-expression"
+      ]
+    },
+    "39": {
+      "original_index": 217,
+      "preprint_pmid": "39764138",
+      "preprint_doi": "10.21203/rs.3.rs-5655066/v1",
+      "retained_relationships": [
+        {
+          "relation_type": "update_in",
+          "pmid": "41361894",
+          "doi": "10.1186/s13059-025-03870-6"
+        }
+      ],
+      "formal_pmid": "41361894",
+      "formal_doi": "10.1186/s13059-025-03870-6",
+      "formal_record_in_collector": false,
+      "update_link_visible_in_lead_tool_return": true,
+      "version_relationship_visible_in_writer_source_block": false,
+      "preprint_publication_type_visible_in_writer_source_block": false,
+      "retrieval_query": "Visium HD spatial transcriptomics[Title/Abstract] AND 2024[Date - Publication]"
+    },
+    "draft_only": {
+      "display_to_original": {
+        "15": [
+          67
+        ],
+        "16": [
+          68
+        ],
+        "60": [
+          34
+        ],
+        "62": [
+          9
+        ]
+      },
+      "sources": [
+        {
+          "original_index": 67,
+          "abstract_chars": 1896,
+          "in_collector": true,
+          "in_writer_material": false,
+          "in_draft": true,
+          "retained_in_writer": true
+        },
+        {
+          "original_index": 68,
+          "abstract_chars": 1666,
+          "in_collector": true,
+          "in_writer_material": false,
+          "in_draft": true,
+          "retained_in_writer": true
+        },
+        {
+          "original_index": 34,
+          "abstract_chars": 2474,
+          "in_collector": true,
+          "in_writer_material": false,
+          "in_draft": true,
+          "retained_in_writer": true
+        },
+        {
+          "original_index": 9,
+          "abstract_chars": 1699,
+          "in_collector": true,
+          "in_writer_material": false,
+          "in_draft": true,
+          "retained_in_writer": true
+        }
+      ],
+      "causal_boundary": "Batch material selection excludes collected, draft-cited sources; writer retains draft-based claims; publication builds bibliography from full collector."
+    }
+  },
+  "writer_equals_publication_input": true,
+  "native_feedback_in_writer": true,
+  "external_primary_sources": [
+    "https://www.sciencedirect.com/science/article/pii/S1936523326003852",
+    "https://www.nature.com/articles/s41467-026-74954-5",
+    "https://pubmed.ncbi.nlm.nih.gov/39764138/",
+    "https://doi.org/10.1186/s13059-025-03870-6"
+  ],
+  "scope": "Diagnosis, saved-trace replay, official-source verification only; no new LLM requests, no application/config/report/DB changes or restart."
+}

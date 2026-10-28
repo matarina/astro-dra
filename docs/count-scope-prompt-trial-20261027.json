@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-27",
+  "scope": "Shared count-entity prompt trial only; controlled Agent prompt and full saved writer request, not full research.",
+  "semantic_fix_accepted": false,
+  "functional_regression": {
+    "passed": 343,
+    "elapsed_s": 1.9
+  },
+  "real_model_request_attempts": 8,
+  "successful_generations": 6,
+  "rejected_synthetic_tool_history_requests": 2,
+  "results": [
+    {
+      "variant": "baseline",
+      "stage": "agent",
+      "status": "ok",
+      "model": "deepseek-flash",
+      "provider": "deepseek",
+      "elapsed_s": 21.69,
+      "response_chars": 3245,
+      "verdict": "Ambiguous or unsupported animal count remains; not accepted as a fix."
+    },
+    {
+      "variant": "v1",
+      "stage": "agent",
+      "status": "ok",
+      "model": "deepseek-flash",
+      "provider": "deepseek",
+      "elapsed_s": 24.87,
+      "response_chars": 4376,
+      "verdict": "Ambiguous or unsupported animal count remains; not accepted as a fix."
+    },
+    {
+      "variant": "v2",
+      "stage": "agent",
+      "status": "ok",
+      "model": "deepseek-flash",
+      "provider": "deepseek",
+      "elapsed_s": 14.653,
+      "response_chars": 2725,
+      "verdict": "Ambiguous or unsupported animal count remains; not accepted as a fix."
+    },
+    {
+      "variant": "baseline",
+      "stage": "writer",
+      "status": "ok",
+      "model": "deepseek-flash",
+      "provider": "deepseek",
+      "elapsed_s": 137.046,
+      "response_chars": 13213,
+      "verdict": "Ambiguous or unsupported animal count remains; not accepted as a fix."
+    },
+    {
+      "variant": "v1",
+      "stage": "writer",
+      "status": "ok",
+      "model": "deepseek-flash",
+      "provider": "deepseek",
+      "elapsed_s": 152.151,
+      "response_chars": 15701,
+      "verdict": "Ambiguous or unsupported animal count remains; not accepted as a fix."
+    },
+    {
+      "variant": "v2",
+      "stage": "writer",
+      "status": "ok",
+      "model": "deepseek-flash",
+      "provider": "deepseek",
+      "elapsed_s": 146.09,
+      "response_chars": 18668,
+      "verdict": "Ambiguous or unsupported animal count remains; not accepted as a fix."
+    }
+  ],
+  "paired_inputs_only_shared_instruction_changed": true,
+  "product_patch_reverted": true,
+  "deployment": {
+    "deployed": false,
+    "application_image": "astro-dra:generic-sources-20261026",
+    "application_id": "728f10d8acdd638d1388da1642ec2f9e9abbcf45929135a82f2ab5f0763a7914",
+    "health": "healthy",
+    "all_container_ids_and_start_times_unchanged": true,
+    "environment_unchanged": true,
+    "runtime_and_workspace_generation_match_pretrial": true
+  },
+  "candidate_image": "astro-dra:count-scope-20261027 (experimental, not deployed/accepted)",
+  "backup": "/data/ningh/nh/ldr-test-5002-backups/count-scope-prompt-20261027-094255",
+  "private_artifacts": "/data/ningh/nh/ldr-experiments/count-scope-prompt-20261027",
+  "limitations": [
+    "One response per arm per scenario; no statistical accuracy estimate",
+    "Agent tests provide two real source records directly under actual captured system prompt; no live tools or complete Agent history",
+    "Writer tests reuse full saved draft/sources/native feedback; no newly run native check",
+    "Other report content not fully audited",
+    "Original 6-mouse Methods evidence not inserted into test inputs"
+  ]
+}

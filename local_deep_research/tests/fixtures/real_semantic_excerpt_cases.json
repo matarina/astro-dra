@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0",
+  "synthetic": false,
+  "label_provenance": "Agent review of PubMed short excerpts; not independent expert adjudication.",
+  "verified_at": "2026-10-14T01:15:53.972910+00:00",
+  "papers": {
+    "33567185": {
+      "doi": "10.1056/NEJMoa2032183",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/33567185/",
+      "title_sha256": "9ca0ad12d13cf1ea7205ca049cd9ab110bc5e5b3a80b7407282b31cabbea382f",
+      "abstract_sha256": "5b934edf1a650d7fa63d2b60d43ecae0d14448e9b324072ccbc2716ed65edc0d",
+      "basis": "abstract",
+      "segments": [
+        {
+          "text": "The mean change in body weight from baseline to week 68 was -14.9% in the semaglutide group",
+          "abstract_start": 963,
+          "abstract_end": 1054
+        },
+        {
+          "text": "who did not have diabetes",
+          "abstract_start": 460,
+          "abstract_end": 485
+        }
+      ]
+    },
+    "22591295": {
+      "doi": "10.1056/NEJMoa1112010",
+      "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+      "title_sha256": "6d84476186f0db92ce72f11e5e610e3cebc17cf00e9eadb911998b3949ffeb39",
+      "abstract_sha256": "7c7372c02a2bde7b1bbe268edd2452c4484308c3ff61f9a8e47ada6f3cfef7ca",
+      "basis": "abstract",
+      "segments": [
+        {
+          "text": "coffee consumption was inversely associated with total and cause-specific mortality",
+          "abstract_start": 1903,
+          "abstract_end": 1986
+        },
+        {
+          "text": "Whether this was a causal or associational finding cannot be determined from our data.",
+          "abstract_start": 1988,
+          "abstract_end": 2074
+        }
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "R01",
+      "category": "real_numeric_support",
+      "claim": "At week 68, the semaglutide group had a mean body-weight change of -14.9% [1].",
+      "source_ids": {
+        "1": "33567185"
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "R02",
+      "category": "real_numeric_mutation",
+      "claim": "At week 68, the semaglutide group had a mean body-weight change of -24.9% [1].",
+      "source_ids": {
+        "1": "33567185"
+      },
+      "expected": "unsupported"
+    },
+    {
+      "id": "R03",
+      "category": "real_population_mutation",
+      "claim": "The trial enrolled participants who had diabetes [1].",
+      "source_ids": {
+        "1": "33567185"
+      },
+      "expected": "unsupported"
+    },
+    {
+      "id": "R04",
+      "category": "real_association_support",
+      "claim": "The cohort reported an association between coffee consumption and lower total and cause-specific mortality [1].",
+      "source_ids": {
+        "1": "22591295"
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "R05",
+      "category": "real_causality_mutation",
+      "claim": "The cohort proves that coffee drinking causes lower mortality [1].",
+      "source_ids": {
+        "1": "22591295"
+      },
+      "expected": "unsupported"
+    },
+    {
+      "id": "R06",
+      "category": "real_negated_causality_support",
+      "claim": "The data do not determine whether the coffee finding is causal or associational [1].",
+      "source_ids": {
+        "1": "22591295"
+      },
+      "expected": "supported"
+    }
+  ]
+}

@@ -1,0 +1,2358 @@
+{
+  "date": "2026-10-27",
+  "scope": "Generic engineering repairs plus isolated model/service comparisons; not complete semantic acceptance.",
+  "product_files": [
+    "local_deep_research/research_verify/evidence_flow.py",
+    "local_deep_research/research_verify/evidence_fetch.py"
+  ],
+  "unit_tests": {
+    "passed": 394,
+    "elapsed_s": 2.78,
+    "extra_identity_publication_check": "5 passed in 0.18s"
+  },
+  "installed_pipeline_smoke": {
+    "passed": true,
+    "real_model_calls": 0,
+    "simulated_synthesis_calls": 2,
+    "trace_permissions_verified": true
+  },
+  "matched_frozen_first_round_prompts": {
+    "all_equal": true,
+    "groups": 12,
+    "sha256": {
+      "1": "17d6c1302bb29868f5cb58b2e04001d5f2d984ef729c5c87fb8430424617188f",
+      "2": "990172bb9e75cc500b442e1d355b3a5bcffdde1be02de0c2884b8b8d6cc95927",
+      "3": "fcefdd930ab720a1bce72f3440382ba29f54a74cc86c44110c3ef93ebd6c3fd2",
+      "4": "dd2186387c6ae2151ec43d8252c55296350b1d88ebef57ec6d73b50394abfd69",
+      "5": "ae816eed0ccfce807d22fd5acee1073fe48d99c8dc845826512893fdf8921758",
+      "6": "0005d53fb9460f983818dae504cdc39317ca8322a1c4a2ac4953f7dd2025a826",
+      "7": "f232880fbe5432ddf08cc0420634a016bd4c47530dd614124c4cbf87f60835b8",
+      "8": "7556c0a4f6c6553399a3e6391d21a1322dcd1f031fd6e9d098950ae91e2becae",
+      "9": "834b691f78b8d48a2250f63ce4bc0a77e2084839af5341ed6bad60d0b332c21b",
+      "10": "ef54d52ba22a15f27f26965a1a4967fd41d41d1f2e814ae2b8689847145b4e05",
+      "11": "4200741cee8863f3fac92c80cb00a2bd535e5ec3ffb56b64a08cee88888151c9",
+      "12": "43be31aa256965d71c7923a5fa6a179837af68dc75bf05f80e5c78b84c86abe4"
+    }
+  },
+  "fresh_flash": {
+    "completed": true,
+    "model": "deepseek-flash",
+    "provider": "openai_endpoint",
+    "strategy": "langgraph-agent",
+    "effective_iterations": 50,
+    "elapsed_s": 1397.264,
+    "source_pool": 104,
+    "references": 50,
+    "report_chars": 22215,
+    "research_error": null
+  },
+  "fresh_flash_image": "sha256:49018edab84f76fdb99151bdd98c76ed1fc9f083fbeaa548cb6ebd65bb80d55e",
+  "full_run_limit": "Fresh and matched full reports use initial three orchestration repairs; later parser, table, applicability, identity and confirmation changes have regression/integration/focused coverage, not another full fresh search.",
+  "comparisons": {
+    "compare-v4": {
+      "manifest": {
+        "model": "deepseek-v4-flash",
+        "provider": "openai_endpoint",
+        "temperature": 0.7,
+        "max_tokens": 30000,
+        "writer_prompt_sha256": "e1838b7bcda3695a0ff4dccc534cc9ad1e8ecad3e11531b4e71e3bfd6478035f",
+        "frozen_body_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+        "source_snapshot_sha256": "ddaf825450b3df968c175929f73fbbdae13778b87eda96999762f5cbb31898fe",
+        "production_flow_sha256": "918eb13d3b53b5d276f261a362b7dedf6d69d3c32fe853f614cc519476cbb756",
+        "scope": "Same material and caller; inference model/service changes. All document retrieval frozen; no production state changes."
+      },
+      "summary": [
+        {
+          "label": "frozen_report",
+          "task_id": "compare-frozen-report-597212e9258149e58b54f43125019a24",
+          "model": "deepseek-v4-flash",
+          "model_calls": 15,
+          "completed": true,
+          "elapsed_s": 202.769,
+          "applied": 0,
+          "unresolved": 3,
+          "input_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+          "output_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+          "shown_sources": 63
+        },
+        {
+          "label": "case_cellchat_unsupported",
+          "task_id": "compare-case-cellchat-unsupported-c3d8e13e3d054f36b5b4a34ec33ebb77",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 4.324,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "output_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_colocalization_correct",
+          "task_id": "compare-case-colocalization-correct-f44019f7a6e843509c3ada112245b7c8",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 4.105,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "output_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_scope",
+          "task_id": "compare-case-tangram-scope-9c71c1a7072749c0b2104fd0d143f784",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.998,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "output_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_correct",
+          "task_id": "compare-case-tangram-correct-a4cef8e7052b4bc1bf849ef64aa17565",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.931,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "output_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_published_version",
+          "task_id": "compare-case-published-version-16841110461443f8894d5b8332cd48bd",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 4.61,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "ad1a5dbe1ecc186d2a79c9fde701ebd9c5413c54a3ee78604847a029a598c595",
+          "output_sha256": "1ca9d1fa6919c2536dbaf0fd7da4fe4bf4359497da0be58eb9eead9e05443681",
+          "shown_sources": 2
+        },
+        {
+          "label": "case_assay_software_mixup",
+          "task_id": "compare-case-assay-software-mixup-3364c6189d364d408943da9295591f4b",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 3.603,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "output_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_assay_software_correct",
+          "task_id": "compare-case-assay-software-correct-3e3583f3efd44f0dace0beb5ba901734",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 6.665,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "output_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_translation",
+          "task_id": "compare-case-translation-e874cdbbddb94dafa129be1c8de6308b",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 3.181,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "output_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_mismatch",
+          "task_id": "compare-case-disease-mismatch-5f95e39b902947e59ad5599bda498d4c",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.176,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "output_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_correct",
+          "task_id": "compare-case-disease-correct-a653ebaccee94d7a9d504fb9eb54cb63",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.4,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_report_framing",
+          "task_id": "compare-case-report-framing-8d9160ca0193482aa1ece4f86c20613e",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.456,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "output_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_uncited_assertion",
+          "task_id": "compare-case-uncited-assertion-3fbd7fe2ca594e82b45b3bd37191bc1e",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.684,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "output_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_unit_mismatch",
+          "task_id": "compare-case-unit-mismatch-2eba6ebef89d4850855809693334e679",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 1.493,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "213e935d09d3343b8d049f27acff9b0ae9735882bb7bce5b8d02c01a139286be",
+          "output_sha256": "9bb8dcbbb429d6f84075d243562ea7d60796d9359e95f81558049904ee80c119",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_parameter_control",
+          "task_id": "compare-case-parameter-control-91b9c0bb9ee34d98a1e1a537ccc73047",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.33,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "output_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "shown_sources": 1
+        },
+        {
+          "label": "same_prompt_writer",
+          "task_id": "compare-same-prompt-writer-1f95b247e7924bf0a5f0601696a624de",
+          "model": "deepseek-v4-flash",
+          "model_calls": 16,
+          "completed": true,
+          "elapsed_s": 261.179,
+          "applied": 0,
+          "unresolved": 4,
+          "input_sha256": "8e73c3bce8b62d23e5b50a4dd29099c72511bbb434711b1e1d7ebb4c0919a92f",
+          "output_sha256": "8e73c3bce8b62d23e5b50a4dd29099c72511bbb434711b1e1d7ebb4c0919a92f",
+          "shown_sources": 68
+        }
+      ]
+    },
+    "compare-flash": {
+      "manifest": {
+        "model": "deepseek-flash",
+        "provider": "openai_endpoint",
+        "temperature": 0.7,
+        "max_tokens": 30000,
+        "writer_prompt_sha256": "e1838b7bcda3695a0ff4dccc534cc9ad1e8ecad3e11531b4e71e3bfd6478035f",
+        "frozen_body_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+        "source_snapshot_sha256": "ddaf825450b3df968c175929f73fbbdae13778b87eda96999762f5cbb31898fe",
+        "production_flow_sha256": "918eb13d3b53b5d276f261a362b7dedf6d69d3c32fe853f614cc519476cbb756",
+        "scope": "Same material and caller; inference model/service changes. All document retrieval frozen; no production state changes."
+      },
+      "summary": [
+        {
+          "label": "frozen_report",
+          "task_id": "compare-frozen-report-3c903a4602dc4a7aa0d958ff77c41ac1",
+          "model": "deepseek-flash",
+          "model_calls": 21,
+          "completed": true,
+          "elapsed_s": 1335.749,
+          "applied": 4,
+          "unresolved": 12,
+          "input_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+          "output_sha256": "9bf94c22e0ab41a120b956029c9336902c7d9bd2c9a028441246dbc9a2d55dda",
+          "shown_sources": 63
+        },
+        {
+          "label": "case_cellchat_unsupported",
+          "task_id": "compare-case-cellchat-unsupported-81506faa491a479e9868f0fed22b44e6",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 26.955,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "output_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_colocalization_correct",
+          "task_id": "compare-case-colocalization-correct-18d43434b461459688822825baedc095",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 8.799,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "output_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_scope",
+          "task_id": "compare-case-tangram-scope-0332d21cbf7c4fc8bf56e6dc274af112",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 29.369,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "output_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_correct",
+          "task_id": "compare-case-tangram-correct-36c72ec185ab43d4a8adc4e1c238fd03",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 18.463,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "output_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_published_version",
+          "task_id": "compare-case-published-version-84c5cfef2f6f496fb4341e4817da167a",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 111.873,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "ad1a5dbe1ecc186d2a79c9fde701ebd9c5413c54a3ee78604847a029a598c595",
+          "output_sha256": "1ca9d1fa6919c2536dbaf0fd7da4fe4bf4359497da0be58eb9eead9e05443681",
+          "shown_sources": 2
+        },
+        {
+          "label": "case_assay_software_mixup",
+          "task_id": "compare-case-assay-software-mixup-59f8d091ea564e77b7a3fe9a9bf5177d",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 47.529,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "output_sha256": "dd1dcc05717db0c33c64929eeae28fe555828ba9ff23e7150e040e0c9192c9cf",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_assay_software_correct",
+          "task_id": "compare-case-assay-software-correct-6be21e29e1a747239cb9a4d9f2f3ad61",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 12.234,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "output_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_translation",
+          "task_id": "compare-case-translation-727ff7bf78884dc48c0b31321795c14d",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 8.236,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "output_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_mismatch",
+          "task_id": "compare-case-disease-mismatch-798f28b2fffc435fa13f0d9feb412e14",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 36.922,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "output_sha256": "3da028e48184436f95d95d3e24d83444e603694d8baf341562fdf3a68317768b",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_correct",
+          "task_id": "compare-case-disease-correct-4ddba61cca904ffe8edcf3623f1a04f2",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 16.084,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_report_framing",
+          "task_id": "compare-case-report-framing-7c332fa4e7e845ddb4686e59d5e53238",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 7.374,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "output_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_uncited_assertion",
+          "task_id": "compare-case-uncited-assertion-6a04007b08254c2f9292ddd5cb5add05",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 11.481,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "output_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_unit_mismatch",
+          "task_id": "compare-case-unit-mismatch-36c6eb55d3a84ae6b4de07dba317d6a6",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 8.077,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "213e935d09d3343b8d049f27acff9b0ae9735882bb7bce5b8d02c01a139286be",
+          "output_sha256": "9bb8dcbbb429d6f84075d243562ea7d60796d9359e95f81558049904ee80c119",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_parameter_control",
+          "task_id": "compare-case-parameter-control-67f835e9a86b44169f273053b90ec83f",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 6.831,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "output_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "shown_sources": 1
+        },
+        {
+          "label": "same_prompt_writer",
+          "task_id": "compare-same-prompt-writer-0deba430f7934f9fbffc5911aaf1e12f",
+          "model": "deepseek-flash",
+          "model_calls": 17,
+          "completed": true,
+          "elapsed_s": 952.393,
+          "applied": 2,
+          "unresolved": 4,
+          "input_sha256": "b3560f64eb6a9d4bcc87a528d2f53af3671127b6c37e4eaf71536c690c5b3520",
+          "output_sha256": "b8ad2beaa3f3759584d0f5b965cf54e6230f4174142ac8452e62f0b3057e77c3",
+          "shown_sources": 74
+        }
+      ]
+    },
+    "nonthinking-v4": {
+      "manifest": {
+        "model": "deepseek-v4-flash",
+        "provider": "openai_endpoint",
+        "temperature": 0.7,
+        "max_tokens": 30000,
+        "writer_prompt_sha256": "e1838b7bcda3695a0ff4dccc534cc9ad1e8ecad3e11531b4e71e3bfd6478035f",
+        "thinking_request": "disabled",
+        "frozen_body_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+        "source_snapshot_sha256": "ddaf825450b3df968c175929f73fbbdae13778b87eda96999762f5cbb31898fe",
+        "production_flow_sha256": "918eb13d3b53b5d276f261a362b7dedf6d69d3c32fe853f614cc519476cbb756",
+        "scope": "Same material and caller; inference model/service changes. All document retrieval frozen; no production state changes."
+      },
+      "summary": [
+        {
+          "label": "case_cellchat_unsupported",
+          "task_id": "compare-case-cellchat-unsupported-88b605f8f5a8430ab22ca309eea9b828",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.786,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "output_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_colocalization_correct",
+          "task_id": "compare-case-colocalization-correct-4764ae813ebf48f296b1923378e11ed8",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 3.339,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "output_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_scope",
+          "task_id": "compare-case-tangram-scope-497d6d22a1064a26a41a2d70e917d434",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.504,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "output_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_correct",
+          "task_id": "compare-case-tangram-correct-b6f11acf85b84209ad9131195eb3164c",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 3.229,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "output_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_published_version",
+          "task_id": "compare-case-published-version-f2eacdb6147a457fad972f10a804dbd4",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 3.363,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "ad1a5dbe1ecc186d2a79c9fde701ebd9c5413c54a3ee78604847a029a598c595",
+          "output_sha256": "1ca9d1fa6919c2536dbaf0fd7da4fe4bf4359497da0be58eb9eead9e05443681",
+          "shown_sources": 2
+        },
+        {
+          "label": "case_assay_software_mixup",
+          "task_id": "compare-case-assay-software-mixup-62353d3f3cfd4c4c83b54ded7d1b2dc9",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 7.938,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "output_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_assay_software_correct",
+          "task_id": "compare-case-assay-software-correct-417370561946400888445fcb7927813c",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.752,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "output_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_translation",
+          "task_id": "compare-case-translation-6b0ee688c6de44c2a985b3040cfcf098",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 4.053,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "output_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_mismatch",
+          "task_id": "compare-case-disease-mismatch-9b3b1b421a194bd8a18e64062959feb5",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 2.227,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_correct",
+          "task_id": "compare-case-disease-correct-41fa4cf2f121493a8842bc246506eb42",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.532,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_report_framing",
+          "task_id": "compare-case-report-framing-ecd943674ed144a98f0d9a79fc0d3575",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 0.889,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "output_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_uncited_assertion",
+          "task_id": "compare-case-uncited-assertion-a010919cdaa14d9a83520b17f25d937f",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.04,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "output_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_unit_mismatch",
+          "task_id": "compare-case-unit-mismatch-f15ccb886087422ea35ddf86f948bb08",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 1.449,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "213e935d09d3343b8d049f27acff9b0ae9735882bb7bce5b8d02c01a139286be",
+          "output_sha256": "9bb8dcbbb429d6f84075d243562ea7d60796d9359e95f81558049904ee80c119",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_parameter_control",
+          "task_id": "compare-case-parameter-control-16d89d50f19d4a129d9a9efb7fe3d671",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.249,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "output_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "shown_sources": 1
+        }
+      ]
+    },
+    "nonthinking-flash": {
+      "manifest": {
+        "model": "deepseek-flash",
+        "provider": "openai_endpoint",
+        "temperature": 0.7,
+        "max_tokens": 30000,
+        "writer_prompt_sha256": "e1838b7bcda3695a0ff4dccc534cc9ad1e8ecad3e11531b4e71e3bfd6478035f",
+        "thinking_request": "disabled",
+        "frozen_body_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+        "source_snapshot_sha256": "ddaf825450b3df968c175929f73fbbdae13778b87eda96999762f5cbb31898fe",
+        "production_flow_sha256": "918eb13d3b53b5d276f261a362b7dedf6d69d3c32fe853f614cc519476cbb756",
+        "scope": "Same material and caller; inference model/service changes. All document retrieval frozen; no production state changes."
+      },
+      "summary": [
+        {
+          "label": "case_cellchat_unsupported",
+          "task_id": "compare-case-cellchat-unsupported-9c45951fb2be430f926f5ddbafbaed49",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 5.027,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "output_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_colocalization_correct",
+          "task_id": "compare-case-colocalization-correct-63e233d4e0634100b8b72937bccf892d",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 4.691,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "output_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_scope",
+          "task_id": "compare-case-tangram-scope-9ed341b6512b4fc7925154247e038707",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.419,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "output_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_correct",
+          "task_id": "compare-case-tangram-correct-a2850e4eeb7644ed90364492e5d77d49",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.989,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "output_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_published_version",
+          "task_id": "compare-case-published-version-18912bd84d8c4f9fa991cbd883174e25",
+          "model": "deepseek-flash",
+          "model_calls": 3,
+          "completed": true,
+          "elapsed_s": 4.861,
+          "applied": 1,
+          "unresolved": 2,
+          "input_sha256": "ad1a5dbe1ecc186d2a79c9fde701ebd9c5413c54a3ee78604847a029a598c595",
+          "output_sha256": "1ca9d1fa6919c2536dbaf0fd7da4fe4bf4359497da0be58eb9eead9e05443681",
+          "shown_sources": 2
+        },
+        {
+          "label": "case_assay_software_mixup",
+          "task_id": "compare-case-assay-software-mixup-821f2bf7e6794fe3b23399bcd076b891",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 4.759,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "output_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_assay_software_correct",
+          "task_id": "compare-case-assay-software-correct-f6517f55b09645449152427f17023f97",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 3.841,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "output_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_translation",
+          "task_id": "compare-case-translation-45898899b19542d08edaef2576d7b4ea",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.782,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "output_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_mismatch",
+          "task_id": "compare-case-disease-mismatch-3df85593e7684164a4b8745114fc1533",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 1.95,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_correct",
+          "task_id": "compare-case-disease-correct-c72dcd91049b4317a30b6fb7a1afeb4e",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.956,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_report_framing",
+          "task_id": "compare-case-report-framing-493ab5137cd24b038a76f68c86af12dc",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 0.874,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "output_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_uncited_assertion",
+          "task_id": "compare-case-uncited-assertion-cbb5b5b86cb242c1b1d82e3bd48274f5",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.351,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "output_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_unit_mismatch",
+          "task_id": "compare-case-unit-mismatch-b26b6472d80c42d9837c6874dbea48a1",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 2.195,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "213e935d09d3343b8d049f27acff9b0ae9735882bb7bce5b8d02c01a139286be",
+          "output_sha256": "9bb8dcbbb429d6f84075d243562ea7d60796d9359e95f81558049904ee80c119",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_parameter_control",
+          "task_id": "compare-case-parameter-control-fd630e1a55814fbba4ffa31e4c885f40",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 0.781,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "output_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "shown_sources": 1
+        }
+      ]
+    },
+    "final-v4": {
+      "manifest": {
+        "model": "deepseek-v4-flash",
+        "provider": "openai_endpoint",
+        "temperature": 0.7,
+        "max_tokens": 30000,
+        "writer_prompt_sha256": "e1838b7bcda3695a0ff4dccc534cc9ad1e8ecad3e11531b4e71e3bfd6478035f",
+        "thinking_request": "disabled",
+        "frozen_body_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+        "source_snapshot_sha256": "ddaf825450b3df968c175929f73fbbdae13778b87eda96999762f5cbb31898fe",
+        "production_flow_sha256": "df82c10d0e74bcdf02fb13fd5348dbd5c0979454c04577e48dc7043d1e6231f2",
+        "scope": "Same material and caller; inference model/service changes. All document retrieval frozen; no production state changes."
+      },
+      "summary": [
+        {
+          "label": "case_cellchat_unsupported",
+          "task_id": "compare-case-cellchat-unsupported-2b9fbdb14ca34ccbb2b88ba777111bfb",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 6.55,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "output_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_colocalization_correct",
+          "task_id": "compare-case-colocalization-correct-2216e5d4132d489e82673b956418c5ae",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 8.57,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "output_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_scope",
+          "task_id": "compare-case-tangram-scope-2623c1f26c1245bbb0f32377d13810a3",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.702,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "output_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_correct",
+          "task_id": "compare-case-tangram-correct-1b8f45b070404e49bb7572d65e3fa972",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 3.098,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "output_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_published_version",
+          "task_id": "compare-case-published-version-3ed8cde5aeb941bdb67650a38a8817c2",
+          "model": "deepseek-v4-flash",
+          "model_calls": 3,
+          "completed": true,
+          "elapsed_s": 7.802,
+          "applied": 1,
+          "unresolved": 1,
+          "input_sha256": "ad1a5dbe1ecc186d2a79c9fde701ebd9c5413c54a3ee78604847a029a598c595",
+          "output_sha256": "1ca9d1fa6919c2536dbaf0fd7da4fe4bf4359497da0be58eb9eead9e05443681",
+          "shown_sources": 2
+        },
+        {
+          "label": "case_assay_software_mixup",
+          "task_id": "compare-case-assay-software-mixup-fcfefcb40dc549e5a86d44750fbe5e53",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 3.39,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "output_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_assay_software_correct",
+          "task_id": "compare-case-assay-software-correct-852a2c90bb4c4c48871dce5f337ec3ab",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.942,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "output_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_translation",
+          "task_id": "compare-case-translation-7865b7498919413f83f9ce4c690bcca4",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 3.828,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "output_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_mismatch",
+          "task_id": "compare-case-disease-mismatch-aec5f85fab2c421988cc8d4fa08c9a1c",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.537,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "output_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_correct",
+          "task_id": "compare-case-disease-correct-947f72d672de4405b0d4218bff3803fe",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.996,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_report_framing",
+          "task_id": "compare-case-report-framing-82298399b94b4a738e321c7a4a72e5d4",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.168,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "output_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_uncited_assertion",
+          "task_id": "compare-case-uncited-assertion-165fb751d1cf47fd9c50f848dee335b8",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.327,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "output_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_unit_mismatch",
+          "task_id": "compare-case-unit-mismatch-0b4395c0fec942a4bb171d07e7af459e",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 1.605,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "213e935d09d3343b8d049f27acff9b0ae9735882bb7bce5b8d02c01a139286be",
+          "output_sha256": "9bb8dcbbb429d6f84075d243562ea7d60796d9359e95f81558049904ee80c119",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_parameter_control",
+          "task_id": "compare-case-parameter-control-854eaef2d020451b83f5deaa92d5412a",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.095,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "output_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_kidney_abstract",
+          "task_id": "compare-case-kidney-abstract-b6527dcc39ba4ca499b4a1bae2ec6956",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.837,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "output_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_kidney_methods",
+          "task_id": "compare-case-kidney-methods-0e216bf91f9b4959a839d7e69fe55e1a",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.061,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "output_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_kidney_correct",
+          "task_id": "compare-case-kidney-correct-9fa1e2016a63459faa00ccfed9a86483",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.833,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "5dbcb1cae0bd77e04d5329000d84cce166637211d93cc39ab2277c377d5fee08",
+          "output_sha256": "5dbcb1cae0bd77e04d5329000d84cce166637211d93cc39ab2277c377d5fee08",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_table_dataset_role",
+          "task_id": "compare-case-table-dataset-role-d8f153470e2b4f0f980e65504598faba",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.537,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "7e25af6efad3c3fe4bbf8fc9452409dff22aaf8d4a4dbd01990d5f7d2b1166c0",
+          "output_sha256": "7e25af6efad3c3fe4bbf8fc9452409dff22aaf8d4a4dbd01990d5f7d2b1166c0",
+          "shown_sources": 1
+        }
+      ]
+    },
+    "final-flash": {
+      "manifest": {
+        "model": "deepseek-flash",
+        "provider": "openai_endpoint",
+        "temperature": 0.7,
+        "max_tokens": 30000,
+        "writer_prompt_sha256": "e1838b7bcda3695a0ff4dccc534cc9ad1e8ecad3e11531b4e71e3bfd6478035f",
+        "thinking_request": "disabled",
+        "frozen_body_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+        "source_snapshot_sha256": "ddaf825450b3df968c175929f73fbbdae13778b87eda96999762f5cbb31898fe",
+        "production_flow_sha256": "df82c10d0e74bcdf02fb13fd5348dbd5c0979454c04577e48dc7043d1e6231f2",
+        "scope": "Same material and caller; inference model/service changes. All document retrieval frozen; no production state changes."
+      },
+      "summary": [
+        {
+          "label": "case_cellchat_unsupported",
+          "task_id": "compare-case-cellchat-unsupported-cda4305e08c547bea0bbc2c6a0e897ee",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 9.707,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "output_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_colocalization_correct",
+          "task_id": "compare-case-colocalization-correct-0a139b05dd854d6288726f8ce62f923e",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.832,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "output_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_scope",
+          "task_id": "compare-case-tangram-scope-103db7062ca447228b5f59d261ff94f0",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 0.87,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "output_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_correct",
+          "task_id": "compare-case-tangram-correct-30f5f49bc9b04202bf89de9754bb27e5",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.303,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "output_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_published_version",
+          "task_id": "compare-case-published-version-92d0474b1dc44dc9990b560e571d0ebf",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 3.047,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "ad1a5dbe1ecc186d2a79c9fde701ebd9c5413c54a3ee78604847a029a598c595",
+          "output_sha256": "1ca9d1fa6919c2536dbaf0fd7da4fe4bf4359497da0be58eb9eead9e05443681",
+          "shown_sources": 2
+        },
+        {
+          "label": "case_assay_software_mixup",
+          "task_id": "compare-case-assay-software-mixup-4d150fd7cdcb47baa82d170391e56e4b",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.315,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "output_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_assay_software_correct",
+          "task_id": "compare-case-assay-software-correct-f59f5d479c084b9d8e2de442b61d9be2",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 3.925,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "output_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_translation",
+          "task_id": "compare-case-translation-338473c223e2449eb37e6f6709fbcaf2",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.809,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "output_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_mismatch",
+          "task_id": "compare-case-disease-mismatch-dada1a541b2946b78a56030162f3ddcd",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 2.798,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "output_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_correct",
+          "task_id": "compare-case-disease-correct-8d88eb1f74b1420f823a7246016088ff",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.61,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_report_framing",
+          "task_id": "compare-case-report-framing-94db81f8e54b472884d55f2567c799f9",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 0.619,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "output_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_uncited_assertion",
+          "task_id": "compare-case-uncited-assertion-480e73e12ecd49acae2a2d5f1dc00152",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.428,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "output_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_unit_mismatch",
+          "task_id": "compare-case-unit-mismatch-58cdc5f01412437a931ae1017c1395c7",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 1.912,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "213e935d09d3343b8d049f27acff9b0ae9735882bb7bce5b8d02c01a139286be",
+          "output_sha256": "9bb8dcbbb429d6f84075d243562ea7d60796d9359e95f81558049904ee80c119",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_parameter_control",
+          "task_id": "compare-case-parameter-control-dd5855a3865a4bbc85eac709c9497054",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.485,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "output_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_kidney_abstract",
+          "task_id": "compare-case-kidney-abstract-a1434d1bf72e4a209d941e0dc858f689",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 2.284,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "output_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_kidney_methods",
+          "task_id": "compare-case-kidney-methods-f972e90e7d7e4e89af024b169d7b9d69",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 2.28,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "output_sha256": "3ab335aa3d1ea580d0d009518337d41a5b17bace6c703e743f6a451ebc224133",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_kidney_correct",
+          "task_id": "compare-case-kidney-correct-eb1d4a0d548a4990bc8370a7ecba6e07",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.23,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "5dbcb1cae0bd77e04d5329000d84cce166637211d93cc39ab2277c377d5fee08",
+          "output_sha256": "5dbcb1cae0bd77e04d5329000d84cce166637211d93cc39ab2277c377d5fee08",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_table_dataset_role",
+          "task_id": "compare-case-table-dataset-role-d3d85829037c4c44a4cb2235e79225b3",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 2.67,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "7e25af6efad3c3fe4bbf8fc9452409dff22aaf8d4a4dbd01990d5f7d2b1166c0",
+          "output_sha256": "4a5b17f719b1c67a07482fce41d9d1540ed0fab0aff7845558dc86376ba6f545",
+          "shown_sources": 1
+        }
+      ]
+    },
+    "applicability-v4": {
+      "manifest": {
+        "model": "deepseek-v4-flash",
+        "provider": "openai_endpoint",
+        "temperature": 0.7,
+        "max_tokens": 30000,
+        "writer_prompt_sha256": "e1838b7bcda3695a0ff4dccc534cc9ad1e8ecad3e11531b4e71e3bfd6478035f",
+        "thinking_request": "disabled",
+        "frozen_body_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+        "source_snapshot_sha256": "ddaf825450b3df968c175929f73fbbdae13778b87eda96999762f5cbb31898fe",
+        "production_flow_sha256": "e096135f0204d3c2f0c433764f6d29c1cafbee3918843df8f04220be6e30f791",
+        "scope": "Same material and caller; inference model/service changes. All document retrieval frozen; no production state changes."
+      },
+      "summary": [
+        {
+          "label": "case_cellchat_unsupported",
+          "task_id": "compare-case-cellchat-unsupported-f47511bf1a014d80b4d064de521f9881",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.255,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "output_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_colocalization_correct",
+          "task_id": "compare-case-colocalization-correct-75e3ee85e2b94b94ae24890407e38075",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 7.723,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "output_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_scope",
+          "task_id": "compare-case-tangram-scope-5957bbc765404d01a008cfe2199cb894",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.655,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "output_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_correct",
+          "task_id": "compare-case-tangram-correct-4e7cff9c2ee4439e9b49f3b5d24d7239",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 3.078,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "output_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_published_version",
+          "task_id": "compare-case-published-version-94afe7199af84501a0432e02b6c6de75",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 3.354,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "ad1a5dbe1ecc186d2a79c9fde701ebd9c5413c54a3ee78604847a029a598c595",
+          "output_sha256": "ad1a5dbe1ecc186d2a79c9fde701ebd9c5413c54a3ee78604847a029a598c595",
+          "shown_sources": 2
+        },
+        {
+          "label": "case_assay_software_mixup",
+          "task_id": "compare-case-assay-software-mixup-935a51065bbc450e8ede3400124e5956",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.694,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "output_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_assay_software_correct",
+          "task_id": "compare-case-assay-software-correct-32420fd498dd4ea1b9c6dc3b86d423af",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 3.144,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "output_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_translation",
+          "task_id": "compare-case-translation-ff582a4fffff4db992bd3f36e8992c6a",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.744,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "output_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_mismatch",
+          "task_id": "compare-case-disease-mismatch-f019ec53374445dab97c18e7b67f98cb",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.236,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "output_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_correct",
+          "task_id": "compare-case-disease-correct-4c19cc858f424303b6814ec008b3f28f",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.53,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_report_framing",
+          "task_id": "compare-case-report-framing-2614faac8cb645b28663c8d6965b9dcc",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 0.836,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "output_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_uncited_assertion",
+          "task_id": "compare-case-uncited-assertion-3854f0c925414ecea4cd0d6d315c4588",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.318,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "output_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_unit_mismatch",
+          "task_id": "compare-case-unit-mismatch-e447996c1ca34f28b9036b1eaa32523d",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 1.704,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "213e935d09d3343b8d049f27acff9b0ae9735882bb7bce5b8d02c01a139286be",
+          "output_sha256": "9bb8dcbbb429d6f84075d243562ea7d60796d9359e95f81558049904ee80c119",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_parameter_control",
+          "task_id": "compare-case-parameter-control-4895c973599c45a2a5fa70db94ebfd01",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.026,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "output_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_kidney_abstract",
+          "task_id": "compare-case-kidney-abstract-6bee0dc80401438c84a59468ccd85ae1",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.664,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "output_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_kidney_methods",
+          "task_id": "compare-case-kidney-methods-40258317a3fb4f318bdc3092e94389f2",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.986,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "output_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_kidney_correct",
+          "task_id": "compare-case-kidney-correct-8fb70440626f428f9e52528411f756c2",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.186,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "5dbcb1cae0bd77e04d5329000d84cce166637211d93cc39ab2277c377d5fee08",
+          "output_sha256": "5dbcb1cae0bd77e04d5329000d84cce166637211d93cc39ab2277c377d5fee08",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_table_dataset_role",
+          "task_id": "compare-case-table-dataset-role-e9b631fd317145f8aa9a675de412e918",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.759,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "7e25af6efad3c3fe4bbf8fc9452409dff22aaf8d4a4dbd01990d5f7d2b1166c0",
+          "output_sha256": "7e25af6efad3c3fe4bbf8fc9452409dff22aaf8d4a4dbd01990d5f7d2b1166c0",
+          "shown_sources": 1
+        }
+      ]
+    },
+    "applicability-flash": {
+      "manifest": {
+        "model": "deepseek-flash",
+        "provider": "openai_endpoint",
+        "temperature": 0.7,
+        "max_tokens": 30000,
+        "writer_prompt_sha256": "e1838b7bcda3695a0ff4dccc534cc9ad1e8ecad3e11531b4e71e3bfd6478035f",
+        "thinking_request": "disabled",
+        "frozen_body_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+        "source_snapshot_sha256": "ddaf825450b3df968c175929f73fbbdae13778b87eda96999762f5cbb31898fe",
+        "production_flow_sha256": "e096135f0204d3c2f0c433764f6d29c1cafbee3918843df8f04220be6e30f791",
+        "scope": "Same material and caller; inference model/service changes. All document retrieval frozen; no production state changes."
+      },
+      "summary": [
+        {
+          "label": "case_cellchat_unsupported",
+          "task_id": "compare-case-cellchat-unsupported-6497a926850e414c8e1af3377d490907",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 4.017,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "output_sha256": "05b41982936660e98ada8109da26800cd64f819a07f0cc922e42df22bc0613e2",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_colocalization_correct",
+          "task_id": "compare-case-colocalization-correct-e5a130c474624e56a5ae42c58eae2ada",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.363,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "output_sha256": "5d8785cf32fe2a2fa74cd57b7ff7075e7f7096f2c7080f77672e0e1f308cc4de",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_scope",
+          "task_id": "compare-case-tangram-scope-78f89ff65fda4faeacbc47e482531625",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.62,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "output_sha256": "3ea199621e08ecf26c4be0242ea54b7687a1495790099166cfd55764bee933eb",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_tangram_correct",
+          "task_id": "compare-case-tangram-correct-1dc712d23a724283b68b1fb0b50e7a1b",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.281,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "output_sha256": "bdc415e99f34ba8fc92a14924accb2de883fd079e4ecf42271ca87ae39f8e0a6",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_published_version",
+          "task_id": "compare-case-published-version-870e6d5f21d44bf2b0fbc685fd39c09c",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 2.274,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "ad1a5dbe1ecc186d2a79c9fde701ebd9c5413c54a3ee78604847a029a598c595",
+          "output_sha256": "ad1a5dbe1ecc186d2a79c9fde701ebd9c5413c54a3ee78604847a029a598c595",
+          "shown_sources": 2
+        },
+        {
+          "label": "case_assay_software_mixup",
+          "task_id": "compare-case-assay-software-mixup-72ff6a111c5949fda6030990af0e17c9",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.704,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "output_sha256": "eb184e828d99353867b948d0b73685e53650c5d3e7290dceeb3c23f53ca59250",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_assay_software_correct",
+          "task_id": "compare-case-assay-software-correct-b13a8ba88a454c2babae1174c6c13db9",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.04,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "output_sha256": "d4af0b3e44dbb52d9ab9223bc847de39e1bdaeb072fe64350f9dc0355b50737a",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_translation",
+          "task_id": "compare-case-translation-891abd4b6eb34bdba3d2cdc8586d9b50",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.694,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "output_sha256": "a5a31c178aca29db76de3e2a67aa9dd1cd4dd25777c7bdd3818b2d1cd3f61138",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_mismatch",
+          "task_id": "compare-case-disease-mismatch-0d2b9774547041a9ba2cd1fb83474261",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 2.634,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "output_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_correct",
+          "task_id": "compare-case-disease-correct-6189256e6d9147cb8d0f45f151fe36de",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 0.745,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_report_framing",
+          "task_id": "compare-case-report-framing-c4d3192eaa45478189646a7115617fab",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 0.695,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "output_sha256": "ce7fe428ff0fd0fa7cb6fc530939a994aa50d10aaaba12cd23482c9154d9765a",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_uncited_assertion",
+          "task_id": "compare-case-uncited-assertion-40b959906d8f484baf643a3d2ae89693",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 0.91,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "output_sha256": "b18350ff81f802ab67c8b1bf77c11283989e6e6bd7b007ed786a6fbff3e52986",
+          "shown_sources": 0
+        },
+        {
+          "label": "case_unit_mismatch",
+          "task_id": "compare-case-unit-mismatch-cdb6cfb85f364678bb0b80567f92b7f4",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 2.013,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "213e935d09d3343b8d049f27acff9b0ae9735882bb7bce5b8d02c01a139286be",
+          "output_sha256": "9bb8dcbbb429d6f84075d243562ea7d60796d9359e95f81558049904ee80c119",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_parameter_control",
+          "task_id": "compare-case-parameter-control-c87dd318b2f14bd0868e279815e1edad",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 0.83,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "output_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_kidney_abstract",
+          "task_id": "compare-case-kidney-abstract-1647edf928804a52bff104311cd7860b",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 2.579,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "output_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_kidney_methods",
+          "task_id": "compare-case-kidney-methods-e8d94c41481841cc9173c2a472a5c2e5",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 2.367,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "eb526ede24e23b35125c4229be956a6b26689564c217801127405658f855e2f4",
+          "output_sha256": "25cb9ce51a2473acceda16344dd4a258e48b705f60231355636e447f54d47313",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_kidney_correct",
+          "task_id": "compare-case-kidney-correct-9668beffe308441d8a3f5f56849ea097",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.186,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "5dbcb1cae0bd77e04d5329000d84cce166637211d93cc39ab2277c377d5fee08",
+          "output_sha256": "5dbcb1cae0bd77e04d5329000d84cce166637211d93cc39ab2277c377d5fee08",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_table_dataset_role",
+          "task_id": "compare-case-table-dataset-role-f91c6cb9c15b4fec88d4fc295cb48a5a",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 3.333,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "7e25af6efad3c3fe4bbf8fc9452409dff22aaf8d4a4dbd01990d5f7d2b1166c0",
+          "output_sha256": "f8f7cddbb71e528d56d1fdd2c141c5cef3ae396024620a2d4595b3ac363cfaf8",
+          "shown_sources": 1
+        }
+      ]
+    },
+    "confirmation-v4": {
+      "manifest": {
+        "model": "deepseek-v4-flash",
+        "provider": "openai_endpoint",
+        "temperature": 0.7,
+        "max_tokens": 30000,
+        "writer_prompt_sha256": "e1838b7bcda3695a0ff4dccc534cc9ad1e8ecad3e11531b4e71e3bfd6478035f",
+        "thinking_request": "disabled",
+        "frozen_body_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+        "source_snapshot_sha256": "ddaf825450b3df968c175929f73fbbdae13778b87eda96999762f5cbb31898fe",
+        "production_flow_sha256": "9c49fe1b877877bbd13c7313d098eb19b5524d9ef25098551e1b0a74960d899d",
+        "scope": "Same material and caller; inference model/service changes. All document retrieval frozen; no production state changes."
+      },
+      "summary": [
+        {
+          "label": "case_disease_mismatch",
+          "task_id": "compare-case-disease-mismatch-ab1f15fd1b244268b46d9326a34d68b6",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 2.553,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "output_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_correct",
+          "task_id": "compare-case-disease-correct-0e22a2ce79c444db9c5b42ad310bd788",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.891,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_unit_mismatch",
+          "task_id": "compare-case-unit-mismatch-f5d2b352c47e4480b31597b3f1f51f1e",
+          "model": "deepseek-v4-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 1.471,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "213e935d09d3343b8d049f27acff9b0ae9735882bb7bce5b8d02c01a139286be",
+          "output_sha256": "9bb8dcbbb429d6f84075d243562ea7d60796d9359e95f81558049904ee80c119",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_parameter_control",
+          "task_id": "compare-case-parameter-control-12741cc095ae4e4d94dc469560bdafb0",
+          "model": "deepseek-v4-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 1.279,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "output_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "shown_sources": 1
+        }
+      ]
+    },
+    "confirmation-flash": {
+      "manifest": {
+        "model": "deepseek-flash",
+        "provider": "openai_endpoint",
+        "temperature": 0.7,
+        "max_tokens": 30000,
+        "writer_prompt_sha256": "e1838b7bcda3695a0ff4dccc534cc9ad1e8ecad3e11531b4e71e3bfd6478035f",
+        "thinking_request": "disabled",
+        "frozen_body_sha256": "55d0a12f51f99ddd4dbcdd5da24d06346c6558bd9efcf2ab95e5b6dc83d1030c",
+        "source_snapshot_sha256": "ddaf825450b3df968c175929f73fbbdae13778b87eda96999762f5cbb31898fe",
+        "production_flow_sha256": "9c49fe1b877877bbd13c7313d098eb19b5524d9ef25098551e1b0a74960d899d",
+        "scope": "Same material and caller; inference model/service changes. All document retrieval frozen; no production state changes."
+      },
+      "summary": [
+        {
+          "label": "case_disease_mismatch",
+          "task_id": "compare-case-disease-mismatch-f2a0074687c541f1b644dd20a4e4b674",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 10.252,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "d670c09972fc462eb3f95b9fd46efe20f7c97d9fac84fc034983181e72ee7275",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_disease_correct",
+          "task_id": "compare-case-disease-correct-920e71a1292046beb3b18af128bd3084",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 0.988,
+          "applied": 0,
+          "unresolved": 0,
+          "input_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "output_sha256": "4bad31cc5ea63a2f03e07141449a8ec2bbb2ff7eb38c76593eec9d7798c60e7e",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_unit_mismatch",
+          "task_id": "compare-case-unit-mismatch-661f10c5a0f04c3887420811d9a77307",
+          "model": "deepseek-flash",
+          "model_calls": 2,
+          "completed": true,
+          "elapsed_s": 2.145,
+          "applied": 1,
+          "unresolved": 0,
+          "input_sha256": "213e935d09d3343b8d049f27acff9b0ae9735882bb7bce5b8d02c01a139286be",
+          "output_sha256": "9bb8dcbbb429d6f84075d243562ea7d60796d9359e95f81558049904ee80c119",
+          "shown_sources": 1
+        },
+        {
+          "label": "case_parameter_control",
+          "task_id": "compare-case-parameter-control-fbdca713371249a7b6b23fa638403c59",
+          "model": "deepseek-flash",
+          "model_calls": 1,
+          "completed": true,
+          "elapsed_s": 0.767,
+          "applied": 0,
+          "unresolved": 1,
+          "input_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "output_sha256": "f111a580d51e0722ad9429b2afeb92f67e63da9ad3596ab8df074a03b12cbd13",
+          "shown_sources": 1
+        }
+      ]
+    }
+  },
+  "identity_bridge_live": {
+    "before": [
+      {
+        "index": 39,
+        "original_indices": [
+          86
+        ],
+        "paper_id": "doi:10.1093/nar/gkag937"
+      },
+      {
+        "index": 40,
+        "original_indices": [
+          163
+        ],
+        "paper_id": "pmcid:PMC13646825"
+      }
+    ],
+    "after": [
+      {
+        "index": 39,
+        "original_indices": [
+          86,
+          163
+        ],
+        "paper_id": "doi:10.1093/nar/gkag937"
+      }
+    ],
+    "events": [
+      {
+        "host": "www.ebi.ac.uk",
+        "status": "retrieved",
+        "bytes": 2133
+      },
+      {
+        "host": "pmc.ncbi.nlm.nih.gov",
+        "status": "retrieved",
+        "bytes": 379
+      }
+    ],
+    "bridge_events": [
+      {
+        "stage": "source_identity_bridge",
+        "source_index": "163",
+        "status": "resolved",
+        "identifiers": {
+          "pmcid": "PMC13646825",
+          "doi": "10.1093/nar/gkag937",
+          "pmid": "42847244"
+        }
+      }
+    ],
+    "mapped": [
+      {
+        "index": "86",
+        "pmcid": "PMC13646825",
+        "pmid": "42847244",
+        "doi": "10.1093/nar/gkag937"
+      },
+      {
+        "index": "163",
+        "pmcid": "PMC13646825",
+        "pmid": "42847244",
+        "doi": "10.1093/nar/gkag937"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "/data/ningh/nh/astro-dra/reports/test002-deepseek-flash.md",
+      "source": "/data/ningh/nh/ldr-experiments/review-repairs-models-20261027/fresh-flash/report.md",
+      "sha256": "83f4dbb3f27c353207ba7c0f5fcc7bbdeafc1a2aded6bd9d2b34195ffab36fe0",
+      "unaltered": true
+    },
+    {
+      "path": "/data/ningh/nh/astro-dra/reports/test001-same-input-v4.md",
+      "source": "/data/ningh/nh/ldr-experiments/review-repairs-models-20261027/compare-v4/same_prompt_writer/report.md",
+      "sha256": "1bd2d99c6048827345cb2959b72c386db55cb8ce17244ff62c463f67b106bbbd",
+      "unaltered": true
+    },
+    {
+      "path": "/data/ningh/nh/astro-dra/reports/test001-same-input-flash.md",
+      "source": "/data/ningh/nh/ldr-experiments/review-repairs-models-20261027/compare-flash/same_prompt_writer/report.md",
+      "sha256": "a56170ae6c2ea2a5974f82e22fcf895da95c42c5e218dfa74832c0786359f8b1",
+      "unaltered": true
+    },
+    {
+      "path": "/data/ningh/nh/astro-dra/reports/test001-reviewed-v4.md",
+      "source": "/data/ningh/nh/ldr-experiments/review-repairs-models-20261027/compare-v4/frozen_report/report.md",
+      "sha256": "60deed9a13da35f25c02ad978b1788d57b0d17a4cf1f6ac2a80a02f78f5f1233",
+      "unaltered": true
+    },
+    {
+      "path": "/data/ningh/nh/astro-dra/reports/test001-reviewed-flash.md",
+      "source": "/data/ningh/nh/ldr-experiments/review-repairs-models-20261027/compare-flash/frozen_report/report.md",
+      "sha256": "c138eafba5e5b7f0a38fe8688fc75ab462e3ac5a3d063dcf10dc4a1032e0a462",
+      "unaltered": true
+    }
+  ],
+  "private_root": "/data/ningh/nh/ldr-experiments/review-repairs-models-20261027",
+  "backup": "/data/ningh/nh/ldr-test-5002-backups/review-repairs-20261027-162146",
+  "remaining": [
+    "Semantic heading/platform and dataset-role errors",
+    "V4 abbreviated evidence quotations rejected as unlocatable",
+    "Reviewer and independent confirmation errors/false positives",
+    "Unverified journal IF criteria",
+    "Service failures may preserve duplicates/versions",
+    "Single-example trials do not establish model rankings"
+  ],
+  "production_default_model": "deepseek-v4-flash",
+  "production_provider": "openai_endpoint",
+  "save_citation_qc": false,
+  "pubmed_auto_full_text": false,
+  "deployment": {
+    "before": [
+      {
+        "name": "/astro-dra-test-5002-local-deep-research-1",
+        "id": "72de350ffdba97562bfcda726abcefebfd36394463cbcc2165a3573dc5addd58",
+        "started": "2026-10-27T06:43:06.358782625Z",
+        "image": "astro-dra:evidence-flow-20261027",
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "astro-dra-test-5002_ldr_data",
+            "Destination": "/data"
+          },
+          {
+            "Type": "volume",
+            "Name": "astro-dra-test-5002_ldr_config",
+            "Destination": "/app/.config/local_deep_research"
+          }
+        ],
+        "model": "deepseek-v4-flash",
+        "provider": "openai_endpoint"
+      },
+      {
+        "name": "/local_deep_research-local-deep-research-1",
+        "id": "3cd64119d61e68c91b31b0011eb43db47beda07ca23b6cf17188b92aa73945ab",
+        "started": "2026-10-15T08:59:54.908821447Z",
+        "image": "localdeepresearch/local-deep-research:astro-dra-d7d874b",
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "local_deep_research_ldr_data",
+            "Destination": "/data"
+          },
+          {
+            "Type": "volume",
+            "Name": "local_deep_research_ldr_scripts",
+            "Destination": "/scripts"
+          },
+          {
+            "Type": "bind",
+            "Name": null,
+            "Destination": "/var/ldr-userlog"
+          },
+          {
+            "Type": "volume",
+            "Name": "168b5447226d9598063bd5cbc837e908d45de059111b5714a2cb7a9880ff6f38",
+            "Destination": "/app/.config/local_deep_research"
+          }
+        ]
+      },
+      {
+        "name": "/astro-dra-test-5002-searxng-1",
+        "id": "9655738081a5fad292ecc54fa731aa706d9f53e14de1d61db61f36060efcd735",
+        "started": "2026-10-16T07:57:47.700526115Z",
+        "image": "searxng/searxng@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "46cf2139f8f079045ed675f0d10c22f7ea384ffccd3ee7ab540f6c00d7d473e4",
+            "Destination": "/etc/searxng"
+          },
+          {
+            "Type": "bind",
+            "Name": null,
+            "Destination": "/etc/searxng/settings.yml"
+          },
+          {
+            "Type": "volume",
+            "Name": "a834ad90ba84d39442a1e9482753ad1b7c37a2514bc2c23ecc2969e379786203",
+            "Destination": "/var/cache/searxng"
+          }
+        ]
+      },
+      {
+        "name": "/astro-dra-test-5002-proxy-relay-1",
+        "id": "41ef5cc8f21f718d545f79b011c8f48c44e323aeb41c48c0ba08bf1b17ac904d",
+        "started": "2026-10-16T07:26:42.115715988Z",
+        "image": "astro-dra:search-stability-20261016-v2",
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "f6297686575020e6c8c31e3d64834d9358d768905dff7ff3a0c253d41df2e54e",
+            "Destination": "/data"
+          },
+          {
+            "Type": "bind",
+            "Name": null,
+            "Destination": "/relay/proxy_relay.py"
+          },
+          {
+            "Type": "volume",
+            "Name": "fbaf6e4a59d09fff464cfa7078d0ae848427a134c2606784c7380d8abb41a1dc",
+            "Destination": "/app/.config/local_deep_research"
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "name": "/astro-dra-test-5002-local-deep-research-1",
+        "id": "ed27d095c54692a9f95c2f12acc87b5a47f2edf37d9a88bb26ae3cc88fbc9d79",
+        "started": "2026-10-27T09:40:34.445087188Z",
+        "image": "astro-dra:review-repairs-20261027",
+        "image_id": "sha256:10fdab3c8de8b663822261cb3ec61a58d00e4f80fbdc29c267659ff973ea747d",
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "astro-dra-test-5002_ldr_data",
+            "Destination": "/data"
+          },
+          {
+            "Type": "volume",
+            "Name": "astro-dra-test-5002_ldr_config",
+            "Destination": "/app/.config/local_deep_research"
+          }
+        ],
+        "model": "deepseek-v4-flash",
+        "provider": "openai_endpoint",
+        "health": "healthy",
+        "flags": {
+          "LDR_RESEARCH_TRACE_DIR": "/data/research_traces",
+          "LDR_GENERAL_ENABLE_FACT_CHECKING": "true",
+          "LDR_RESEARCH_TRACE_ENABLED": "true",
+          "LDR_VERIFY_ENABLE_CITATION_QC": "false"
+        }
+      },
+      {
+        "name": "/local_deep_research-local-deep-research-1",
+        "id": "3cd64119d61e68c91b31b0011eb43db47beda07ca23b6cf17188b92aa73945ab",
+        "started": "2026-10-15T08:59:54.908821447Z",
+        "image": "localdeepresearch/local-deep-research:astro-dra-d7d874b",
+        "image_id": "sha256:e94a4b527a6f61778da2aa7b2994722562fbfadac0dda9c6b499f64a16a5b1b2",
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "local_deep_research_ldr_data",
+            "Destination": "/data"
+          },
+          {
+            "Type": "volume",
+            "Name": "local_deep_research_ldr_scripts",
+            "Destination": "/scripts"
+          },
+          {
+            "Type": "bind",
+            "Name": null,
+            "Destination": "/var/ldr-userlog"
+          },
+          {
+            "Type": "volume",
+            "Name": "168b5447226d9598063bd5cbc837e908d45de059111b5714a2cb7a9880ff6f38",
+            "Destination": "/app/.config/local_deep_research"
+          }
+        ]
+      },
+      {
+        "name": "/astro-dra-test-5002-searxng-1",
+        "id": "9655738081a5fad292ecc54fa731aa706d9f53e14de1d61db61f36060efcd735",
+        "started": "2026-10-16T07:57:47.700526115Z",
+        "image": "searxng/searxng@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+        "image_id": "sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "46cf2139f8f079045ed675f0d10c22f7ea384ffccd3ee7ab540f6c00d7d473e4",
+            "Destination": "/etc/searxng"
+          },
+          {
+            "Type": "bind",
+            "Name": null,
+            "Destination": "/etc/searxng/settings.yml"
+          },
+          {
+            "Type": "volume",
+            "Name": "a834ad90ba84d39442a1e9482753ad1b7c37a2514bc2c23ecc2969e379786203",
+            "Destination": "/var/cache/searxng"
+          }
+        ]
+      },
+      {
+        "name": "/astro-dra-test-5002-proxy-relay-1",
+        "id": "41ef5cc8f21f718d545f79b011c8f48c44e323aeb41c48c0ba08bf1b17ac904d",
+        "started": "2026-10-16T07:26:42.115715988Z",
+        "image": "astro-dra:search-stability-20261016-v2",
+        "image_id": "sha256:fc50ef18b85cc5943cf5965be121dd36d1fe01e3fb14403a73a0a29731220bad",
+        "mounts": [
+          {
+            "Type": "volume",
+            "Name": "f6297686575020e6c8c31e3d64834d9358d768905dff7ff3a0c253d41df2e54e",
+            "Destination": "/data"
+          },
+          {
+            "Type": "bind",
+            "Name": null,
+            "Destination": "/relay/proxy_relay.py"
+          },
+          {
+            "Type": "volume",
+            "Name": "fbaf6e4a59d09fff464cfa7078d0ae848427a134c2606784c7380d8abb41a1dc",
+            "Destination": "/app/.config/local_deep_research"
+          }
+        ]
+      }
+    ],
+    "other_services_unchanged": true,
+    "data_volumes_unchanged": true,
+    "installed_sha256": {
+      "evidence_flow.py": "9c49fe1b877877bbd13c7313d098eb19b5524d9ef25098551e1b0a74960d899d",
+      "evidence_fetch.py": "db684372d0eaf2a55c97f520b98591ee298b14d940c84c45a8987310909151f7"
+    },
+    "image": "sha256:10fdab3c8de8b663822261cb3ec61a58d00e4f80fbdc29c267659ff973ea747d",
+    "http_login_status": 200,
+    "startup_error_lines": 0,
+    "host_load_observed": "1281.54 1300.59 1147.96; other existing services also briefly unhealthy; no intervention"
+  }
+}

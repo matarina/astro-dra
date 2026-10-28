@@ -1,0 +1,304 @@
+{
+  "summary": {
+    "state": "complete",
+    "variant": "search-only",
+    "mode": "quick",
+    "elapsed_s": 1509.783,
+    "model": "deepseek-v4-flash",
+    "strategy": "langgraph-agent",
+    "research_error": null,
+    "report_chars": 17002,
+    "sources_collected": 100,
+    "sources_cited": 20,
+    "audit_status": "completed",
+    "audited_claims": 50,
+    "warnings": [],
+    "exports": {
+      "pdf": {
+        "bytes": 454996,
+        "mime": "application/pdf"
+      },
+      "ris": {
+        "bytes": 6103,
+        "mime": "text/plain"
+      }
+    },
+    "counts": {
+      "http": 877,
+      "research_start": 1,
+      "progress": 204,
+      "model_start": 670,
+      "model_end": 669,
+      "search_start": 200,
+      "artifact": 2140,
+      "search_end": 200,
+      "relevance_end": 171,
+      "collector_add": 112,
+      "http_error": 1,
+      "page_fetch": 44,
+      "fetch_registration": 28,
+      "fallback_start": 1,
+      "fallback_end": 1,
+      "agent_draft": 1,
+      "writer_start": 1,
+      "writer_end": 1,
+      "publication_end": 1
+    }
+  },
+  "search_by_engine": {
+    "searxng": 51,
+    "pubmed": 89,
+    "europepmc": 60
+  },
+  "search_nonempty_by_engine": {
+    "pubmed": 67,
+    "europepmc": 44,
+    "searxng": 1
+  },
+  "collector_batches": 112,
+  "collector_nonempty_to_empty": 86,
+  "relevance": {
+    "pubmed": {
+      "calls": 73,
+      "before": 696,
+      "after": 287
+    },
+    "europepmc": {
+      "calls": 60,
+      "before": 710,
+      "after": 186
+    },
+    "searxng": {
+      "calls": 38,
+      "before": 360,
+      "after": 6
+    }
+  },
+  "ncbi_http": {
+    "200": 243,
+    "429": 16
+  },
+  "ncbi_rate_limit_sequences": [
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ],
+    [
+      429,
+      200
+    ]
+  ],
+  "benchmark_retrieved": [
+    {
+      "elapsed_s": 110.643,
+      "engine": "pubmed",
+      "query": "Stereo-seq liver cancer spatial transcriptomic"
+    }
+  ],
+  "benchmark_collection": [
+    {
+      "elapsed_s": 110.652,
+      "before": 4,
+      "after": 0,
+      "pool_before": 80,
+      "pool_after": 80,
+      "input_artifact": "artifacts/0564-collector-input.json.gz",
+      "output_artifact": "artifacts/0565-collector-output.json.gz"
+    }
+  ],
+  "benchmark_in_final_sources": false,
+  "slow_models": [
+    {
+      "elapsed_s": 667.325,
+      "phase": "relevance_filter",
+      "seconds": 358.931,
+      "input_chars": null,
+      "output_chars": 25
+    },
+    {
+      "elapsed_s": 671.487,
+      "phase": "relevance_filter",
+      "seconds": 363.094,
+      "input_chars": null,
+      "output_chars": 27
+    },
+    {
+      "elapsed_s": 1305.689,
+      "phase": "fallback_writer",
+      "seconds": 50.596,
+      "input_chars": null,
+      "output_chars": 12806
+    },
+    {
+      "elapsed_s": 1366.869,
+      "phase": "final_writer",
+      "seconds": 60.855,
+      "input_chars": null,
+      "output_chars": 12806
+    }
+  ],
+  "writer_sources": 100,
+  "draft_chars": 12806,
+  "audit_verdicts": {
+    "unverifiable": 17,
+    "partial": 5,
+    "supported": 27,
+    "unsupported": 1
+  },
+  "display_ranges": [],
+  "initial_pool": {
+    "count": 80,
+    "by_engine": {
+      "pubmed": 47,
+      "europepmc": 33
+    },
+    "abstracts": 77,
+    "full_at_s": 91.723,
+    "pubmed_count": 47,
+    "pubmed_abstracts": 47,
+    "preprints": 6
+  },
+  "fetch_sources": {
+    "count": 20,
+    "max_snippet_chars": 203,
+    "with_full_content": 0,
+    "pubmed_search_pages": 16
+  },
+  "writer": {
+    "input_chars": 300322,
+    "fallback_chars": 12806,
+    "output_chars": 12806,
+    "fallback_similarity": 0.9982820552865844,
+    "cited_original_indices": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "later_xenium_mentions": 21,
+    "correct_vispro_doi_in_fallback": false,
+    "correct_vispro_doi_in_writer": false
+  },
+  "vispro": {
+    "published_doi": "10.1186/s13059-025-03648-w",
+    "published_pmid": "40533768",
+    "published_date": "2025-06-18",
+    "preprint_doi": "10.1101/2024.10.07.617088",
+    "preprint_received_at_s": 641.807,
+    "offline_original_collector_reproduced": true,
+    "original_index": 9,
+    "display_index": 16,
+    "published_url": "https://link.springer.com/article/10.1186/s13059-025-03648-w"
+  },
+  "runtime": {
+    "5000": {
+      "image": "sha256:e94a4b527a6f61778da2aa7b2994722562fbfadac0dda9c6b499f64a16a5b1b2",
+      "started": "2026-10-15T08:59:54.908821447Z",
+      "health": "healthy"
+    },
+    "5002": {
+      "image": "sha256:1b2e7c4264b830e96ddd25f87d7c20576c45d851e76d95a8e0eea9a9de0e4cb0",
+      "started": "2026-10-16T09:45:32.875099337Z",
+      "health": "healthy"
+    }
+  },
+  "comparison_controls": {
+    "same_query": true,
+    "query_sha256": "adf34eae72aedfce6d215fc683ec7229de49859ecca6ae487f25bd3a8060c4d6",
+    "unchanged_modules": {
+      "advanced_search_system/strategies/langgraph_agent_strategy.py": true,
+      "citation_handlers/standard_citation_handler.py": true,
+      "citation_handlers/base_citation_handler.py": true,
+      "advanced_search_system/tools/fetch/__init__.py": true
+    },
+    "model": "deepseek-v4-flash",
+    "strategy": "langgraph-agent"
+  },
+  "workflow_checks": {
+    "state_complete": true,
+    "pdf_header": true,
+    "sqlite_header": true,
+    "ris_records": 20,
+    "pdf_bytes": 454996,
+    "ris_bytes": 6103,
+    "pending_models": [
+      {
+        "elapsed_s": 847.052,
+        "thread": "ThreadPoolExecutor-323_1",
+        "phase": "relevance_filter",
+        "input_chars": 7561
+      }
+    ],
+    "cleanup": "Disposable container stopped only after complete summary, publication, database and both exports were verified; one abandoned relevance-model call was still pending. Running services unchanged."
+  },
+  "scope": "Third complete quick run with search-only patch; corpus coverage/JIF/citation accuracy not accepted; same-model audit is diagnostic, not independent accuracy measurement."
+}

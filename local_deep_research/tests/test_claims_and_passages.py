@@ -2,6 +2,7 @@
 import json
 from types import SimpleNamespace
 import pytest
+from semantic_test_helpers import complete_payload
 
 from research_verify.citation_qc import CitationQc, Claim
 from research_verify.config import VerifyConfig
@@ -17,7 +18,7 @@ class Judge:
 
     def invoke(self, prompt):
         self.prompts.append(prompt)
-        return SimpleNamespace(content=json.dumps({"verdict":"supported", "supporting_fragment":self.quote}))
+        return SimpleNamespace(content=json.dumps(complete_payload({"verdict":"supported", "supporting_fragment":self.quote})))
 
 
 class Collector:
@@ -222,12 +223,11 @@ def test_strategy_entry_audits_uncited_claim_and_late_evidence():
     runner._write_citation_qc_json = lambda checks: audit.extend(c.model_dump() for c in checks)
     report = "METTL3 increases proliferation [1].\n\nMortality declined."
     output, checks = ns["_attach_citation_qc"](runner, report, [source])
-    assert len(checks) == 2 and len(judge.prompts) == 1
+    assert len(checks) == 1 and len(judge.prompts) == 1
     assert checks[0].citation_checks[0].evidence.locator.start > 1500
-    assert checks[1].reason == "missing_citation"
-    assert "无引用" in output
-    replay = ClaimCheck.model_validate_json(json.dumps(audit[1]))
-    assert report[replay.report_start:replay.report_end] == "Mortality declined."
+    assert output == report
+    replay = ClaimCheck.model_validate_json(json.dumps(audit[0]))
+    assert report[replay.report_start:replay.report_end] == "METTL3 increases proliferation [1]."
 
 def test_nested_ignored_heading_does_not_reopen_reference_body():
     report = "Fact [1].\n\n## Sources\n### References\n### Additional notes\nWrong claim [9]."

@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-16",
+  "instance": "astro-dra-test-5002",
+  "proxy": "http://host.docker.internal:9876",
+  "host_upstream": "127.0.0.1:9876",
+  "runtime_changed": [
+    "astro-dra-test-5002-local-deep-research-1",
+    "astro-dra-test-5002-searxng-1",
+    "astro-dra-test-5002-proxy-relay-1"
+  ],
+  "data_volumes_preserved": true,
+  "legacy_instances_restarted": false,
+  "checks": {
+    "crossref_http": 200,
+    "searxng_default_http": 200,
+    "searxng_results": 10,
+    "searxng_limitations": [
+      "brave timeout",
+      "startpage CAPTCHA"
+    ],
+    "model_http": 200,
+    "model_bypasses_proxy": true,
+    "arxiv_http": 429,
+    "arxiv_proxy_connection_refused": false,
+    "arxiv_search_restored": false
+  },
+  "note": "Connectivity verification only; no raw research query, model credentials or article contents saved."
+}

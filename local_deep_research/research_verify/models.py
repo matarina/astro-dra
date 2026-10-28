@@ -21,6 +21,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 from .contracts import ClaimEvidence
+from .semantics import SemanticCheck
 
 
 class VerifyResult(BaseModel):
@@ -100,6 +101,9 @@ class CitationSupport(BaseModel):
     verdict: str = "unverifiable"
     reason_code: str = "unresolved_citation"
     model_reason: str = ""
+    model_verdict: str | None = None
+    semantic_schema_version: str = "1.0"
+    semantic_checks: list[SemanticCheck] = Field(default_factory=list)
     evidence: ClaimEvidence | None = None
 
 

@@ -1,0 +1,208 @@
+{
+  "research_id": "f172a8c9-e843-4107-8476-204444000f61",
+  "report": "reports/test001.md",
+  "scope": "Frozen real-run diagnosis with primary-source spot checks; not a full fact-by-fact certification",
+  "trace_integrity": {
+    "recorded": 319,
+    "hash_failures": 0,
+    "omitted": 0
+  },
+  "lineage": {
+    "research_id": "f172a8c9-e843-4107-8476-204444000f61",
+    "source_pool": 214,
+    "writer_sources": 88,
+    "writer_source_chars": 198294,
+    "required": 77,
+    "required_missing": [],
+    "draft_chars": 12441,
+    "writer_chars": 7487,
+    "writer_equals_final_equals_publication_input": true,
+    "native_calls": 18,
+    "review_group_count": 16,
+    "unique_claims": 122,
+    "review_status_counts": {
+      "insufficient_evidence": 27,
+      "supported": 112
+    },
+    "null_id_insufficient_responses": 27,
+    "repair_confirmations": 1,
+    "applied_repairs": 0,
+    "body_exact_in_export": true,
+    "body_offset": 369
+  },
+  "reference_inventory": {
+    "count": 63,
+    "preprints": [
+      3,
+      25,
+      30,
+      36,
+      43,
+      44,
+      45,
+      46,
+      47,
+      51,
+      54
+    ],
+    "reviews": [
+      1,
+      52,
+      61
+    ],
+    "book_chapter": [
+      35
+    ],
+    "selected_reference_years": {
+      "2024": 2,
+      "2026": 55,
+      "2025": 6
+    },
+    "pool_years": {
+      "2026": 166,
+      "2025": 26,
+      "2024": 14,
+      "2022": 5,
+      "2023": 3
+    }
+  },
+  "timing": {
+    "elapsed_s": 287.032,
+    "stages": {
+      "source_selection_request": 8.920000000000002,
+      "writer_request": 33.151,
+      "native_check_request": 234.46199999999996,
+      "repair_validation_request": 0.7860000000000014
+    }
+  },
+  "findings": [
+    {
+      "id": "eligibility",
+      "class": "recurring",
+      "references": [
+        1,
+        31,
+        35,
+        52,
+        61
+      ],
+      "finding": "IF>10 was not verified; preprints, reviews and a methods book chapter mixed into the research corpus. Cancers official current JIF4.8 (2025) is below threshold."
+    },
+    {
+      "id": "duplicate_identity",
+      "class": "recurring",
+      "references": [
+        39,
+        40
+      ],
+      "finding": "Same STAT3D paper, PMID42847244 and PMCIDPMC13646825, appeared as original86 and163. PMC row has no DOI/PMID; no shared identity bridge. Already two records in tools/draft; stable publication replay retains two."
+    },
+    {
+      "id": "published_preprint",
+      "class": "recurring_with_new_retry_gap",
+      "references": [
+        2,
+        3
+      ],
+      "finding": "Explicit update_in from101 to97 exists; both texts available. Citation-only removal of101 was proposed, declined, then not revisited after acquiring full text."
+    },
+    {
+      "id": "platform_scope",
+      "class": "recurring",
+      "references": [
+        11
+      ],
+      "finding": "scRNA-only pseudo-spatial projection on synthetic scaffolds is placed in low-resolution Visium deconvolution section. Native checks method name but does not flag input/heading scope."
+    },
+    {
+      "id": "unsupported_method",
+      "class": "recurring",
+      "references": [
+        5
+      ],
+      "finding": "CellChat attributed without support from supplied abstract, acquired main text or inspected supplementary methods. Review changed from not_reported to supported with implied-by-context reasoning."
+    },
+    {
+      "id": "cross_server_versions",
+      "class": "suspected_same_study_versions",
+      "references": [
+        44,
+        45
+      ],
+      "finding": "Near-identical title, author set and abstract under different preprint server DOIs; no explicit stored publication relation. Requires version-level identity confirmation, not blind title-only merging."
+    },
+    {
+      "id": "taxonomy_translation",
+      "class": "new_report_examples_existing_draft_origin",
+      "references": [
+        2,
+        3,
+        38
+      ],
+      "finding": "Visium-CytAssist-V2 used as an example of Seurat ecosystem, and gap-free reference genome mistranslated as 缺口无参考基因组; already in Agent draft."
+    },
+    {
+      "id": "review_target_noise",
+      "class": "new_orchestration_defect",
+      "finding": "122 claim candidates include37 without inline citations and12 bold section labels. Four unchecked IDs48/51/52/55 are labels or introductions, not four substantive factual omissions."
+    },
+    {
+      "id": "unbound_web_skip",
+      "class": "new_orchestration_defect",
+      "finding": "24 pending web requests have null source ID. supplement converts source_id to int before checking request kind, skipping all these requests; reproduced with actual function."
+    },
+    {
+      "id": "pending_overwritten",
+      "class": "new_orchestration_defect",
+      "finding": "Second review round replaces unresolved list. Declined publication-version candidate disappears from final unresolved issues; actual19 frozen responses replayed, exact body preserved, pending version count0."
+    },
+    {
+      "id": "temporal_coverage",
+      "class": "coverage_bias",
+      "finding": "55 of63 reference entries from2026; none2022/2023, although pool includes5/3 such records. This is selection/coverage bias, not evidence that search returned no older records."
+    }
+  ],
+  "positive_observations": [
+    "All77 required sources supplied; no missing IDs and no trace omissions.",
+    "All18 native requests matched actual writer digest;0 automatic repairs, writer=final=publication input.",
+    "Supplementation retrieved two article texts successfully (original97/183); no failed transport recorded in that supplementary phase.",
+    "Source identity, collection and publication modules unchanged from pre-change backup; duplicate symptom is not newly introduced by renumbering.",
+    "Main body in uploaded export exactly matches recorded publication output; header/bibliography/metrics are export additions."
+  ],
+  "red_reproductions": [
+    {
+      "file": "/data/ningh/nh/ldr-experiments/test001-review-20261027/reproduce_findings.py",
+      "expected_exit": 1,
+      "cases": [
+        "duplicate_reference_39_40",
+        "null_source_web_request_skipped"
+      ],
+      "network_calls": 0,
+      "model_calls": 0
+    },
+    {
+      "file": "/data/ningh/nh/ldr-experiments/test001-review-20261027/replay_review_offline.py",
+      "expected_exit": 1,
+      "cases": [
+        "declined_version_issue_lost_after_second_review"
+      ],
+      "frozen_replies": 19,
+      "network_calls": 0,
+      "model_calls": 0
+    }
+  ],
+  "supplementary_verification": {
+    "doi": "10.1186/s13046-026-03675-w",
+    "main_text_chars": 76824,
+    "method_supplement": 3,
+    "method_supplement_chars": 8959,
+    "cellchat_mentions_in_main_and_two_docx_supplements": 0,
+    "qualification": "Absence does not prove no unpublished analysis occurred; provided paper evidence does not establish the asserted CellChat use."
+  },
+  "app_code_or_configuration_changed": false,
+  "restarted": false,
+  "historical_report_modified": false,
+  "new_research_or_llm_calls": 0,
+  "private_artifacts": "/data/ningh/nh/ldr-experiments/test001-review-20261027",
+  "git_remote_check": "authentication unavailable; no commit/push"
+}

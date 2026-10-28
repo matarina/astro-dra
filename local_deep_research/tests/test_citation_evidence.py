@@ -3,6 +3,7 @@ from hashlib import sha256
 import json
 from types import SimpleNamespace
 import pytest
+from semantic_test_helpers import complete_payload
 
 from research_verify.evidence import paper_identity, source_artifacts
 from research_verify.citation_qc import CitationQc, Claim
@@ -23,7 +24,7 @@ class Judge:
 
     def invoke(self, prompt):
         self.prompts.append(prompt)
-        return SimpleNamespace(content=json.dumps(next(self.responses)))
+        return SimpleNamespace(content=json.dumps(complete_payload(next(self.responses))))
 
 
 def paper(text="The trial observed a 12% reduction.", **extras):
@@ -211,7 +212,8 @@ def test_strategy_entry_retains_per_citation_evidence_in_audit():
     audit = []
     runner._write_citation_qc_json = lambda checks: audit.extend(c.model_dump() for c in checks)
     report, checks = ns["_attach_citation_qc"](runner, "The trial observed a 12% reduction [1].", [source])
-    assert "逐篇引用证据" in report and checks[0].verdict == "supported"
+    assert report == "The trial observed a 12% reduction [1]."
+    assert checks[0].verdict == "supported"
     assert audit[0]["citation_checks"][0]["source_field"] == "abstract"
     replay = ClaimCheck.model_validate_json(json.dumps(audit[0]))
     assert replay.citation_checks[0].evidence.locator.quote == payload()["supporting_fragment"]

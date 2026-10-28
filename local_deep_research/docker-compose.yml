@@ -217,15 +217,15 @@ services:
       - LDR_USER_QUESTIONS_LOG=/var/ldr-userlog/user_questions.log
 
       # proxyconfig_ning
-      # LLM 端点必须加入 NO_PROXY，否则请求会走 host.docker.internal:2081 代理而被拒
+      # LLM 端点必须加入 NO_PROXY，否则请求会走 host.docker.internal:9876 代理而被拒
       # (27.30.76.162=pi端点, 10.0.11.40=备用vllm)
-      # 注：2080 为宿主机 sing-box(仅监听127.0.0.1)，经 singbox-relay 转发到 2081 供容器访问
-      - HTTP_PROXY=http://host.docker.internal:2081
-      - HTTPS_PROXY=http://host.docker.internal:2081
+      # 宿主机代理统一9876；仅监听127.0.0.1时需先启用Docker网关转发。
+      - HTTP_PROXY=http://host.docker.internal:9876
+      - HTTPS_PROXY=http://host.docker.internal:9876
       - NO_PROXY=localhost,127.0.0.1,::1,*.local,host.docker.internal,searxng,110.40.189.141,27.30.76.162,10.0.11.40,api.openalex.org
 
-      - http_proxy=http://host.docker.internal:2081
-      - https_proxy=http://host.docker.internal:2081
+      - http_proxy=http://host.docker.internal:9876
+      - https_proxy=http://host.docker.internal:9876
       - no_proxy=localhost,127.0.0.1,::1,*.local,host.docker.internal,searxng,110.40.189.141,27.30.76.162,10.0.11.40,api.openalex.org
 
       # SEARCH ENGINE API KEYS CONFIG_ning
@@ -246,6 +246,11 @@ services:
       # 禁用 Semantic Scholar（无 API key，匿名配额易触发 429；不参与自动搜索、不注册为 agent 工具）
       - LDR_SEARCH_ENGINE_WEB_SEMANTIC_SCHOLAR_USE_IN_AUTO_SEARCH=false
       - LDR_SEARCH_ENGINE_WEB_SEMANTIC_SCHOLAR_AGENT_ENABLED=false
+      # Temporary unavailable-source pause, matching the root test deployment.
+      - LDR_SEARCH_ENGINE_WEB_ARXIV_AGENT_ENABLED=false
+      - LDR_SEARCH_ENGINE_WEB_ARXIV_USE_IN_AUTO_SEARCH=false
+      - LDR_SEARCH_ENGINE_WEB_DDG_AGENT_ENABLED=false
+      - LDR_SEARCH_ENGINE_WEB_DDG_USE_IN_AUTO_SEARCH=false
 
       # ============================================================================
       # 精简：关闭配额已废/失效的引擎（2026-09-28 容器内实测）
@@ -350,11 +355,11 @@ services:
     extra_hosts:                           # ← 添加这一整段
       - "host.docker.internal:host-gateway"
     environment:
-      - HTTP_PROXY=http://host.docker.internal:2081
-      - HTTPS_PROXY=http://host.docker.internal:2081
+      - HTTP_PROXY=http://host.docker.internal:9876
+      - HTTPS_PROXY=http://host.docker.internal:9876
       - NO_PROXY=localhost,127.0.0.1,::1,*.local,searxng
-      - http_proxy=http://host.docker.internal:2081
-      - https_proxy=http://host.docker.internal:2081
+      - http_proxy=http://host.docker.internal:9876
+      - https_proxy=http://host.docker.internal:9876
       - no_proxy=localhost,127.0.0.1,::1,*.local,searxng
 
 

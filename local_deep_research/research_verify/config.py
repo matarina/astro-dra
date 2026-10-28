@@ -31,8 +31,8 @@ class VerifyConfig(BaseSettings):
     # --- global switches (one per module; ``enable_verify`` is the master) ---
     enable_verify: bool = True
     enable_doi_validation: bool = True
-    enable_constraint_match: bool = True
-    enable_keyword_coverage: bool = True
+    enable_constraint_match: bool = False
+    enable_keyword_coverage: bool = False
     enable_citation_qc: bool = True
 
     # --- shared HTTP client ---

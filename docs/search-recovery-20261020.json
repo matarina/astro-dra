@@ -1,0 +1,191 @@
+{
+  "date": "2026-10-20",
+  "scope": "isolated search-only factory/run/tool construction; not full report or JIF eligibility validation",
+  "model": "deepseek-v4-flash",
+  "checks": {
+    "three_agent_engines": true,
+    "default_engine_preserved": true,
+    "restored_limits": true,
+    "explicit_filter_enabled": true,
+    "frozen_unrelated_removed": true,
+    "mixed_relevant_retained": true,
+    "known_paper_retrieved_by_both": true,
+    "one_pubmed_xml_per_query": true,
+    "no_ncbi_rate_limit_in_probe": true,
+    "structured_queries_unchanged": true,
+    "cross_engine_deduplication": true,
+    "native_agent_tools": true,
+    "unrelated_modules_unchanged": true,
+    "same_source_replication_showed_restore_alone_insufficient": true,
+    "running_services_unchanged": true,
+    "search_overlay_syntax": true
+  },
+  "checks_passed": true,
+  "runtime": {
+    "5000": {
+      "image": "sha256:e94a4b527a6f61778da2aa7b2994722562fbfadac0dda9c6b499f64a16a5b1b2",
+      "started": "2026-10-15T08:59:54.908821447Z",
+      "health": "healthy"
+    },
+    "5002": {
+      "image": "sha256:1b2e7c4264b830e96ddd25f87d7c20576c45d851e76d95a8e0eea9a9de0e4cb0",
+      "started": "2026-10-16T09:45:32.875099337Z",
+      "health": "healthy"
+    }
+  },
+  "arms": {
+    "installed": {
+      "settings": {
+        "search.tool": "searxng",
+        "search.skip_relevance_filter": true,
+        "search.max_results": 50,
+        "search.max_filtered_results": 20,
+        "search.engine.web.pubmed.default_params.optimize_queries": true
+      },
+      "eligible_engines": [
+        "pubmed",
+        "searxng"
+      ],
+      "frozen_filter": {
+        "input_count": 10,
+        "kept_count": 10,
+        "enabled": false
+      }
+    },
+    "restored": {
+      "settings": {
+        "search.tool": "searxng",
+        "search.skip_relevance_filter": false,
+        "search.max_results": 12,
+        "search.max_filtered_results": 6,
+        "search.engine.web.pubmed.default_params.optimize_queries": true
+      },
+      "eligible_engines": [
+        "pubmed",
+        "searxng"
+      ],
+      "frozen_filter": {
+        "input_count": 10,
+        "kept_count": 10,
+        "enabled": false
+      }
+    },
+    "patched": {
+      "settings": {
+        "search.tool": "searxng",
+        "search.skip_relevance_filter": false,
+        "search.max_results": 12,
+        "search.max_filtered_results": 6,
+        "search.engine.web.pubmed.default_params.optimize_queries": false
+      },
+      "eligible_engines": [
+        "europepmc",
+        "pubmed",
+        "searxng"
+      ],
+      "frozen_filter": {
+        "input_count": 10,
+        "kept_count": 0,
+        "enabled": true
+      }
+    }
+  },
+  "final_cases": [
+    {
+      "engine": "searxng",
+      "query": "\"Visium HD\" spatial transcriptomics",
+      "raw_count": 10,
+      "returned_count": 0,
+      "abstracts": 0,
+      "metadata_only": 0,
+      "http_statuses": [
+        200,
+        200
+      ],
+      "filter_errors": 0
+    },
+    {
+      "engine": "pubmed",
+      "query": "41107232[PMID]",
+      "raw_count": 1,
+      "returned_count": 1,
+      "abstracts": 1,
+      "metadata_only": 0,
+      "http_statuses": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "filter_errors": 0
+    },
+    {
+      "engine": "pubmed",
+      "query": "\"Visium HD\"[Title/Abstract] AND (\"2022/01/01\"[Date - Publication] : \"2026/10/19\"[Date - Publication])",
+      "raw_count": 12,
+      "returned_count": 6,
+      "abstracts": 6,
+      "metadata_only": 0,
+      "http_statuses": [
+        200,
+        200,
+        200,
+        200
+      ],
+      "filter_errors": 0
+    },
+    {
+      "engine": "europepmc",
+      "query": "EXT_ID:41107232 AND SRC:MED",
+      "raw_count": 1,
+      "returned_count": 1,
+      "abstracts": 1,
+      "metadata_only": 0,
+      "http_statuses": [
+        200,
+        200
+      ],
+      "filter_errors": 0
+    },
+    {
+      "engine": "europepmc",
+      "query": "\"Visium HD\" AND FIRST_PDATE:[2022-01-01 TO 2026-10-19]",
+      "raw_count": 12,
+      "returned_count": 6,
+      "abstracts": 6,
+      "metadata_only": 0,
+      "http_statuses": [
+        200,
+        200
+      ],
+      "filter_errors": 0
+    }
+  ],
+  "source_hashes": {
+    "search_engine_pubmed.py": "b7ce6816fc0f63fa3c50c6cd684d4ab1bba0f0d6dd3b687862c9de4051629401",
+    "overlay/search_engines_config.py": "340fa9483a3eb9b5bd3165aee9d8ffb9bceca5e81500eaa3692c8a3cd94ed64c",
+    "overlay/engine_registry.py": "e139676463a6edb244bc5cb05ec73689a0488b2f0749bc2b1831e4d91df581da",
+    "overlay/module_whitelist.py": "c6761de88de29ef5b7e08d2abd4d413411aeba1e440c0eebcd0463d852677dcf",
+    "overlay/search_engine_europepmc.py": "50ec4ba6bda41b8edaba7696c5d9c9551e2be166ac9e18831de44e6b319041d5",
+    "overlay/relevance_filter.py": "d33d58697f4a581e5c9a6b46674c300fb3aec38c54aa2f1ed6d9dccb47f363aa"
+  },
+  "mixed_filter": {
+    "input_count": 9,
+    "kept_count": 1,
+    "positive_kept": true,
+    "irrelevant_kept": 0
+  },
+  "cross_engine_identity": {
+    "input_records": 2,
+    "collected_records": 1,
+    "same_doi": true,
+    "same_abstract": true
+  },
+  "agent_tools": [
+    "web_search",
+    "fetch_content",
+    "search_pubmed",
+    "search_europepmc",
+    "research_subtopic"
+  ]
+}

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from research_verify.citation_qc import Claim, CitationQc
 from research_verify.config import VerifyConfig
+import json
+from semantic_test_helpers import complete_payload
 
 
 class FakeCollector:
@@ -16,7 +18,7 @@ class FakeCollector:
 
 class FakeJudge:
     def __init__(self, payload):
-        self._payload = payload
+        self._payload = json.dumps(complete_payload(json.loads(payload)))
 
     def invoke(self, prompt):
         class R:

@@ -1,0 +1,241 @@
+{
+  "files": {
+    "research_service.py": {
+      "sha256": "00a845326a299a948da48ff44dda0290f4ab770e56495bdc5c6ce8e93ab79936",
+      "target": "web/services/research_service.py",
+      "host_sha256": "00a845326a299a948da48ff44dda0290f4ab770e56495bdc5c6ce8e93ab79936",
+      "host_exact": true
+    },
+    "langgraph_agent_strategy.py": {
+      "sha256": "b2a9ab4f47cf73a51a0ea8694455838a930b2a3294be81275cdd87b28eefd639",
+      "target": "advanced_search_system/strategies/langgraph_agent_strategy.py",
+      "host_sha256": "b074fe257bc938e18074d6421268d89631a5bcc4ae96fa26b6935cca12787fbe",
+      "host_exact": false
+    },
+    "overlay/tracker.py": {
+      "sha256": "da1f6bfee544d805bb34073108acf26dd8505012da4a42cb08830f5f4c630561",
+      "target": "web_search_engines/rate_limiting/tracker.py",
+      "host_sha256": "da1f6bfee544d805bb34073108acf26dd8505012da4a42cb08830f5f4c630561",
+      "host_exact": true
+    },
+    "search_engine_serper.py": {
+      "sha256": "5e600d10c6124bac879b84cb7b77a56e8281dc6e76f2133679fd7830f03efe49",
+      "target": "web_search_engines/engines/search_engine_serper.py",
+      "host_sha256": "5e600d10c6124bac879b84cb7b77a56e8281dc6e76f2133679fd7830f03efe49",
+      "host_exact": true
+    },
+    "search_engine_pubmed.py": {
+      "sha256": "377dd2b84daef0836006dd965531df35711dd8796397a8537b97ab4b8e3b8f5b",
+      "target": "web_search_engines/engines/search_engine_pubmed.py",
+      "host_sha256": "377dd2b84daef0836006dd965531df35711dd8796397a8537b97ab4b8e3b8f5b",
+      "host_exact": true
+    },
+    "overlay/database_storage.py": {
+      "sha256": "e5198dfdbdf4f5abb0df02db4b7c1f6c35539d85860eec93d9e826a7341e030e",
+      "target": "storage/database.py",
+      "host_sha256": "e5198dfdbdf4f5abb0df02db4b7c1f6c35539d85860eec93d9e826a7341e030e",
+      "host_exact": true
+    },
+    "overlay/file_storage.py": {
+      "sha256": "fb1c2b1f0e4efa64885c2a493a88ae4373156eafdafcc7ae0cb335be203dc29e",
+      "target": "storage/file.py",
+      "host_sha256": "fb1c2b1f0e4efa64885c2a493a88ae4373156eafdafcc7ae0cb335be203dc29e",
+      "host_exact": true
+    },
+    "overlay/report_assembly_service.py": {
+      "sha256": "5595fee7219a7af8a84d4edd260d26b9735f0a00704986d65f10ee25cd85c2d0",
+      "target": "web/services/report_assembly_service.py",
+      "host_sha256": "5595fee7219a7af8a84d4edd260d26b9735f0a00704986d65f10ee25cd85c2d0",
+      "host_exact": true
+    },
+    "overlay/scheduler_background.py": {
+      "sha256": "b9da086db695f67418c76dee1e9645d14131e37a20dd6301afc00ad81aec289f",
+      "target": "scheduler/background.py",
+      "host_sha256": "b9da086db695f67418c76dee1e9645d14131e37a20dd6301afc00ad81aec289f",
+      "host_exact": true
+    },
+    "overlay/report_generator.py": {
+      "sha256": "196fad4a3525780e00a82c57f8d8c574c0c623ac0882ebc35cfefa0a1903f3b8",
+      "target": "report_generator.py",
+      "host_sha256": "196fad4a3525780e00a82c57f8d8c574c0c623ac0882ebc35cfefa0a1903f3b8",
+      "host_exact": true
+    },
+    "overlay/quarto_exporter.py": {
+      "sha256": "2f68d310518aaa30c98e6082ef3da5873f3419ca0e62ad8dd74251df506ec007",
+      "target": "exporters/quarto_exporter.py",
+      "host_sha256": "2f68d310518aaa30c98e6082ef3da5873f3419ca0e62ad8dd74251df506ec007",
+      "host_exact": true
+    },
+    "overlay/search_engine_wayback.py": {
+      "sha256": "b645cc4b291afcdfc9ae5d6dccb3bda2fc65e4e01405165a120f16a5f4ffe054",
+      "target": "web_search_engines/engines/search_engine_wayback.py",
+      "host_sha256": "b645cc4b291afcdfc9ae5d6dccb3bda2fc65e4e01405165a120f16a5f4ffe054",
+      "host_exact": true
+    },
+    "overlay/search_engines_config.py": {
+      "sha256": "340fa9483a3eb9b5bd3165aee9d8ffb9bceca5e81500eaa3692c8a3cd94ed64c",
+      "target": "web_search_engines/search_engines_config.py",
+      "host_sha256": "340fa9483a3eb9b5bd3165aee9d8ffb9bceca5e81500eaa3692c8a3cd94ed64c",
+      "host_exact": true
+    },
+    "overlay/research.js": {
+      "sha256": "a087b728c32936610e49d767e6ad88b40027547d1b0d056b4d61e5eb0014654a",
+      "target": "web/static/js/components/research.js",
+      "host_sha256": "a087b728c32936610e49d767e6ad88b40027547d1b0d056b4d61e5eb0014654a",
+      "host_exact": true
+    },
+    "overlay/settings_sync.js": {
+      "sha256": "ecf0db2df1cb0ca313b16984c41030f3e235322601617ca7d0cc16ba33a93012",
+      "target": "web/static/js/components/settings_sync.js",
+      "host_sha256": "ecf0db2df1cb0ca313b16984c41030f3e235322601617ca7d0cc16ba33a93012",
+      "host_exact": true
+    },
+    "overlay/base_citation_handler.py": {
+      "sha256": "37b79f53f61160b1e5afa2780002a3d0e7f3b4627ad03ff218d980c6a3400f15",
+      "target": "citation_handlers/base_citation_handler.py",
+      "host_sha256": "37b79f53f61160b1e5afa2780002a3d0e7f3b4627ad03ff218d980c6a3400f15",
+      "host_exact": true
+    },
+    "overlay/standard_citation_handler.py": {
+      "sha256": "d446b8eee36e85c4dc07c8a9057221653f92f151d8007acfe94b6cd1432a4984",
+      "target": "citation_handlers/standard_citation_handler.py",
+      "host_sha256": "d446b8eee36e85c4dc07c8a9057221653f92f151d8007acfe94b6cd1432a4984",
+      "host_exact": true
+    },
+    "overlay/fetch_tools.py": {
+      "sha256": "052a66349edb58ec8d9cd6f01fd2a06d53c8f9dd4191ea6ccd950d49b92901a7",
+      "target": "advanced_search_system/tools/fetch/__init__.py",
+      "host_sha256": "052a66349edb58ec8d9cd6f01fd2a06d53c8f9dd4191ea6ccd950d49b92901a7",
+      "host_exact": true
+    },
+    "overlay/engine_registry.py": {
+      "sha256": "e139676463a6edb244bc5cb05ec73689a0488b2f0749bc2b1831e4d91df581da",
+      "target": "web_search_engines/engine_registry.py",
+      "host_sha256": "e139676463a6edb244bc5cb05ec73689a0488b2f0749bc2b1831e4d91df581da",
+      "host_exact": true
+    },
+    "overlay/module_whitelist.py": {
+      "sha256": "c6761de88de29ef5b7e08d2abd4d413411aeba1e440c0eebcd0463d852677dcf",
+      "target": "security/module_whitelist.py",
+      "host_sha256": "c6761de88de29ef5b7e08d2abd4d413411aeba1e440c0eebcd0463d852677dcf",
+      "host_exact": true
+    },
+    "overlay/search_engine_europepmc.py": {
+      "sha256": "4e1ff435e968c9c7514df2ad709178637c8ec4985632436c6b4c322ad6328a3b",
+      "target": "web_search_engines/engines/search_engine_europepmc.py",
+      "host_sha256": "4e1ff435e968c9c7514df2ad709178637c8ec4985632436c6b4c322ad6328a3b",
+      "host_exact": true
+    },
+    "overlay/relevance_filter.py": {
+      "sha256": "03acd9662253cf2812942281bada00af5ce2a32031707796193cdd6319b609ab",
+      "target": "web_search_engines/relevance_filter.py",
+      "host_sha256": "03acd9662253cf2812942281bada00af5ce2a32031707796193cdd6319b609ab",
+      "host_exact": true
+    },
+    "overlay/pubmed_downloader.py": {
+      "sha256": "63a61cfa054402b76f4c3d34c6e216502bef9cb5290d62ec4526c53f747691d2",
+      "target": "research_library/downloaders/pubmed.py",
+      "host_sha256": "63a61cfa054402b76f4c3d34c6e216502bef9cb5290d62ec4526c53f747691d2",
+      "host_exact": true
+    },
+    "overlay/url_classifier.py": {
+      "sha256": "6e608dfd23c3d0c0b1e6530003c8612d4983f2b0ff291db55feeddaa01e48af9",
+      "target": "content_fetcher/url_classifier.py",
+      "host_sha256": "6e608dfd23c3d0c0b1e6530003c8612d4983f2b0ff291db55feeddaa01e48af9",
+      "host_exact": true
+    }
+  },
+  "verify_files": {
+    "__init__.py": "11538d04e2443ee3571d687989ffac6af46c4abdff816fb7e189f927853af4f3",
+    "__main__.py": "e8aba19bda5166eca8ffc06bd4647381c51bd8abd6dec15514d05f25292b9dcf",
+    "citation_display.py": "1abf6272ba7d2527f1f9e83b9fe878a9e4b37252a0bc25122a35fb0da8b0c7ae",
+    "citation_qc.py": "8f877c788b43f58c99003188b599284475f7e49d686c90a5305a4b3e9c9be77f",
+    "claims.py": "dac360f8bed8f979ffc3ea31c36d051280aebcc5d59f6960f113c7e6e85e93ff",
+    "cli_check.py": "85cf079a8717d6387e73220ae986fdfbe8ec3fa0548984c40bff82ca37334d2a",
+    "config.py": "e33f87ebd68a1bdc2163b61c33187c2df9eeb8d81a47703721f7454d7551bb65",
+    "constraint_matcher.py": "fde82942bf3a0ebe67603be94ce8960272bc7643c16a345fc641da6b2671317e",
+    "contracts.py": "30a461f449b2446b693c45775fb613791743adffd0b22c1008c7c1a1dc274b2a",
+    "doi_validator.py": "9656f05d4c506ed56c2faae16fa0132f1fc5effb0b0423ef6c78263172ab1606",
+    "evidence.py": "b5bcc4fd400ba31834325bf13e128b79d669168ac0ea429a1711e03d9c6c082e",
+    "generation.py": "90697d3fc59d9622e4e577400bca79d56ae3f4c6c5b06c3fb64fa50c0ff7c1bd",
+    "http_client.py": "d3dfcf448315b093ffbb243bf9b6a0bf82c257cda48dc0de301c52e01a8a1198",
+    "keyword_cov.py": "560579e7217fe734337455e3494693a2d550b8f04544d76b2f38439ff61771da",
+    "models.py": "eaa2690ce2a5d456bb5060f38ec1317c4c93f7786c3d6710136e0205df64922f",
+    "passages.py": "0cb026fc22bbc185b962caeaba3f72c135f6479c53a3d7c5ffd2ec7536aa5b16",
+    "pmc_identity.py": "6b2317f152289b226dfe53461428c27361ea030abeae183c6d6d6d3b64c7c5d0",
+    "publication.py": "7715588f96c4a24bab5d19a74ae05fa7d42cb878cc954cf01be29bcd63fa207d",
+    "retrieval.py": "1bdaa3a317e5f3c9807a30992587474f839634f1ecbc9a1d4ebbd17711479ff6",
+    "revision.py": "3cf3e81c35db56b778ba4a3bcc096e132d5e5b9a4c871c5379f734b3a6248aee",
+    "search_policy.py": "903daae5ec4d341017a649a316324cada6f8172e8445ad4176dabeb8bf417c76",
+    "semantics.py": "36cdd9ac5b46577aab6bf3f08602cca8fcdc8664e9f5c698c54efa7983f4bf27",
+    "source_collection.py": "9b39f2d49ded3ff7e816b6a897f4b7a1875be15fe5f2342d4aac037a37f12215",
+    "textutil.py": "702db5973b2b6cd192a5f7276590e1ce7357011c03584a487695966331a48a3a",
+    "evidence_fetch.py": "db684372d0eaf2a55c97f520b98591ee298b14d940c84c45a8987310909151f7",
+    "evidence_flow.py": "9c49fe1b877877bbd13c7313d098eb19b5524d9ef25098551e1b0a74960d899d",
+    "synthesis_trace.py": "a8b446cf83210263f8f13e1a2093a59bfc7b16f7a54a20e3df7f8842868ee66c",
+    "source_identity.py": "401158ae026d7d5e7a65649c8d51b030924132729a6f57931f1a2324b15b1dde",
+    "source_relations.py": "145878ec78e3f17b770537b4aaac81447ebf64937ec980cdf0c1948861394b95"
+  },
+  "environment": {
+    "LDR_LLM_MODEL": "deepseek-v4-flash",
+    "LDR_LLM_PROVIDER": "openai_endpoint",
+    "LDR_GENERAL_ENABLE_FACT_CHECKING": "true",
+    "LDR_VERIFY_ENABLE_CITATION_QC": "false",
+    "LDR_RESEARCH_TRACE_ENABLED": "true",
+    "LDR_RESEARCH_TRACE_DIR": "/data/research_traces",
+    "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": "500",
+    "LDR_SEARCH_TOOL": "searxng",
+    "LDR_SEARCH_MAX_RESULTS": "12",
+    "LDR_SEARCH_MAX_FILTERED_RESULTS": "6"
+  },
+  "git": {
+    "branch": "work/ldr-20261012",
+    "head": "bfb2e003cf6745aa29eec8abe027ae302c2a91c4",
+    "main_local": "d7d874bb6eb4b9a55636ce933cba82e47dc1fc13",
+    "main_cached_remote": "115e2638fb89d643a0afb8f80134b627e6aa323a",
+    "remote_fetch": "failed: HTTPS authentication unavailable",
+    "status_entries": 219,
+    "note": "git diff omits untracked additions; runtime compared separately"
+  },
+  "current_verify_new_vs_main": [
+    "citation_display.py",
+    "claims.py",
+    "contracts.py",
+    "evidence.py",
+    "generation.py",
+    "passages.py",
+    "pmc_identity.py",
+    "publication.py",
+    "retrieval.py",
+    "revision.py",
+    "search_policy.py",
+    "semantics.py",
+    "source_collection.py",
+    "evidence_fetch.py",
+    "evidence_flow.py",
+    "synthesis_trace.py",
+    "source_identity.py",
+    "source_relations.py"
+  ],
+  "agent_hook_expected_sha256": "b2a9ab4f47cf73a51a0ea8694455838a930b2a3294be81275cdd87b28eefd639",
+  "agent_with_installer_hook_matches": true,
+  "verify_all_host_exact": true,
+  "runtime": [
+    {
+      "name": "/astro-dra-test-5002-local-deep-research-1",
+      "id": "ed27d095c54692a9f95c2f12acc87b5a47f2edf37d9a88bb26ae3cc88fbc9d79",
+      "image": "astro-dra:review-repairs-20261027",
+      "image_id": "sha256:10fdab3c8de8b663822261cb3ec61a58d00e4f80fbdc29c267659ff973ea747d",
+      "started": "2026-10-27T09:40:34.445087188Z",
+      "health": "healthy"
+    },
+    {
+      "name": "/local_deep_research-local-deep-research-1",
+      "id": "3cd64119d61e68c91b31b0011eb43db47beda07ca23b6cf17188b92aa73945ab",
+      "image": "localdeepresearch/local-deep-research:astro-dra-d7d874b",
+      "image_id": "sha256:e94a4b527a6f61778da2aa7b2994722562fbfadac0dda9c6b499f64a16a5b1b2",
+      "started": "2026-10-15T08:59:54.908821447Z",
+      "health": "healthy"
+    }
+  ]
+}

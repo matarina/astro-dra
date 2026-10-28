@@ -64,6 +64,8 @@ def _whitespace_map(text: str) -> tuple[str, list[tuple[int, int]]]:
 
 
 def paper_identity(source: dict) -> str | None:
+    from .source_identity import with_identity
+    source = with_identity(source)
     doi = extract_doi(source.get("doi"), source.get("DOI"))
     if doi:
         return "doi:" + doi.casefold()
@@ -71,6 +73,8 @@ def paper_identity(source: dict) -> str | None:
         value = str(source.get(field) or "").strip()
         if value.isdigit():
             return "pmid:" + value
+    if re.fullmatch(r"PMC\d+", str(source.get("pmcid") or "")):
+        return "pmcid:" + source["pmcid"]
     url = source.get("link") or source.get("url")
     if isinstance(url, str):
         try:
@@ -101,11 +105,16 @@ def source_artifacts(source: dict) -> tuple[SourceArtifact, ...]:
         url = "https://pubmed.ncbi.nlm.nih.gov/" + paper_id[5:] + "/"
     content_type = str(source.get("content_type") or "").lower()
     artifacts = []
-    for field in ("full_content", "body", "content", "abstract", "snippet"):
+    for field in ("full_content", "body", "content", "abstract", "fetched_content", "snippet"):
         text = source.get(field)
         if not isinstance(text, str) or not text.strip():
             continue
-        if field == "abstract" or content_type == "abstract" and field != "snippet":
+        if field == "fetched_content":
+            # The fetch API supplies raw acquired text but no dependable proof
+            # that it is a complete original paper. Keep it auditable without
+            # inheriting another field's abstract/full-text classification.
+            basis = "snippet"
+        elif field == "abstract" or content_type == "abstract" and field != "snippet":
             basis = "abstract"
         elif field != "snippet" and content_type in {"full_text", "fulltext"}:
             basis = "fulltext"

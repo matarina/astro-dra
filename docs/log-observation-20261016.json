@@ -1,0 +1,394 @@
+{
+  "started_at_utc": "2026-10-16T03:24:45.663876+00:00",
+  "scope": "Only Docker stdout/stderr of the three port-5002 services. Bounded historical tail plus a 120-second live window. Mention counts are not distinct request failures; patterns and stdout/stderr duplicates may overlap. No raw log lines, research queries or credentials persisted.",
+  "initial_states": [
+    {
+      "container": "astro-dra-test-5002-local-deep-research-1",
+      "container_id": "f4d85648f1a21c89bc58e202261d490d77e2fbd820ecfd26b1ae01307e19430d",
+      "status": "running",
+      "health": "healthy",
+      "restart_count": 0,
+      "oom_killed": false,
+      "failing_streak": 0
+    },
+    {
+      "container": "astro-dra-test-5002-searxng-1",
+      "container_id": "5b04f93557fe76fa604348876f90b84eedf9ff53dbff6fb8d2b3239218425b42",
+      "status": "running",
+      "health": "healthy",
+      "restart_count": 0,
+      "oom_killed": false,
+      "failing_streak": 0
+    },
+    {
+      "container": "astro-dra-test-5002-proxy-relay-1",
+      "container_id": "92658a1056f34f572241e3b0a166889ef2f7616cf6acaf4f4d211fcc51eee882",
+      "status": "running",
+      "health": "healthy",
+      "restart_count": 0,
+      "oom_killed": false,
+      "failing_streak": 0
+    }
+  ],
+  "baseline": [
+    {
+      "container": "astro-dra-test-5002-local-deep-research-1",
+      "docker_logs_exit": 0,
+      "nonempty_lines": 6324,
+      "tail_limit": 20000,
+      "first_timestamp": "2026-10-16T03:01:46.238954197Z",
+      "last_timestamp": "2026-10-16T03:24:43.363373047Z",
+      "pattern_mentions": {
+        "upstream_throttle": 169,
+        "proxy_refused": 4,
+        "upstream_captcha": 21,
+        "no_search_results": 49,
+        "upstream_timeout": 12,
+        "journal_db_not_ready": 62,
+        "ssrf_private_dns": 12
+      },
+      "exception_mentions": {
+        "ConnectionRefusedError": 1,
+        "NewConnectionError": 4,
+        "MaxRetryError": 2,
+        "ConnectionError": 2,
+        "ResponseError": 51,
+        "HTTPError": 44,
+        "DDGSException": 2,
+        "ConnectError": 4,
+        "ValueError": 11,
+        "JSONDecodeError": 1,
+        "ReadTimeout": 1
+      },
+      "warning_error_locations": {
+        "WARNING:local_deep_research.advanced_search_system.filters.journal_reputation_filter:filter_results:1292": 62,
+        "WARNING:local_deep_research.web_search_engines.engines.search_engine_semantic_scholar:_make_request:257": 51,
+        "WARNING:local_deep_research.web_search_engines.engines.search_engine_semantic_scholar:_direct_search:379": 51,
+        "ERROR:local_deep_research.web_search_engines.engines.search_engine_arxiv:_get_previews:176": 42,
+        "WARNING:local_deep_research.web_search_engines.engines.search_engine_pubmed:_get_article_abstracts:971": 32,
+        "WARNING:local_deep_research.web_search_engines.engines.search_engine_searxng:_parse_json_results:606": 21,
+        "WARNING:local_deep_research.web_search_engines.engines.search_engine_searxng:_parse_json_results:639": 21,
+        "WARNING:local_deep_research.web_search_engines.engines.search_engine_searxng:_get_previews:666": 21,
+        "WARNING:local_deep_research.web_search_engines.search_engine_base:run:808": 14,
+        "WARNING:local_deep_research.security.ssrf_validator:validate_url:486": 12,
+        "ERROR:local_deep_research.web_search_engines.engines.search_engine_wayback:_get_wayback_snapshots:241": 11,
+        "WARNING:local_deep_research.web_search_engines.engines.search_engine_semantic_scholar:_get_previews:577": 3,
+        "WARNING:local_deep_research.web_search_engines.engines.search_engine_wikipedia:_get_previews:183": 3,
+        "WARNING:local_deep_research.database.sqlcipher_utils:get_salt_for_database:61": 2,
+        "ERROR:local_deep_research.database.encrypted_db:_open_user_database_cold:1018": 2,
+        "WARNING:local_deep_research.web.auth.routes:login:329": 2,
+        "WARNING:local_deep_research.llm.providers.openai_base:list_models_for_api:373": 2,
+        "ERROR:local_deep_research.web_search_engines.engines.search_engine_wayback:_extract_urls_from_query:113": 2,
+        "WARNING:local_deep_research.web_search_engines.engines.search_engine_wikipedia:_get_previews:206": 2,
+        "WARNING:local_deep_research.web_search_engines.relevance_filter:filter_previews_for_relevance:286": 2,
+        "WARNING:local_deep_research.utilities.log_utils:config_logger:787": 1,
+        "WARNING:local_deep_research.security.security_headers:init_app:98": 1,
+        "WARNING:local_deep_research.web.app:main:129": 1,
+        "WARNING:werkzeug._internal:_log:97": 1,
+        "WARNING:local_deep_research.database.alembic_runner:run_migrations:451": 1
+      }
+    },
+    {
+      "container": "astro-dra-test-5002-searxng-1",
+      "docker_logs_exit": 0,
+      "nonempty_lines": 420,
+      "tail_limit": 20000,
+      "first_timestamp": "2026-10-16T03:01:35.532338269Z",
+      "last_timestamp": "2026-10-16T03:23:36.121353748Z",
+      "pattern_mentions": {
+        "upstream_timeout": 36,
+        "searx_late_result": 10,
+        "upstream_captcha": 80,
+        "upstream_throttle": 10
+      },
+      "exception_mentions": {
+        "HTTPError": 2,
+        "SearxEngineAccessDeniedException": 2,
+        "TimeoutException": 8,
+        "SearxEngineCaptchaException": 84,
+        "SearxEngineTooManyRequestsException": 9,
+        "ConnectTimeout": 10
+      },
+      "warning_error_locations": {}
+    },
+    {
+      "container": "astro-dra-test-5002-proxy-relay-1",
+      "docker_logs_exit": 0,
+      "nonempty_lines": 120,
+      "tail_limit": 20000,
+      "first_timestamp": "2026-10-16T02:59:37.014740919Z",
+      "last_timestamp": "2026-10-16T03:24:34.890135657Z",
+      "pattern_mentions": {
+        "relay_reset": 111,
+        "relay_broken_pipe": 8
+      },
+      "exception_mentions": {
+        "ConnectionResetError": 111,
+        "BrokenPipeError": 8
+      },
+      "warning_error_locations": {}
+    }
+  ],
+  "live": [
+    {
+      "from_utc": "2026-10-16T03:24:45.663876+00:00",
+      "to_utc": "2026-10-16T03:25:16.188510+00:00",
+      "containers": [
+        {
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "docker_logs_exit": 0,
+          "nonempty_lines": 19,
+          "tail_limit": 4000,
+          "first_timestamp": "2026-10-16T03:24:46.411574820Z",
+          "last_timestamp": "2026-10-16T03:25:16.007026135Z",
+          "pattern_mentions": {
+            "upstream_throttle": 1
+          },
+          "exception_mentions": {
+            "ResponseError": 1
+          },
+          "warning_error_locations": {
+            "WARNING:local_deep_research.web_search_engines.engines.search_engine_semantic_scholar:_make_request:257": 1,
+            "WARNING:local_deep_research.web_search_engines.engines.search_engine_semantic_scholar:_direct_search:379": 1
+          }
+        },
+        {
+          "container": "astro-dra-test-5002-searxng-1",
+          "docker_logs_exit": 0,
+          "nonempty_lines": 0,
+          "tail_limit": 4000,
+          "first_timestamp": null,
+          "last_timestamp": null,
+          "pattern_mentions": {},
+          "exception_mentions": {},
+          "warning_error_locations": {}
+        },
+        {
+          "container": "astro-dra-test-5002-proxy-relay-1",
+          "docker_logs_exit": 0,
+          "nonempty_lines": 2,
+          "tail_limit": 4000,
+          "first_timestamp": "2026-10-16T03:24:49.963292910Z",
+          "last_timestamp": "2026-10-16T03:25:05.035779102Z",
+          "pattern_mentions": {
+            "relay_reset": 2
+          },
+          "exception_mentions": {
+            "ConnectionResetError": 2
+          },
+          "warning_error_locations": {}
+        }
+      ]
+    },
+    {
+      "from_utc": "2026-10-16T03:25:16.188510+00:00",
+      "to_utc": "2026-10-16T03:25:46.336739+00:00",
+      "containers": [
+        {
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "docker_logs_exit": 0,
+          "nonempty_lines": 72,
+          "tail_limit": 4000,
+          "first_timestamp": "2026-10-16T03:25:18.188818625Z",
+          "last_timestamp": "2026-10-16T03:25:45.311387961Z",
+          "pattern_mentions": {
+            "upstream_captcha": 1,
+            "upstream_throttle": 2,
+            "no_search_results": 2
+          },
+          "exception_mentions": {
+            "ResponseError": 1
+          },
+          "warning_error_locations": {
+            "WARNING:local_deep_research.web_search_engines.engines.search_engine_searxng:_parse_json_results:606": 1,
+            "WARNING:local_deep_research.web_search_engines.engines.search_engine_searxng:_parse_json_results:639": 1,
+            "WARNING:local_deep_research.web_search_engines.engines.search_engine_searxng:_get_previews:666": 1,
+            "WARNING:local_deep_research.web_search_engines.engines.search_engine_semantic_scholar:_make_request:257": 1,
+            "WARNING:local_deep_research.web_search_engines.engines.search_engine_semantic_scholar:_direct_search:379": 1
+          }
+        },
+        {
+          "container": "astro-dra-test-5002-searxng-1",
+          "docker_logs_exit": 0,
+          "nonempty_lines": 11,
+          "tail_limit": 4000,
+          "first_timestamp": "2026-10-16T03:25:38.069349716Z",
+          "last_timestamp": "2026-10-16T03:25:38.069476851Z",
+          "pattern_mentions": {
+            "upstream_captcha": 4
+          },
+          "exception_mentions": {
+            "SearxEngineCaptchaException": 4
+          },
+          "warning_error_locations": {}
+        },
+        {
+          "container": "astro-dra-test-5002-proxy-relay-1",
+          "docker_logs_exit": 0,
+          "nonempty_lines": 2,
+          "tail_limit": 4000,
+          "first_timestamp": "2026-10-16T03:25:20.118876313Z",
+          "last_timestamp": "2026-10-16T03:25:35.190736927Z",
+          "pattern_mentions": {
+            "relay_reset": 2
+          },
+          "exception_mentions": {
+            "ConnectionResetError": 2
+          },
+          "warning_error_locations": {}
+        }
+      ]
+    },
+    {
+      "from_utc": "2026-10-16T03:25:46.336739+00:00",
+      "to_utc": "2026-10-16T03:26:16.509085+00:00",
+      "containers": [
+        {
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "docker_logs_exit": 0,
+          "nonempty_lines": 4,
+          "tail_limit": 4000,
+          "first_timestamp": "2026-10-16T03:25:46.586209022Z",
+          "last_timestamp": "2026-10-16T03:25:53.041944231Z",
+          "pattern_mentions": {},
+          "exception_mentions": {
+            "JSONDecodeError": 1
+          },
+          "warning_error_locations": {
+            "ERROR:local_deep_research.web_search_engines.engines.search_engine_wayback:_get_wayback_snapshots:241": 1
+          }
+        },
+        {
+          "container": "astro-dra-test-5002-searxng-1",
+          "docker_logs_exit": 0,
+          "nonempty_lines": 0,
+          "tail_limit": 4000,
+          "first_timestamp": null,
+          "last_timestamp": null,
+          "pattern_mentions": {},
+          "exception_mentions": {},
+          "warning_error_locations": {}
+        },
+        {
+          "container": "astro-dra-test-5002-proxy-relay-1",
+          "docker_logs_exit": 0,
+          "nonempty_lines": 2,
+          "tail_limit": 4000,
+          "first_timestamp": "2026-10-16T03:25:50.262108375Z",
+          "last_timestamp": "2026-10-16T03:26:05.354909734Z",
+          "pattern_mentions": {
+            "relay_reset": 2
+          },
+          "exception_mentions": {
+            "ConnectionResetError": 2
+          },
+          "warning_error_locations": {}
+        }
+      ]
+    },
+    {
+      "from_utc": "2026-10-16T03:26:16.509085+00:00",
+      "to_utc": "2026-10-16T03:26:46.669211+00:00",
+      "containers": [
+        {
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "docker_logs_exit": 0,
+          "nonempty_lines": 8,
+          "tail_limit": 4000,
+          "first_timestamp": "2026-10-16T03:26:17.904280361Z",
+          "last_timestamp": "2026-10-16T03:26:34.876683759Z",
+          "pattern_mentions": {
+            "upstream_throttle": 1
+          },
+          "exception_mentions": {
+            "ResponseError": 1,
+            "JSONDecodeError": 1
+          },
+          "warning_error_locations": {
+            "WARNING:local_deep_research.web_search_engines.engines.search_engine_semantic_scholar:_make_request:257": 1,
+            "WARNING:local_deep_research.web_search_engines.engines.search_engine_semantic_scholar:_direct_search:379": 1,
+            "ERROR:local_deep_research.web_search_engines.engines.search_engine_wayback:_get_wayback_snapshots:241": 1
+          }
+        },
+        {
+          "container": "astro-dra-test-5002-searxng-1",
+          "docker_logs_exit": 0,
+          "nonempty_lines": 0,
+          "tail_limit": 4000,
+          "first_timestamp": null,
+          "last_timestamp": null,
+          "pattern_mentions": {},
+          "exception_mentions": {},
+          "warning_error_locations": {}
+        },
+        {
+          "container": "astro-dra-test-5002-proxy-relay-1",
+          "docker_logs_exit": 0,
+          "nonempty_lines": 2,
+          "tail_limit": 4000,
+          "first_timestamp": "2026-10-16T03:26:20.425369739Z",
+          "last_timestamp": "2026-10-16T03:26:35.498874728Z",
+          "pattern_mentions": {
+            "relay_reset": 2
+          },
+          "exception_mentions": {
+            "ConnectionResetError": 2
+          },
+          "warning_error_locations": {}
+        }
+      ]
+    }
+  ],
+  "final_states": [
+    {
+      "container": "astro-dra-test-5002-local-deep-research-1",
+      "container_id": "f4d85648f1a21c89bc58e202261d490d77e2fbd820ecfd26b1ae01307e19430d",
+      "status": "running",
+      "health": "healthy",
+      "restart_count": 0,
+      "oom_killed": false,
+      "failing_streak": 0
+    },
+    {
+      "container": "astro-dra-test-5002-searxng-1",
+      "container_id": "5b04f93557fe76fa604348876f90b84eedf9ff53dbff6fb8d2b3239218425b42",
+      "status": "running",
+      "health": "healthy",
+      "restart_count": 0,
+      "oom_killed": false,
+      "failing_streak": 0
+    },
+    {
+      "container": "astro-dra-test-5002-proxy-relay-1",
+      "container_id": "92658a1056f34f572241e3b0a166889ef2f7616cf6acaf4f4d211fcc51eee882",
+      "status": "running",
+      "health": "healthy",
+      "restart_count": 0,
+      "oom_killed": false,
+      "failing_streak": 0
+    }
+  ],
+  "ended_at_utc": "2026-10-16T03:26:46.878013+00:00",
+  "classification_notes": [
+    "Counts refer to log mentions, not unique failed requests.",
+    "proxy_refused was a broad regex label for connection refused or ProxyError; inspected connection-refused samples refer to optional provider probing on port 11434, not proxy 9876.",
+    "Five recent successful relay healthchecks were followed by reset logs within 0.066-0.087 seconds; this does not classify every reset or broken pipe as harmless.",
+    "No raw logs or research queries are retained."
+  ],
+  "diagnostic_followup": {
+    "relay_probe_correlations_s": [
+      0.077652,
+      0.066321,
+      0.066105,
+      0.087176,
+      0.066688
+    ],
+    "journal_compiled_db_exists": false,
+    "journal_download_marker_age_s": 1524.3,
+    "journal_progress_still_observed": true,
+    "wayback_json_status_handling_needs_review": true,
+    "optional_ollama_probe_port": 11434,
+    "openalex_api_bypasses_proxy": true,
+    "openalex_snapshot_uses_proxy": true
+  }
+}

@@ -9,10 +9,11 @@ from dataclasses import dataclass, field
 import re
 
 CITE_RE = re.compile(r"\[(\d+(?:\s*,\s*\d+)*)\](?:\([^\n)]*\))?")
-_IGNORED = {"sources", "references", "bibliography", "参考文献", "文献列表",
+_IGNORED = {"sources", "references", "bibliography", "参考文献", "文献列表", "引用文献",
             "文献真实性核验", "条件匹配核验", "条件匹配提示", "关键词覆盖核验",
             "结论可溯源性核查", "逐篇引用证据", "research metrics",
-            "search questions by iteration", "detailed findings", "all sources"}
+            "search questions by iteration", "detailed findings", "all sources",
+            "待核验内容", "结论修订记录"}
 _FACT = re.compile(r"\d|\b(?:increases?|decreases?|reduces?|regulates?|causes?|associated|improves?|is|are|was|were)\b|增加|降低|导致|相关|表明|发现|显示|促进|抑制", re.I)
 _PURE_ADVICE = re.compile(r"^(?:(?:we\s+)?(?:recommend|suggest)\s+(?:further|additional)\s+(?:research|studies)|(?:建议|推荐)(?:开展)?(?:进一步|更多)?(?:研究|验证|实验))[.!。！]?$", re.I)
 _SEPARATOR = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$")

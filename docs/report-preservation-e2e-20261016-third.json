@@ -1,0 +1,17 @@
+{
+  "checks_passed": false,
+  "exit_code": 1,
+  "failure": {
+    "reason": "bib_missing_urls_detailed_[2, 3, 4, 5, 1]",
+    "frames": [
+      {
+        "file": "publication_e2e_worker.py",
+        "line": 201
+      },
+      {
+        "file": "publication_e2e_worker.py",
+        "line": 157
+      }
+    ]
+  }
+}

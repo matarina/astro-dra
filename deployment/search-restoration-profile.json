@@ -1,0 +1,9 @@
+{
+  "baseline": "5000 observed retrieval settings",
+  "settings": {
+    "search.skip_relevance_filter": false,
+    "search.max_results": 12,
+    "search.max_filtered_results": 6,
+    "search.tool": "searxng"
+  }
+}
