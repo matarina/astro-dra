@@ -17,3 +17,6 @@ local-deep-research
 local_deep_research/tests
 ldr-monitor
 docs
+
+# Private generated research reports stay local.
+/reports/

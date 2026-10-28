@@ -1,0 +1,8 @@
+{
+  "search_engine_pubmed.py": "web_search_engines/engines/search_engine_pubmed.py",
+  "overlay/search_engines_config.py": "web_search_engines/search_engines_config.py",
+  "overlay/engine_registry.py": "web_search_engines/engine_registry.py",
+  "overlay/module_whitelist.py": "security/module_whitelist.py",
+  "overlay/search_engine_europepmc.py": "web_search_engines/engines/search_engine_europepmc.py",
+  "overlay/relevance_filter.py": "web_search_engines/relevance_filter.py"
+}

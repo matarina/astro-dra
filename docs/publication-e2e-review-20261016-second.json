@@ -1,0 +1,19 @@
+{
+  "artifact": "publication-e2e-20261016-reviewed-final.json",
+  "reviewer": "agent internal source comparison; not independent expert adjudication",
+  "accepted": false,
+  "automated_checks_passed": true,
+  "reviewed_final_claims": 9,
+  "false_supported": 2,
+  "findings": [
+    {
+      "claim_sha256": "bbd808d2ea74245934c68c319c565ed141b014e24d364e52eda517efc5ee9098",
+      "reason": "extra_adherence_comparison_not_reported_in_abstract"
+    },
+    {
+      "claim_sha256": "7edf2810c7e4583f4308601bb089107fc459b2f6bb41673237698cb4efca5dc7",
+      "reason": "named_analysis_interpretation_not_explicit_in_abstract"
+    }
+  ],
+  "followup": "Expand discourse-clause splitting and detect named analytical frameworks independent of grammatical suffix; preserve raw mismatches."
+}

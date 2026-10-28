@@ -1,0 +1,20 @@
+{
+  "image": "astro-dra:citations-20261016",
+  "image_id": "sha256:9c44b43188b328b43bf9d9a19f44e4ae44bdfc2859149417c06aadbbb1621e07",
+  "health": "healthy",
+  "login_http_status": 200,
+  "volumes": {
+    "/data": "astro-dra-test-5002_ldr_data",
+    "/app/.config/local_deep_research": "astro-dra-test-5002_ldr_config"
+  },
+  "smoke": {
+    "citation_smoke": true,
+    "sha256": {
+      "citation_display.py": "1abf6272ba7d2527f1f9e83b9fe878a9e4b37252a0bc25122a35fb0da8b0c7ae",
+      "publication.py": "79d41b0a8db84875c39b41d2cb87ecd79dd7483867a5dcd1abefefcfcec4c311",
+      "claims.py": "dac360f8bed8f979ffc3ea31c36d051280aebcc5d59f6960f113c7e6e85e93ff"
+    },
+    "matches_worktree": true
+  },
+  "checks_passed": true
+}

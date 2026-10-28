@@ -1,0 +1,47 @@
+{
+  "container": "astro-dra-test-5002-local-deep-research-1",
+  "scope": "Supplementary metadata, candidate discovery, open article XML and production generic extraction function; content lengths only, no full text stored.",
+  "results": [
+    {
+      "service": "Crossref DOI metadata",
+      "url": "https://api.crossref.org/works/10.1038/nature14539",
+      "http_status": 200,
+      "content_type": "application/json",
+      "response_bytes": 40565,
+      "seconds": 1.224,
+      "title": [
+        "Deep learning"
+      ]
+    },
+    {
+      "service": "Europe PMC search",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
+      "http_status": 200,
+      "content_type": "application/json;charset=UTF-8",
+      "response_bytes": 1168,
+      "seconds": 1.293,
+      "hit_count": 258722,
+      "pmcid": "PMC13647138",
+      "title": "Recent advances in tumor-activated prodrug nanoparticles for cancer immunotherapy"
+    },
+    {
+      "service": "Europe PMC open full-text XML",
+      "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13647138/fullTextXML",
+      "http_status": 200,
+      "content_type": "application/xml",
+      "response_bytes": 316875,
+      "seconds": 4.058,
+      "has_article_body": true,
+      "pmcid": "PMC13647138"
+    },
+    {
+      "service": "LDR generic page extraction",
+      "url_chars": {
+        "https://www.cancer.gov/about-cancer/understanding/what-is-cancer": 14499,
+        "https://en.wikipedia.org/wiki/Cancer": 141752
+      },
+      "seconds": 14.949,
+      "js_rendering": false
+    }
+  ]
+}

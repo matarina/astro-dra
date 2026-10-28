@@ -1,0 +1,2586 @@
+{
+  "run_at_utc": "2026-10-14T01:13:38.826532+00:00",
+  "code_commit": "7f885ee7b7c3101ba554ae9d0f5b5ad446ebe1eb",
+  "model": "deepseek-v4-flash",
+  "temperature": 0,
+  "synthetic": true,
+  "working_tree_dirty": true,
+  "fixture_sha256": "1a2ecfced4d513d86c0de33d778a2783dda93de8982557aba5ae676266cfdf1a",
+  "verification_source_sha256": {
+    "__init__.py": "11538d04e2443ee3571d687989ffac6af46c4abdff816fb7e189f927853af4f3",
+    "__main__.py": "e8aba19bda5166eca8ffc06bd4647381c51bd8abd6dec15514d05f25292b9dcf",
+    "citation_qc.py": "5c3d2f8f5cb4536cea0d18b37d3805f30e935a3b25d0df6dd2fe7a3f61426a72",
+    "claims.py": "aba5974314f0d22c88c1dfa0383532b548d7ef78243cb27ac8c33dc925b52dd6",
+    "cli_check.py": "85cf079a8717d6387e73220ae986fdfbe8ec3fa0548984c40bff82ca37334d2a",
+    "config.py": "57ee453c13cee163ec71f718a770cc72c354f634a41ec749f4bba7d9dce6bee7",
+    "constraint_matcher.py": "fde82942bf3a0ebe67603be94ce8960272bc7643c16a345fc641da6b2671317e",
+    "contracts.py": "30a461f449b2446b693c45775fb613791743adffd0b22c1008c7c1a1dc274b2a",
+    "doi_validator.py": "9656f05d4c506ed56c2faae16fa0132f1fc5effb0b0423ef6c78263172ab1606",
+    "evidence.py": "b986eda63f70544c608e9082fafa8605785aba18b8c3419c405b24326a6ba5fd",
+    "http_client.py": "d3dfcf448315b093ffbb243bf9b6a0bf82c257cda48dc0de301c52e01a8a1198",
+    "keyword_cov.py": "560579e7217fe734337455e3494693a2d550b8f04544d76b2f38439ff61771da",
+    "models.py": "eaa2690ce2a5d456bb5060f38ec1317c4c93f7786c3d6710136e0205df64922f",
+    "passages.py": "0cb026fc22bbc185b962caeaba3f72c135f6479c53a3d7c5ffd2ec7536aa5b16",
+    "semantics.py": "aacf440dbb198facc00f0fdd3cc5ee345a5d99ff7fbc5976945bde7d833ad000",
+    "textutil.py": "702db5973b2b6cd192a5f7276590e1ce7357011c03584a487695966331a48a3a"
+  },
+  "label_provenance": "Agent-authored controlled expectations; not expert-adjudicated literature.",
+  "config": {
+    "enable_verify": true,
+    "enable_doi_validation": true,
+    "enable_constraint_match": true,
+    "enable_keyword_coverage": true,
+    "enable_citation_qc": true,
+    "http_timeout": 10.0,
+    "http_max_retries": 2,
+    "http_concurrency": 8,
+    "crossref_mailto": "ldr-research-verify@example.com",
+    "min_if": null,
+    "strict_year": false,
+    "min_keyword_hits": 3,
+    "keyword_threshold_ratio": 0.75,
+    "qc_batch_size": 5,
+    "qc_passage_chars": 1600,
+    "qc_max_passages": 3,
+    "qc_passage_overlap_chars": 200,
+    "judge_temperature": 0.0
+  },
+  "scope": "Existing branch CitationQc with real model; not literature or complete report validation.",
+  "summary": {
+    "cases": 15,
+    "positive_cases": 3,
+    "negative_cases": 12,
+    "exact_matches": 14,
+    "negative_fully_supported": 0,
+    "positive_supported": 2,
+    "model_calls": 14,
+    "transport_or_http_errors": 0,
+    "elapsed_s": 24.707
+  },
+  "cases": [
+    {
+      "id": "P01",
+      "category": "exact_numeric_support",
+      "expected": "supported",
+      "actual": "supported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X reduced tumor growth by 12% [1].",
+          "claim_id": "claim:b01facd1608529c6ab5d72c8b8e571c274b72e5a6ed3af7ffb878d21e88a717b",
+          "report_start": 0,
+          "report_end": 43,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:P01:1",
+              "artifact_id": "text-v1:92f5749af323578609ba9f413ac9d0693cab2dddf51154c27b1a78a3a1ca837a",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 86,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 86,
+                  "score": 7.897366596101028
+                }
+              ],
+              "verdict": "supported",
+              "reason_code": "located_quote",
+              "model_reason": "The claim exactly matches the cited passage: same compound, same effect direction (reduced), same magnitude (12%), and same endpoint (tumor growth). The passage specifies the context as cultured tumor cells, which is consistent with the claim's general statement without overreaching. All applicable dimensions are supported.",
+              "model_verdict": "supported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The claim does not specify a population, but the passage explicitly states cultured tumor cells, which is the only population mentioned and matches the claim's implicit context.",
+                  "locator": {
+                    "paper_id": "synthetic:P01:1",
+                    "artifact_id": "text-v1:92f5749af323578609ba9f413ac9d0693cab2dddf51154c27b1a78a3a1ca837a",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 23,
+                    "quote": "In cultured tumor cells"
+                  }
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The numerical value and unit (12%) exactly match the claim.",
+                  "locator": {
+                    "paper_id": "synthetic:P01:1",
+                    "artifact_id": "text-v1:92f5749af323578609ba9f413ac9d0693cab2dddf51154c27b1a78a3a1ca837a",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 36,
+                    "end": 63,
+                    "quote": "reduced tumor growth by 12%"
+                  }
+                },
+                {
+                  "dimension": "direction",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The claim states 'reduced' and the passage states 'reduced', indicating the same direction of effect.",
+                  "locator": {
+                    "paper_id": "synthetic:P01:1",
+                    "artifact_id": "text-v1:92f5749af323578609ba9f413ac9d0693cab2dddf51154c27b1a78a3a1ca837a",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 36,
+                    "end": 56,
+                    "quote": "reduced tumor growth"
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The passage uses causal language ('reduced') consistent with the claim's assertion of an effect by Compound X.",
+                  "locator": {
+                    "paper_id": "synthetic:P01:1",
+                    "artifact_id": "text-v1:92f5749af323578609ba9f413ac9d0693cab2dddf51154c27b1a78a3a1ca837a",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 25,
+                    "end": 56,
+                    "quote": "Compound X reduced tumor growth"
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The passage indicates a controlled comparison with vehicle, which is consistent with the claim's implied experimental context.",
+                  "locator": {
+                    "paper_id": "synthetic:P01:1",
+                    "artifact_id": "text-v1:92f5749af323578609ba9f413ac9d0693cab2dddf51154c27b1a78a3a1ca837a",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 64,
+                    "end": 85,
+                    "quote": "compared with vehicle"
+                  }
+                },
+                {
+                  "dimension": "scope",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The claim does not extend beyond the passage's scope; both refer to the same experimental setting without broader generalization.",
+                  "locator": {
+                    "paper_id": "synthetic:P01:1",
+                    "artifact_id": "text-v1:92f5749af323578609ba9f413ac9d0693cab2dddf51154c27b1a78a3a1ca837a",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 23,
+                    "quote": "In cultured tumor cells"
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:b01facd1608529c6ab5d72c8b8e571c274b72e5a6ed3af7ffb878d21e88a717b",
+                "claim": "Compound X reduced tumor growth by 12% [1].",
+                "paper_id": "synthetic:P01:1",
+                "verdict": "supported",
+                "locator": {
+                  "paper_id": "synthetic:P01:1",
+                  "artifact_id": "text-v1:92f5749af323578609ba9f413ac9d0693cab2dddf51154c27b1a78a3a1ca837a",
+                  "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 86,
+                  "quote": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle."
+                },
+                "quote_verified": true,
+                "reason_code": "located_quote"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:P01:1"
+          ],
+          "verdict": "supported",
+          "supporting_fragment": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle.",
+          "reason": "[1] located_quote"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 3.358,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 436,
+            "prompt_tokens": 455,
+            "total_tokens": 891
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"supported\",\n  \"supporting_fragment\": \"In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle.\",\n  \"reason\": \"The claim exactly matches the cited passage: same compound, same effect direction (reduced), same magnitude (12%), and same endpoint (tumor growth). The passage specifies the context as cultured tumor cells, which is consistent with the claim's general statement without overreaching. All applicable dimensions are supported.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"In cultured tumor cells\",\n      \"reason\": \"The claim does not specify a population, but the passage explicitly states cultured tumor cells, which is the only population mentioned and matches the claim's implicit context.\"\n    },\n    \"quantities\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"reduced tumor growth by 12%\",\n      \"reason\": \"The numerical value and unit (12%) exactly match the claim.\"\n    },\n    \"direction\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"reduced tumor growth\",\n      \"reason\": \"The claim states 'reduced' and the passage states 'reduced', indicating the same direction of effect.\"\n    },\n    \"causality\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"Compound X reduced tumor growth\",\n      \"reason\": \"The passage uses causal language ('reduced') consistent with the claim's assertion of an effect by Compound X.\"\n    },\n    \"study_design\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"compared with vehicle\",\n      \"reason\": \"The passage indicates a controlled comparison with vehicle, which is consistent with the claim's implied experimental context.\"\n    },\n    \"scope\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"In cultured tumor cells\",\n      \"reason\": \"The claim does not extend beyond the passage's scope; both refer to the same experimental setting without broader generalization.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N01",
+      "category": "wrong_number",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X reduced tumor growth by 42% [1].",
+          "claim_id": "claim:bff0166982cc339c56d5b13817d2190f98335c78cf56dfda502ab29fd139389e",
+          "report_start": 0,
+          "report_end": 43,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N01:1",
+              "artifact_id": "text-v1:6e8372ebf27e99857c2f69cf043ee639285c970332ccdcdcd9020b412aae43d8",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 86,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 86,
+                  "score": 6.581138830084189
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "semantic_dimension_mismatch",
+              "model_reason": "The claim states a 42% reduction in tumor growth, but the cited passage reports a 12% reduction in cultured tumor cells. The numerical value is explicitly contradicted, and the population is limited to cultured cells, not an in vivo or clinical setting. Therefore, the claim is unsupported.",
+              "model_verdict": "unsupported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim does not specify population, but the source is limited to cultured tumor cells, not human patients or in vivo models. The claim's unspecified population could be interpreted broadly, but the source's explicit limitation to cultured cells does not support a broader population.",
+                  "locator": {
+                    "paper_id": "synthetic:N01:1",
+                    "artifact_id": "text-v1:6e8372ebf27e99857c2f69cf043ee639285c970332ccdcdcd9020b412aae43d8",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 23,
+                    "quote": "In cultured tumor cells"
+                  }
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim asserts a 42% reduction, but the source reports a 12% reduction. The numerical value is explicitly different, so the quantity is mismatched.",
+                  "locator": {
+                    "paper_id": "synthetic:N01:1",
+                    "artifact_id": "text-v1:6e8372ebf27e99857c2f69cf043ee639285c970332ccdcdcd9020b412aae43d8",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 36,
+                    "end": 63,
+                    "quote": "reduced tumor growth by 12%"
+                  }
+                },
+                {
+                  "dimension": "direction",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "Both the claim and the source indicate a reduction in tumor growth, so the direction is consistent.",
+                  "locator": {
+                    "paper_id": "synthetic:N01:1",
+                    "artifact_id": "text-v1:6e8372ebf27e99857c2f69cf043ee639285c970332ccdcdcd9020b412aae43d8",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 36,
+                    "end": 56,
+                    "quote": "reduced tumor growth"
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The source uses causal language ('reduced') for the effect of Compound X, and the claim also asserts a causal effect. The source's experimental context (compared with vehicle) supports a causal interpretation within that setting.",
+                  "locator": {
+                    "paper_id": "synthetic:N01:1",
+                    "artifact_id": "text-v1:6e8372ebf27e99857c2f69cf043ee639285c970332ccdcdcd9020b412aae43d8",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 25,
+                    "end": 56,
+                    "quote": "Compound X reduced tumor growth"
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The source describes a controlled comparison with vehicle, which is consistent with an experimental design. The claim does not specify design, but the source's design supports the causal assertion.",
+                  "locator": {
+                    "paper_id": "synthetic:N01:1",
+                    "artifact_id": "text-v1:6e8372ebf27e99857c2f69cf043ee639285c970332ccdcdcd9020b412aae43d8",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 64,
+                    "end": 85,
+                    "quote": "compared with vehicle"
+                  }
+                },
+                {
+                  "dimension": "scope",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The source is limited to cultured tumor cells, not in vivo or clinical settings. The claim does not specify scope, but the source's limitation means it cannot support broader applicability.",
+                  "locator": {
+                    "paper_id": "synthetic:N01:1",
+                    "artifact_id": "text-v1:6e8372ebf27e99857c2f69cf043ee639285c970332ccdcdcd9020b412aae43d8",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 23,
+                    "quote": "In cultured tumor cells"
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:bff0166982cc339c56d5b13817d2190f98335c78cf56dfda502ab29fd139389e",
+                "claim": "Compound X reduced tumor growth by 42% [1].",
+                "paper_id": "synthetic:N01:1",
+                "verdict": "unsupported",
+                "locator": {
+                  "paper_id": "synthetic:N01:1",
+                  "artifact_id": "text-v1:6e8372ebf27e99857c2f69cf043ee639285c970332ccdcdcd9020b412aae43d8",
+                  "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 86,
+                  "quote": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle."
+                },
+                "quote_verified": true,
+                "reason_code": "semantic_dimension_mismatch"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N01:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle.",
+          "reason": "[1] semantic_dimension_mismatch"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 4.072,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 527,
+            "prompt_tokens": 455,
+            "total_tokens": 982
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"unsupported\",\n  \"supporting_fragment\": \"In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle.\",\n  \"reason\": \"The claim states a 42% reduction in tumor growth, but the cited passage reports a 12% reduction in cultured tumor cells. The numerical value is explicitly contradicted, and the population is limited to cultured cells, not an in vivo or clinical setting. Therefore, the claim is unsupported.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"In cultured tumor cells\",\n      \"reason\": \"The claim does not specify population, but the source is limited to cultured tumor cells, not human patients or in vivo models. The claim's unspecified population could be interpreted broadly, but the source's explicit limitation to cultured cells does not support a broader population.\"\n    },\n    \"quantities\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"reduced tumor growth by 12%\",\n      \"reason\": \"The claim asserts a 42% reduction, but the source reports a 12% reduction. The numerical value is explicitly different, so the quantity is mismatched.\"\n    },\n    \"direction\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"reduced tumor growth\",\n      \"reason\": \"Both the claim and the source indicate a reduction in tumor growth, so the direction is consistent.\"\n    },\n    \"causality\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"Compound X reduced tumor growth\",\n      \"reason\": \"The source uses causal language ('reduced') for the effect of Compound X, and the claim also asserts a causal effect. The source's experimental context (compared with vehicle) supports a causal interpretation within that setting.\"\n    },\n    \"study_design\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"compared with vehicle\",\n      \"reason\": \"The source describes a controlled comparison with vehicle, which is consistent with an experimental design. The claim does not specify design, but the source's design supports the causal assertion.\"\n    },\n    \"scope\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"In cultured tumor cells\",\n      \"reason\": \"The source is limited to cultured tumor cells, not in vivo or clinical settings. The claim does not specify scope, but the source's limitation means it cannot support broader applicability.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N02",
+      "category": "wrong_direction",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X increased tumor growth by 12% [1].",
+          "claim_id": "claim:b1bb1dac812fe92e8849c3c9dbce2a3bfd13a849ecd4685d20957a551b11a3da",
+          "report_start": 0,
+          "report_end": 45,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N02:1",
+              "artifact_id": "text-v1:cd8ad71e8b4b1fdd8ba32a4f37f95aa880f5c41079285b2b3da20de01ebcd50b",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 86,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 86,
+                  "score": 6.581138830084189
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "semantic_dimension_mismatch",
+              "model_reason": "The claim asserts an increase in tumor growth by 12%, but the cited passage explicitly states a reduction (decrease) of 12% in cultured tumor cells. The direction of the effect is opposite, and the population is limited to cultured cells, not an in vivo or clinical setting. Thus the claim is directly contradicted on the key quantitative and directional assertion.",
+              "model_verdict": "unsupported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason": "The claim does not specify a population, but the passage specifies cultured tumor cells. The claim's implicit population could be broader, but the evidence is limited to cultured cells, so the population is partially matched (only in vitro).",
+                  "locator": {
+                    "paper_id": "synthetic:N02:1",
+                    "artifact_id": "text-v1:cd8ad71e8b4b1fdd8ba32a4f37f95aa880f5c41079285b2b3da20de01ebcd50b",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 23,
+                    "quote": "In cultured tumor cells"
+                  }
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim states an increase of 12%, but the passage states a reduction of 12%. The numerical value matches but the sign is opposite, so the quantity direction is mismatched.",
+                  "locator": {
+                    "paper_id": "synthetic:N02:1",
+                    "artifact_id": "text-v1:cd8ad71e8b4b1fdd8ba32a4f37f95aa880f5c41079285b2b3da20de01ebcd50b",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 36,
+                    "end": 63,
+                    "quote": "reduced tumor growth by 12%"
+                  }
+                },
+                {
+                  "dimension": "direction",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim asserts an increase, but the passage explicitly states a reduction. The direction is opposite.",
+                  "locator": {
+                    "paper_id": "synthetic:N02:1",
+                    "artifact_id": "text-v1:cd8ad71e8b4b1fdd8ba32a4f37f95aa880f5c41079285b2b3da20de01ebcd50b",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 36,
+                    "end": 56,
+                    "quote": "reduced tumor growth"
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The passage uses causal language ('reduced') for the effect of Compound X, and the claim also asserts a causal effect ('increased'). The causal strength is similar, but the direction is opposite.",
+                  "locator": {
+                    "paper_id": "synthetic:N02:1",
+                    "artifact_id": "text-v1:cd8ad71e8b4b1fdd8ba32a4f37f95aa880f5c41079285b2b3da20de01ebcd50b",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 25,
+                    "end": 56,
+                    "quote": "Compound X reduced tumor growth"
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason": "The passage indicates an in vitro experimental design (cultured cells), but the claim does not specify a design. The evidence is from a controlled experiment, but not a clinical trial or in vivo study, so the design is partially matched.",
+                  "locator": {
+                    "paper_id": "synthetic:N02:1",
+                    "artifact_id": "text-v1:cd8ad71e8b4b1fdd8ba32a4f37f95aa880f5c41079285b2b3da20de01ebcd50b",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 23,
+                    "quote": "In cultured tumor cells"
+                  }
+                },
+                {
+                  "dimension": "scope",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim is general ('tumor growth') without specifying context, but the passage limits the finding to cultured tumor cells. The scope is narrower than the claim's implicit generality, and the direction is opposite, so it is a mismatch.",
+                  "locator": {
+                    "paper_id": "synthetic:N02:1",
+                    "artifact_id": "text-v1:cd8ad71e8b4b1fdd8ba32a4f37f95aa880f5c41079285b2b3da20de01ebcd50b",
+                    "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 23,
+                    "quote": "In cultured tumor cells"
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:b1bb1dac812fe92e8849c3c9dbce2a3bfd13a849ecd4685d20957a551b11a3da",
+                "claim": "Compound X increased tumor growth by 12% [1].",
+                "paper_id": "synthetic:N02:1",
+                "verdict": "unsupported",
+                "locator": {
+                  "paper_id": "synthetic:N02:1",
+                  "artifact_id": "text-v1:cd8ad71e8b4b1fdd8ba32a4f37f95aa880f5c41079285b2b3da20de01ebcd50b",
+                  "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 86,
+                  "quote": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle."
+                },
+                "quote_verified": true,
+                "reason_code": "semantic_dimension_mismatch"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N02:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle.",
+          "reason": "[1] semantic_dimension_mismatch"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 4.297,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 562,
+            "prompt_tokens": 455,
+            "total_tokens": 1017
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"unsupported\",\n  \"supporting_fragment\": \"In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle.\",\n  \"reason\": \"The claim asserts an increase in tumor growth by 12%, but the cited passage explicitly states a reduction (decrease) of 12% in cultured tumor cells. The direction of the effect is opposite, and the population is limited to cultured cells, not an in vivo or clinical setting. Thus the claim is directly contradicted on the key quantitative and directional assertion.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"partial\",\n      \"evidence_quote\": \"In cultured tumor cells\",\n      \"reason\": \"The claim does not specify a population, but the passage specifies cultured tumor cells. The claim's implicit population could be broader, but the evidence is limited to cultured cells, so the population is partially matched (only in vitro).\"\n    },\n    \"quantities\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"reduced tumor growth by 12%\",\n      \"reason\": \"The claim states an increase of 12%, but the passage states a reduction of 12%. The numerical value matches but the sign is opposite, so the quantity direction is mismatched.\"\n    },\n    \"direction\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"reduced tumor growth\",\n      \"reason\": \"The claim asserts an increase, but the passage explicitly states a reduction. The direction is opposite.\"\n    },\n    \"causality\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"Compound X reduced tumor growth\",\n      \"reason\": \"The passage uses causal language ('reduced') for the effect of Compound X, and the claim also asserts a causal effect ('increased'). The causal strength is similar, but the direction is opposite.\"\n    },\n    \"study_design\": {\n      \"status\": \"partial\",\n      \"evidence_quote\": \"In cultured tumor cells\",\n      \"reason\": \"The passage indicates an in vitro experimental design (cultured cells), but the claim does not specify a design. The evidence is from a controlled experiment, but not a clinical trial or in vivo study, so the design is partially matched.\"\n    },\n    \"scope\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"In cultured tumor cells\",\n      \"reason\": \"The claim is general ('tumor growth') without specifying context, but the passage limits the finding to cultured tumor cells. The scope is narrower than the claim's implicit generality, and the direction is opposite, so it is a mismatch.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N03",
+      "category": "negation_lost",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Treatment X improved overall survival [1].",
+          "claim_id": "claim:a9eaf46aaea8eda87616e477567ed6af7c2aa82788ad46b08b2c7356bfa23805",
+          "report_start": 0,
+          "report_end": 42,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N03:1",
+              "artifact_id": "text-v1:f402143d2838486b3d746b5bd4cb7a81562f4e56ea782e08706d204a8ceec1d0",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 67,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 67,
+                  "score": 5.333333333333333
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "semantic_dimension_mismatch",
+              "model_reason": "The cited passage explicitly contradicts the claim's assertion of improved overall survival, stating the opposite (did not improve).",
+              "model_verdict": "unsupported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not specify a population; the passage mentions 'compared with placebo' but no population is asserted in the claim.",
+                  "locator": null
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not assert any numerical values or units.",
+                  "locator": null
+                },
+                {
+                  "dimension": "direction",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim asserts improvement, but the passage explicitly states no improvement, a direct contradiction.",
+                  "locator": {
+                    "paper_id": "synthetic:N03:1",
+                    "artifact_id": "text-v1:f402143d2838486b3d746b5bd4cb7a81562f4e56ea782e08706d204a8ceec1d0",
+                    "content_sha256": "b561727ba7e8e160cefcfd62f8e1d7f33d6545af4df5b37c391164a7cfa47591",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 67,
+                    "quote": "Treatment X did not improve overall survival compared with placebo."
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim asserts an effect but does not specify causal strength; the passage's negation is already addressed under direction.",
+                  "locator": null
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not assert a study design; the passage mentions a comparison but no design is claimed.",
+                  "locator": null
+                },
+                {
+                  "dimension": "scope",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not assert any scope limitations or generalizations beyond the treatment effect.",
+                  "locator": null
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:a9eaf46aaea8eda87616e477567ed6af7c2aa82788ad46b08b2c7356bfa23805",
+                "claim": "Treatment X improved overall survival [1].",
+                "paper_id": "synthetic:N03:1",
+                "verdict": "unsupported",
+                "locator": {
+                  "paper_id": "synthetic:N03:1",
+                  "artifact_id": "text-v1:f402143d2838486b3d746b5bd4cb7a81562f4e56ea782e08706d204a8ceec1d0",
+                  "content_sha256": "b561727ba7e8e160cefcfd62f8e1d7f33d6545af4df5b37c391164a7cfa47591",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 67,
+                  "quote": "Treatment X did not improve overall survival compared with placebo."
+                },
+                "quote_verified": true,
+                "reason_code": "semantic_dimension_mismatch"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N03:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": "Treatment X did not improve overall survival compared with placebo.",
+          "reason": "[1] semantic_dimension_mismatch"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 2.798,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 366,
+            "prompt_tokens": 444,
+            "total_tokens": 810
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"unsupported\",\n  \"supporting_fragment\": \"Treatment X did not improve overall survival compared with placebo.\",\n  \"reason\": \"The cited passage explicitly contradicts the claim's assertion of improved overall survival, stating the opposite (did not improve).\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not specify a population; the passage mentions 'compared with placebo' but no population is asserted in the claim.\"\n    },\n    \"quantities\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not assert any numerical values or units.\"\n    },\n    \"direction\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"Treatment X did not improve overall survival compared with placebo.\",\n      \"reason\": \"The claim asserts improvement, but the passage explicitly states no improvement, a direct contradiction.\"\n    },\n    \"causality\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim asserts an effect but does not specify causal strength; the passage's negation is already addressed under direction.\"\n    },\n    \"study_design\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not assert a study design; the passage mentions a comparison but no design is claimed.\"\n    },\n    \"scope\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not assert any scope limitations or generalizations beyond the treatment effect.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N04",
+      "category": "correlation_as_causation",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Higher marker M causes increased disease risk [1].",
+          "claim_id": "claim:9e69803625ffb49b00f1bef499c505ea9f373263dab3dd235dcd1496782fe3b4",
+          "report_start": 0,
+          "report_end": 50,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N04:1",
+              "artifact_id": "text-v1:9e206536488164f5e39746da6a2a105cde1957c0c5dd07f6f2265b8f5c5ca0b5",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 126,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 126,
+                  "score": 7.664100588675687
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "causal_strength_mismatch",
+              "model_reason": "The claim asserts a causal relationship ('causes') and an increase in disease risk. The cited passage reports only an association in an observational cohort and explicitly states that causality was not established. Thus, the direction of the effect (increased risk) is supported, but the causal assertion is not supported by the evidence.",
+              "model_verdict": "partial",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not specify a population; the passage mentions an observational cohort but the claim makes no population assertion.",
+                  "locator": null
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not include any numerical values or units.",
+                  "locator": null
+                },
+                {
+                  "dimension": "direction",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The passage explicitly states that higher marker M is associated with increased disease risk, matching the claim's direction of increased risk.",
+                  "locator": {
+                    "paper_id": "synthetic:N04:1",
+                    "artifact_id": "text-v1:9e206536488164f5e39746da6a2a105cde1957c0c5dd07f6f2265b8f5c5ca0b5",
+                    "content_sha256": "16f4542a8f815cb3a308e6c3eb9171c2b3addb113f107f694a244682dabe61b7",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 28,
+                    "end": 86,
+                    "quote": "higher marker M was associated with increased disease risk"
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim asserts a causal relationship ('causes'), but the passage explicitly states that causality was not established, contradicting the causal assertion.",
+                  "locator": {
+                    "paper_id": "synthetic:N04:1",
+                    "artifact_id": "text-v1:9e206536488164f5e39746da6a2a105cde1957c0c5dd07f6f2265b8f5c5ca0b5",
+                    "content_sha256": "16f4542a8f815cb3a308e6c3eb9171c2b3addb113f107f694a244682dabe61b7",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 88,
+                    "end": 126,
+                    "quote": "The study did not establish causality."
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The passage identifies the study design as an observational cohort, which is consistent with the claim's implicit observational context (though the claim does not specify design, the passage's design is not contradicted).",
+                  "locator": {
+                    "paper_id": "synthetic:N04:1",
+                    "artifact_id": "text-v1:9e206536488164f5e39746da6a2a105cde1957c0c5dd07f6f2265b8f5c5ca0b5",
+                    "content_sha256": "16f4542a8f815cb3a308e6c3eb9171c2b3addb113f107f694a244682dabe61b7",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 26,
+                    "quote": "In an observational cohort"
+                  }
+                },
+                {
+                  "dimension": "scope",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not make any explicit scope or generalizability assertion beyond the causal effect.",
+                  "locator": null
+                },
+                {
+                  "dimension": "causality",
+                  "status": "mismatch",
+                  "origin": "rule",
+                  "reason_code": "causal_strength_mismatch",
+                  "reason": "",
+                  "locator": {
+                    "paper_id": "synthetic:N04:1",
+                    "artifact_id": "text-v1:9e206536488164f5e39746da6a2a105cde1957c0c5dd07f6f2265b8f5c5ca0b5",
+                    "content_sha256": "16f4542a8f815cb3a308e6c3eb9171c2b3addb113f107f694a244682dabe61b7",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 87,
+                    "quote": "In an observational cohort, higher marker M was associated with increased disease risk."
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:9e69803625ffb49b00f1bef499c505ea9f373263dab3dd235dcd1496782fe3b4",
+                "claim": "Higher marker M causes increased disease risk [1].",
+                "paper_id": "synthetic:N04:1",
+                "verdict": "unsupported",
+                "locator": {
+                  "paper_id": "synthetic:N04:1",
+                  "artifact_id": "text-v1:9e206536488164f5e39746da6a2a105cde1957c0c5dd07f6f2265b8f5c5ca0b5",
+                  "content_sha256": "16f4542a8f815cb3a308e6c3eb9171c2b3addb113f107f694a244682dabe61b7",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 87,
+                  "quote": "In an observational cohort, higher marker M was associated with increased disease risk."
+                },
+                "quote_verified": true,
+                "reason_code": "causal_strength_mismatch"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N04:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": "In an observational cohort, higher marker M was associated with increased disease risk.",
+          "reason": "[1] causal_strength_mismatch"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 3.416,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 445,
+            "prompt_tokens": 457,
+            "total_tokens": 902
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"partial\",\n  \"supporting_fragment\": \"In an observational cohort, higher marker M was associated with increased disease risk.\",\n  \"reason\": \"The claim asserts a causal relationship ('causes') and an increase in disease risk. The cited passage reports only an association in an observational cohort and explicitly states that causality was not established. Thus, the direction of the effect (increased risk) is supported, but the causal assertion is not supported by the evidence.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not specify a population; the passage mentions an observational cohort but the claim makes no population assertion.\"\n    },\n    \"quantities\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not include any numerical values or units.\"\n    },\n    \"direction\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"higher marker M was associated with increased disease risk\",\n      \"reason\": \"The passage explicitly states that higher marker M is associated with increased disease risk, matching the claim's direction of increased risk.\"\n    },\n    \"causality\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"The study did not establish causality.\",\n      \"reason\": \"The claim asserts a causal relationship ('causes'), but the passage explicitly states that causality was not established, contradicting the causal assertion.\"\n    },\n    \"study_design\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"In an observational cohort\",\n      \"reason\": \"The passage identifies the study design as an observational cohort, which is consistent with the claim's implicit observational context (though the claim does not specify design, the passage's design is not contradicted).\"\n    },\n    \"scope\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not make any explicit scope or generalizability assertion beyond the causal effect.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N05",
+      "category": "animal_to_human",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Treatment X improved survival in human patients [1].",
+          "claim_id": "claim:b7d7de4a2348231d52eaf54a7fb07438924f0fcc18be68033de0d970cb86ba4f",
+          "report_start": 0,
+          "report_end": 52,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N05:1",
+              "artifact_id": "text-v1:438c5945676f82f4b0626e2d55167d4c1b593fae9b4d661265c40905e2c2b7cd",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 72,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 72,
+                  "score": 6.666666666666667
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "semantic_dimension_mismatch",
+              "model_reason": "The claim asserts improvement in human patients, but the cited passage explicitly states that human efficacy was not evaluated and only reports an effect in mice. This is a direct contradiction of the population and scope of the claim.",
+              "model_verdict": "unsupported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim specifies human patients, but the source explicitly states human efficacy was not evaluated, and the only population mentioned is mice.",
+                  "locator": {
+                    "paper_id": "synthetic:N05:1",
+                    "artifact_id": "text-v1:438c5945676f82f4b0626e2d55167d4c1b593fae9b4d661265c40905e2c2b7cd",
+                    "content_sha256": "33124367551cb4dfb6ec1ba084a0b211dc7f97d5487f0b5bf58e846f8229e0c9",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 39,
+                    "end": 72,
+                    "quote": "Human efficacy was not evaluated."
+                  }
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not assert any specific numerical values or units.",
+                  "locator": null
+                },
+                {
+                  "dimension": "direction",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason": "The direction of effect (improved survival) is reported in mice, but the claim applies it to humans, which is not supported.",
+                  "locator": {
+                    "paper_id": "synthetic:N05:1",
+                    "artifact_id": "text-v1:438c5945676f82f4b0626e2d55167d4c1b593fae9b4d661265c40905e2c2b7cd",
+                    "content_sha256": "33124367551cb4dfb6ec1ba084a0b211dc7f97d5487f0b5bf58e846f8229e0c9",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 38,
+                    "quote": "Treatment X improved survival in mice."
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason": "The source reports an improvement in mice, which could imply a causal effect in that model, but the claim's causal assertion for humans is unsupported.",
+                  "locator": {
+                    "paper_id": "synthetic:N05:1",
+                    "artifact_id": "text-v1:438c5945676f82f4b0626e2d55167d4c1b593fae9b4d661265c40905e2c2b7cd",
+                    "content_sha256": "33124367551cb4dfb6ec1ba084a0b211dc7f97d5487f0b5bf58e846f8229e0c9",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 38,
+                    "quote": "Treatment X improved survival in mice."
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "design_not_asserted",
+                  "reason": "The passage does not describe the study design (e.g., randomized, observational), so the design for the human claim is undetermined.",
+                  "locator": null
+                },
+                {
+                  "dimension": "scope",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim's scope is human patients, but the source explicitly limits the finding to mice and states human efficacy was not evaluated.",
+                  "locator": {
+                    "paper_id": "synthetic:N05:1",
+                    "artifact_id": "text-v1:438c5945676f82f4b0626e2d55167d4c1b593fae9b4d661265c40905e2c2b7cd",
+                    "content_sha256": "33124367551cb4dfb6ec1ba084a0b211dc7f97d5487f0b5bf58e846f8229e0c9",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 39,
+                    "end": 72,
+                    "quote": "Human efficacy was not evaluated."
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:b7d7de4a2348231d52eaf54a7fb07438924f0fcc18be68033de0d970cb86ba4f",
+                "claim": "Treatment X improved survival in human patients [1].",
+                "paper_id": "synthetic:N05:1",
+                "verdict": "unsupported",
+                "locator": {
+                  "paper_id": "synthetic:N05:1",
+                  "artifact_id": "text-v1:438c5945676f82f4b0626e2d55167d4c1b593fae9b4d661265c40905e2c2b7cd",
+                  "content_sha256": "33124367551cb4dfb6ec1ba084a0b211dc7f97d5487f0b5bf58e846f8229e0c9",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 72,
+                  "quote": "Treatment X improved survival in mice. Human efficacy was not evaluated."
+                },
+                "quote_verified": true,
+                "reason_code": "semantic_dimension_mismatch"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N05:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": "Treatment X improved survival in mice. Human efficacy was not evaluated.",
+          "reason": "[1] semantic_dimension_mismatch"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 3.289,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 429,
+            "prompt_tokens": 448,
+            "total_tokens": 877
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"unsupported\",\n  \"supporting_fragment\": \"Treatment X improved survival in mice. Human efficacy was not evaluated.\",\n  \"reason\": \"The claim asserts improvement in human patients, but the cited passage explicitly states that human efficacy was not evaluated and only reports an effect in mice. This is a direct contradiction of the population and scope of the claim.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"Human efficacy was not evaluated.\",\n      \"reason\": \"The claim specifies human patients, but the source explicitly states human efficacy was not evaluated, and the only population mentioned is mice.\"\n    },\n    \"quantities\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not assert any specific numerical values or units.\"\n    },\n    \"direction\": {\n      \"status\": \"partial\",\n      \"evidence_quote\": \"Treatment X improved survival in mice.\",\n      \"reason\": \"The direction of effect (improved survival) is reported in mice, but the claim applies it to humans, which is not supported.\"\n    },\n    \"causality\": {\n      \"status\": \"partial\",\n      \"evidence_quote\": \"Treatment X improved survival in mice.\",\n      \"reason\": \"The source reports an improvement in mice, which could imply a causal effect in that model, but the claim's causal assertion for humans is unsupported.\"\n    },\n    \"study_design\": {\n      \"status\": \"uncertain\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The passage does not describe the study design (e.g., randomized, observational), so the design for the human claim is undetermined.\"\n    },\n    \"scope\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"Human efficacy was not evaluated.\",\n      \"reason\": \"The claim's scope is human patients, but the source explicitly limits the finding to mice and states human efficacy was not evaluated.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N06",
+      "category": "wrong_unit",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X was effective at a concentration of 5 mg/mL [1].",
+          "claim_id": "claim:90ce27db12ebaa82d6d72100e5a0fba5d6984a8f5b609be5bfec41cb619606dc",
+          "report_start": 0,
+          "report_end": 59,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N06:1",
+              "artifact_id": "text-v1:09074d9662b5dc0d63de02ced8cabde070c0d20353742585dd985c2479e20836",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 63,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 63,
+                  "score": 8.267786838055363
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "semantic_dimension_mismatch",
+              "model_reason": "The claim states 5 mg/mL, but the cited passage states 5 micrograms/mL. These are different by a factor of 1000 (1 mg = 1000 micrograms). The numerical value and unit do not match, so the claim is explicitly contradicted by the evidence.",
+              "model_verdict": "unsupported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not specify a population, species, or cell type; the passage also does not mention one. No assertion to evaluate.",
+                  "locator": null
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim states 5 mg/mL, but the passage states 5 micrograms/mL. These are different concentrations (1 mg = 1000 micrograms), so the quantity/unit does not match.",
+                  "locator": {
+                    "paper_id": "synthetic:N06:1",
+                    "artifact_id": "text-v1:09074d9662b5dc0d63de02ced8cabde070c0d20353742585dd985c2479e20836",
+                    "content_sha256": "a5144e926b84e77d7015bd0cfd657dffbefde283878b84eeda305ff2341bb6bc",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 47,
+                    "end": 62,
+                    "quote": "5 micrograms/mL"
+                  }
+                },
+                {
+                  "dimension": "direction",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim only asserts effectiveness without specifying an increase or decrease in any outcome; the passage also does not specify direction. No directional assertion to evaluate.",
+                  "locator": null
+                },
+                {
+                  "dimension": "causality",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not assert a causal mechanism, only an association of effectiveness at a concentration. The passage also does not provide causal language. No causal assertion to evaluate.",
+                  "locator": null
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not specify a study design, and the passage does not mention one. No design assertion to evaluate.",
+                  "locator": null
+                },
+                {
+                  "dimension": "scope",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not make a clinical or universal generalization; it is a specific statement about Compound X at a concentration. The passage is also specific. No scope assertion to evaluate.",
+                  "locator": null
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:90ce27db12ebaa82d6d72100e5a0fba5d6984a8f5b609be5bfec41cb619606dc",
+                "claim": "Compound X was effective at a concentration of 5 mg/mL [1].",
+                "paper_id": "synthetic:N06:1",
+                "verdict": "unsupported",
+                "locator": {
+                  "paper_id": "synthetic:N06:1",
+                  "artifact_id": "text-v1:09074d9662b5dc0d63de02ced8cabde070c0d20353742585dd985c2479e20836",
+                  "content_sha256": "a5144e926b84e77d7015bd0cfd657dffbefde283878b84eeda305ff2341bb6bc",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 63,
+                  "quote": "Compound X was effective at a concentration of 5 micrograms/mL."
+                },
+                "quote_verified": true,
+                "reason_code": "semantic_dimension_mismatch"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N06:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": "Compound X was effective at a concentration of 5 micrograms/mL.",
+          "reason": "[1] semantic_dimension_mismatch"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 3.623,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 471,
+            "prompt_tokens": 453,
+            "total_tokens": 924
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"unsupported\",\n  \"supporting_fragment\": \"Compound X was effective at a concentration of 5 micrograms/mL.\",\n  \"reason\": \"The claim states 5 mg/mL, but the cited passage states 5 micrograms/mL. These are different by a factor of 1000 (1 mg = 1000 micrograms). The numerical value and unit do not match, so the claim is explicitly contradicted by the evidence.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not specify a population, species, or cell type; the passage also does not mention one. No assertion to evaluate.\"\n    },\n    \"quantities\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"5 micrograms/mL\",\n      \"reason\": \"The claim states 5 mg/mL, but the passage states 5 micrograms/mL. These are different concentrations (1 mg = 1000 micrograms), so the quantity/unit does not match.\"\n    },\n    \"direction\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim only asserts effectiveness without specifying an increase or decrease in any outcome; the passage also does not specify direction. No directional assertion to evaluate.\"\n    },\n    \"causality\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not assert a causal mechanism, only an association of effectiveness at a concentration. The passage also does not provide causal language. No causal assertion to evaluate.\"\n    },\n    \"study_design\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not specify a study design, and the passage does not mention one. No design assertion to evaluate.\"\n    },\n    \"scope\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not make a clinical or universal generalization; it is a specific statement about Compound X at a concentration. The passage is also specific. No scope assertion to evaluate.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N07",
+      "category": "population_scope",
+      "expected": "partial",
+      "actual": "partial",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Treatment X benefits adults and children [1].",
+          "claim_id": "claim:42a642a9060a97caab112749932d24dcfdbe691e5f4b09cee4171c1c093cb005",
+          "report_start": 0,
+          "report_end": 45,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N07:1",
+              "artifact_id": "text-v1:8c89e4ad7e82fa1cf8b3d160cfca43121bf177715f65ec8d0ce070d4956fd76b",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 117,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 117,
+                  "score": 5.109400392450459
+                }
+              ],
+              "verdict": "partial",
+              "reason_code": "partial_support",
+              "model_reason": "",
+              "model_verdict": "partial",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason": "The claim asserts benefit for both adults and children. The source supports benefit only for adults aged 65+, and explicitly excludes children, so the child population is unsupported.",
+                  "locator": {
+                    "paper_id": "synthetic:N07:1",
+                    "artifact_id": "text-v1:8c89e4ad7e82fa1cf8b3d160cfca43121bf177715f65ec8d0ce070d4956fd76b",
+                    "content_sha256": "cf02da2358a4f29309dec98e10076e5c09912aa00dbc3b87b9756c614d7be9c5",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 117,
+                    "quote": "Treatment X improved the measured outcome among adults aged 65 years or older. Children were excluded from the trial."
+                  }
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not specify any numerical values or units.",
+                  "locator": null
+                },
+                {
+                  "dimension": "direction",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The claim states 'benefits' which aligns with the source's 'improved' direction.",
+                  "locator": {
+                    "paper_id": "synthetic:N07:1",
+                    "artifact_id": "text-v1:8c89e4ad7e82fa1cf8b3d160cfca43121bf177715f65ec8d0ce070d4956fd76b",
+                    "content_sha256": "cf02da2358a4f29309dec98e10076e5c09912aa00dbc3b87b9756c614d7be9c5",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 12,
+                    "end": 41,
+                    "quote": "improved the measured outcome"
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The source reports an improvement, which is consistent with the claim's 'benefits' without overstating causation.",
+                  "locator": {
+                    "paper_id": "synthetic:N07:1",
+                    "artifact_id": "text-v1:8c89e4ad7e82fa1cf8b3d160cfca43121bf177715f65ec8d0ce070d4956fd76b",
+                    "content_sha256": "cf02da2358a4f29309dec98e10076e5c09912aa00dbc3b87b9756c614d7be9c5",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 12,
+                    "end": 41,
+                    "quote": "improved the measured outcome"
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not assert any specific study design.",
+                  "locator": null
+                },
+                {
+                  "dimension": "scope",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason": "The claim's scope includes children, but the source explicitly excludes them, so the scope is only partially supported.",
+                  "locator": {
+                    "paper_id": "synthetic:N07:1",
+                    "artifact_id": "text-v1:8c89e4ad7e82fa1cf8b3d160cfca43121bf177715f65ec8d0ce070d4956fd76b",
+                    "content_sha256": "cf02da2358a4f29309dec98e10076e5c09912aa00dbc3b87b9756c614d7be9c5",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 79,
+                    "end": 117,
+                    "quote": "Children were excluded from the trial."
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:42a642a9060a97caab112749932d24dcfdbe691e5f4b09cee4171c1c093cb005",
+                "claim": "Treatment X benefits adults and children [1].",
+                "paper_id": "synthetic:N07:1",
+                "verdict": "partial",
+                "locator": {
+                  "paper_id": "synthetic:N07:1",
+                  "artifact_id": "text-v1:8c89e4ad7e82fa1cf8b3d160cfca43121bf177715f65ec8d0ce070d4956fd76b",
+                  "content_sha256": "cf02da2358a4f29309dec98e10076e5c09912aa00dbc3b87b9756c614d7be9c5",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 78,
+                  "quote": "Treatment X improved the measured outcome among adults aged 65 years or older."
+                },
+                "quote_verified": true,
+                "reason_code": "partial_support"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N07:1"
+          ],
+          "verdict": "partial",
+          "supporting_fragment": "Treatment X improved the measured outcome among adults aged 65 years or older.",
+          "reason": "[1] partial_support"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 2.821,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 369,
+            "prompt_tokens": 456,
+            "total_tokens": 825
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"partial\",\n  \"supporting_fragment\": \"Treatment X improved the measured outcome among adults aged 65 years or older.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"partial\",\n      \"evidence_quote\": \"Treatment X improved the measured outcome among adults aged 65 years or older. Children were excluded from the trial.\",\n      \"reason\": \"The claim asserts benefit for both adults and children. The source supports benefit only for adults aged 65+, and explicitly excludes children, so the child population is unsupported.\"\n    },\n    \"quantities\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not specify any numerical values or units.\"\n    },\n    \"direction\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"improved the measured outcome\",\n      \"reason\": \"The claim states 'benefits' which aligns with the source's 'improved' direction.\"\n    },\n    \"causality\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"improved the measured outcome\",\n      \"reason\": \"The source reports an improvement, which is consistent with the claim's 'benefits' without overstating causation.\"\n    },\n    \"study_design\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not assert any specific study design.\"\n    },\n    \"scope\": {\n      \"status\": \"partial\",\n      \"evidence_quote\": \"Children were excluded from the trial.\",\n      \"reason\": \"The claim's scope includes children, but the source explicitly excludes them, so the scope is only partially supported.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N08",
+      "category": "compound_claim",
+      "expected": "partial",
+      "actual": "partial",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X reduced tumor growth by 12% and cured the disease [1].",
+          "claim_id": "claim:11eec6facf99b19a56265706af1a9b0e4d9c75cfb31664d522d707f9f80b3c90",
+          "report_start": 0,
+          "report_end": 65,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N08:1",
+              "artifact_id": "text-v1:3acf7cc0439130ceba6aac7cc79cdc1ef739870c341d47d3275dc2692ef32d3d",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 88,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 88,
+                  "score": 9.02072594216369
+                }
+              ],
+              "verdict": "partial",
+              "reason_code": "partial_support",
+              "model_reason": "The claim has two components: (1) a 12% reduction in tumor growth and (2) disease cure. The cited passage supports the 12% reduction but explicitly states that disease cure was not assessed. Therefore, the composite claim is only partially supported.",
+              "model_verdict": "partial",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason": "The claim does not specify a population, but the passage specifies cultured cells, which are not human patients or an in vivo model. The claim's implicit population is broader than the evidence.",
+                  "locator": {
+                    "paper_id": "synthetic:N08:1",
+                    "artifact_id": "text-v1:3acf7cc0439130ceba6aac7cc79cdc1ef739870c341d47d3275dc2692ef32d3d",
+                    "content_sha256": "6f6bbb01e6507b898f3be0e5ca63799746722d193f255a9a929a62c47243760b",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 39,
+                    "end": 56,
+                    "quote": "in cultured cells"
+                  }
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The numerical value and direction (reduction by 12%) match exactly between the claim and the passage.",
+                  "locator": {
+                    "paper_id": "synthetic:N08:1",
+                    "artifact_id": "text-v1:3acf7cc0439130ceba6aac7cc79cdc1ef739870c341d47d3275dc2692ef32d3d",
+                    "content_sha256": "6f6bbb01e6507b898f3be0e5ca63799746722d193f255a9a929a62c47243760b",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 11,
+                    "end": 38,
+                    "quote": "reduced tumor growth by 12%"
+                  }
+                },
+                {
+                  "dimension": "direction",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The direction of the effect (reduction) is explicitly stated and matches the claim.",
+                  "locator": {
+                    "paper_id": "synthetic:N08:1",
+                    "artifact_id": "text-v1:3acf7cc0439130ceba6aac7cc79cdc1ef739870c341d47d3275dc2692ef32d3d",
+                    "content_sha256": "6f6bbb01e6507b898f3be0e5ca63799746722d193f255a9a929a62c47243760b",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 11,
+                    "end": 38,
+                    "quote": "reduced tumor growth by 12%"
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The passage uses causal language ('reduced') consistent with the claim's assertion of a causal effect.",
+                  "locator": {
+                    "paper_id": "synthetic:N08:1",
+                    "artifact_id": "text-v1:3acf7cc0439130ceba6aac7cc79cdc1ef739870c341d47d3275dc2692ef32d3d",
+                    "content_sha256": "6f6bbb01e6507b898f3be0e5ca63799746722d193f255a9a929a62c47243760b",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 38,
+                    "quote": "Compound X reduced tumor growth by 12%"
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "design_not_asserted",
+                  "reason": "The passage indicates an in vitro experimental design, but the specific study design (e.g., randomized, controlled) is not described. The claim does not specify a design, so this is not directly asserted, but the evidence is limited to cell culture.",
+                  "locator": {
+                    "paper_id": "synthetic:N08:1",
+                    "artifact_id": "text-v1:3acf7cc0439130ceba6aac7cc79cdc1ef739870c341d47d3275dc2692ef32d3d",
+                    "content_sha256": "6f6bbb01e6507b898f3be0e5ca63799746722d193f255a9a929a62c47243760b",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 39,
+                    "end": 56,
+                    "quote": "in cultured cells"
+                  }
+                },
+                {
+                  "dimension": "scope",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason": "The claim asserts 'cured the disease,' but the passage explicitly states that disease cure was not assessed. Thus, the scope of the claim is broader than the evidence supports.",
+                  "locator": {
+                    "paper_id": "synthetic:N08:1",
+                    "artifact_id": "text-v1:3acf7cc0439130ceba6aac7cc79cdc1ef739870c341d47d3275dc2692ef32d3d",
+                    "content_sha256": "6f6bbb01e6507b898f3be0e5ca63799746722d193f255a9a929a62c47243760b",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 58,
+                    "end": 88,
+                    "quote": "Disease cure was not assessed."
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:11eec6facf99b19a56265706af1a9b0e4d9c75cfb31664d522d707f9f80b3c90",
+                "claim": "Compound X reduced tumor growth by 12% and cured the disease [1].",
+                "paper_id": "synthetic:N08:1",
+                "verdict": "partial",
+                "locator": {
+                  "paper_id": "synthetic:N08:1",
+                  "artifact_id": "text-v1:3acf7cc0439130ceba6aac7cc79cdc1ef739870c341d47d3275dc2692ef32d3d",
+                  "content_sha256": "6f6bbb01e6507b898f3be0e5ca63799746722d193f255a9a929a62c47243760b",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 57,
+                  "quote": "Compound X reduced tumor growth by 12% in cultured cells."
+                },
+                "quote_verified": true,
+                "reason_code": "partial_support"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N08:1"
+          ],
+          "verdict": "partial",
+          "supporting_fragment": "Compound X reduced tumor growth by 12% in cultured cells.",
+          "reason": "[1] partial_support"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 3.7,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 483,
+            "prompt_tokens": 460,
+            "total_tokens": 943
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"partial\",\n  \"supporting_fragment\": \"Compound X reduced tumor growth by 12% in cultured cells.\",\n  \"reason\": \"The claim has two components: (1) a 12% reduction in tumor growth and (2) disease cure. The cited passage supports the 12% reduction but explicitly states that disease cure was not assessed. Therefore, the composite claim is only partially supported.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"partial\",\n      \"evidence_quote\": \"in cultured cells\",\n      \"reason\": \"The claim does not specify a population, but the passage specifies cultured cells, which are not human patients or an in vivo model. The claim's implicit population is broader than the evidence.\"\n    },\n    \"quantities\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"reduced tumor growth by 12%\",\n      \"reason\": \"The numerical value and direction (reduction by 12%) match exactly between the claim and the passage.\"\n    },\n    \"direction\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"reduced tumor growth by 12%\",\n      \"reason\": \"The direction of the effect (reduction) is explicitly stated and matches the claim.\"\n    },\n    \"causality\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"Compound X reduced tumor growth by 12%\",\n      \"reason\": \"The passage uses causal language ('reduced') consistent with the claim's assertion of a causal effect.\"\n    },\n    \"study_design\": {\n      \"status\": \"uncertain\",\n      \"evidence_quote\": \"in cultured cells\",\n      \"reason\": \"The passage indicates an in vitro experimental design, but the specific study design (e.g., randomized, controlled) is not described. The claim does not specify a design, so this is not directly asserted, but the evidence is limited to cell culture.\"\n    },\n    \"scope\": {\n      \"status\": \"partial\",\n      \"evidence_quote\": \"Disease cure was not assessed.\",\n      \"reason\": \"The claim asserts 'cured the disease,' but the passage explicitly states that disease cure was not assessed. Thus, the scope of the claim is broader than the evidence supports.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N09",
+      "category": "missing_citation",
+      "expected": "unverifiable",
+      "actual": "unverifiable",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X reduced tumor growth by 12%.",
+          "claim_id": "claim:84b0ae43b849ab218755a8931d15770c2ef773f7df018e823852260541e9c25a",
+          "report_start": 0,
+          "report_end": 39,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [],
+          "citations": [],
+          "sources": [],
+          "verdict": "unverifiable",
+          "supporting_fragment": null,
+          "reason": "missing_citation"
+        }
+      ],
+      "model_calls": [],
+      "model_errors": []
+    },
+    {
+      "id": "N10",
+      "category": "unresolved_citation",
+      "expected": "unverifiable",
+      "actual": "unverifiable",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X reduced tumor growth by 12% [9].",
+          "claim_id": "claim:b01facd1608529c6ab5d72c8b8e571c274b72e5a6ed3af7ffb878d21e88a717b",
+          "report_start": 0,
+          "report_end": 43,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 9,
+              "paper_id": null,
+              "artifact_id": null,
+              "basis": null,
+              "source_field": null,
+              "text_version": "raw-text-v1",
+              "assessed_chars": 0,
+              "retrieval_method": "",
+              "retrieved_passages": [],
+              "verdict": "unverifiable",
+              "reason_code": "unresolved_citation",
+              "model_reason": "",
+              "model_verdict": null,
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [],
+              "evidence": null
+            }
+          ],
+          "citations": [
+            9
+          ],
+          "sources": [],
+          "verdict": "unverifiable",
+          "supporting_fragment": null,
+          "reason": "[9] unresolved_citation"
+        }
+      ],
+      "model_calls": [],
+      "model_errors": []
+    },
+    {
+      "id": "P02",
+      "category": "late_supporting_passage",
+      "expected": "supported",
+      "actual": "partial",
+      "exact_match": false,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Marker M regulates tumor proliferation [1].",
+          "claim_id": "claim:fb7a4136239722304ebb2917bfda461c29cccef659a8e0c0a28adc3a59ba97f0",
+          "report_start": 0,
+          "report_end": 43,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:P02:1",
+              "artifact_id": "text-v1:cf5350137a5026836548a6e7338d2aa422188fdc064dc3eaa6a0e010bf70cee1",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 57,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 3900,
+                  "end": 3957,
+                  "score": 6.889822365046136
+                }
+              ],
+              "verdict": "partial",
+              "reason_code": "partial_support",
+              "model_reason": "The claim 'Marker M regulates tumor proliferation' is supported only for cultured cells, not for in vivo or human contexts. The passage explicitly limits the finding to cultured cells, so the population dimension is partial. The direction of regulation is not specified in either the claim or the passage, so that dimension is not applicable. Causality is asserted as 'regulates' in both, matching the claim's causal language. Study design is not specified in the passage, so it is uncertain. Scope is limited to cultured cells, which is a partial match to the broader claim.",
+              "model_verdict": "partial",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason": "The passage specifies cultured cells, which is a subset of the general 'tumor' context implied by the claim. The claim does not specify a population, but the passage's limitation to cultured cells means the finding does not extend to in vivo or human tumors.",
+                  "locator": {
+                    "paper_id": "synthetic:P02:1",
+                    "artifact_id": "text-v1:cf5350137a5026836548a6e7338d2aa422188fdc064dc3eaa6a0e010bf70cee1",
+                    "content_sha256": "ff18df90fbb14aaffa616bdd08bc411818a866a5d673ddcb76564fb8d9bee1f7",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 3939,
+                    "end": 3956,
+                    "quote": "in cultured cells"
+                  }
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim and passage do not mention any numerical values or units.",
+                  "locator": null
+                },
+                {
+                  "dimension": "direction",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "Neither the claim nor the passage specifies whether regulation is an increase or decrease.",
+                  "locator": null
+                },
+                {
+                  "dimension": "causality",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The passage uses the same causal verb 'regulates' as the claim, indicating a direct regulatory effect.",
+                  "locator": {
+                    "paper_id": "synthetic:P02:1",
+                    "artifact_id": "text-v1:cf5350137a5026836548a6e7338d2aa422188fdc064dc3eaa6a0e010bf70cee1",
+                    "content_sha256": "ff18df90fbb14aaffa616bdd08bc411818a866a5d673ddcb76564fb8d9bee1f7",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 3909,
+                    "end": 3918,
+                    "quote": "regulates"
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "design_not_asserted",
+                  "reason": "The passage does not describe the study design (e.g., experimental, observational, randomized).",
+                  "locator": null
+                },
+                {
+                  "dimension": "scope",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason": "The claim is general, but the passage limits the finding to cultured cells, so the scope is narrower than the claim's broad assertion.",
+                  "locator": {
+                    "paper_id": "synthetic:P02:1",
+                    "artifact_id": "text-v1:cf5350137a5026836548a6e7338d2aa422188fdc064dc3eaa6a0e010bf70cee1",
+                    "content_sha256": "ff18df90fbb14aaffa616bdd08bc411818a866a5d673ddcb76564fb8d9bee1f7",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 3939,
+                    "end": 3956,
+                    "quote": "in cultured cells"
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:fb7a4136239722304ebb2917bfda461c29cccef659a8e0c0a28adc3a59ba97f0",
+                "claim": "Marker M regulates tumor proliferation [1].",
+                "paper_id": "synthetic:P02:1",
+                "verdict": "partial",
+                "locator": {
+                  "paper_id": "synthetic:P02:1",
+                  "artifact_id": "text-v1:cf5350137a5026836548a6e7338d2aa422188fdc064dc3eaa6a0e010bf70cee1",
+                  "content_sha256": "ff18df90fbb14aaffa616bdd08bc411818a866a5d673ddcb76564fb8d9bee1f7",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 3900,
+                  "end": 3957,
+                  "quote": "Marker M regulates tumor proliferation in cultured cells."
+                },
+                "quote_verified": true,
+                "reason_code": "partial_support"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:P02:1"
+          ],
+          "verdict": "partial",
+          "supporting_fragment": "Marker M regulates tumor proliferation in cultured cells.",
+          "reason": "[1] partial_support"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 3.617,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 480,
+            "prompt_tokens": 442,
+            "total_tokens": 922
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"partial\",\n  \"supporting_fragment\": \"Marker M regulates tumor proliferation in cultured cells.\",\n  \"reason\": \"The claim 'Marker M regulates tumor proliferation' is supported only for cultured cells, not for in vivo or human contexts. The passage explicitly limits the finding to cultured cells, so the population dimension is partial. The direction of regulation is not specified in either the claim or the passage, so that dimension is not applicable. Causality is asserted as 'regulates' in both, matching the claim's causal language. Study design is not specified in the passage, so it is uncertain. Scope is limited to cultured cells, which is a partial match to the broader claim.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"partial\",\n      \"evidence_quote\": \"in cultured cells\",\n      \"reason\": \"The passage specifies cultured cells, which is a subset of the general 'tumor' context implied by the claim. The claim does not specify a population, but the passage's limitation to cultured cells means the finding does not extend to in vivo or human tumors.\"\n    },\n    \"quantities\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim and passage do not mention any numerical values or units.\"\n    },\n    \"direction\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"Neither the claim nor the passage specifies whether regulation is an increase or decrease.\"\n    },\n    \"causality\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"regulates\",\n      \"reason\": \"The passage uses the same causal verb 'regulates' as the claim, indicating a direct regulatory effect.\"\n    },\n    \"study_design\": {\n      \"status\": \"uncertain\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The passage does not describe the study design (e.g., experimental, observational, randomized).\"\n    },\n    \"scope\": {\n      \"status\": \"partial\",\n      \"evidence_quote\": \"in cultured cells\",\n      \"reason\": \"The claim is general, but the passage limits the finding to cultured cells, so the scope is narrower than the claim's broad assertion.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N11",
+      "category": "one_of_multiple_citations_unrelated",
+      "expected": "unverifiable",
+      "actual": "unverifiable",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Marker M regulates tumor proliferation [1, 2].",
+          "claim_id": "claim:fb7a4136239722304ebb2917bfda461c29cccef659a8e0c0a28adc3a59ba97f0",
+          "report_start": 0,
+          "report_end": 46,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N11:1",
+              "artifact_id": "text-v1:1f99e3a0a67113b59667762868be1330ac2f3a568fd8e3bfd74dff21f01c5388",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 57,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 57,
+                  "score": 6.889822365046136
+                }
+              ],
+              "verdict": "partial",
+              "reason_code": "partial_support",
+              "model_reason": "The claim 'Marker M regulates tumor proliferation' is supported only for cultured cells, not for in vivo or human contexts. The cited passage explicitly limits the finding to cultured cells, so the population dimension is partial, while the other dimensions are not applicable or matched as per the claim's assertions.",
+              "model_verdict": "partial",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason": "The claim does not specify a population, but the source limits the finding to cultured cells, which is a narrower scope than general tumor proliferation. Since the claim is general, the evidence is partial.",
+                  "locator": {
+                    "paper_id": "synthetic:N11:1",
+                    "artifact_id": "text-v1:1f99e3a0a67113b59667762868be1330ac2f3a568fd8e3bfd74dff21f01c5388",
+                    "content_sha256": "e019570e15df01d3f32b9db7c6c7021bc1f8aae0e6916b65a57d77b1b86cb180",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 39,
+                    "end": 56,
+                    "quote": "in cultured cells"
+                  }
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not assert any numerical values or units.",
+                  "locator": null
+                },
+                {
+                  "dimension": "direction",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim uses 'regulates' without specifying increase or decrease, so no direction is asserted.",
+                  "locator": null
+                },
+                {
+                  "dimension": "causality",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The claim asserts regulation, and the source states 'regulates tumor proliferation', matching the causal language.",
+                  "locator": {
+                    "paper_id": "synthetic:N11:1",
+                    "artifact_id": "text-v1:1f99e3a0a67113b59667762868be1330ac2f3a568fd8e3bfd74dff21f01c5388",
+                    "content_sha256": "e019570e15df01d3f32b9db7c6c7021bc1f8aae0e6916b65a57d77b1b86cb180",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 9,
+                    "end": 38,
+                    "quote": "regulates tumor proliferation"
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not assert any study design.",
+                  "locator": null
+                },
+                {
+                  "dimension": "scope",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason": "The source explicitly limits the effect to cultured cells, which is narrower than the general claim. The claim does not specify a scope, but the evidence is limited to in vitro, so the scope is partial.",
+                  "locator": {
+                    "paper_id": "synthetic:N11:1",
+                    "artifact_id": "text-v1:1f99e3a0a67113b59667762868be1330ac2f3a568fd8e3bfd74dff21f01c5388",
+                    "content_sha256": "e019570e15df01d3f32b9db7c6c7021bc1f8aae0e6916b65a57d77b1b86cb180",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 39,
+                    "end": 56,
+                    "quote": "in cultured cells"
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:fb7a4136239722304ebb2917bfda461c29cccef659a8e0c0a28adc3a59ba97f0",
+                "claim": "Marker M regulates tumor proliferation [1, 2].",
+                "paper_id": "synthetic:N11:1",
+                "verdict": "partial",
+                "locator": {
+                  "paper_id": "synthetic:N11:1",
+                  "artifact_id": "text-v1:1f99e3a0a67113b59667762868be1330ac2f3a568fd8e3bfd74dff21f01c5388",
+                  "content_sha256": "e019570e15df01d3f32b9db7c6c7021bc1f8aae0e6916b65a57d77b1b86cb180",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 57,
+                  "quote": "Marker M regulates tumor proliferation in cultured cells."
+                },
+                "quote_verified": true,
+                "reason_code": "partial_support"
+              }
+            },
+            {
+              "citation_index": 2,
+              "paper_id": "synthetic:N11:2",
+              "artifact_id": "text-v1:2543daa325d7ea24e9a78c5e438da1818128b3c060b69c45d65da0c95372fb57",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 73,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 73,
+                  "score": 2.7071067811865475
+                }
+              ],
+              "verdict": "unverifiable",
+              "reason_code": "judge_unverifiable",
+              "model_reason": "The cited passage does not mention Marker M, tumor proliferation, or any regulatory relationship; it is entirely unrelated to the claim.",
+              "model_verdict": "unverifiable",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not specify a population, and the passage provides no relevant population information.",
+                  "locator": null
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not assert any numerical values or units, and the passage provides none.",
+                  "locator": null
+                },
+                {
+                  "dimension": "direction",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim uses the neutral term 'regulates' without specifying increase or decrease, so no directional assertion is made.",
+                  "locator": null
+                },
+                {
+                  "dimension": "causality",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim asserts a regulatory relationship, but the passage does not address any causal or regulatory mechanism.",
+                  "locator": null
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not specify a study design, and the passage describes a rainfall study unrelated to the claim.",
+                  "locator": null
+                },
+                {
+                  "dimension": "scope",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not specify a scope beyond general tumor proliferation, and the passage provides no relevant scope information.",
+                  "locator": null
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:fb7a4136239722304ebb2917bfda461c29cccef659a8e0c0a28adc3a59ba97f0",
+                "claim": "Marker M regulates tumor proliferation [1, 2].",
+                "paper_id": "synthetic:N11:2",
+                "verdict": "unverifiable",
+                "locator": null,
+                "quote_verified": false,
+                "reason_code": "judge_unverifiable"
+              }
+            }
+          ],
+          "citations": [
+            1,
+            2
+          ],
+          "sources": [
+            "synthetic:N11:1",
+            "synthetic:N11:2"
+          ],
+          "verdict": "unverifiable",
+          "supporting_fragment": "Marker M regulates tumor proliferation in cultured cells.",
+          "reason": "[1] partial_support; [2] judge_unverifiable"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 3.207,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 421,
+            "prompt_tokens": 442,
+            "total_tokens": 863
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"partial\",\n  \"supporting_fragment\": \"Marker M regulates tumor proliferation in cultured cells.\",\n  \"reason\": \"The claim 'Marker M regulates tumor proliferation' is supported only for cultured cells, not for in vivo or human contexts. The cited passage explicitly limits the finding to cultured cells, so the population dimension is partial, while the other dimensions are not applicable or matched as per the claim's assertions.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"partial\",\n      \"evidence_quote\": \"in cultured cells\",\n      \"reason\": \"The claim does not specify a population, but the source limits the finding to cultured cells, which is a narrower scope than general tumor proliferation. Since the claim is general, the evidence is partial.\"\n    },\n    \"quantities\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not assert any numerical values or units.\"\n    },\n    \"direction\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim uses 'regulates' without specifying increase or decrease, so no direction is asserted.\"\n    },\n    \"causality\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"regulates tumor proliferation\",\n      \"reason\": \"The claim asserts regulation, and the source states 'regulates tumor proliferation', matching the causal language.\"\n    },\n    \"study_design\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not assert any study design.\"\n    },\n    \"scope\": {\n      \"status\": \"partial\",\n      \"evidence_quote\": \"in cultured cells\",\n      \"reason\": \"The source explicitly limits the effect to cultured cells, which is narrower than the general claim. The claim does not specify a scope, but the evidence is limited to in vitro, so the scope is partial.\"\n    }\n  }\n}"
+        },
+        {
+          "elapsed_s": 2.75,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 356,
+            "prompt_tokens": 445,
+            "total_tokens": 801
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"unverifiable\",\n  \"supporting_fragment\": \"\",\n  \"reason\": \"The cited passage does not mention Marker M, tumor proliferation, or any regulatory relationship; it is entirely unrelated to the claim.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not specify a population, and the passage provides no relevant population information.\"\n    },\n    \"quantities\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not assert any numerical values or units, and the passage provides none.\"\n    },\n    \"direction\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim uses the neutral term 'regulates' without specifying increase or decrease, so no directional assertion is made.\"\n    },\n    \"causality\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim asserts a regulatory relationship, but the passage does not address any causal or regulatory mechanism.\"\n    },\n    \"study_design\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not specify a study design, and the passage describes a rainfall study unrelated to the claim.\"\n    },\n    \"scope\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not specify a scope beyond general tumor proliferation, and the passage provides no relevant scope information.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "P03",
+      "category": "association_supported",
+      "expected": "supported",
+      "actual": "supported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Higher marker M is associated with increased disease risk [1].",
+          "claim_id": "claim:b1a33a981d4a10d92cfb5b81cd4717f931b880259769ad19a06912b74f521e1b",
+          "report_start": 0,
+          "report_end": 62,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:P03:1",
+              "artifact_id": "text-v1:b37d3342d2fab434047a83b9912eff2858cf4847e036f2e69374954772d1bb2a",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 118,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 118,
+                  "score": 9.02072594216369
+                }
+              ],
+              "verdict": "supported",
+              "reason_code": "located_quote",
+              "model_reason": "The claim exactly matches the cited passage's assertion: higher marker M is associated with increased disease risk. The passage explicitly states the association in an observational cohort, and the claim does not assert causality or specify a population beyond what is stated. All applicable dimensions are supported.",
+              "model_verdict": "supported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not specify a population; the passage mentions 'an observational cohort' but the claim makes no population assertion, so this dimension is not applicable.",
+                  "locator": null
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason": "The claim does not include any numerical values or units.",
+                  "locator": null
+                },
+                {
+                  "dimension": "direction",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The claim states 'higher marker M is associated with increased disease risk' and the passage states exactly that direction.",
+                  "locator": {
+                    "paper_id": "synthetic:P03:1",
+                    "artifact_id": "text-v1:b37d3342d2fab434047a83b9912eff2858cf4847e036f2e69374954772d1bb2a",
+                    "content_sha256": "80b2976f81b2c0ad1293d7b7341acc8c2a9654a3333e988a861b58a95b8ca61f",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 28,
+                    "end": 86,
+                    "quote": "higher marker M was associated with increased disease risk"
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The claim uses 'associated' and does not assert causation; the passage explicitly notes causality was not established, matching the claim's associative language.",
+                  "locator": {
+                    "paper_id": "synthetic:P03:1",
+                    "artifact_id": "text-v1:b37d3342d2fab434047a83b9912eff2858cf4847e036f2e69374954772d1bb2a",
+                    "content_sha256": "80b2976f81b2c0ad1293d7b7341acc8c2a9654a3333e988a861b58a95b8ca61f",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 88,
+                    "end": 118,
+                    "quote": "Causality was not established."
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The claim does not specify a study design, but the passage's observational cohort design is consistent with the associative claim and does not imply a stronger design.",
+                  "locator": {
+                    "paper_id": "synthetic:P03:1",
+                    "artifact_id": "text-v1:b37d3342d2fab434047a83b9912eff2858cf4847e036f2e69374954772d1bb2a",
+                    "content_sha256": "80b2976f81b2c0ad1293d7b7341acc8c2a9654a3333e988a861b58a95b8ca61f",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 26,
+                    "quote": "In an observational cohort"
+                  }
+                },
+                {
+                  "dimension": "scope",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The claim's scope is limited to the association as stated; the passage's scope is the same, with no broader clinical or universal implications.",
+                  "locator": {
+                    "paper_id": "synthetic:P03:1",
+                    "artifact_id": "text-v1:b37d3342d2fab434047a83b9912eff2858cf4847e036f2e69374954772d1bb2a",
+                    "content_sha256": "80b2976f81b2c0ad1293d7b7341acc8c2a9654a3333e988a861b58a95b8ca61f",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 87,
+                    "quote": "In an observational cohort, higher marker M was associated with increased disease risk."
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:b1a33a981d4a10d92cfb5b81cd4717f931b880259769ad19a06912b74f521e1b",
+                "claim": "Higher marker M is associated with increased disease risk [1].",
+                "paper_id": "synthetic:P03:1",
+                "verdict": "supported",
+                "locator": {
+                  "paper_id": "synthetic:P03:1",
+                  "artifact_id": "text-v1:b37d3342d2fab434047a83b9912eff2858cf4847e036f2e69374954772d1bb2a",
+                  "content_sha256": "80b2976f81b2c0ad1293d7b7341acc8c2a9654a3333e988a861b58a95b8ca61f",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 87,
+                  "quote": "In an observational cohort, higher marker M was associated with increased disease risk."
+                },
+                "quote_verified": true,
+                "reason_code": "located_quote"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:P03:1"
+          ],
+          "verdict": "supported",
+          "supporting_fragment": "In an observational cohort, higher marker M was associated with increased disease risk.",
+          "reason": "[1] located_quote"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 3.491,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 454,
+            "prompt_tokens": 458,
+            "total_tokens": 912
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"supported\",\n  \"supporting_fragment\": \"In an observational cohort, higher marker M was associated with increased disease risk.\",\n  \"reason\": \"The claim exactly matches the cited passage's assertion: higher marker M is associated with increased disease risk. The passage explicitly states the association in an observational cohort, and the claim does not assert causality or specify a population beyond what is stated. All applicable dimensions are supported.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not specify a population; the passage mentions 'an observational cohort' but the claim makes no population assertion, so this dimension is not applicable.\"\n    },\n    \"quantities\": {\n      \"status\": \"not_applicable\",\n      \"evidence_quote\": \"\",\n      \"reason\": \"The claim does not include any numerical values or units.\"\n    },\n    \"direction\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"higher marker M was associated with increased disease risk\",\n      \"reason\": \"The claim states 'higher marker M is associated with increased disease risk' and the passage states exactly that direction.\"\n    },\n    \"causality\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"Causality was not established.\",\n      \"reason\": \"The claim uses 'associated' and does not assert causation; the passage explicitly notes causality was not established, matching the claim's associative language.\"\n    },\n    \"study_design\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"In an observational cohort\",\n      \"reason\": \"The claim does not specify a study design, but the passage's observational cohort design is consistent with the associative claim and does not imply a stronger design.\"\n    },\n    \"scope\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"In an observational cohort, higher marker M was associated with increased disease risk.\",\n      \"reason\": \"The claim's scope is limited to the association as stated; the passage's scope is the same, with no broader clinical or universal implications.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N12",
+      "category": "cross_language_numeric_mismatch",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "该化合物将肿瘤生长降低了42%。[1]",
+          "claim_id": "claim:5edecd5a8da39093354d1fa98c249af852d72055baf0e4fcee54db2a2d703bba",
+          "report_start": 0,
+          "report_end": 19,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N12:1",
+              "artifact_id": "text-v1:11ea9755ea89ae6be78a7bbcd51afd5bade6bbc69a1ec691944d4dfa5b18d3c4",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 57,
+              "retrieval_method": "opening_fallback-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 57,
+                  "score": 0.0
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "semantic_dimension_mismatch",
+              "model_reason": "The claim states a 42% reduction in tumor growth, but the cited passage reports only a 12% reduction in cultured cells. The numerical value and the experimental context (cultured cells vs. tumor growth in vivo) do not match the claim. The passage does not support the claimed magnitude or the implied in vivo tumor context.",
+              "model_verdict": "unsupported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim refers to 'tumor growth' without specifying population, but the passage specifies 'cultured cells', which are not tumors in a living organism. The population is mismatched.",
+                  "locator": {
+                    "paper_id": "synthetic:N12:1",
+                    "artifact_id": "text-v1:11ea9755ea89ae6be78a7bbcd51afd5bade6bbc69a1ec691944d4dfa5b18d3c4",
+                    "content_sha256": "adca537e4be4600594000111c9d2f5430aa5de5db8161739cd0f2e4fe35703fc",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 39,
+                    "end": 56,
+                    "quote": "in cultured cells"
+                  }
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim states a 42% reduction, but the passage reports only 12%. The numerical value is explicitly different.",
+                  "locator": {
+                    "paper_id": "synthetic:N12:1",
+                    "artifact_id": "text-v1:11ea9755ea89ae6be78a7bbcd51afd5bade6bbc69a1ec691944d4dfa5b18d3c4",
+                    "content_sha256": "adca537e4be4600594000111c9d2f5430aa5de5db8161739cd0f2e4fe35703fc",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 11,
+                    "end": 38,
+                    "quote": "reduced tumor growth by 12%"
+                  }
+                },
+                {
+                  "dimension": "direction",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "Both the claim and the passage indicate a reduction in tumor growth, so the direction is consistent.",
+                  "locator": {
+                    "paper_id": "synthetic:N12:1",
+                    "artifact_id": "text-v1:11ea9755ea89ae6be78a7bbcd51afd5bade6bbc69a1ec691944d4dfa5b18d3c4",
+                    "content_sha256": "adca537e4be4600594000111c9d2f5430aa5de5db8161739cd0f2e4fe35703fc",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 11,
+                    "end": 31,
+                    "quote": "reduced tumor growth"
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason": "The passage uses causal language ('reduced'), and the claim also implies a causal effect. The causal strength is consistent.",
+                  "locator": {
+                    "paper_id": "synthetic:N12:1",
+                    "artifact_id": "text-v1:11ea9755ea89ae6be78a7bbcd51afd5bade6bbc69a1ec691944d4dfa5b18d3c4",
+                    "content_sha256": "adca537e4be4600594000111c9d2f5430aa5de5db8161739cd0f2e4fe35703fc",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 31,
+                    "quote": "Compound X reduced tumor growth"
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "design_not_asserted",
+                  "reason": "The passage indicates an in vitro experiment, but the claim does not specify study design. The design is not fully described, so it is uncertain whether it matches the claim's implied context.",
+                  "locator": {
+                    "paper_id": "synthetic:N12:1",
+                    "artifact_id": "text-v1:11ea9755ea89ae6be78a7bbcd51afd5bade6bbc69a1ec691944d4dfa5b18d3c4",
+                    "content_sha256": "adca537e4be4600594000111c9d2f5430aa5de5db8161739cd0f2e4fe35703fc",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 39,
+                    "end": 56,
+                    "quote": "in cultured cells"
+                  }
+                },
+                {
+                  "dimension": "scope",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason": "The claim is about 'tumor growth' generally, which could imply in vivo tumors, but the passage only supports effects in cultured cells. The scope is narrower and does not support the claim's broader tumor context.",
+                  "locator": {
+                    "paper_id": "synthetic:N12:1",
+                    "artifact_id": "text-v1:11ea9755ea89ae6be78a7bbcd51afd5bade6bbc69a1ec691944d4dfa5b18d3c4",
+                    "content_sha256": "adca537e4be4600594000111c9d2f5430aa5de5db8161739cd0f2e4fe35703fc",
+                    "source_url": null,
+                    "basis": "fulltext",
+                    "section": null,
+                    "page": null,
+                    "start": 39,
+                    "end": 56,
+                    "quote": "in cultured cells"
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:5edecd5a8da39093354d1fa98c249af852d72055baf0e4fcee54db2a2d703bba",
+                "claim": "该化合物将肿瘤生长降低了42%。[1]",
+                "paper_id": "synthetic:N12:1",
+                "verdict": "unsupported",
+                "locator": {
+                  "paper_id": "synthetic:N12:1",
+                  "artifact_id": "text-v1:11ea9755ea89ae6be78a7bbcd51afd5bade6bbc69a1ec691944d4dfa5b18d3c4",
+                  "content_sha256": "adca537e4be4600594000111c9d2f5430aa5de5db8161739cd0f2e4fe35703fc",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 57,
+                  "quote": "Compound X reduced tumor growth by 12% in cultured cells."
+                },
+                "quote_verified": true,
+                "reason_code": "semantic_dimension_mismatch"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N12:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": "Compound X reduced tumor growth by 12% in cultured cells.",
+          "reason": "[1] semantic_dimension_mismatch"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 3.673,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 497,
+            "prompt_tokens": 448,
+            "total_tokens": 945
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content": "{\n  \"verdict\": \"unsupported\",\n  \"supporting_fragment\": \"Compound X reduced tumor growth by 12% in cultured cells.\",\n  \"reason\": \"The claim states a 42% reduction in tumor growth, but the cited passage reports only a 12% reduction in cultured cells. The numerical value and the experimental context (cultured cells vs. tumor growth in vivo) do not match the claim. The passage does not support the claimed magnitude or the implied in vivo tumor context.\",\n  \"dimensions\": {\n    \"population\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"in cultured cells\",\n      \"reason\": \"The claim refers to 'tumor growth' without specifying population, but the passage specifies 'cultured cells', which are not tumors in a living organism. The population is mismatched.\"\n    },\n    \"quantities\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"reduced tumor growth by 12%\",\n      \"reason\": \"The claim states a 42% reduction, but the passage reports only 12%. The numerical value is explicitly different.\"\n    },\n    \"direction\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"reduced tumor growth\",\n      \"reason\": \"Both the claim and the passage indicate a reduction in tumor growth, so the direction is consistent.\"\n    },\n    \"causality\": {\n      \"status\": \"matched\",\n      \"evidence_quote\": \"Compound X reduced tumor growth\",\n      \"reason\": \"The passage uses causal language ('reduced'), and the claim also implies a causal effect. The causal strength is consistent.\"\n    },\n    \"study_design\": {\n      \"status\": \"uncertain\",\n      \"evidence_quote\": \"in cultured cells\",\n      \"reason\": \"The passage indicates an in vitro experiment, but the claim does not specify study design. The design is not fully described, so it is uncertain whether it matches the claim's implied context.\"\n    },\n    \"scope\": {\n      \"status\": \"mismatch\",\n      \"evidence_quote\": \"in cultured cells\",\n      \"reason\": \"The claim is about 'tumor growth' generally, which could imply in vivo tumors, but the passage only supports effects in cultured cells. The scope is narrower and does not support the claim's broader tumor context.\"\n    }\n  }\n}"
+        }
+      ],
+      "model_errors": []
+    }
+  ]
+}

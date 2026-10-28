@@ -1,0 +1,197 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "label_provenance": "Unchanged 15 baseline cases plus 6 explicitly qualified positive controls; agent-authored expectations, not independent adjudication.",
+  "cases": [
+    {
+      "id": "P01",
+      "category": "exact_numeric_support",
+      "claim": "Compound X reduced tumor growth by 12% [1].",
+      "sources": {
+        "1": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "N01",
+      "category": "wrong_number",
+      "claim": "Compound X reduced tumor growth by 42% [1].",
+      "sources": {
+        "1": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle."
+      },
+      "expected": "unsupported"
+    },
+    {
+      "id": "N02",
+      "category": "wrong_direction",
+      "claim": "Compound X increased tumor growth by 12% [1].",
+      "sources": {
+        "1": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle."
+      },
+      "expected": "unsupported"
+    },
+    {
+      "id": "N03",
+      "category": "negation_lost",
+      "claim": "Treatment X improved overall survival [1].",
+      "sources": {
+        "1": "Treatment X did not improve overall survival compared with placebo."
+      },
+      "expected": "unsupported"
+    },
+    {
+      "id": "N04",
+      "category": "correlation_as_causation",
+      "claim": "Higher marker M causes increased disease risk [1].",
+      "sources": {
+        "1": "In an observational cohort, higher marker M was associated with increased disease risk. The study did not establish causality."
+      },
+      "expected": "unsupported"
+    },
+    {
+      "id": "N05",
+      "category": "animal_to_human",
+      "claim": "Treatment X improved survival in human patients [1].",
+      "sources": {
+        "1": "Treatment X improved survival in mice. Human efficacy was not evaluated."
+      },
+      "expected": "unsupported"
+    },
+    {
+      "id": "N06",
+      "category": "wrong_unit",
+      "claim": "Compound X was effective at a concentration of 5 mg/mL [1].",
+      "sources": {
+        "1": "Compound X was effective at a concentration of 5 micrograms/mL."
+      },
+      "expected": "unsupported"
+    },
+    {
+      "id": "N07",
+      "category": "population_scope",
+      "claim": "Treatment X benefits adults and children [1].",
+      "sources": {
+        "1": "Treatment X improved the measured outcome among adults aged 65 years or older. Children were excluded from the trial."
+      },
+      "expected": "partial"
+    },
+    {
+      "id": "N08",
+      "category": "compound_claim",
+      "claim": "Compound X reduced tumor growth by 12% and cured the disease [1].",
+      "sources": {
+        "1": "Compound X reduced tumor growth by 12% in cultured cells. Disease cure was not assessed."
+      },
+      "expected": "partial"
+    },
+    {
+      "id": "N09",
+      "category": "missing_citation",
+      "claim": "Compound X reduced tumor growth by 12%.",
+      "sources": {
+        "1": "Compound X reduced tumor growth by 12%."
+      },
+      "expected": "unverifiable"
+    },
+    {
+      "id": "N10",
+      "category": "unresolved_citation",
+      "claim": "Compound X reduced tumor growth by 12% [9].",
+      "sources": {
+        "1": "Compound X reduced tumor growth by 12%."
+      },
+      "expected": "unverifiable"
+    },
+    {
+      "id": "P02",
+      "category": "late_supporting_passage",
+      "claim": "Marker M regulates tumor proliferation [1].",
+      "sources": {
+        "1": "Unrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nUnrelated observations about weather.\n\nMarker M regulates tumor proliferation in cultured cells."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "N11",
+      "category": "one_of_multiple_citations_unrelated",
+      "claim": "Marker M regulates tumor proliferation [1, 2].",
+      "sources": {
+        "1": "Marker M regulates tumor proliferation in cultured cells.",
+        "2": "Study B measured rainfall patterns. Tumor proliferation was not examined."
+      },
+      "expected": "unverifiable"
+    },
+    {
+      "id": "P03",
+      "category": "association_supported",
+      "claim": "Higher marker M is associated with increased disease risk [1].",
+      "sources": {
+        "1": "In an observational cohort, higher marker M was associated with increased disease risk. Causality was not established."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "N12",
+      "category": "cross_language_numeric_mismatch",
+      "claim": "该化合物将肿瘤生长降低了42%。[1]",
+      "sources": {
+        "1": "Compound X reduced tumor growth by 12% in cultured cells."
+      },
+      "expected": "unsupported"
+    },
+    {
+      "id": "Q01",
+      "category": "explicit_cell_scope",
+      "claim": "In cultured tumor cells, Compound X reduced tumor growth by 12% [1].",
+      "sources": {
+        "1": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "Q02",
+      "category": "explicit_regulation_scope",
+      "claim": "In cultured cells, marker M regulates tumor proliferation [1].",
+      "sources": {
+        "1": "Marker M regulates tumor proliferation in cultured cells."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "Q03",
+      "category": "equivalent_concentration_units",
+      "claim": "Compound X was effective at 0.005 mg/mL [1].",
+      "sources": {
+        "1": "Compound X was effective at 5 micrograms/mL."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "Q04",
+      "category": "explicit_randomized_causality",
+      "claim": "In a randomized experiment, increasing M caused increased risk [1].",
+      "sources": {
+        "1": "In a randomized experiment, increasing M caused increased risk."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "Q05",
+      "category": "qualified_animal_result",
+      "claim": "Treatment X improved survival in mice [1].",
+      "sources": {
+        "1": "Treatment X improved survival in mice. Human efficacy was not evaluated."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "Q06",
+      "category": "no_causation_statement",
+      "claim": "The observational study did not establish causality [1].",
+      "sources": {
+        "1": "In an observational cohort, higher marker M was associated with increased disease risk. The study did not establish causality."
+      },
+      "expected": "supported"
+    }
+  ]
+}

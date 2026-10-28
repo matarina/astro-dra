@@ -1,0 +1,910 @@
+{
+  "run_at_utc": "2026-10-16T01:31:27.695879+00:00",
+  "model": "deepseek-v4-flash",
+  "temperature": 0,
+  "synthetic": false,
+  "strategy": "source-based",
+  "search_engine": "PubMedSearchEngine",
+  "search_iterations": 1,
+  "paper_scope": "33567185",
+  "scope": "Actual strategy and detailed generator; disposable SQLite/file/export. No production HTTP login/task or independent expert adjudication.",
+  "source_count": 3,
+  "source_artifacts": [
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:2a5161ae890861143dd10c686410058b11dde52659d3e55d75deed9eeeb55092",
+      "basis": "abstract",
+      "content_sha256": "5dea6f7f072a14bf1dcbfc4f6d6bc56be49d3736ab7063ba183d20f782dfdbd5"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:a7611b6a0544256055a8e7cd3660e5e3e2f54de7fb26e5631172749127b9cb9e",
+      "basis": "abstract",
+      "content_sha256": "5dea6f7f072a14bf1dcbfc4f6d6bc56be49d3736ab7063ba183d20f782dfdbd5"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+      "basis": "abstract",
+      "content_sha256": "329c44b2867c6286ab72ff86c544aed3b1846d671476712705a0816959dcc10d"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:001be0a6c289c8c0ce4aa1e398df9dbe402305b68ecf5271a3039706c5cfcba0",
+      "basis": "snippet",
+      "content_sha256": "684e304a2fe26eae32f148932a4dfdedc68bd99f6692f517687088a9ef57fad3"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:2a5161ae890861143dd10c686410058b11dde52659d3e55d75deed9eeeb55092",
+      "basis": "abstract",
+      "content_sha256": "5dea6f7f072a14bf1dcbfc4f6d6bc56be49d3736ab7063ba183d20f782dfdbd5"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:a7611b6a0544256055a8e7cd3660e5e3e2f54de7fb26e5631172749127b9cb9e",
+      "basis": "abstract",
+      "content_sha256": "5dea6f7f072a14bf1dcbfc4f6d6bc56be49d3736ab7063ba183d20f782dfdbd5"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+      "basis": "abstract",
+      "content_sha256": "329c44b2867c6286ab72ff86c544aed3b1846d671476712705a0816959dcc10d"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:001be0a6c289c8c0ce4aa1e398df9dbe402305b68ecf5271a3039706c5cfcba0",
+      "basis": "snippet",
+      "content_sha256": "684e304a2fe26eae32f148932a4dfdedc68bd99f6692f517687088a9ef57fad3"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:2a5161ae890861143dd10c686410058b11dde52659d3e55d75deed9eeeb55092",
+      "basis": "abstract",
+      "content_sha256": "5dea6f7f072a14bf1dcbfc4f6d6bc56be49d3736ab7063ba183d20f782dfdbd5"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:a7611b6a0544256055a8e7cd3660e5e3e2f54de7fb26e5631172749127b9cb9e",
+      "basis": "abstract",
+      "content_sha256": "5dea6f7f072a14bf1dcbfc4f6d6bc56be49d3736ab7063ba183d20f782dfdbd5"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+      "basis": "abstract",
+      "content_sha256": "329c44b2867c6286ab72ff86c544aed3b1846d671476712705a0816959dcc10d"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:001be0a6c289c8c0ce4aa1e398df9dbe402305b68ecf5271a3039706c5cfcba0",
+      "basis": "snippet",
+      "content_sha256": "684e304a2fe26eae32f148932a4dfdedc68bd99f6692f517687088a9ef57fad3"
+    }
+  ],
+  "quick": {
+    "status": "partial",
+    "verified_claims": 4,
+    "action_reasons": [
+      {
+        "action": "retained",
+        "reason": "[1] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "retained",
+        "reason": "[1] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "pending",
+        "reason": "[1] quote_not_found",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "retained",
+        "reason": "[1] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "pending",
+        "reason": "[1] semantic_uncertain",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "retained",
+        "reason": "[1] located_quote",
+        "repair_reason": "supported"
+      }
+    ],
+    "actions": {
+      "retained": 4,
+      "revised": 0,
+      "removed": 0,
+      "pending": 3
+    },
+    "sources": [
+      {
+        "index": 1,
+        "original_indices": [
+          1
+        ],
+        "paper_id": "doi:10.1056/nejmoa2032183",
+        "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+        "title": "Once-Weekly Semaglutide in Adults with Overweight or Obesity.",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/33567185/"
+      }
+    ],
+    "content_sha256": "297836b368aeaff72ef38bf3599e43916bd23ce574567a9f662cd2af5542d594",
+    "reason_code": "publication_complete",
+    "checks": [
+      {
+        "claim_sha256": "0e313acef1f4a9f613c2b8ca86fe718042be4687cb8ae180818deae7e4f5dd5a",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "30770645109d916f2f9884a89cca182f6c6f680dd924c39b649abd7496ef0761",
+            "quote_verified": true
+          }
+        ]
+      },
+      {
+        "claim_sha256": "15504e275e22c3afcf8f8e7cc8f3be1644bf490b74d131089b390623f7fd9acb",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "6f69c4589955363631e2927f45f2249d006306ce88494f9ccc070df9791720ae",
+            "quote_verified": true
+          }
+        ]
+      },
+      {
+        "claim_sha256": "5db59a0d5d9d53df86fe0cf4679baf643513d4805032aad5a2ed09366bafa670",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "66c405ee7ad4067453feabaddbadbccc5e0f491aa59ec09b19b8dcd26ae8deaf",
+            "quote_verified": true
+          }
+        ]
+      },
+      {
+        "claim_sha256": "bbd808d2ea74245934c68c319c565ed141b014e24d364e52eda517efc5ee9098",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "e01482f90845fedb511e9b63fb9afab833651650c23a369cae7390f4f59a4d31",
+            "quote_verified": true
+          }
+        ]
+      }
+    ]
+  },
+  "detailed": {
+    "status": "partial",
+    "verified_claims": 5,
+    "action_reasons": [
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "retained",
+        "reason": "[2] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "retained",
+        "reason": "[2] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "pending",
+        "reason": "[2] partial_support",
+        "repair_reason": "repair_not_supported"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "retained",
+        "reason": "[3] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "pending",
+        "reason": "[3] semantic_uncertain",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "retained",
+        "reason": "[3] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "retained",
+        "reason": "[3] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "pending",
+        "reason": "[3] semantic_uncertain",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[3] semantic_uncertain",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      }
+    ],
+    "actions": {
+      "retained": 5,
+      "revised": 0,
+      "removed": 0,
+      "pending": 11
+    },
+    "sources": [
+      {
+        "index": 1,
+        "original_indices": [
+          2,
+          3
+        ],
+        "paper_id": "doi:10.1056/nejmoa2032183",
+        "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+        "title": "Once-Weekly Semaglutide in Adults with Overweight or Obesity.",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/33567185/"
+      }
+    ],
+    "content_sha256": "2af0f4819f9de062ffd62cfe548c9ed3bde7a2413db7370b9ed5c03c7d1b8e4c",
+    "reason_code": "publication_complete",
+    "checks": [
+      {
+        "claim_sha256": "4b8547116cdcead79c0e1efd2a154ccd5967f868cc83b9453210aa859fbf96d8",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "30770645109d916f2f9884a89cca182f6c6f680dd924c39b649abd7496ef0761",
+            "quote_verified": true
+          }
+        ]
+      },
+      {
+        "claim_sha256": "1a1b8b29083377cd3efb70e1f611e6e39721394d8b2baeabde392763ef0572e0",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "6f69c4589955363631e2927f45f2249d006306ce88494f9ccc070df9791720ae",
+            "quote_verified": true
+          }
+        ]
+      },
+      {
+        "claim_sha256": "2667f21236c5b1345234352124b0613dbc59a35b152e7dc332cd29f25faeb3d1",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "66c405ee7ad4067453feabaddbadbccc5e0f491aa59ec09b19b8dcd26ae8deaf",
+            "quote_verified": true
+          }
+        ]
+      },
+      {
+        "claim_sha256": "7edf2810c7e4583f4308601bb089107fc459b2f6bb41673237698cb4efca5dc7",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "e01482f90845fedb511e9b63fb9afab833651650c23a369cae7390f4f59a4d31",
+            "quote_verified": true
+          }
+        ]
+      },
+      {
+        "claim_sha256": "b63aa8cb2e6de996569c63e5337e64334a6c30fc75bc047e07d4e76bc497d983",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "b65a2d7e543355eca9976bd296abac455ad2d94e4cfdb4819ef6979f2311b679",
+            "quote_verified": true
+          }
+        ]
+      }
+    ]
+  },
+  "storage_and_exports": [
+    {
+      "mode": "quick",
+      "database_equal": true,
+      "audit_roundtrip": true,
+      "chat_body_equal": true,
+      "file_equal": true,
+      "display_prefix_equal": true,
+      "exports": {
+        "quarto": {
+          "bytes": 2167,
+          "sha256": "cbb255ff19c9b51567a4941482d67b6432c94051dcaaf8a0061ccfe589e972b8",
+          "mimetype": "application/zip"
+        },
+        "latex": {
+          "bytes": 4070,
+          "sha256": "6477fa820cc0448799bb77edd384639166944e6c57ee0d050ccb6daf2ef2ea85",
+          "mimetype": "text/plain"
+        },
+        "odt": {
+          "bytes": 8949,
+          "sha256": "1b9c21de88299dd92cd3bea2457934fc9d2d0dd96bab4f8b32b126418822ddc0",
+          "mimetype": "application/vnd.oasis.opendocument.text"
+        },
+        "pdf": {
+          "bytes": 250437,
+          "sha256": "467aeb75e3f13f50932c55037361dc210700e4b417b0422639743052076d7325",
+          "mimetype": "application/pdf"
+        },
+        "ris": {
+          "bytes": 239,
+          "sha256": "4a1715e8bde94d8f78ad2c16ece9c8ef3d15f6f444073848427125346ddfe803",
+          "mimetype": "text/plain"
+        }
+      }
+    },
+    {
+      "mode": "detailed",
+      "database_equal": true,
+      "audit_roundtrip": true,
+      "chat_body_equal": true,
+      "file_equal": true,
+      "display_prefix_equal": true,
+      "exports": {
+        "quarto": {
+          "bytes": 2969,
+          "sha256": "3794675a44ae541fe0955fb4e436536bc9a607578c56e92f28eb62172c9c235a",
+          "mimetype": "application/zip"
+        },
+        "latex": {
+          "bytes": 6458,
+          "sha256": "9f0aad2663f743b4b4f5728d42518c12f7053ab959b2da83d9390516d2260c2b",
+          "mimetype": "text/plain"
+        },
+        "odt": {
+          "bytes": 9815,
+          "sha256": "b1d9a2b39e06e546598d1de0c0915f71d2f0ba2261623db37d20d64bdd26d2a7",
+          "mimetype": "application/vnd.oasis.opendocument.text"
+        },
+        "pdf": {
+          "bytes": 307451,
+          "sha256": "4c036d711e3c144ca285dbd0e0dd5d74d46221d5b114b327e5ba79b0add5f54e",
+          "mimetype": "application/pdf"
+        },
+        "ris": {
+          "bytes": 239,
+          "sha256": "4a1715e8bde94d8f78ad2c16ece9c8ef3d15f6f444073848427125346ddfe803",
+          "mimetype": "text/plain"
+        }
+      }
+    }
+  ],
+  "faults": {
+    "verification_disabled": {
+      "status": "withheld",
+      "reason_code": "verification_disabled"
+    },
+    "model_offline": {
+      "status": "withheld",
+      "reason_code": "revision_complete"
+    },
+    "sources_unavailable": {
+      "status": "withheld",
+      "reason_code": "revision_complete"
+    },
+    "numeric_mutation": {
+      "status": "withheld",
+      "reason_code": "revision_complete"
+    }
+  },
+  "qualifier_controls": {
+    "mechanism_from_eligibility": {
+      "verdict": "unverifiable",
+      "reason": "[17] semantic_uncertain"
+    },
+    "named_estimand_substitution": {
+      "verdict": "unverifiable",
+      "reason": "[17] semantic_uncertain"
+    }
+  },
+  "located_final_quotes": 9,
+  "elapsed_s": 229.063,
+  "model_calls": [
+    {
+      "elapsed_s": 0.727,
+      "usage": {
+        "input_tokens": 145,
+        "output_tokens": 72,
+        "total_tokens": 217,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 2.558,
+      "usage": {
+        "input_tokens": 5792,
+        "output_tokens": 285,
+        "total_tokens": 6077,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.137,
+      "usage": {
+        "input_tokens": 826,
+        "output_tokens": 607,
+        "total_tokens": 1433,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.537,
+      "usage": {
+        "input_tokens": 834,
+        "output_tokens": 642,
+        "total_tokens": 1476,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.254,
+      "usage": {
+        "input_tokens": 772,
+        "output_tokens": 493,
+        "total_tokens": 1265,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.781,
+      "usage": {
+        "input_tokens": 1164,
+        "output_tokens": 790,
+        "total_tokens": 1954,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 7.42,
+      "usage": {
+        "input_tokens": 1144,
+        "output_tokens": 869,
+        "total_tokens": 2013,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.728,
+      "usage": {
+        "input_tokens": 1133,
+        "output_tokens": 791,
+        "total_tokens": 1924,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.844,
+      "usage": {
+        "input_tokens": 826,
+        "output_tokens": 591,
+        "total_tokens": 1417,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.605,
+      "usage": {
+        "input_tokens": 834,
+        "output_tokens": 667,
+        "total_tokens": 1501,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 7.022,
+      "usage": {
+        "input_tokens": 1164,
+        "output_tokens": 837,
+        "total_tokens": 2001,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.618,
+      "usage": {
+        "input_tokens": 1133,
+        "output_tokens": 547,
+        "total_tokens": 1680,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 0.791,
+      "usage": {
+        "input_tokens": 511,
+        "output_tokens": 81,
+        "total_tokens": 592,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 1.686,
+      "usage": {
+        "input_tokens": 564,
+        "output_tokens": 186,
+        "total_tokens": 750,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 1.892,
+      "usage": {
+        "input_tokens": 6108,
+        "output_tokens": 161,
+        "total_tokens": 6269,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 1.118,
+      "usage": {
+        "input_tokens": 793,
+        "output_tokens": 141,
+        "total_tokens": 934,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.372,
+      "usage": {
+        "input_tokens": 6340,
+        "output_tokens": 417,
+        "total_tokens": 6757,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.833,
+      "usage": {
+        "input_tokens": 1150,
+        "output_tokens": 577,
+        "total_tokens": 1727,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.571,
+      "usage": {
+        "input_tokens": 832,
+        "output_tokens": 595,
+        "total_tokens": 1427,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.647,
+      "usage": {
+        "input_tokens": 858,
+        "output_tokens": 869,
+        "total_tokens": 1727,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.668,
+      "usage": {
+        "input_tokens": 1170,
+        "output_tokens": 803,
+        "total_tokens": 1973,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 7.547,
+      "usage": {
+        "input_tokens": 1158,
+        "output_tokens": 911,
+        "total_tokens": 2069,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.041,
+      "usage": {
+        "input_tokens": 1082,
+        "output_tokens": 579,
+        "total_tokens": 1661,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 7.375,
+      "usage": {
+        "input_tokens": 1203,
+        "output_tokens": 935,
+        "total_tokens": 2138,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 11.109,
+      "usage": {
+        "input_tokens": 1126,
+        "output_tokens": 1348,
+        "total_tokens": 2474,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.582,
+      "usage": {
+        "input_tokens": 1179,
+        "output_tokens": 789,
+        "total_tokens": 1968,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 0.807,
+      "usage": {
+        "input_tokens": 360,
+        "output_tokens": 88,
+        "total_tokens": 448,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.217,
+      "usage": {
+        "input_tokens": 862,
+        "output_tokens": 627,
+        "total_tokens": 1489,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 0.762,
+      "usage": {
+        "input_tokens": 360,
+        "output_tokens": 86,
+        "total_tokens": 446,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.405,
+      "usage": {
+        "input_tokens": 860,
+        "output_tokens": 658,
+        "total_tokens": 1518,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.648,
+      "usage": {
+        "input_tokens": 1150,
+        "output_tokens": 567,
+        "total_tokens": 1717,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.149,
+      "usage": {
+        "input_tokens": 832,
+        "output_tokens": 630,
+        "total_tokens": 1462,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.907,
+      "usage": {
+        "input_tokens": 1170,
+        "output_tokens": 847,
+        "total_tokens": 2017,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.11,
+      "usage": {
+        "input_tokens": 1082,
+        "output_tokens": 624,
+        "total_tokens": 1706,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 7.759,
+      "usage": {
+        "input_tokens": 1203,
+        "output_tokens": 933,
+        "total_tokens": 2136,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.004,
+      "usage": {
+        "input_tokens": 1113,
+        "output_tokens": 695,
+        "total_tokens": 1808,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.346,
+      "usage": {
+        "input_tokens": 699,
+        "output_tokens": 635,
+        "total_tokens": 1334,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.453,
+      "usage": {
+        "input_tokens": 1063,
+        "output_tokens": 735,
+        "total_tokens": 1798,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    }
+  ],
+  "checks_passed": true,
+  "image_id": "sha256:5c6f60594e5b9f439403e705155dad55dba20a512d68c5ab1247a1338b169952",
+  "code_commit": "bfb2e003cf6745aa29eec8abe027ae302c2a91c4",
+  "working_tree_dirty": true,
+  "code_sha256": {
+    "local_deep_research/research_verify/__init__.py": "11538d04e2443ee3571d687989ffac6af46c4abdff816fb7e189f927853af4f3",
+    "local_deep_research/research_verify/__main__.py": "e8aba19bda5166eca8ffc06bd4647381c51bd8abd6dec15514d05f25292b9dcf",
+    "local_deep_research/research_verify/citation_qc.py": "9ccf88653bc2214f17b6fb844d6f1eaaa341078d801d4c3daed28dab631df65a",
+    "local_deep_research/research_verify/claims.py": "ef1eea19d3972d2b3ed80f72395fed104ebc79721872d3cba703a59e06ede08d",
+    "local_deep_research/research_verify/cli_check.py": "85cf079a8717d6387e73220ae986fdfbe8ec3fa0548984c40bff82ca37334d2a",
+    "local_deep_research/research_verify/config.py": "3260e211d780e356e1a2992ed9fb4a325a2197ca2e5705b77d5d2ceac2d7f458",
+    "local_deep_research/research_verify/constraint_matcher.py": "fde82942bf3a0ebe67603be94ce8960272bc7643c16a345fc641da6b2671317e",
+    "local_deep_research/research_verify/contracts.py": "30a461f449b2446b693c45775fb613791743adffd0b22c1008c7c1a1dc274b2a",
+    "local_deep_research/research_verify/doi_validator.py": "9656f05d4c506ed56c2faae16fa0132f1fc5effb0b0423ef6c78263172ab1606",
+    "local_deep_research/research_verify/evidence.py": "b986eda63f70544c608e9082fafa8605785aba18b8c3419c405b24326a6ba5fd",
+    "local_deep_research/research_verify/http_client.py": "d3dfcf448315b093ffbb243bf9b6a0bf82c257cda48dc0de301c52e01a8a1198",
+    "local_deep_research/research_verify/keyword_cov.py": "560579e7217fe734337455e3494693a2d550b8f04544d76b2f38439ff61771da",
+    "local_deep_research/research_verify/models.py": "eaa2690ce2a5d456bb5060f38ec1317c4c93f7786c3d6710136e0205df64922f",
+    "local_deep_research/research_verify/passages.py": "0cb026fc22bbc185b962caeaba3f72c135f6479c53a3d7c5ffd2ec7536aa5b16",
+    "local_deep_research/research_verify/publication.py": "dc3e4c690a983d5d8beaa9e6c6c5c59c9cbe39fec02493afba25ee76f9a816b8",
+    "local_deep_research/research_verify/revision.py": "d871ed6e4e2c0033d6fdfa8e21fa011b29ad08e75d614b7980b500bece7b7bf7",
+    "local_deep_research/research_verify/semantics.py": "8d600cc124c5fb0803196a9675835d8168b1d716091583af4874e8626f493894",
+    "local_deep_research/research_verify/textutil.py": "702db5973b2b6cd192a5f7276590e1ce7357011c03584a487695966331a48a3a"
+  }
+}

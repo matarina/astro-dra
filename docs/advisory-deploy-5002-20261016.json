@@ -1,0 +1,17 @@
+{
+  "image_tag": "astro-dra:advisory-20261016",
+  "image_id": "sha256:4d848ee3f457f25031847e9cc36adaea327aaaf8645dce08d333d33fdec4c196",
+  "image_match": true,
+  "health": "healthy",
+  "login_http_status": 200,
+  "volumes": {
+    "/data": "astro-dra-test-5002_ldr_data",
+    "/app/.config/local_deep_research": "astro-dra-test-5002_ldr_config"
+  },
+  "smoke": {
+    "preservation_smoke": true,
+    "publication_sha256": "548d05e34bbf9a01f91e6db6b6c847012304b8ee1d81711e3df3814357c79171",
+    "matches_worktree": true
+  },
+  "checks_passed": true
+}

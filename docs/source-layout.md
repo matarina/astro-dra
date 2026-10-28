@@ -18,6 +18,6 @@
 
 修改部署行为时，应修改补丁并重建根目录镜像；修改旁置源码时，应明确后续采用源码构建还是将变更移植到部署补丁。当前没有自动同步流程。旧 Dockerfile 的 `latest` 构建方式只为保留历史部署而保留。
 
-新增核验能力以 [严格核验工程计划](ldr-verification-engineering-plan.md) 为验收依据。`research_verify/README.md` 的模块说明描述当前标注式实现；旧需求文档中的完成状态不代表严格流程已实现。
+当前行为以[累计变化](5002-vs-main-20261028.md)、[当前证据流程](review-repairs-model-comparison-20261027.md)及开发接续为准；下表是早期五目标概览，实际安装清单现含24个目标，以manifest为准。`research_verify`同时包含运行模块、独立CLI及旧数据兼容，安装存在不代表全部启用。早期严格核验计划与试验报告只作历史记录。
 
 根目录 `requirements-test.txt` 仅包含独立核验测试所需依赖，带版本范围，尚未作为完整依赖锁文件。当前 Docker 构建固定上游镜像 digest 和额外 `ddgs` 版本，其传递依赖仍由 pip 解析，因此不宣称逐位可重现。

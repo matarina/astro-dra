@@ -1,0 +1,368 @@
+{
+  "application_settings": {
+    "post_report_citation_qc": false,
+    "native_fact_check": true,
+    "max_unique_sources": 200
+  },
+  "tests": {
+    "passed": 296,
+    "seconds": 2.48
+  },
+  "deployment": {
+    "containers": [
+      {
+        "name": "/astro-dra-test-5002-local-deep-research-1",
+        "id": "97415ecc1ac791d6d6673523cc35bcde547eb004da895613daa5bc952379a87f",
+        "image": "sha256:2f69a6dafd35e0d9d91b84b6da756415428bc1337a4145fe3a6b6b73a2f5f726",
+        "started": "2026-10-21T06:10:27.195559831Z",
+        "health": "healthy"
+      },
+      {
+        "name": "/local_deep_research-local-deep-research-1",
+        "id": "3cd64119d61e68c91b31b0011eb43db47beda07ca23b6cf17188b92aa73945ab",
+        "image": "sha256:e94a4b527a6f61778da2aa7b2994722562fbfadac0dda9c6b499f64a16a5b1b2",
+        "started": "2026-10-15T08:59:54.908821447Z",
+        "health": "healthy"
+      },
+      {
+        "name": "/astro-dra-test-5002-searxng-1",
+        "id": "9655738081a5fad292ecc54fa731aa706d9f53e14de1d61db61f36060efcd735",
+        "image": "sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+        "started": "2026-10-16T07:57:47.700526115Z",
+        "health": "healthy"
+      },
+      {
+        "name": "/astro-dra-test-5002-proxy-relay-1",
+        "id": "41ef5cc8f21f718d545f79b011c8f48c44e323aeb41c48c0ba08bf1b17ac904d",
+        "image": "sha256:fc50ef18b85cc5943cf5965be121dd36d1fe01e3fb14403a73a0a29731220bad",
+        "started": "2026-10-16T07:26:42.115715988Z",
+        "health": "healthy"
+      }
+    ],
+    "other_services_unchanged": true
+  },
+  "installed_checks": {
+    "post_report_qc_disabled": true,
+    "native_fact_check_enabled": true,
+    "source_capacity_200": true,
+    "citing_pmc_rejected": true,
+    "identity_in_prompt": true
+  },
+  "live_pmc_checks": {
+    "35512705": {
+      "own_pmc_id": null
+    },
+    "36385528": {
+      "own_pmc_id": "PMC9684076"
+    },
+    "verified_fulltext": {
+      "chars": 82766,
+      "expected_visium_sentence_present": true
+    }
+  },
+  "same_response_parser_comparison": {
+    "responses": 171,
+    "old_parser_failures": 38,
+    "new_parser_failures": 3,
+    "changed_examples": [
+      {
+        "chars": 10,
+        "old": null,
+        "new": [
+          0,
+          4
+        ],
+        "response": "[\"0\", \"4\"]"
+      },
+      {
+        "chars": 15,
+        "old": null,
+        "new": [
+          1,
+          3,
+          4
+        ],
+        "response": "[\"1\", \"3\", \"4\"]"
+      },
+      {
+        "chars": 25,
+        "old": null,
+        "new": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "response": "[\"0\", \"1\", \"2\", \"3\", \"4\"]"
+      },
+      {
+        "chars": 9,
+        "old": null,
+        "new": [
+          0,
+          1
+        ],
+        "response": "[\"0\",\"1\"]"
+      },
+      {
+        "chars": 15,
+        "old": null,
+        "new": [
+          0,
+          1,
+          2
+        ],
+        "response": "[\"0\", \"1\", \"2\"]"
+      },
+      {
+        "chars": 9,
+        "old": null,
+        "new": [
+          0,
+          1
+        ],
+        "response": "[\"0\",\"1\"]"
+      },
+      {
+        "chars": 5,
+        "old": null,
+        "new": [
+          1
+        ],
+        "response": "[\"1\"]"
+      },
+      {
+        "chars": 13,
+        "old": null,
+        "new": [
+          0,
+          1,
+          3
+        ],
+        "response": "[\"0\",\"1\",\"3\"]"
+      }
+    ]
+  },
+  "format_retries": {
+    "initial_invalid_responses": 3,
+    "recovered_by_one_retry": 3,
+    "unrecovered": 0,
+    "repairs": [
+      {
+        "initial_artifact": "artifacts/0309-model-output-relevance_filter.json.gz",
+        "initial_response": "[json array of 0-based indices matching the query criteria]\n\nBased on the query \"Visium HD\" AND (deconvolution OR \"cell type\" OR annotation OR clustering), I need to evaluate the relevance of each result.\n\n[0] \"Spatial transcriptomics profiling across tissue boundaries in the developing mouse brain\" - No abstract available, metadata only. No evidence of relevance to Visium HD, deconvolution, cell type, annotation, or clustering. Cannot confirm match.\n\n[1] \"SMURF: soft-segmentation for single-cell reconstruction and topological analysis of spatial transcriptomic data\" - The abstract explicitly mentions using Visium HD data, segmentation of cells, and analyzing cell-type organization. It directly matches the query's technology (Visium HD) and topics (cell type, clustering/organization).\n\nTherefore, only result [1] is relevant.\n\n```json\n[1]\n```",
+        "retry_artifact": "artifacts/0311-model-output-relevance_filter.json.gz",
+        "retry_response": "[1]",
+        "recovered": true
+      },
+      {
+        "initial_artifact": "artifacts/0401-model-output-relevance_filter.json.gz",
+        "initial_response": "[json]\n[0]\n[/json]",
+        "retry_artifact": "artifacts/0408-model-output-relevance_filter.json.gz",
+        "retry_response": "[0]",
+        "recovered": true
+      },
+      {
+        "initial_artifact": "artifacts/0656-model-output-relevance_filter.json.gz",
+        "initial_response": "{\"0\": true, \"1\": true}",
+        "retry_artifact": "artifacts/0660-model-output-relevance_filter.json.gz",
+        "retry_response": "[0, 1]",
+        "recovered": true
+      }
+    ]
+  },
+  "searxng_direct": [
+    {
+      "query": "OpenAI",
+      "status": 200,
+      "raw_results": 10,
+      "unresponsive_engines": [],
+      "errors": null,
+      "sample": [
+        {
+          "title": "OpenAI | Research & Deployment",
+          "url": "https://openai.com/",
+          "engine": "bing"
+        },
+        {
+          "title": "OpenAI (@OpenAI) / X",
+          "url": "https://x.com/OpenAI",
+          "engine": "bing"
+        },
+        {
+          "title": "OpenAI - LinkedIn",
+          "url": "https://www.linkedin.com/company/openai",
+          "engine": "bing"
+        }
+      ]
+    },
+    {
+      "query": "spatial transcriptomics",
+      "status": 200,
+      "raw_results": 0,
+      "unresponsive_engines": [],
+      "errors": null,
+      "sample": []
+    },
+    {
+      "query": "Visium spatial transcriptomics atlas Nature",
+      "status": 200,
+      "raw_results": 0,
+      "unresponsive_engines": [],
+      "errors": null,
+      "sample": []
+    }
+  ],
+  "bing_html": [
+    {
+      "query": "OpenAI",
+      "status": 200,
+      "bytes": 120880,
+      "title": "OpenAI - Search",
+      "b_results": 1,
+      "b_algo": 10,
+      "captcha_markers": false
+    },
+    {
+      "query": "spatial transcriptomics",
+      "status": 200,
+      "bytes": 90139,
+      "title": "spatial transcriptomics - Search",
+      "b_results": 1,
+      "b_algo": 0,
+      "captcha_markers": false
+    }
+  ],
+  "native_comparison": [
+    {
+      "enabled": false,
+      "seconds": 4.904,
+      "call_count": 1,
+      "answer": "根据提供的材料，草稿中的三项内容均需修正：\n\n1. **发表年份**：该研究发表于 **2022年11月**（Nature），而非2025年 [17]。\n\n2. **空间技术**：研究使用的是 **10x Visium空间转录组学** 和 **GeoMx数字空间 profiling**，并未提及“Visium HD”（该技术为后续版本，摘要中未出现）[17]。\n\n3. **结论范围**：摘要仅报告了 **口腔鳞状细胞癌和结直肠癌** 患者肿瘤组织中的空间、细胞和分子宿主-微生物互作，显示细菌定植于低血管化、免疫抑制的微生态位，并与癌细胞侵袭及髓系细胞募集相关 [17]。摘要 **未提及任何随机临床试验**，也未报告“去除细菌提高癌症患者生存率”的结论——该表述属于草稿中的虚构或误解，与源文本不符 [17]。\n\n**解读：** 所提供的摘要仅覆盖基础研究（空间转录组、单细胞RNA测序及功能实验），未涉及临床干预或生存数据；因此草稿中的“随机临床试验证明去除细菌提高生存率”缺乏证据支持，且发表年份和技术描述均需更正为上述内容。"
+    },
+    {
+      "enabled": true,
+      "seconds": 12.419,
+      "call_count": 2,
+      "answer": "根据来源[17]，该研究发表于**2022年11月**的《Nature》[17]，而非草稿所称的2025年。研究使用的是**10x Visium空间转录组学**（以及GeoMx数字空间 profiling 和自研的INVADEseq单细胞RNA测序方法）[17]，来源摘要中**未提及“Visium HD”**。该研究为**观察性/机制性研究**，基于患者肿瘤组织进行空间定位和功能实验[17]，**并非随机临床试验**，摘要中也**未报告去除细菌提高患者生存率**这一结论；相反，摘要指出细菌定植的微环境与免疫抑制和癌症进展相关[17]。草稿中的发表年份、技术名称、研究类型和结论范围均与来源不符，仅“发表于Nature”这一点一致[17]。"
+    }
+  ],
+  "full_run": {
+    "summary": {
+      "state": "complete",
+      "variant": "installed",
+      "mode": "quick",
+      "elapsed_s": 368.124,
+      "model": "deepseek-v4-flash",
+      "strategy": "langgraph-agent",
+      "research_error": null,
+      "report_chars": 18433,
+      "sources_collected": 163,
+      "sources_cited": 105,
+      "audit_status": "disabled",
+      "audited_claims": 0,
+      "warnings": [],
+      "exports": {
+        "pdf": {
+          "bytes": 605381,
+          "mime": "application/pdf"
+        },
+        "ris": {
+          "bytes": 29742,
+          "mime": "text/plain"
+        }
+      },
+      "counts": {
+        "http": 475,
+        "research_start": 1,
+        "progress": 49,
+        "model_start": 245,
+        "model_end": 245,
+        "artifact": 942,
+        "search_start": 140,
+        "search_end": 140,
+        "relevance_end": 71,
+        "collector_add": 66,
+        "page_fetch": 19,
+        "fetch_registration": 7,
+        "agent_draft": 1,
+        "writer_start": 1,
+        "writer_end": 1,
+        "publication_end": 1
+      }
+    },
+    "effective_source_limit": 200,
+    "searches_by_engine": {
+      "searxng": 45,
+      "europepmc": 39,
+      "pubmed": 56
+    },
+    "sources_by_engine": {
+      "europepmc": 95,
+      "pubmed": 64,
+      "fetch": 4
+    },
+    "source_years": {
+      "2026": 133,
+      "2025": 16,
+      "unknown": 4,
+      "2024": 6,
+      "2022": 3,
+      "2023": 1
+    },
+    "source_abstracts": 157,
+    "source_preprints": 15,
+    "collection": {
+      "batches": 66,
+      "added": 159,
+      "reused": 135,
+      "unregistered": 0
+    },
+    "cited_sources_after80": 48,
+    "known_benchmark_collected": true,
+    "model_phases": {
+      "agent": 62,
+      "focused_extraction_or_helper": 10,
+      "relevance_filter": 171,
+      "native_fact_check": 1,
+      "final_writer": 1
+    },
+    "native_fact_check_seconds": 11.418,
+    "native_feedback_used_in_final_prompt": true,
+    "post_writer_publication_seconds": 0.63,
+    "writer_input_chars": 126752,
+    "source_blocks_in_actual_prompt": 163,
+    "metadata_missing_from_source_block": [],
+    "remaining_journal_error": {
+      "source": {
+        "index": "38",
+        "title": "Spatial transcriptomic profiling of porcine tissue microarray detecting subclinical circovirus infection.",
+        "journal": "Frontiers in veterinary science",
+        "doi": "10.3389/fvets.2026.1900962",
+        "pubdate": "2026-09-17"
+      },
+      "correct_journal_in_actual_prompt": true,
+      "report_line": "- **Nature Communications (2026)** 猪组织微阵列亚临床圆环病毒感染检测使用Stereo-seq随机引物捕获，随后进行无监督细胞聚类[[76]](https://europepmc.org/article/MED/42824453)。"
+    },
+    "native_review_overgeneralization": {
+      "claim_all_sources_2025_2026": true,
+      "sources_before2025": 10
+    },
+    "export_checks": {
+      "pdf_header": true,
+      "sqlite_header": true,
+      "ris_records": 105
+    }
+  },
+  "limitations": [
+    "No independent report accuracy measurement.",
+    "Native consistency review can miss or introduce mistaken claims.",
+    "JIF and full-method evidence requirements remain unmet.",
+    "Fetch tool still limits source text to its opening 10000 characters.",
+    "200-source limit still uses first-come registration.",
+    "Programmatic full run does not exercise encrypted account web authentication."
+  ],
+  "backup": "/data/ningh/nh/ldr-test-5002-backups/runtime-fixes-20261021-135924",
+  "private_artifacts": "/data/ningh/nh/ldr-experiments/runtime-fixes-20261021"
+}

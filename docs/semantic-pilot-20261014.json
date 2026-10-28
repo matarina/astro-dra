@@ -1,0 +1,1164 @@
+{
+  "run_at_utc": "2026-10-14T00:40:16.262496+00:00",
+  "code_commit": "0cdbc6e3464579c39ca68da6bf15f0b7747a1790",
+  "model": "deepseek-v4-flash",
+  "temperature": 0,
+  "synthetic": true,
+  "label_provenance": "Agent-authored controlled expectations; not expert-adjudicated literature.",
+  "config": {
+    "enable_verify": true,
+    "enable_doi_validation": true,
+    "enable_constraint_match": true,
+    "enable_keyword_coverage": true,
+    "enable_citation_qc": true,
+    "http_timeout": 10.0,
+    "http_max_retries": 2,
+    "http_concurrency": 8,
+    "crossref_mailto": "ldr-research-verify@example.com",
+    "min_if": null,
+    "strict_year": false,
+    "min_keyword_hits": 3,
+    "keyword_threshold_ratio": 0.75,
+    "qc_batch_size": 5,
+    "qc_passage_chars": 1600,
+    "qc_max_passages": 3,
+    "qc_passage_overlap_chars": 200,
+    "judge_temperature": 0.0
+  },
+  "scope": "Existing branch CitationQc with real model; not literature or complete report validation.",
+  "summary": {
+    "cases": 15,
+    "positive_cases": 3,
+    "negative_cases": 12,
+    "exact_matches": 13,
+    "negative_fully_supported": 1,
+    "positive_supported": 3,
+    "model_calls": 14,
+    "transport_or_http_errors": 0,
+    "elapsed_s": 3.33
+  },
+  "cases": [
+    {
+      "id": "P01",
+      "category": "exact_numeric_support",
+      "expected": "supported",
+      "actual": "supported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X reduced tumor growth by 12% [1].",
+          "claim_id": "claim:b01facd1608529c6ab5d72c8b8e571c274b72e5a6ed3af7ffb878d21e88a717b",
+          "report_start": 0,
+          "report_end": 43,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:P01:1",
+              "artifact_id": "text-v1:92f5749af323578609ba9f413ac9d0693cab2dddf51154c27b1a78a3a1ca837a",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 86,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 86,
+                  "score": 7.897366596101028
+                }
+              ],
+              "verdict": "supported",
+              "reason_code": "located_quote",
+              "model_reason": "The fragment directly states the same 12% reduction in tumor growth by Compound X.",
+              "evidence": {
+                "claim_id": "claim:b01facd1608529c6ab5d72c8b8e571c274b72e5a6ed3af7ffb878d21e88a717b",
+                "claim": "Compound X reduced tumor growth by 12% [1].",
+                "paper_id": "synthetic:P01:1",
+                "verdict": "supported",
+                "locator": {
+                  "paper_id": "synthetic:P01:1",
+                  "artifact_id": "text-v1:92f5749af323578609ba9f413ac9d0693cab2dddf51154c27b1a78a3a1ca837a",
+                  "content_sha256": "7c2d89cb7de146993a1e4d38740f6db6423f65480f84f789558e9f6b6f31f748",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 86,
+                  "quote": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle."
+                },
+                "quote_verified": true,
+                "reason_code": "located_quote"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:P01:1"
+          ],
+          "verdict": "supported",
+          "supporting_fragment": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle.",
+          "reason": "[1] located_quote"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.518,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 51,
+            "prompt_tokens": 154,
+            "total_tokens": 205
+          },
+          "response_content": "{\"verdict\":\"supported\",\"supporting_fragment\":\"In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle.\",\"reason\":\"The fragment directly states the same 12% reduction in tumor growth by Compound X.\"}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N01",
+      "category": "wrong_number",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X reduced tumor growth by 42% [1].",
+          "claim_id": "claim:bff0166982cc339c56d5b13817d2190f98335c78cf56dfda502ab29fd139389e",
+          "report_start": 0,
+          "report_end": 43,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N01:1",
+              "artifact_id": "text-v1:6e8372ebf27e99857c2f69cf043ee639285c970332ccdcdcd9020b412aae43d8",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 86,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 86,
+                  "score": 6.581138830084189
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "unsupported",
+              "model_reason": "The cited fragment states a 12% reduction in cultured tumor cells, not the claimed 42% reduction in tumor growth.",
+              "evidence": {
+                "claim_id": "claim:bff0166982cc339c56d5b13817d2190f98335c78cf56dfda502ab29fd139389e",
+                "claim": "Compound X reduced tumor growth by 42% [1].",
+                "paper_id": "synthetic:N01:1",
+                "verdict": "unsupported",
+                "locator": null,
+                "quote_verified": false,
+                "reason_code": "unsupported"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N01:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": null,
+          "reason": "[1] unsupported"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.452,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 42,
+            "prompt_tokens": 154,
+            "total_tokens": 196
+          },
+          "response_content": "{\"verdict\":\"unsupported\",\"supporting_fragment\":\"\",\"reason\":\"The cited fragment states a 12% reduction in cultured tumor cells, not the claimed 42% reduction in tumor growth.\"}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N02",
+      "category": "wrong_direction",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X increased tumor growth by 12% [1].",
+          "claim_id": "claim:b1bb1dac812fe92e8849c3c9dbce2a3bfd13a849ecd4685d20957a551b11a3da",
+          "report_start": 0,
+          "report_end": 45,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N02:1",
+              "artifact_id": "text-v1:cd8ad71e8b4b1fdd8ba32a4f37f95aa880f5c41079285b2b3da20de01ebcd50b",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 86,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 86,
+                  "score": 6.581138830084189
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "unsupported",
+              "model_reason": "The source states Compound X reduced tumor growth by 12%, which contradicts the claim that it increased tumor growth by 12%.",
+              "evidence": {
+                "claim_id": "claim:b1bb1dac812fe92e8849c3c9dbce2a3bfd13a849ecd4685d20957a551b11a3da",
+                "claim": "Compound X increased tumor growth by 12% [1].",
+                "paper_id": "synthetic:N02:1",
+                "verdict": "unsupported",
+                "locator": null,
+                "quote_verified": false,
+                "reason_code": "unsupported"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N02:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": null,
+          "reason": "[1] unsupported"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.438,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 43,
+            "prompt_tokens": 154,
+            "total_tokens": 197
+          },
+          "response_content": "{\"verdict\":\"unsupported\",\"supporting_fragment\":\"\",\"reason\":\"The source states Compound X reduced tumor growth by 12%, which contradicts the claim that it increased tumor growth by 12%.\"}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N03",
+      "category": "negation_lost",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Treatment X improved overall survival [1].",
+          "claim_id": "claim:a9eaf46aaea8eda87616e477567ed6af7c2aa82788ad46b08b2c7356bfa23805",
+          "report_start": 0,
+          "report_end": 42,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N03:1",
+              "artifact_id": "text-v1:f402143d2838486b3d746b5bd4cb7a81562f4e56ea782e08706d204a8ceec1d0",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 67,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 67,
+                  "score": 5.333333333333333
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "unsupported",
+              "model_reason": "The cited fragment directly contradicts the claim, stating that Treatment X did not improve overall survival.",
+              "evidence": {
+                "claim_id": "claim:a9eaf46aaea8eda87616e477567ed6af7c2aa82788ad46b08b2c7356bfa23805",
+                "claim": "Treatment X improved overall survival [1].",
+                "paper_id": "synthetic:N03:1",
+                "verdict": "unsupported",
+                "locator": {
+                  "paper_id": "synthetic:N03:1",
+                  "artifact_id": "text-v1:f402143d2838486b3d746b5bd4cb7a81562f4e56ea782e08706d204a8ceec1d0",
+                  "content_sha256": "b561727ba7e8e160cefcfd62f8e1d7f33d6545af4df5b37c391164a7cfa47591",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 67,
+                  "quote": "Treatment X did not improve overall survival compared with placebo."
+                },
+                "quote_verified": true,
+                "reason_code": "unsupported"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N03:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": "Treatment X did not improve overall survival compared with placebo.",
+          "reason": "[1] unsupported"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.435,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 46,
+            "prompt_tokens": 143,
+            "total_tokens": 189
+          },
+          "response_content": "{\"verdict\":\"unsupported\",\"supporting_fragment\":\"Treatment X did not improve overall survival compared with placebo.\",\"reason\":\"The cited fragment directly contradicts the claim, stating that Treatment X did not improve overall survival.\"}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N04",
+      "category": "correlation_as_causation",
+      "expected": "unsupported",
+      "actual": "supported",
+      "exact_match": false,
+      "negative_fully_supported": true,
+      "checks": [
+        {
+          "claim": "Higher marker M causes increased disease risk [1].",
+          "claim_id": "claim:9e69803625ffb49b00f1bef499c505ea9f373263dab3dd235dcd1496782fe3b4",
+          "report_start": 0,
+          "report_end": 50,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N04:1",
+              "artifact_id": "text-v1:9e206536488164f5e39746da6a2a105cde1957c0c5dd07f6f2265b8f5c5ca0b5",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 126,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 126,
+                  "score": 7.664100588675687
+                }
+              ],
+              "verdict": "supported",
+              "reason_code": "located_quote",
+              "model_reason": "The fragment directly states the association between higher marker M and increased disease risk, matching the claim's wording.",
+              "evidence": {
+                "claim_id": "claim:9e69803625ffb49b00f1bef499c505ea9f373263dab3dd235dcd1496782fe3b4",
+                "claim": "Higher marker M causes increased disease risk [1].",
+                "paper_id": "synthetic:N04:1",
+                "verdict": "supported",
+                "locator": {
+                  "paper_id": "synthetic:N04:1",
+                  "artifact_id": "text-v1:9e206536488164f5e39746da6a2a105cde1957c0c5dd07f6f2265b8f5c5ca0b5",
+                  "content_sha256": "16f4542a8f815cb3a308e6c3eb9171c2b3addb113f107f694a244682dabe61b7",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 87,
+                  "quote": "In an observational cohort, higher marker M was associated with increased disease risk."
+                },
+                "quote_verified": true,
+                "reason_code": "located_quote"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N04:1"
+          ],
+          "verdict": "supported",
+          "supporting_fragment": "In an observational cohort, higher marker M was associated with increased disease risk.",
+          "reason": "[1] located_quote"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.508,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 52,
+            "prompt_tokens": 156,
+            "total_tokens": 208
+          },
+          "response_content": "{\"verdict\":\"supported\",\"supporting_fragment\":\"In an observational cohort, higher marker M was associated with increased disease risk.\",\"reason\":\"The fragment directly states the association between higher marker M and increased disease risk, matching the claim's wording.\"}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N05",
+      "category": "animal_to_human",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Treatment X improved survival in human patients [1].",
+          "claim_id": "claim:b7d7de4a2348231d52eaf54a7fb07438924f0fcc18be68033de0d970cb86ba4f",
+          "report_start": 0,
+          "report_end": 52,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N05:1",
+              "artifact_id": "text-v1:438c5945676f82f4b0626e2d55167d4c1b593fae9b4d661265c40905e2c2b7cd",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 72,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 72,
+                  "score": 6.666666666666667
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "unsupported",
+              "model_reason": "The fragment explicitly states human efficacy was not evaluated, so it does not support the claim about human patients.",
+              "evidence": {
+                "claim_id": "claim:b7d7de4a2348231d52eaf54a7fb07438924f0fcc18be68033de0d970cb86ba4f",
+                "claim": "Treatment X improved survival in human patients [1].",
+                "paper_id": "synthetic:N05:1",
+                "verdict": "unsupported",
+                "locator": null,
+                "quote_verified": false,
+                "reason_code": "unsupported"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N05:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": null,
+          "reason": "[1] unsupported"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.449,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 38,
+            "prompt_tokens": 147,
+            "total_tokens": 185
+          },
+          "response_content": "{\"verdict\":\"unsupported\",\"supporting_fragment\":\"\",\"reason\":\"The fragment explicitly states human efficacy was not evaluated, so it does not support the claim about human patients.\"}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N06",
+      "category": "wrong_unit",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X was effective at a concentration of 5 mg/mL [1].",
+          "claim_id": "claim:90ce27db12ebaa82d6d72100e5a0fba5d6984a8f5b609be5bfec41cb619606dc",
+          "report_start": 0,
+          "report_end": 59,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N06:1",
+              "artifact_id": "text-v1:09074d9662b5dc0d63de02ced8cabde070c0d20353742585dd985c2479e20836",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 63,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 63,
+                  "score": 8.267786838055363
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "unsupported",
+              "model_reason": "The claim states 5 mg/mL, but the source says 5 micrograms/mL, which is a different concentration by a factor of 1000.",
+              "evidence": {
+                "claim_id": "claim:90ce27db12ebaa82d6d72100e5a0fba5d6984a8f5b609be5bfec41cb619606dc",
+                "claim": "Compound X was effective at a concentration of 5 mg/mL [1].",
+                "paper_id": "synthetic:N06:1",
+                "verdict": "unsupported",
+                "locator": null,
+                "quote_verified": false,
+                "reason_code": "unsupported"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N06:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": null,
+          "reason": "[1] unsupported"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.467,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 47,
+            "prompt_tokens": 152,
+            "total_tokens": 199
+          },
+          "response_content": "{\"verdict\":\"unsupported\",\"supporting_fragment\":\"\",\"reason\":\"The claim states 5 mg/mL, but the source says 5 micrograms/mL, which is a different concentration by a factor of 1000.\"}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N07",
+      "category": "population_scope",
+      "expected": "partial",
+      "actual": "partial",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Treatment X benefits adults and children [1].",
+          "claim_id": "claim:42a642a9060a97caab112749932d24dcfdbe691e5f4b09cee4171c1c093cb005",
+          "report_start": 0,
+          "report_end": 45,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N07:1",
+              "artifact_id": "text-v1:8c89e4ad7e82fa1cf8b3d160cfca43121bf177715f65ec8d0ce070d4956fd76b",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 117,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 117,
+                  "score": 5.109400392450459
+                }
+              ],
+              "verdict": "partial",
+              "reason_code": "partial_support",
+              "model_reason": "The source supports benefit for adults but explicitly states children were excluded, so the claim of benefit for children is unsupported.",
+              "evidence": {
+                "claim_id": "claim:42a642a9060a97caab112749932d24dcfdbe691e5f4b09cee4171c1c093cb005",
+                "claim": "Treatment X benefits adults and children [1].",
+                "paper_id": "synthetic:N07:1",
+                "verdict": "partial",
+                "locator": {
+                  "paper_id": "synthetic:N07:1",
+                  "artifact_id": "text-v1:8c89e4ad7e82fa1cf8b3d160cfca43121bf177715f65ec8d0ce070d4956fd76b",
+                  "content_sha256": "cf02da2358a4f29309dec98e10076e5c09912aa00dbc3b87b9756c614d7be9c5",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 117,
+                  "quote": "Treatment X improved the measured outcome among adults aged 65 years or older. Children were excluded from the trial."
+                },
+                "quote_verified": true,
+                "reason_code": "partial_support"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N07:1"
+          ],
+          "verdict": "partial",
+          "supporting_fragment": "Treatment X improved the measured outcome among adults aged 65 years or older. Children were excluded from the trial.",
+          "reason": "[1] partial_support"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.612,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 62,
+            "prompt_tokens": 155,
+            "total_tokens": 217
+          },
+          "response_content": "{\"verdict\":\"partial\",\"supporting_fragment\":\"Treatment X improved the measured outcome among adults aged 65 years or older. Children were excluded from the trial.\",\"reason\":\"The source supports benefit for adults but explicitly states children were excluded, so the claim of benefit for children is unsupported.\"}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N08",
+      "category": "compound_claim",
+      "expected": "partial",
+      "actual": "partial",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X reduced tumor growth by 12% and cured the disease [1].",
+          "claim_id": "claim:11eec6facf99b19a56265706af1a9b0e4d9c75cfb31664d522d707f9f80b3c90",
+          "report_start": 0,
+          "report_end": 65,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N08:1",
+              "artifact_id": "text-v1:3acf7cc0439130ceba6aac7cc79cdc1ef739870c341d47d3275dc2692ef32d3d",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 88,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 88,
+                  "score": 9.02072594216369
+                }
+              ],
+              "verdict": "partial",
+              "reason_code": "partial_support",
+              "model_reason": "The fragment supports the 12% reduction in tumor growth but explicitly states that disease cure was not assessed, so the cure claim is unsupported.",
+              "evidence": {
+                "claim_id": "claim:11eec6facf99b19a56265706af1a9b0e4d9c75cfb31664d522d707f9f80b3c90",
+                "claim": "Compound X reduced tumor growth by 12% and cured the disease [1].",
+                "paper_id": "synthetic:N08:1",
+                "verdict": "partial",
+                "locator": {
+                  "paper_id": "synthetic:N08:1",
+                  "artifact_id": "text-v1:3acf7cc0439130ceba6aac7cc79cdc1ef739870c341d47d3275dc2692ef32d3d",
+                  "content_sha256": "6f6bbb01e6507b898f3be0e5ca63799746722d193f255a9a929a62c47243760b",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 88,
+                  "quote": "Compound X reduced tumor growth by 12% in cultured cells. Disease cure was not assessed."
+                },
+                "quote_verified": true,
+                "reason_code": "partial_support"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N08:1"
+          ],
+          "verdict": "partial",
+          "supporting_fragment": "Compound X reduced tumor growth by 12% in cultured cells. Disease cure was not assessed.",
+          "reason": "[1] partial_support"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.61,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 64,
+            "prompt_tokens": 159,
+            "total_tokens": 223
+          },
+          "response_content": "{\"verdict\":\"partial\",\"supporting_fragment\":\"Compound X reduced tumor growth by 12% in cultured cells. Disease cure was not assessed.\",\"reason\":\"The fragment supports the 12% reduction in tumor growth but explicitly states that disease cure was not assessed, so the cure claim is unsupported.\"}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N09",
+      "category": "missing_citation",
+      "expected": "unverifiable",
+      "actual": "unverifiable",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X reduced tumor growth by 12%.",
+          "claim_id": "claim:84b0ae43b849ab218755a8931d15770c2ef773f7df018e823852260541e9c25a",
+          "report_start": 0,
+          "report_end": 39,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [],
+          "citations": [],
+          "sources": [],
+          "verdict": "unverifiable",
+          "supporting_fragment": null,
+          "reason": "missing_citation"
+        }
+      ],
+      "model_calls": [],
+      "model_errors": []
+    },
+    {
+      "id": "N10",
+      "category": "unresolved_citation",
+      "expected": "unverifiable",
+      "actual": "unverifiable",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Compound X reduced tumor growth by 12% [9].",
+          "claim_id": "claim:b01facd1608529c6ab5d72c8b8e571c274b72e5a6ed3af7ffb878d21e88a717b",
+          "report_start": 0,
+          "report_end": 43,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 9,
+              "paper_id": null,
+              "artifact_id": null,
+              "basis": null,
+              "source_field": null,
+              "text_version": "raw-text-v1",
+              "assessed_chars": 0,
+              "retrieval_method": "",
+              "retrieved_passages": [],
+              "verdict": "unverifiable",
+              "reason_code": "unresolved_citation",
+              "model_reason": "",
+              "evidence": null
+            }
+          ],
+          "citations": [
+            9
+          ],
+          "sources": [],
+          "verdict": "unverifiable",
+          "supporting_fragment": null,
+          "reason": "[9] unresolved_citation"
+        }
+      ],
+      "model_calls": [],
+      "model_errors": []
+    },
+    {
+      "id": "P02",
+      "category": "late_supporting_passage",
+      "expected": "supported",
+      "actual": "supported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Marker M regulates tumor proliferation [1].",
+          "claim_id": "claim:fb7a4136239722304ebb2917bfda461c29cccef659a8e0c0a28adc3a59ba97f0",
+          "report_start": 0,
+          "report_end": 43,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:P02:1",
+              "artifact_id": "text-v1:cf5350137a5026836548a6e7338d2aa422188fdc064dc3eaa6a0e010bf70cee1",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 57,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 3900,
+                  "end": 3957,
+                  "score": 6.889822365046136
+                }
+              ],
+              "verdict": "supported",
+              "reason_code": "located_quote",
+              "model_reason": "The fragment directly states the claim verbatim.",
+              "evidence": {
+                "claim_id": "claim:fb7a4136239722304ebb2917bfda461c29cccef659a8e0c0a28adc3a59ba97f0",
+                "claim": "Marker M regulates tumor proliferation [1].",
+                "paper_id": "synthetic:P02:1",
+                "verdict": "supported",
+                "locator": {
+                  "paper_id": "synthetic:P02:1",
+                  "artifact_id": "text-v1:cf5350137a5026836548a6e7338d2aa422188fdc064dc3eaa6a0e010bf70cee1",
+                  "content_sha256": "ff18df90fbb14aaffa616bdd08bc411818a866a5d673ddcb76564fb8d9bee1f7",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 3900,
+                  "end": 3957,
+                  "quote": "Marker M regulates tumor proliferation in cultured cells."
+                },
+                "quote_verified": true,
+                "reason_code": "located_quote"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:P02:1"
+          ],
+          "verdict": "supported",
+          "supporting_fragment": "Marker M regulates tumor proliferation in cultured cells.",
+          "reason": "[1] located_quote"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.371,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 34,
+            "prompt_tokens": 141,
+            "total_tokens": 175
+          },
+          "response_content": "{\"verdict\":\"supported\",\"supporting_fragment\":\"Marker M regulates tumor proliferation in cultured cells.\",\"reason\":\"The fragment directly states the claim verbatim.\"}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N11",
+      "category": "one_of_multiple_citations_unrelated",
+      "expected": "unverifiable",
+      "actual": "partial",
+      "exact_match": false,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Marker M regulates tumor proliferation [1, 2].",
+          "claim_id": "claim:fb7a4136239722304ebb2917bfda461c29cccef659a8e0c0a28adc3a59ba97f0",
+          "report_start": 0,
+          "report_end": 46,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N11:1",
+              "artifact_id": "text-v1:1f99e3a0a67113b59667762868be1330ac2f3a568fd8e3bfd74dff21f01c5388",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 57,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 57,
+                  "score": 6.889822365046136
+                }
+              ],
+              "verdict": "supported",
+              "reason_code": "located_quote",
+              "model_reason": "The cited fragment directly states that Marker M regulates tumor proliferation, matching the claim.",
+              "evidence": {
+                "claim_id": "claim:fb7a4136239722304ebb2917bfda461c29cccef659a8e0c0a28adc3a59ba97f0",
+                "claim": "Marker M regulates tumor proliferation [1, 2].",
+                "paper_id": "synthetic:N11:1",
+                "verdict": "supported",
+                "locator": {
+                  "paper_id": "synthetic:N11:1",
+                  "artifact_id": "text-v1:1f99e3a0a67113b59667762868be1330ac2f3a568fd8e3bfd74dff21f01c5388",
+                  "content_sha256": "e019570e15df01d3f32b9db7c6c7021bc1f8aae0e6916b65a57d77b1b86cb180",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 57,
+                  "quote": "Marker M regulates tumor proliferation in cultured cells."
+                },
+                "quote_verified": true,
+                "reason_code": "located_quote"
+              }
+            },
+            {
+              "citation_index": 2,
+              "paper_id": "synthetic:N11:2",
+              "artifact_id": "text-v1:2543daa325d7ea24e9a78c5e438da1818128b3c060b69c45d65da0c95372fb57",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 73,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 73,
+                  "score": 2.7071067811865475
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "unsupported",
+              "model_reason": "The cited fragment does not mention Marker M or tumor proliferation; it only discusses rainfall patterns.",
+              "evidence": {
+                "claim_id": "claim:fb7a4136239722304ebb2917bfda461c29cccef659a8e0c0a28adc3a59ba97f0",
+                "claim": "Marker M regulates tumor proliferation [1, 2].",
+                "paper_id": "synthetic:N11:2",
+                "verdict": "unsupported",
+                "locator": null,
+                "quote_verified": false,
+                "reason_code": "unsupported"
+              }
+            }
+          ],
+          "citations": [
+            1,
+            2
+          ],
+          "sources": [
+            "synthetic:N11:1",
+            "synthetic:N11:2"
+          ],
+          "verdict": "partial",
+          "supporting_fragment": "Marker M regulates tumor proliferation in cultured cells.",
+          "reason": "[1] located_quote; [2] unsupported"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.439,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 41,
+            "prompt_tokens": 141,
+            "total_tokens": 182
+          },
+          "response_content": "{\"verdict\":\"supported\",\"supporting_fragment\":\"Marker M regulates tumor proliferation in cultured cells.\",\"reason\":\"The cited fragment directly states that Marker M regulates tumor proliferation, matching the claim.\"}"
+        },
+        {
+          "elapsed_s": 0.378,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 35,
+            "prompt_tokens": 144,
+            "total_tokens": 179
+          },
+          "response_content": "{\"verdict\":\"unsupported\",\"supporting_fragment\":\"\",\"reason\":\"The cited fragment does not mention Marker M or tumor proliferation; it only discusses rainfall patterns.\"}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "P03",
+      "category": "association_supported",
+      "expected": "supported",
+      "actual": "supported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "Higher marker M is associated with increased disease risk [1].",
+          "claim_id": "claim:b1a33a981d4a10d92cfb5b81cd4717f931b880259769ad19a06912b74f521e1b",
+          "report_start": 0,
+          "report_end": 62,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:P03:1",
+              "artifact_id": "text-v1:b37d3342d2fab434047a83b9912eff2858cf4847e036f2e69374954772d1bb2a",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 118,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 118,
+                  "score": 9.02072594216369
+                }
+              ],
+              "verdict": "supported",
+              "reason_code": "located_quote",
+              "model_reason": "The fragment directly states the association between higher marker M and increased disease risk.",
+              "evidence": {
+                "claim_id": "claim:b1a33a981d4a10d92cfb5b81cd4717f931b880259769ad19a06912b74f521e1b",
+                "claim": "Higher marker M is associated with increased disease risk [1].",
+                "paper_id": "synthetic:P03:1",
+                "verdict": "supported",
+                "locator": {
+                  "paper_id": "synthetic:P03:1",
+                  "artifact_id": "text-v1:b37d3342d2fab434047a83b9912eff2858cf4847e036f2e69374954772d1bb2a",
+                  "content_sha256": "80b2976f81b2c0ad1293d7b7341acc8c2a9654a3333e988a861b58a95b8ca61f",
+                  "source_url": null,
+                  "basis": "fulltext",
+                  "section": null,
+                  "page": null,
+                  "start": 28,
+                  "end": 86,
+                  "quote": "higher marker M was associated with increased disease risk"
+                },
+                "quote_verified": true,
+                "reason_code": "located_quote"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:P03:1"
+          ],
+          "verdict": "supported",
+          "supporting_fragment": "higher marker M was associated with increased disease risk",
+          "reason": "[1] located_quote"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.396,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 40,
+            "prompt_tokens": 157,
+            "total_tokens": 197
+          },
+          "response_content": "{\"verdict\":\"supported\",\"supporting_fragment\":\"higher marker M was associated with increased disease risk\",\"reason\":\"The fragment directly states the association between higher marker M and increased disease risk.\"}"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "N12",
+      "category": "cross_language_numeric_mismatch",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim": "该化合物将肿瘤生长降低了42%。[1]",
+          "claim_id": "claim:5edecd5a8da39093354d1fa98c249af852d72055baf0e4fcee54db2a2d703bba",
+          "report_start": 0,
+          "report_end": 19,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "synthetic:N12:1",
+              "artifact_id": "text-v1:11ea9755ea89ae6be78a7bbcd51afd5bade6bbc69a1ec691944d4dfa5b18d3c4",
+              "basis": "fulltext",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 57,
+              "retrieval_method": "opening_fallback-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 57,
+                  "score": 0.0
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "unsupported",
+              "model_reason": "The cited fragment states a 12% reduction in cultured cells, not 42% in tumor growth, so it does not support the claim.",
+              "evidence": {
+                "claim_id": "claim:5edecd5a8da39093354d1fa98c249af852d72055baf0e4fcee54db2a2d703bba",
+                "claim": "该化合物将肿瘤生长降低了42%。[1]",
+                "paper_id": "synthetic:N12:1",
+                "verdict": "unsupported",
+                "locator": null,
+                "quote_verified": false,
+                "reason_code": "unsupported"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "synthetic:N12:1"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment": null,
+          "reason": "[1] unsupported"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 0.447,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 46,
+            "prompt_tokens": 147,
+            "total_tokens": 193
+          },
+          "response_content": "{\"verdict\":\"unsupported\",\"supporting_fragment\":\"\",\"reason\":\"The cited fragment states a 12% reduction in cultured cells, not 42% in tumor growth, so it does not support the claim.\"}"
+        }
+      ],
+      "model_errors": []
+    }
+  ]
+}

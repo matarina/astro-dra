@@ -26,12 +26,12 @@ from research_verify.config import get_config
 # --------------------------------------------------------------------------- #
 # configuration
 # --------------------------------------------------------------------------- #
-def test_defaults_are_enabled():
+def test_default_audit_is_enabled_without_automatic_selection_constraints():
     cfg = VerifyConfig()
     assert cfg.enable_verify is True
     assert cfg.module_enabled("doi_validation") is True
-    assert cfg.module_enabled("constraint_match") is True
-    assert cfg.module_enabled("keyword_coverage") is True
+    assert cfg.module_enabled("constraint_match") is False
+    assert cfg.module_enabled("keyword_coverage") is False
     assert cfg.module_enabled("citation_qc") is True
 
 

@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from research_verify.citation_qc import Claim, CitationQc
 from research_verify.config import VerifyConfig
+import json
+from semantic_test_helpers import complete_payload
 
 
 class FakeCollector:
     def __init__(self, mapping):
-        self._m = mapping
+        self._m = {index: {"paper_id": f"synthetic:{index}", **source} for index, source in mapping.items()}
 
     def find_by_index(self, idx):
         return self._m.get(idx)
@@ -16,7 +18,7 @@ class FakeCollector:
 
 class FakeJudge:
     def __init__(self, payload):
-        self._payload = payload
+        self._payload = json.dumps(complete_payload(json.loads(payload)))
 
     def invoke(self, prompt):
         class R:
@@ -39,11 +41,12 @@ Another supported claim here [3].
 """
 
 
-def test_extract_claims_only_cited_sentences():
+def test_extract_claims_includes_uncited_candidates():
     claims = CitationQc().extract_claims(REPORT)
     texts = [c.text for c in claims]
     assert any("[1]" in t for t in texts)
-    assert all("no citation" not in t for t in texts)
+    assert any("no citation" in t for t in texts)
+    assert any(not c.citations for c in claims)
     # multi-citation parsing
     multi = [c for c in claims if c.citations == [1, 2]]
     assert multi
@@ -59,7 +62,7 @@ def test_check_unverifiable_when_no_fragment():
 
 
 def test_check_supported_via_judge():
-    qc = CitationQc(judge_model=FakeJudge('{"verdict":"supported","reason":"ok"}'))
+    qc = CitationQc(judge_model=FakeJudge('{"verdict":"supported","supporting_fragment":"m6A drives HCC","reason":"ok"}'))
     collector = FakeCollector({1: {"index": "1", "abstract": "m6A drives HCC"}})
     checks = qc.check([Claim("x [1]", [1])], collector)
     assert checks[0].verdict == "supported"

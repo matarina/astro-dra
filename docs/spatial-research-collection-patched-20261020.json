@@ -1,0 +1,488 @@
+{
+  "summary": {
+    "state": "complete",
+    "variant": "collection-only",
+    "mode": "quick",
+    "elapsed_s": 975.338,
+    "model": "deepseek-v4-flash",
+    "strategy": "langgraph-agent",
+    "research_error": null,
+    "report_chars": 14622,
+    "sources_collected": 97,
+    "sources_cited": 65,
+    "audit_status": "unavailable",
+    "audited_claims": 66,
+    "warnings": [],
+    "exports": {
+      "pdf": {
+        "bytes": 447686,
+        "mime": "application/pdf"
+      },
+      "ris": {
+        "bytes": 18216,
+        "mime": "text/plain"
+      }
+    },
+    "counts": {
+      "http": 1022,
+      "research_start": 1,
+      "progress": 386,
+      "model_start": 731,
+      "model_end": 731,
+      "search_start": 265,
+      "artifact": 2455,
+      "search_end": 265,
+      "relevance_end": 200,
+      "collector_add": 134,
+      "page_fetch": 40,
+      "fetch_registration": 20,
+      "http_error": 12,
+      "fallback_start": 1,
+      "fallback_end": 1,
+      "agent_draft": 1,
+      "writer_start": 1,
+      "writer_end": 1,
+      "publication_end": 1
+    }
+  },
+  "search_by_engine": {
+    "searxng": 20,
+    "pubmed": 150,
+    "europepmc": 95
+  },
+  "search_nonempty_by_engine": {
+    "pubmed": 76,
+    "europepmc": 58
+  },
+  "relevance": {
+    "searxng": {
+      "calls": 18,
+      "before": 171,
+      "after": 0
+    },
+    "europepmc": {
+      "calls": 92,
+      "before": 1065,
+      "after": 197
+    },
+    "pubmed": {
+      "calls": 90,
+      "before": 672,
+      "after": 248
+    }
+  },
+  "ncbi_http": {
+    "200": 333,
+    "429": 47,
+    "400": 1
+  },
+  "fallback": [
+    {
+      "at": "2026-10-20T07:08:28.792418+00:00",
+      "elapsed_s": 651.414,
+      "kind": "fallback_start",
+      "thread": "MainThread",
+      "source_count": 97,
+      "artifact": "artifacts/2215-fallback-sources.json.gz"
+    }
+  ],
+  "model_errors": [],
+  "slow_models": [
+    {
+      "elapsed_s": 722.885,
+      "phase": "final_writer",
+      "seconds": 56.441,
+      "input_chars": null,
+      "output_chars": 8477
+    }
+  ],
+  "benchmark_retrieved": [
+    {
+      "elapsed_s": 96.275,
+      "engine": "pubmed",
+      "query": "\"Visium HD\" AND (breast OR kidney OR pancreas OR \"spatial transcriptomic\" OR atlas OR tumor) AND (\"2025\"[Date - Publication] : \"2026\"[Date - Publication]) AND (Nature[Journal] OR Cell[Journal] OR \"Nature Medicine\"[Journal] OR \"Nature Genetics\"[Journal] OR \"Nature Communications\"[Journal] OR \"Nature Methods\"[Journal] OR \"Cancer Cell\"[Journal] OR Immunity[Journal] OR Gut[Journal] OR \"Cell Discovery\"[Journal] OR \"Molecular Cancer\"[Journal])"
+    },
+    {
+      "elapsed_s": 279.616,
+      "engine": "pubmed",
+      "query": "Ren[Author] AND spatial transcriptomics AND colorectal cancer AND Cell"
+    },
+    {
+      "elapsed_s": 283.501,
+      "engine": "pubmed",
+      "query": "\"Stereo-seq\" hepatocellular carcinoma spatial"
+    },
+    {
+      "elapsed_s": 314.004,
+      "engine": "pubmed",
+      "query": "\"Visium HD\" AND (\"2024/01/01\"[Date - Publication] : \"2025/12/31\"[Date - Publication]) AND (\"Nature Communications\"[Journal] OR \"Nature\"[Journal] OR \"Cell\"[Journal] OR \"Nature Medicine\"[Journal] OR \"Nature Genetics\"[Journal] OR \"Nature Methods\"[Journal] OR \"Cancer Cell\"[Journal] OR \"Gastroenterology\"[Journal] OR \"Immunity\"[Journal] OR \"Cell Reports\"[Journal] OR \"Nature Immunology\"[Journal] OR \"Nature Cancer\"[Journal] OR \"Science Advances\"[Journal] OR \"Nature Metabolism\"[Journal] OR \"Hepatology\"[Journal] OR \"Gut\"[Journal])"
+    }
+  ],
+  "benchmark_collection": [
+    {
+      "elapsed_s": 96.29,
+      "before": 6,
+      "after": 2,
+      "pool_before": 80,
+      "pool_after": 80,
+      "input_artifact": "artifacts/0431-collector-input.json.gz",
+      "output_artifact": "artifacts/0432-collector-output.json.gz"
+    },
+    {
+      "elapsed_s": 279.629,
+      "before": 6,
+      "after": 0,
+      "pool_before": 82,
+      "pool_after": 82,
+      "input_artifact": "artifacts/1311-collector-input.json.gz",
+      "output_artifact": "artifacts/1312-collector-output.json.gz"
+    },
+    {
+      "elapsed_s": 283.507,
+      "before": 2,
+      "after": 0,
+      "pool_before": 82,
+      "pool_after": 82,
+      "input_artifact": "artifacts/1370-collector-input.json.gz",
+      "output_artifact": "artifacts/1371-collector-output.json.gz"
+    },
+    {
+      "elapsed_s": 314.041,
+      "before": 4,
+      "after": 1,
+      "pool_before": 82,
+      "pool_after": 82,
+      "input_artifact": "artifacts/1543-collector-input.json.gz",
+      "output_artifact": "artifacts/1546-collector-output.json.gz"
+    }
+  ],
+  "benchmark_in_final_sources": false,
+  "initial_pool": {
+    "count": 80,
+    "by_engine": {
+      "pubmed": 55,
+      "europepmc": 25
+    },
+    "abstracts": 79,
+    "full_text_marked": 0,
+    "full_at_s": 88.841,
+    "pubmed_count": 55,
+    "pubmed_abstracts": 55,
+    "preprints": 12
+  },
+  "final_sources": {
+    "count": 97,
+    "by_engine": {
+      "pubmed": 55,
+      "europepmc": 25,
+      "fetch": 17
+    },
+    "abstracts": 82,
+    "full_text_marked": 0
+  },
+  "ncbi_rate_limit_groups": {
+    "total": 41,
+    "final_200": 39,
+    "without_final_200": 2
+  },
+  "controls": {
+    "same_query": true,
+    "same_settings": true,
+    "same_retrieval_modules": true,
+    "unchanged_generation_and_fetch": true,
+    "agent_changed_for_collection_hook": true
+  },
+  "collection": {
+    "batches": 134,
+    "newly_registered_hits": 80,
+    "reused_hits": 150,
+    "unregistered_hits": 215,
+    "batches_reusing_hits": 68,
+    "batches_with_unregistered_hits": 87,
+    "no_registered_rows_but_capacity_feedback": 49
+  },
+  "identity": {
+    "doi_headers_checked": 83,
+    "doi_header_conflicts": [],
+    "same_normalized_title_records": [],
+    "vispro_in_this_run": false
+  },
+  "writing": {
+    "draft_chars": 5346,
+    "raw_output_chars": 8477,
+    "draft_similarity": 0.12428561093829125,
+    "cited_original_indices": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      9,
+      10,
+      12,
+      13,
+      14,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      29,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      41,
+      42,
+      44,
+      45,
+      46,
+      47,
+      48,
+      50,
+      51,
+      52,
+      53,
+      54,
+      56,
+      57,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      67,
+      68,
+      69,
+      70,
+      71,
+      79,
+      80,
+      81,
+      83,
+      84,
+      85,
+      95
+    ],
+    "cited_sources_after20": 48,
+    "table_rows": 38,
+    "table_years": {
+      "2022": 3,
+      "2024": 6,
+      "2023": 2,
+      "2025": 2,
+      "2026": 25
+    },
+    "writer_bracket_to_bracket_ranges": [
+      "[84]-[95]",
+      "[84]-[95]"
+    ],
+    "display_bracket_to_bracket_ranges": [],
+    "metadata_examples": [
+      {
+        "source": {
+          "index": "1",
+          "title": "Effect of the intratumoral microbiota on spatial and cellular heterogeneity in cancer.",
+          "pubdate": "2022 Nov",
+          "journal": "Nature",
+          "doi": "10.1038/s41586-022-05435-0",
+          "pmid": "36385528"
+        },
+        "date_in_actual_writer_prompt": false,
+        "doi_in_actual_writer_prompt": false,
+        "raw_writer_rows": [
+          "| Effect of the tumour-associated microbiota [1] | 2022 | Nature | 待确认 | 10x Visium (已改造) | 识别肿瘤内微生物群落的空间位置和宿主互作。 | 摘要 | 摘要 | 待确认 |"
+        ]
+      },
+      {
+        "source": {
+          "index": "2",
+          "title": "Single-Nucleus RNA Sequencing and Spatial Transcriptomics Reveal the Immunological Microenvironment of Cervical Squamous Cell Carcinoma.",
+          "pubdate": "2022 Oct",
+          "journal": "Advanced science (Weinheim, Baden-Wurttemberg, Germany)",
+          "doi": "10.1002/advs.202203040",
+          "pmid": "35986392"
+        },
+        "date_in_actual_writer_prompt": false,
+        "doi_in_actual_writer_prompt": false,
+        "raw_writer_rows": [
+          "| **数据预处理与质控** | 从原始测序数据生成表达矩阵，进行质量控制。 | 所有组别。是下游分析的前提。 | 未在摘要中详述。部分提及使用平台官方流程，如Stereo-seq的“SAW” [60]。 | [2], [18], [60] |",
+          "| **组织图像整合与验证** | 将转录数据与H&E或免疫荧光图像对齐，进行空间验证。 | 所有组别。用于验证分析结果的生物学意义。 | 提及使用“multiplex immunofluorescence staining” [2], [48]，或开发集成工作流如“post-Xenium 4i” [13]。 | [2], [13], [48] |",
+          "| Stereo-seq of cervical cancer [2] | 2023 (待确认) | 待确认 | 待确认 | Stereo-seq | 结合snRNA-seq, 分析肿瘤免疫微环境，识别myCAFs。 | 摘要 | 摘要 | 待确认 |"
+        ]
+      },
+      {
+        "source": {
+          "index": "39",
+          "title": "Quantification of spatial pharmacogene expression heterogeneity in breast tumors.",
+          "pubdate": "2023 Jan",
+          "journal": "Cancer reports (Hoboken, N.J.)",
+          "doi": "10.1002/cnr2.1686",
+          "pmid": "35906899"
+        },
+        "date_in_actual_writer_prompt": false,
+        "doi_in_actual_writer_prompt": false,
+        "raw_writer_rows": [
+          "| Spatial pharmacogene expression [39] | 2024 (待确认) | 待确认 | 待确认 | Visium | 分析286个药物基因在肿瘤区域的异质性表达。 | 摘要 | 摘要 | 待确认 |"
+        ]
+      },
+      {
+        "source": {
+          "index": "80",
+          "title": "The single-cell stereo-seq reveals region-specific cell subtypes and transcriptome profiling in Arabidopsis leaves.",
+          "pubdate": "2022 May 23",
+          "journal": "Developmental cell",
+          "doi": "10.1016/j.devcel.2022.04.011",
+          "pmid": "35512702"
+        },
+        "date_in_actual_writer_prompt": false,
+        "doi_in_actual_writer_prompt": false,
+        "raw_writer_rows": [
+          "| scStereo-seq of Arabidopsis [80] | 2022 | Cell | 待确认 | Stereo-seq | 构建拟南芥叶片单细胞空间图谱。 | 摘要 | 摘要 | 待确认 |"
+        ]
+      }
+    ]
+  },
+  "files": {
+    "pdf_bytes": 447686,
+    "pdf_header_ok": true,
+    "sqlite_header_ok": true,
+    "ris_records": 65
+  },
+  "actual_prompt": {
+    "doi_header_count": 1,
+    "title_header_count": 0,
+    "fallback_has_date2": true,
+    "fallback_has_doi2": true,
+    "writer_has_date2": false,
+    "writer_has_doi2": false,
+    "writer_input_chars": 285217
+  },
+  "audit": {
+    "status": "unavailable",
+    "claims": 66,
+    "claim_verdicts": {
+      "unverifiable": 21,
+      "partial": 12,
+      "supported": 33
+    },
+    "citation_checks": 115,
+    "semantic_schema_errors": 1
+  },
+  "cited_preprint_sources": [
+    {
+      "index": "3",
+      "title": "Identifying cell-type-specific spatially variable genes with ctSVG.",
+      "publication_types": [
+        "Journal Article",
+        "Preprint"
+      ]
+    },
+    {
+      "index": "9",
+      "title": "Systematic benchmarking of imaging spatial transcriptomics platforms in FFPE tissues.",
+      "publication_types": [
+        "Journal Article",
+        "Preprint"
+      ]
+    },
+    {
+      "index": "13",
+      "title": "High-Dimensional Multi-Omic Mapping of Post-Mortem Human Brain Using Iterative Indirect Immunofluorescence Imaging on Xenium-Processed Tissues",
+      "publication_types": [
+        "Preprint"
+      ]
+    },
+    {
+      "index": "21",
+      "title": "Same-section spatial metabolo-transcriptomics using Stereo-meta-seq reveals DHA-driven kidney maturation",
+      "publication_types": [
+        "Preprint"
+      ]
+    },
+    {
+      "index": "22",
+      "title": "STARgrid: an open-source pipeline from Visium HD sequencing reads to count matrices",
+      "publication_types": [
+        "Preprint"
+      ]
+    },
+    {
+      "index": "33",
+      "title": "dbverse scales spatial omics analysis with embedded analytical databases.",
+      "publication_types": [
+        "Journal Article",
+        "Preprint"
+      ]
+    },
+    {
+      "index": "37",
+      "title": "Kintsugi decides, gene by gene, where spatial transcriptomics borrows information.",
+      "publication_types": [
+        "Journal Article",
+        "Preprint"
+      ]
+    },
+    {
+      "index": "41",
+      "title": "A multimodal interrogation of Broca's area in the pediatric and adult human brain.",
+      "publication_types": [
+        "Journal Article",
+        "Preprint"
+      ]
+    },
+    {
+      "index": "44",
+      "title": "Mapping disease critical spatially variable gene programs by integrating spatial transcriptomics with human genetics.",
+      "publication_types": [
+        "Journal Article",
+        "Preprint"
+      ]
+    },
+    {
+      "index": "48",
+      "title": "Spatial Mapping of Cytotoxic T Cell Exclusion Associated with Hypoxic PLAUR+ Macrophages in Triple-Negative Breast Cancer",
+      "publication_types": [
+        "Preprint"
+      ]
+    }
+  ],
+  "runtime_services": [
+    {
+      "name": "/local_deep_research-local-deep-research-1",
+      "image": "sha256:e94a4b527a6f61778da2aa7b2994722562fbfadac0dda9c6b499f64a16a5b1b2",
+      "started": "2026-10-15T08:59:54.908821447Z",
+      "health": "healthy"
+    },
+    {
+      "name": "/astro-dra-test-5002-local-deep-research-1",
+      "image": "sha256:1b2e7c4264b830e96ddd25f87d7c20576c45d851e76d95a8e0eea9a9de0e4cb0",
+      "started": "2026-10-16T09:45:32.875099337Z",
+      "health": "healthy"
+    }
+  ],
+  "scope": {
+    "source_collection_helper": true,
+    "search_changes_since_previous_run": false,
+    "new_relevance_or_topic_rules": false,
+    "writer_or_fetch_changed": false,
+    "max_regular_sources": 80,
+    "deployed": false,
+    "tests_passed": 284
+  },
+  "raw_artifact_directory": "/data/ningh/nh/ldr-experiments/spatial-20261020-collection-patched"
+}

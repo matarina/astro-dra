@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "label_provenance": "Agent-authored positive controls with explicit study scope and convertible units.",
+  "cases": [
+    {
+      "id": "Q01",
+      "category": "explicit_cell_scope",
+      "claim": "In cultured tumor cells, Compound X reduced tumor growth by 12% [1].",
+      "sources": {
+        "1": "In cultured tumor cells, Compound X reduced tumor growth by 12% compared with vehicle."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "Q02",
+      "category": "explicit_regulation_scope",
+      "claim": "In cultured cells, marker M regulates tumor proliferation [1].",
+      "sources": {
+        "1": "Marker M regulates tumor proliferation in cultured cells."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "Q03",
+      "category": "equivalent_concentration_units",
+      "claim": "Compound X was effective at 0.005 mg/mL [1].",
+      "sources": {
+        "1": "Compound X was effective at 5 micrograms/mL."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "Q04",
+      "category": "explicit_randomized_causality",
+      "claim": "In a randomized experiment, increasing M caused increased risk [1].",
+      "sources": {
+        "1": "In a randomized experiment, increasing M caused increased risk."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "Q05",
+      "category": "qualified_animal_result",
+      "claim": "Treatment X improved survival in mice [1].",
+      "sources": {
+        "1": "Treatment X improved survival in mice. Human efficacy was not evaluated."
+      },
+      "expected": "supported"
+    },
+    {
+      "id": "Q06",
+      "category": "no_causation_statement",
+      "claim": "The observational study did not establish causality [1].",
+      "sources": {
+        "1": "In an observational cohort, higher marker M was associated with increased disease risk. The study did not establish causality."
+      },
+      "expected": "supported"
+    }
+  ]
+}

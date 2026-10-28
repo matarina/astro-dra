@@ -8,11 +8,13 @@
 | `local_deep_research/` | 实际安装到镜像的补丁、`research_verify` 模块及其测试；旧部署配置仍保留 |
 | `local-deep-research/` | 旁置上游源码快照（导入说明基于提交 `2915dc05a`），包含本地修改 |
 | `ldr-monitor/` | 原部署的诊断脚本与历史说明，使用前需检查机器路径 |
-| `docs/` | 源码说明、部署说明及严格文献验证工程计划 |
+| `docs/` | 当前流程、部署说明、测试记录及历史工程计划 |
 
 API 密钥通过环境变量传入。`.env`、本地部署覆盖文件、日志和数据不应提交 Git。
 
-当前核验模块能为 DOI/PMID、年份/IF/语种条件、关键词及结论引用提供检查与标注。**严格文献验证仍处于工程计划阶段**：现有实现不保证最新年度 JIF、正文排除参考文献、逐篇结论证据及所有报告出口严格一致。具体缺口与验收门槛见下方工程计划。
+当前默认研究来源为 **PubMed、SearXNG、Europe PMC**。来源保留完整摘要及可取得的原文，最终成文后结合章节和表格核对引用；有原文支持且独立确认的错误可局部修订。核对失败或证据不足仍可输出报告，不使用强制准入或删句门槛。保存前逐引用语义审计默认关闭，PubMed自动全文默认关闭，按需取文保留。
+
+**这不保证引文语义准确、论文全集覆盖或逐篇JIF条件已核实。** 当前实现与已知限制见[5002累计变化](docs/5002-vs-main-20261028.md)和[修复及模型对照](docs/review-repairs-model-comparison-20261027.md)。旧严格核验计划仅作历史参考。
 
 ## 部署
 
@@ -28,7 +30,7 @@ docker compose up -d
 docker compose ps
 ```
 
-访问 <http://localhost:5000> 并注册初始账号。默认仅监听宿主机回环地址；远程访问和已有部署迁移见 [部署说明](docs/deployment.md)。模型相关环境变量会锁定对应的界面设置。账号创建后可将 `LDR_APP_ALLOW_REGISTRATIONS=false`，执行 `docker compose up -d` 应用配置。
+访问 <http://localhost:5000> 并注册初始账号。默认仅监听宿主机回环地址；远程访问和已有部署迁移见 [部署说明](docs/deployment.md)。研究表单可按次选择模型/提供方；环境配置的默认值保持不变。账号创建后可将 `LDR_APP_ALLOW_REGISTRATIONS=false`，执行 `docker compose up -d` 应用配置。
 
 根目录部署使用固定 digest 的上游运行镜像，再安装本仓库补丁。**修改 `local-deep-research/` 不会自动进入这个镜像**。补丁映射和源码开发边界见 [源码说明](docs/source-layout.md)。`local_deep_research/docker-compose.yml` 和该目录 Dockerfile 是原机器的历史部署入口，与根目录方案分开使用。
 
@@ -53,6 +55,12 @@ PYTHONPATH=local_deep_research .venv/bin/python -m pytest -q local_deep_research
 
 上游项目为 [LearningCircuit/local-deep-research](https://github.com/LearningCircuit/local-deep-research)，采用 MIT 许可证，见 [LICENSE](local-deep-research/LICENSE)。
 
-## 严格文献验证工程计划
+## 当前流程与历史计划
 
-后续开发与验收参见 [工程计划](docs/ldr-verification-engineering-plan.md)。默认使用最新已发布年度的 JIF，关键词仅统计正文并排除参考文献。
+当前行为以[累计变化](docs/5002-vs-main-20261028.md)、[最近实现与限制](docs/review-repairs-model-comparison-20261027.md)及[开发进度](docs/development-progress.md)为准。模型收到的来源材料、写作及核对过程可私有保存到`/data/research_traces`，不追加到报告正文；生成报告目录`reports/`、私有`.env`、数据库和日志不提交Git。
+
+[早期严格核验工程计划](docs/ldr-verification-engineering-plan.md)保留历史设计，不能作为当前功能或逐篇JIF验收已实现的证明。
+
+## 开发接续
+
+每次开发先读 [开发进度记录](docs/development-progress.md) 与 [M0 工程基线](docs/verification-foundation-20261012.md)。当前以有用研究报告、证据连续性和通用引用归属修复为主，不恢复旧的强制准入流程。

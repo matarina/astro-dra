@@ -20,6 +20,9 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from .contracts import ClaimEvidence
+from .semantics import SemanticCheck
+
 
 class VerifyResult(BaseModel):
     """Outcome of a DOI/PMID authenticity check (requirement 1)."""
@@ -77,10 +80,43 @@ class KeywordCov(BaseModel):
     basis: str = "unavailable"  # fulltext | abstract | unavailable
 
 
+class RetrievedPassage(BaseModel):
+    """A range in the source artifact actually presented to the judge."""
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+    score: float = Field(ge=0)
+
+
+class CitationSupport(BaseModel):
+    """One cited work's outcome; missing citations remain explicit audit rows."""
+    citation_index: int
+    paper_id: str | None = None
+    artifact_id: str | None = None
+    basis: str | None = None
+    source_field: str | None = None
+    text_version: str = "raw-text-v1"
+    assessed_chars: int = 0
+    retrieval_method: str = ""
+    retrieved_passages: list[RetrievedPassage] = Field(default_factory=list)
+    verdict: str = "unverifiable"
+    reason_code: str = "unresolved_citation"
+    model_reason: str = ""
+    model_verdict: str | None = None
+    semantic_schema_version: str = "1.0"
+    semantic_checks: list[SemanticCheck] = Field(default_factory=list)
+    evidence: ClaimEvidence | None = None
+
+
 class ClaimCheck(BaseModel):
     """Support verdict for one report claim and its citations (requirement 4)."""
 
     claim: str
+    claim_id: str = ""
+    report_start: int | None = None
+    report_end: int | None = None
+    claim_kind: str = "factual_candidate"
+    claim_context: str = ""
+    citation_checks: list[CitationSupport] = Field(default_factory=list)
     citations: list[int] = Field(default_factory=list)
     sources: list[str] = Field(default_factory=list)
     verdict: str = "unverifiable"  # supported | partial | unsupported | unverifiable

@@ -1,0 +1,18 @@
+{
+  "checks_passed": true,
+  "endpoint": "http://27.30.76.162:6183/ai/v1",
+  "provider": "llamacpp",
+  "model": "/data/AI/maxw/models/Qwen3.8-Flash-Next-GGUF/UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf",
+  "checks": [
+    "model_discovery",
+    "native_provider_available",
+    "ldr_get_llm",
+    "chinese_completion",
+    "streaming",
+    "structured_tool_call",
+    "tool_result_roundtrip"
+  ],
+  "default_provider": "openai_endpoint",
+  "default_model": "deepseek-v4-flash",
+  "scope": "Base-model integration smoke test; no full biomedical research run."
+}

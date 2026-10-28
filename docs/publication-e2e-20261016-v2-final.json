@@ -1,0 +1,942 @@
+{
+  "run_at_utc": "2026-10-16T01:43:52.465424+00:00",
+  "model": "deepseek-v4-flash",
+  "temperature": 0,
+  "synthetic": false,
+  "strategy": "source-based",
+  "search_engine": "PubMedSearchEngine",
+  "search_iterations": 1,
+  "paper_scope": "33567185",
+  "scope": "Actual strategy and detailed generator; disposable SQLite/file/export. No production HTTP login/task or independent expert adjudication.",
+  "source_count": 3,
+  "source_artifacts": [
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:2a5161ae890861143dd10c686410058b11dde52659d3e55d75deed9eeeb55092",
+      "basis": "abstract",
+      "content_sha256": "5dea6f7f072a14bf1dcbfc4f6d6bc56be49d3736ab7063ba183d20f782dfdbd5"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:a7611b6a0544256055a8e7cd3660e5e3e2f54de7fb26e5631172749127b9cb9e",
+      "basis": "abstract",
+      "content_sha256": "5dea6f7f072a14bf1dcbfc4f6d6bc56be49d3736ab7063ba183d20f782dfdbd5"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+      "basis": "abstract",
+      "content_sha256": "329c44b2867c6286ab72ff86c544aed3b1846d671476712705a0816959dcc10d"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:001be0a6c289c8c0ce4aa1e398df9dbe402305b68ecf5271a3039706c5cfcba0",
+      "basis": "snippet",
+      "content_sha256": "684e304a2fe26eae32f148932a4dfdedc68bd99f6692f517687088a9ef57fad3"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:2a5161ae890861143dd10c686410058b11dde52659d3e55d75deed9eeeb55092",
+      "basis": "abstract",
+      "content_sha256": "5dea6f7f072a14bf1dcbfc4f6d6bc56be49d3736ab7063ba183d20f782dfdbd5"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:a7611b6a0544256055a8e7cd3660e5e3e2f54de7fb26e5631172749127b9cb9e",
+      "basis": "abstract",
+      "content_sha256": "5dea6f7f072a14bf1dcbfc4f6d6bc56be49d3736ab7063ba183d20f782dfdbd5"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+      "basis": "abstract",
+      "content_sha256": "329c44b2867c6286ab72ff86c544aed3b1846d671476712705a0816959dcc10d"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:001be0a6c289c8c0ce4aa1e398df9dbe402305b68ecf5271a3039706c5cfcba0",
+      "basis": "snippet",
+      "content_sha256": "684e304a2fe26eae32f148932a4dfdedc68bd99f6692f517687088a9ef57fad3"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:2a5161ae890861143dd10c686410058b11dde52659d3e55d75deed9eeeb55092",
+      "basis": "abstract",
+      "content_sha256": "5dea6f7f072a14bf1dcbfc4f6d6bc56be49d3736ab7063ba183d20f782dfdbd5"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:a7611b6a0544256055a8e7cd3660e5e3e2f54de7fb26e5631172749127b9cb9e",
+      "basis": "abstract",
+      "content_sha256": "5dea6f7f072a14bf1dcbfc4f6d6bc56be49d3736ab7063ba183d20f782dfdbd5"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+      "basis": "abstract",
+      "content_sha256": "329c44b2867c6286ab72ff86c544aed3b1846d671476712705a0816959dcc10d"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:001be0a6c289c8c0ce4aa1e398df9dbe402305b68ecf5271a3039706c5cfcba0",
+      "basis": "snippet",
+      "content_sha256": "684e304a2fe26eae32f148932a4dfdedc68bd99f6692f517687088a9ef57fad3"
+    }
+  ],
+  "quick": {
+    "status": "partial",
+    "verified_claims": 2,
+    "action_reasons": [
+      {
+        "action": "pending",
+        "reason": "[1] semantic_uncertain",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[1] quote_not_found",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "revised",
+        "reason": "[1] partial_support",
+        "repair_reason": "repair_reverified"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[1] semantic_uncertain",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "retained",
+        "reason": "[1] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "retained",
+        "reason": "[1] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "pending",
+        "reason": "[1] semantic_uncertain",
+        "repair_reason": "final_recheck_failed"
+      }
+    ],
+    "actions": {
+      "retained": 2,
+      "revised": 1,
+      "removed": 0,
+      "pending": 5
+    },
+    "sources": [
+      {
+        "index": 1,
+        "original_indices": [
+          1
+        ],
+        "paper_id": "doi:10.1056/nejmoa2032183",
+        "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+        "title": "Once-Weekly Semaglutide in Adults with Overweight or Obesity.",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/33567185/"
+      }
+    ],
+    "content_sha256": "8a080804ec789ac8d2a5c24768b9de078412f88ec42829a525d7ce4dea139410",
+    "reason_code": "publication_complete",
+    "checks": [
+      {
+        "claim_sha256": "1ace812c314be7c5ac1e46d90df08efa7e6d7e73c0eb2e6aa59a35b1c4a4142d",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "f6b951a6a6e96228cf07cb934f55c03ae2a1efd7fe94a9d6c36d71caebe4d6a5",
+            "quote_verified": true
+          }
+        ]
+      },
+      {
+        "claim_sha256": "db249950258e2afff6aa25ebc747a668c22f12b3739a5c8c11f63aeed01e88ae",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "d6b7c32e566c5a9becae8fc78fbc805c869065dd4d9502b5b1060ba2570077f2",
+            "quote_verified": true
+          }
+        ]
+      }
+    ]
+  },
+  "detailed": {
+    "status": "partial",
+    "verified_claims": 4,
+    "action_reasons": [
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "retained",
+        "reason": "[2] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "retained",
+        "reason": "[2] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "pending",
+        "reason": "[2] quote_not_found",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[2] semantic_uncertain",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "revised",
+        "reason": "[2] partial_support",
+        "repair_reason": "repair_reverified"
+      },
+      {
+        "action": "pending",
+        "reason": "[2] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[3] semantic_uncertain",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[3] semantic_uncertain",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "revised",
+        "reason": "[3] located_quote",
+        "repair_reason": "repair_reverified"
+      },
+      {
+        "action": "retained",
+        "reason": "[3] located_quote",
+        "repair_reason": "supported"
+      },
+      {
+        "action": "pending",
+        "reason": "[3] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[2] semantic_uncertain",
+        "repair_reason": "final_recheck_failed"
+      }
+    ],
+    "actions": {
+      "retained": 3,
+      "revised": 2,
+      "removed": 0,
+      "pending": 14
+    },
+    "sources": [
+      {
+        "index": 1,
+        "original_indices": [
+          2,
+          3
+        ],
+        "paper_id": "doi:10.1056/nejmoa2032183",
+        "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+        "title": "Once-Weekly Semaglutide in Adults with Overweight or Obesity.",
+        "url": "https://pubmed.ncbi.nlm.nih.gov/33567185/"
+      }
+    ],
+    "content_sha256": "89d3c8746c4b0ad64f050efa65ee2816e0cb6915d1ca6c3da225cdbe3ce30168",
+    "reason_code": "publication_complete",
+    "checks": [
+      {
+        "claim_sha256": "5718de3180f5864c4496641e12129504729993d766ea08858eb1b9a9cf07e75c",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "30770645109d916f2f9884a89cca182f6c6f680dd924c39b649abd7496ef0761",
+            "quote_verified": true
+          }
+        ]
+      },
+      {
+        "claim_sha256": "b696dd815f1b721cddc2ac72e7321627abdc7592e6810a09ab9804f0f88e20a4",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "d6b7c32e566c5a9becae8fc78fbc805c869065dd4d9502b5b1060ba2570077f2",
+            "quote_verified": true
+          }
+        ]
+      },
+      {
+        "claim_sha256": "bd6af4214b4eaea4125dbb34f8c0c596997a514b991cfeab9db06d6a320d201d",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "e01482f90845fedb511e9b63fb9afab833651650c23a369cae7390f4f59a4d31",
+            "quote_verified": true
+          }
+        ]
+      },
+      {
+        "claim_sha256": "b63aa8cb2e6de996569c63e5337e64334a6c30fc75bc047e07d4e76bc497d983",
+        "verdict": "supported",
+        "citation_indices": [
+          1
+        ],
+        "evidence": [
+          {
+            "paper_id": "doi:10.1056/nejmoa2032183",
+            "basis": "abstract",
+            "artifact_id": "text-v1:62b843631596ebe599ee970a6bec9c35562452594b40ef7376b59c0ee1ebf665",
+            "quote_sha256": "b65a2d7e543355eca9976bd296abac455ad2d94e4cfdb4819ef6979f2311b679",
+            "quote_verified": true
+          }
+        ]
+      }
+    ]
+  },
+  "storage_and_exports": [
+    {
+      "mode": "quick",
+      "database_equal": true,
+      "audit_roundtrip": true,
+      "chat_body_equal": true,
+      "file_equal": true,
+      "display_prefix_equal": true,
+      "exports": {
+        "quarto": {
+          "bytes": 1992,
+          "sha256": "d49c5c5caf7757d9d848313236cb100f651bbc1bc2809aee7cd6c77f765e47a5",
+          "mimetype": "application/zip"
+        },
+        "latex": {
+          "bytes": 3218,
+          "sha256": "9985280b8d1ebb213314b1a67c74087534a4777c74e18e6b0042348efb176c27",
+          "mimetype": "text/plain"
+        },
+        "odt": {
+          "bytes": 8711,
+          "sha256": "29c44bbd5b342e3001f86a2c2654b5fc1fdc010c162fc7ceabc07e0a32acc36b",
+          "mimetype": "application/vnd.oasis.opendocument.text"
+        },
+        "pdf": {
+          "bytes": 248555,
+          "sha256": "65e7e0e79f04343f36ef40c88c39de30371f5e84715f4f43025fb4b2c2f9a66c",
+          "mimetype": "application/pdf"
+        },
+        "ris": {
+          "bytes": 239,
+          "sha256": "4a1715e8bde94d8f78ad2c16ece9c8ef3d15f6f444073848427125346ddfe803",
+          "mimetype": "text/plain"
+        }
+      }
+    },
+    {
+      "mode": "detailed",
+      "database_equal": true,
+      "audit_roundtrip": true,
+      "chat_body_equal": true,
+      "file_equal": true,
+      "display_prefix_equal": true,
+      "exports": {
+        "quarto": {
+          "bytes": 2772,
+          "sha256": "683dd4ef4585ef199eb8aa15438232fe682e2c4bfd4df7c8116825dacb0bb1b3",
+          "mimetype": "application/zip"
+        },
+        "latex": {
+          "bytes": 5815,
+          "sha256": "cdad9c2bc80a2be9007da59525153d5159fabe69cfcbae6fdf2908d83e201a58",
+          "mimetype": "text/plain"
+        },
+        "odt": {
+          "bytes": 9581,
+          "sha256": "25c7400f2355a97fc9744fbcceee519c188113f231bcf979e86a4dbfdc147ce2",
+          "mimetype": "application/vnd.oasis.opendocument.text"
+        },
+        "pdf": {
+          "bytes": 306506,
+          "sha256": "20a67c4ecec87a787b6d059398f3260e780f5dd4bd786a70a39db5a4fbcb3b34",
+          "mimetype": "application/pdf"
+        },
+        "ris": {
+          "bytes": 239,
+          "sha256": "4a1715e8bde94d8f78ad2c16ece9c8ef3d15f6f444073848427125346ddfe803",
+          "mimetype": "text/plain"
+        }
+      }
+    }
+  ],
+  "faults": {
+    "verification_disabled": {
+      "status": "withheld",
+      "reason_code": "verification_disabled"
+    },
+    "model_offline": {
+      "status": "withheld",
+      "reason_code": "revision_complete"
+    },
+    "sources_unavailable": {
+      "status": "withheld",
+      "reason_code": "revision_complete"
+    },
+    "numeric_mutation": {
+      "status": "withheld",
+      "reason_code": "revision_complete"
+    }
+  },
+  "qualifier_controls": {
+    "mechanism_from_eligibility": {
+      "verdict": "partial",
+      "reason": "[17] semantic_partial"
+    },
+    "named_estimand_substitution": {
+      "verdict": "partial",
+      "reason": "[17] semantic_partial"
+    }
+  },
+  "located_final_quotes": 6,
+  "elapsed_s": 282.334,
+  "model_calls": [
+    {
+      "elapsed_s": 0.685,
+      "usage": {
+        "input_tokens": 145,
+        "output_tokens": 81,
+        "total_tokens": 226,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 2.779,
+      "usage": {
+        "input_tokens": 5792,
+        "output_tokens": 317,
+        "total_tokens": 6109,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.305,
+      "usage": {
+        "input_tokens": 862,
+        "output_tokens": 643,
+        "total_tokens": 1505,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.978,
+      "usage": {
+        "input_tokens": 1058,
+        "output_tokens": 554,
+        "total_tokens": 1612,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.208,
+      "usage": {
+        "input_tokens": 720,
+        "output_tokens": 734,
+        "total_tokens": 1454,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 7.197,
+      "usage": {
+        "input_tokens": 1167,
+        "output_tokens": 848,
+        "total_tokens": 2015,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.712,
+      "usage": {
+        "input_tokens": 1140,
+        "output_tokens": 787,
+        "total_tokens": 1927,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.904,
+      "usage": {
+        "input_tokens": 1143,
+        "output_tokens": 813,
+        "total_tokens": 1956,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 0.542,
+      "usage": {
+        "input_tokens": 290,
+        "output_tokens": 53,
+        "total_tokens": 343,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 8.272,
+      "usage": {
+        "input_tokens": 827,
+        "output_tokens": 985,
+        "total_tokens": 1812,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 0.526,
+      "usage": {
+        "input_tokens": 297,
+        "output_tokens": 54,
+        "total_tokens": 351,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.879,
+      "usage": {
+        "input_tokens": 828,
+        "output_tokens": 578,
+        "total_tokens": 1406,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 7.467,
+      "usage": {
+        "input_tokens": 828,
+        "output_tokens": 919,
+        "total_tokens": 1747,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 7.012,
+      "usage": {
+        "input_tokens": 1140,
+        "output_tokens": 774,
+        "total_tokens": 1914,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.697,
+      "usage": {
+        "input_tokens": 1143,
+        "output_tokens": 699,
+        "total_tokens": 1842,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 0.801,
+      "usage": {
+        "input_tokens": 492,
+        "output_tokens": 85,
+        "total_tokens": 577,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 2.927,
+      "usage": {
+        "input_tokens": 582,
+        "output_tokens": 326,
+        "total_tokens": 908,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 2.932,
+      "usage": {
+        "input_tokens": 6117,
+        "output_tokens": 248,
+        "total_tokens": 6365,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 3.524,
+      "usage": {
+        "input_tokens": 926,
+        "output_tokens": 362,
+        "total_tokens": 1288,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 3.714,
+      "usage": {
+        "input_tokens": 6423,
+        "output_tokens": 327,
+        "total_tokens": 6750,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.777,
+      "usage": {
+        "input_tokens": 834,
+        "output_tokens": 565,
+        "total_tokens": 1399,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.206,
+      "usage": {
+        "input_tokens": 832,
+        "output_tokens": 626,
+        "total_tokens": 1458,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.773,
+      "usage": {
+        "input_tokens": 1066,
+        "output_tokens": 648,
+        "total_tokens": 1714,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.182,
+      "usage": {
+        "input_tokens": 1134,
+        "output_tokens": 725,
+        "total_tokens": 1859,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.905,
+      "usage": {
+        "input_tokens": 1136,
+        "output_tokens": 781,
+        "total_tokens": 1917,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.337,
+      "usage": {
+        "input_tokens": 1072,
+        "output_tokens": 616,
+        "total_tokens": 1688,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 19.243,
+      "usage": {
+        "input_tokens": 1170,
+        "output_tokens": 805,
+        "total_tokens": 1975,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 7.733,
+      "usage": {
+        "input_tokens": 1147,
+        "output_tokens": 882,
+        "total_tokens": 2029,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.604,
+      "usage": {
+        "input_tokens": 1070,
+        "output_tokens": 677,
+        "total_tokens": 1747,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 7.462,
+      "usage": {
+        "input_tokens": 1203,
+        "output_tokens": 908,
+        "total_tokens": 2111,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.88,
+      "usage": {
+        "input_tokens": 1074,
+        "output_tokens": 818,
+        "total_tokens": 1892,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 0.143,
+      "usage": {
+        "input_tokens": 277,
+        "output_tokens": 6,
+        "total_tokens": 283,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 0.482,
+      "usage": {
+        "input_tokens": 277,
+        "output_tokens": 50,
+        "total_tokens": 327,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.595,
+      "usage": {
+        "input_tokens": 971,
+        "output_tokens": 638,
+        "total_tokens": 1609,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 0.573,
+      "usage": {
+        "input_tokens": 289,
+        "output_tokens": 31,
+        "total_tokens": 320,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 3.196,
+      "usage": {
+        "input_tokens": 1051,
+        "output_tokens": 432,
+        "total_tokens": 1483,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.093,
+      "usage": {
+        "input_tokens": 834,
+        "output_tokens": 525,
+        "total_tokens": 1359,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.654,
+      "usage": {
+        "input_tokens": 832,
+        "output_tokens": 589,
+        "total_tokens": 1421,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 3.861,
+      "usage": {
+        "input_tokens": 971,
+        "output_tokens": 574,
+        "total_tokens": 1545,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 3.341,
+      "usage": {
+        "input_tokens": 1051,
+        "output_tokens": 441,
+        "total_tokens": 1492,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 5.856,
+      "usage": {
+        "input_tokens": 1203,
+        "output_tokens": 779,
+        "total_tokens": 1982,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.708,
+      "usage": {
+        "input_tokens": 1113,
+        "output_tokens": 737,
+        "total_tokens": 1850,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 6.244,
+      "usage": {
+        "input_tokens": 699,
+        "output_tokens": 766,
+        "total_tokens": 1465,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.814,
+      "usage": {
+        "input_tokens": 1063,
+        "output_tokens": 602,
+        "total_tokens": 1665,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    }
+  ],
+  "checks_passed": true,
+  "image_id": "sha256:4fdce7d19d5a2081402f6f0b89df8982d9d9e374c278019455705b183fb2c4ba",
+  "code_commit": "bfb2e003cf6745aa29eec8abe027ae302c2a91c4",
+  "working_tree_dirty": true,
+  "code_sha256": {
+    "local_deep_research/research_verify/__init__.py": "11538d04e2443ee3571d687989ffac6af46c4abdff816fb7e189f927853af4f3",
+    "local_deep_research/research_verify/__main__.py": "e8aba19bda5166eca8ffc06bd4647381c51bd8abd6dec15514d05f25292b9dcf",
+    "local_deep_research/research_verify/citation_qc.py": "9ccf88653bc2214f17b6fb844d6f1eaaa341078d801d4c3daed28dab631df65a",
+    "local_deep_research/research_verify/claims.py": "ef1eea19d3972d2b3ed80f72395fed104ebc79721872d3cba703a59e06ede08d",
+    "local_deep_research/research_verify/cli_check.py": "85cf079a8717d6387e73220ae986fdfbe8ec3fa0548984c40bff82ca37334d2a",
+    "local_deep_research/research_verify/config.py": "3260e211d780e356e1a2992ed9fb4a325a2197ca2e5705b77d5d2ceac2d7f458",
+    "local_deep_research/research_verify/constraint_matcher.py": "fde82942bf3a0ebe67603be94ce8960272bc7643c16a345fc641da6b2671317e",
+    "local_deep_research/research_verify/contracts.py": "30a461f449b2446b693c45775fb613791743adffd0b22c1008c7c1a1dc274b2a",
+    "local_deep_research/research_verify/doi_validator.py": "9656f05d4c506ed56c2faae16fa0132f1fc5effb0b0423ef6c78263172ab1606",
+    "local_deep_research/research_verify/evidence.py": "b986eda63f70544c608e9082fafa8605785aba18b8c3419c405b24326a6ba5fd",
+    "local_deep_research/research_verify/http_client.py": "d3dfcf448315b093ffbb243bf9b6a0bf82c257cda48dc0de301c52e01a8a1198",
+    "local_deep_research/research_verify/keyword_cov.py": "560579e7217fe734337455e3494693a2d550b8f04544d76b2f38439ff61771da",
+    "local_deep_research/research_verify/models.py": "eaa2690ce2a5d456bb5060f38ec1317c4c93f7786c3d6710136e0205df64922f",
+    "local_deep_research/research_verify/passages.py": "0cb026fc22bbc185b962caeaba3f72c135f6479c53a3d7c5ffd2ec7536aa5b16",
+    "local_deep_research/research_verify/publication.py": "dc3e4c690a983d5d8beaa9e6c6c5c59c9cbe39fec02493afba25ee76f9a816b8",
+    "local_deep_research/research_verify/revision.py": "5d1dd5fbe029142e30a0b3971105d950fa92abd1305520dd64bbec64399b13f9",
+    "local_deep_research/research_verify/semantics.py": "edc5c8cb4a00adce06e4a0b71b5f5c287000026cad8c0ee3cc73c1272cc55e35",
+    "local_deep_research/research_verify/textutil.py": "702db5973b2b6cd192a5f7276590e1ce7357011c03584a487695966331a48a3a"
+  }
+}

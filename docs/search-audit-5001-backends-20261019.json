@@ -1,0 +1,65 @@
+{
+  "container": "astro-dra-local-deep-research-1",
+  "results": [
+    {
+      "backend": "bing",
+      "query": "cancer immunotherapy",
+      "http_status": 200,
+      "count": 10,
+      "unresponsive_engines": [],
+      "seconds": 0.575
+    },
+    {
+      "backend": "google",
+      "query": "cancer immunotherapy",
+      "http_status": 200,
+      "count": 0,
+      "unresponsive_engines": [
+        [
+          "google",
+          "timeout"
+        ]
+      ],
+      "seconds": 3.006
+    },
+    {
+      "backend": "brave",
+      "query": "cancer immunotherapy",
+      "http_status": 200,
+      "count": 0,
+      "unresponsive_engines": [
+        [
+          "brave",
+          "timeout"
+        ]
+      ],
+      "seconds": 3.006
+    },
+    {
+      "backend": "duckduckgo",
+      "query": "cancer immunotherapy",
+      "http_status": 200,
+      "count": 0,
+      "unresponsive_engines": [
+        [
+          "duckduckgo",
+          "HTTP connection error"
+        ]
+      ],
+      "seconds": 0.033
+    },
+    {
+      "backend": "startpage",
+      "query": "cancer immunotherapy",
+      "http_status": 200,
+      "count": 0,
+      "unresponsive_engines": [
+        [
+          "startpage",
+          "timeout"
+        ]
+      ],
+      "seconds": 3.01
+    }
+  ]
+}

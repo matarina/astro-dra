@@ -1,0 +1,45 @@
+{
+  "checks_passed": false,
+  "quick": {
+    "status": "withheld",
+    "verified_claims": 0,
+    "actions": {
+      "retained": 0,
+      "revised": 0,
+      "removed": 0,
+      "pending": 8
+    },
+    "sources": [],
+    "content_sha256": "c519cd16bb5c23bd0eaa3aad9d0c0d4c13f013b28291080a52b1c09d803e5e98",
+    "reason_code": "revision_complete",
+    "checks": []
+  },
+  "detailed": {
+    "verified_claims": 0
+  },
+  "elapsed_s": 38.089,
+  "scope": "Diagnostic quick pipeline only",
+  "image_id": "sha256:6e2adbc982eea0aa84504986954581825312cb3f4d1b9846d9f670d94faffa48",
+  "code_commit": "04a83cc6a3307f8bf212531d7130b39357950d1a",
+  "working_tree_dirty": true,
+  "code_sha256": {
+    "local_deep_research/research_verify/__init__.py": "11538d04e2443ee3571d687989ffac6af46c4abdff816fb7e189f927853af4f3",
+    "local_deep_research/research_verify/__main__.py": "e8aba19bda5166eca8ffc06bd4647381c51bd8abd6dec15514d05f25292b9dcf",
+    "local_deep_research/research_verify/citation_qc.py": "72ff70a7972d74516ca2ba0e03a8ad12566c41c4874d4e061d9ffab1a10ecacc",
+    "local_deep_research/research_verify/claims.py": "ef1eea19d3972d2b3ed80f72395fed104ebc79721872d3cba703a59e06ede08d",
+    "local_deep_research/research_verify/cli_check.py": "85cf079a8717d6387e73220ae986fdfbe8ec3fa0548984c40bff82ca37334d2a",
+    "local_deep_research/research_verify/config.py": "3260e211d780e356e1a2992ed9fb4a325a2197ca2e5705b77d5d2ceac2d7f458",
+    "local_deep_research/research_verify/constraint_matcher.py": "fde82942bf3a0ebe67603be94ce8960272bc7643c16a345fc641da6b2671317e",
+    "local_deep_research/research_verify/contracts.py": "30a461f449b2446b693c45775fb613791743adffd0b22c1008c7c1a1dc274b2a",
+    "local_deep_research/research_verify/doi_validator.py": "9656f05d4c506ed56c2faae16fa0132f1fc5effb0b0423ef6c78263172ab1606",
+    "local_deep_research/research_verify/evidence.py": "b986eda63f70544c608e9082fafa8605785aba18b8c3419c405b24326a6ba5fd",
+    "local_deep_research/research_verify/http_client.py": "d3dfcf448315b093ffbb243bf9b6a0bf82c257cda48dc0de301c52e01a8a1198",
+    "local_deep_research/research_verify/keyword_cov.py": "560579e7217fe734337455e3494693a2d550b8f04544d76b2f38439ff61771da",
+    "local_deep_research/research_verify/models.py": "eaa2690ce2a5d456bb5060f38ec1317c4c93f7786c3d6710136e0205df64922f",
+    "local_deep_research/research_verify/passages.py": "0cb026fc22bbc185b962caeaba3f72c135f6479c53a3d7c5ffd2ec7536aa5b16",
+    "local_deep_research/research_verify/publication.py": "dc3e4c690a983d5d8beaa9e6c6c5c59c9cbe39fec02493afba25ee76f9a816b8",
+    "local_deep_research/research_verify/revision.py": "e3fd65f6a26e7b65b80f672affe7f4b13cabbba15d1a16c3b1662acec768c71e",
+    "local_deep_research/research_verify/semantics.py": "5884aafb85e64c8577ab26975e98928100ac16e2aa5c7463dcaf094489c50434",
+    "local_deep_research/research_verify/textutil.py": "702db5973b2b6cd192a5f7276590e1ce7357011c03584a487695966331a48a3a"
+  }
+}

@@ -10,3 +10,6 @@
 **/*.local.yaml
 **/*.pyc
 **/.coverage
+
+# Private generated research reports stay local.
+/reports/

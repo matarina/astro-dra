@@ -1,0 +1,17 @@
+{
+  "checks_passed": false,
+  "exit_code": 1,
+  "failure": {
+    "reason": "live_research_no_sources",
+    "frames": [
+      {
+        "file": "publication_e2e_worker.py",
+        "line": 181
+      },
+      {
+        "file": "publication_e2e_worker.py",
+        "line": 81
+      }
+    ]
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "date": "2026-10-26",
+  "scope": "Generic source processing and private observability; no case-63-specific rules.",
+  "checks_passed": true,
+  "regression": {
+    "passed": 343,
+    "elapsed_s": 2.0
+  },
+  "deployment": {
+    "application": {
+      "id": "728f10d8acdd638d1388da1642ec2f9e9abbcf45929135a82f2ab5f0763a7914",
+      "image": "astro-dra:generic-sources-20261026",
+      "started_at": "2026-10-26T09:46:29.847601453Z",
+      "health": "healthy"
+    },
+    "other_services_unchanged": true,
+    "volumes_unchanged": true,
+    "matched_modules": 13,
+    "login_http_status": 200,
+    "health": "healthy",
+    "configuration": {
+      "LDR_LLM_PROVIDER": "deepseek",
+      "LDR_LLM_MODEL": "deepseek-flash",
+      "LDR_RESEARCH_TRACE_ENABLED": "true",
+      "LDR_RESEARCH_TRACE_DIR": "/data/research_traces",
+      "LDR_GENERAL_ENABLE_FACT_CHECKING": "true",
+      "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": "500",
+      "LDR_VERIFY_ENABLE_CITATION_QC": "false"
+    },
+    "pubmed_get_full_text_constructor_default": false,
+    "pubmed_fulltext_default_settings": {
+      "search.engine.web.pubmed.default_params.full_text_limit": 3,
+      "search.engine.web.pubmed.default_params.get_full_text": false
+    },
+    "startup_error_lines": 0
+  },
+  "saved_material_replay": {
+    "checks_passed": true,
+    "model_calls": 0,
+    "cleaned_superscript_preserved": true,
+    "xml_article_reference_preserved": true,
+    "duplicate_records": 4,
+    "collector_articles": 2,
+    "publication_articles": 2,
+    "related_notice_carried_without_independent_selection": true,
+    "ordinary_excerpt_unchanged": true,
+    "scope": "Saved source fixtures through installed adapters/collector/formatter/publication; no new research."
+  },
+  "installed_simulated_pipeline": {
+    "checks_passed": true,
+    "research_id": "diagnostic-generic-e9074800a9854996b99af7305c2af4c1",
+    "real_model_calls": 0,
+    "simulated_synthesis_calls": 2,
+    "tool_result_private": true,
+    "notice_in_review_and_writer": true,
+    "trace_permissions_checked": true,
+    "trace_stage_counts": {
+      "start": 4,
+      "tool_messages": 1,
+      "finish": 4,
+      "agent_draft": 2,
+      "agent_messages": 1,
+      "collector_sources": 1,
+      "input_sources": 1,
+      "source_material_views": 1,
+      "writer_sources": 1,
+      "native_check_request": 1,
+      "native_check_response": 1,
+      "writer_request": 1,
+      "writer_response": 1,
+      "publication_input": 1,
+      "publication_output": 1
+    }
+  },
+  "backup": "/data/ningh/nh/ldr-test-5002-backups/generic-sources-20261026-173953",
+  "image": "astro-dra:generic-sources-20261026",
+  "not_changed": [
+    "native consistency/writer prompts",
+    "native check location",
+    "ordinary excerpt selection",
+    "count/domain rules",
+    "default model",
+    "full-text auto-fetch default",
+    "saved reports"
+  ],
+  "limitations": [
+    "No full new research/model evaluation",
+    "Abstract/body conflict not automatically reconciled",
+    "Metadata-only notices do not establish exact corrections",
+    "Native consistency check still precedes final writer"
+  ],
+  "deployment_incident": "Preflight shared relay image reference triggered rejection; old app image recreated once before corrected sequential update. Other services unchanged."
+}

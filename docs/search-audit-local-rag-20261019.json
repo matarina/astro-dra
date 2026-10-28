@@ -1,0 +1,53 @@
+{
+  "scope": "Dependency import discovery and aggregate file counts only; no account DB access or private document search; zero files is not a claim that external libraries cannot exist. Retriever registry is process-local and a fresh audit process cannot enumerate the web worker registrations.",
+  "results": [
+    {
+      "container": "local_deep_research-local-deep-research-1",
+      "checks": {
+        "langchain_community": true,
+        "langchain_core": true,
+        "sentence_transformers": true,
+        "faiss": true,
+        "elasticsearch": true,
+        "wikipedia": true,
+        "ddgs": true,
+        "duckduckgo_search": true,
+        "faiss_index_count": 0,
+        "safetensors_count": 0,
+        "new_process_shared_retriever_count": 0
+      }
+    },
+    {
+      "container": "astro-dra-local-deep-research-1",
+      "checks": {
+        "langchain_community": true,
+        "langchain_core": true,
+        "sentence_transformers": true,
+        "faiss": true,
+        "elasticsearch": true,
+        "wikipedia": true,
+        "ddgs": true,
+        "duckduckgo_search": true,
+        "faiss_index_count": 0,
+        "safetensors_count": 0,
+        "new_process_shared_retriever_count": 0
+      }
+    },
+    {
+      "container": "astro-dra-test-5002-local-deep-research-1",
+      "checks": {
+        "langchain_community": true,
+        "langchain_core": true,
+        "sentence_transformers": true,
+        "faiss": true,
+        "elasticsearch": true,
+        "wikipedia": true,
+        "ddgs": true,
+        "duckduckgo_search": true,
+        "faiss_index_count": 0,
+        "safetensors_count": 0,
+        "new_process_shared_retriever_count": 0
+      }
+    }
+  ]
+}

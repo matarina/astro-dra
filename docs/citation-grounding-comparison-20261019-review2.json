@@ -1,0 +1,310 @@
+{
+  "timestamp": "2026-10-19T07:57:01.940400+00:00",
+  "image_id": "sha256:1b2e7c4264b830e96ddd25f87d7c20576c45d851e76d95a8e0eea9a9de0e4cb0",
+  "arms": [
+    {
+      "variant": "installed",
+      "model": "deepseek-v4-flash",
+      "source_hashes": {
+        "33567185": "b3cd54b0520753ec0d22d6c7b2c9c09e100a9bb705e8cfe859d37b8f8e840375",
+        "22591295": "d4477b582e6fff994af33cd2b5581d8f7ab81c370c91e23ba4b1999e4abfb75f"
+      },
+      "structural_checks_passed": true,
+      "cases": [
+        {
+          "case": "ordinary",
+          "report": "根据您的要求，以下是基于来源[17]和[23]的四个到六个事实句，分别说明STEP 1试验的人群和68周体重结果，以及咖啡队列的死亡风险发现和因果局限。所有信息均严格来自所提供来源，未添加额外内容。\n\n**STEP 1试验（来源[17]）**\n\n1. STEP 1试验纳入了1961名无糖尿病的成人，其体质指数（BMI）为30或以上，或BMI为27或以上且伴有至少一种体重相关合并症 [17]。\n2. 参与者按2:1比例随机分配，接受每周一次皮下注射2.4 mg司美格鲁肽或安慰剂，并同时接受生活方式干预，疗程为68周 [17]。\n3. 在68周时，司美格鲁肽组的平均体重变化为-14.9%，而安慰剂组为-2.4%，估计治疗差异为-12.4个百分点（95%置信区间，-13.4至-11.5；P<0.001）[17]。\n4. 司美格鲁肽组中86.4%的参与者（1047人）实现了体重减轻至少5%，而安慰剂组为31.5%（182人）；体重减轻至少10%和15%的比例也显著更高（分别为69.1%对12.0%，以及50.5%对4.9%）[17]。\n5. 从基线到68周，司美格鲁肽组的体重绝对变化为-15.3 kg，安慰剂组为-2.6 kg，估计治疗差异为-12.7 kg（95%置信区间，-13.7至-11.7）[17]。\n\n**咖啡队列（来源[23]）**\n\n6. 该队列研究纳入了229,119名男性和173,141名女性，年龄在50至71岁之间，来自美国国立卫生研究院-AARP饮食与健康研究，排除了患有癌症、心脏病和中风的参与者 [23]。\n7. 在调整吸烟状态和其他潜在混杂因素后，咖啡摄入与总死亡率及多种原因特异性死亡率呈显著负相关；例如，男性每天喝2至3杯咖啡的死亡风险比为0.90（95%置信区间，0.86至0.93），女性为0.87（95%置信区间，0.83至0.92）[23]。\n8. 该研究明确表示，咖啡摄入与死亡率的负相关是否属于因果关系或仅为关联性发现，无法从数据中确定 [23]。此外，咖啡摄入量仅在基线时评估一次，且未考虑随时间的变化，这限制了因果推断的强度 [23]。",
+          "review": {
+            "verdict": "issues_found",
+            "issues": [
+              {
+                "claim": "咖啡摄入量仅在基线时评估一次，且未考虑随时间的变化，这限制了因果推断的强度",
+                "citations": [
+                  23
+                ],
+                "verdict": "unverifiable",
+                "reason": "Source [23] states coffee consumption was assessed once at baseline, but does not mention 'not considering changes over time' or 'limiting causal inference strength'—this is added interpretation, not in source."
+              }
+            ]
+          },
+          "display_sources": [
+            {
+              "index": 1,
+              "original_indices": [
+                17
+              ],
+              "paper_id": "doi:10.1056/nejmoa2032183",
+              "artifact_id": "text-v1:8ee584e2cc10a15b1130a800759f4f6b41d2cbb280db029d2baec411ffabf295",
+              "title": "Once-Weekly Semaglutide in Adults with Overweight or Obesity.",
+              "url": "https://pubmed.ncbi.nlm.nih.gov/33567185/"
+            },
+            {
+              "index": 2,
+              "original_indices": [
+                23
+              ],
+              "paper_id": "doi:10.1056/nejmoa1112010",
+              "artifact_id": "text-v1:fa608f711b605796547c5b27c9327361be877e32fd71c532e80357ac936f6455",
+              "title": "Association of coffee drinking with total and cause-specific mortality.",
+              "url": "https://pubmed.ncbi.nlm.nih.gov/22591295/"
+            }
+          ],
+          "warnings": [],
+          "elapsed_s": 1.049
+        },
+        {
+          "case": "incorrect_draft",
+          "report": "根据来源[17]，STEP 1是一项双盲随机对照试验，纳入1961名无糖尿病的超重或肥胖成人（BMI≥30，或≥27且伴有至少一种体重相关合并症），随机接受每周一次2.4 mg司美格鲁肽或安慰剂，并联合生活方式干预，持续68周。主要终点为体重百分比变化及至少5%的体重降幅。结果显示，司美格鲁肽组平均体重下降14.9%，安慰剂组下降2.4%，治疗差异为-12.4个百分点（95% CI -13.4至-11.5，P<0.001）；86.4%的司美格鲁肽组参与者实现≥5%的体重降幅，而安慰剂组为31.5%。此外，司美格鲁肽组在心血管代谢风险因素和身体功能方面改善更明显，但恶心和腹泻是最常见不良事件，且因胃肠道事件停药的比例更高（4.5% vs. 0.8%）。该试验的主要限制在于：仅纳入无糖尿病人群，结果不能直接推广至糖尿病患者；随访期仅68周，长期疗效和安全性未知；且试验由制药公司（诺和诺德）资助，可能存在利益冲突。\n\n根据来源[23]，咖啡队列研究基于美国国立卫生研究院-AARP饮食与健康研究，纳入229,119名男性和173,141名女性（基线年龄50-71岁），排除癌症、心脏病和中风患者，咖啡摄入量仅在基线时评估一次。在约514.9万人年的随访中（1995-2008），共发生52,515例死亡。调整吸烟等混杂因素后，咖啡摄入与总死亡率呈显著负相关：男性每日喝2-3杯咖啡的死亡风险比为0.90（95% CI 0.86-0.93），女性为0.87（95% CI 0.83-0.92）；每日4-5杯时男性为0.88，女性为0.84。这种负相关见于心脏病、呼吸系统疾病、中风、意外伤害、糖尿病和感染导致的死亡，但未见于癌症死亡。该研究的主要限制包括：咖啡摄入量仅测量一次，可能随时间变化；作为观察性研究，无法排除残余混杂（如其他生活方式因素）；且作者明确指出，数据不能确定咖啡与死亡风险降低之间存在因果关系，只能提示关联。",
+          "review": {
+            "verdict": "issues_found",
+            "issues": [
+              {
+                "claim": "该试验的主要限制在于：仅纳入无糖尿病人群，结果不能直接推广至糖尿病患者；随访期仅68周，长期疗效和安全性未知；且试验由制药公司（诺和诺德）资助，可能存在利益冲突。",
+                "citations": [
+                  17
+                ],
+                "verdict": "unverifiable",
+                "reason": "Source [17] does not mention these limitations, funding, or generalizability concerns; missing information is unverifiable, not contradicted."
+              },
+              {
+                "claim": "在约514.9万人年的随访中（1995-2008），共发生52,515例死亡。",
+                "citations": [
+                  23
+                ],
+                "verdict": "supported",
+                "reason": "Source [23] states 5,148,760 person-years and 33,731+18,784=52,515 deaths; numbers align."
+              },
+              {
+                "claim": "这种负相关见于心脏病、呼吸系统疾病、中风、意外伤害、糖尿病和感染导致的死亡，但未见于癌症死亡。",
+                "citations": [
+                  23
+                ],
+                "verdict": "supported",
+                "reason": "Source [23] explicitly lists these causes and notes no inverse association for cancer deaths."
+              }
+            ]
+          },
+          "display_sources": [
+            {
+              "index": 1,
+              "original_indices": [
+                17
+              ],
+              "paper_id": "doi:10.1056/nejmoa2032183",
+              "artifact_id": "text-v1:8ee584e2cc10a15b1130a800759f4f6b41d2cbb280db029d2baec411ffabf295",
+              "title": "Once-Weekly Semaglutide in Adults with Overweight or Obesity.",
+              "url": "https://pubmed.ncbi.nlm.nih.gov/33567185/"
+            },
+            {
+              "index": 2,
+              "original_indices": [
+                23
+              ],
+              "paper_id": "doi:10.1056/nejmoa1112010",
+              "artifact_id": "text-v1:fa608f711b605796547c5b27c9327361be877e32fd71c532e80357ac936f6455",
+              "title": "Association of coffee drinking with total and cause-specific mortality.",
+              "url": "https://pubmed.ncbi.nlm.nih.gov/22591295/"
+            }
+          ],
+          "warnings": [],
+          "elapsed_s": 1.789
+        },
+        {
+          "case": "unprovided_detail",
+          "report": "根据STEP 1试验的论文报告，该研究纳入1961名无糖尿病的成人，其体质指数≥30（或≥27且合并至少一种体重相关疾病），按2:1随机分配至每周一次司美格鲁肽2.4 mg或安慰剂组，并联合生活方式干预，持续68周 [17]。主要终点结果显示，司美格鲁肽组体重平均下降14.9%，安慰剂组下降2.4%，治疗差异为-12.4个百分点（95% CI -13.4至-11.5，P<0.001）；同时，司美格鲁肽组中86.4%的参与者实现≥5%的体重降幅，而安慰剂组为31.5% [17]。论文还报告了体重下降≥10%和≥15%的参与者比例分别为69.1%和50.5%，均显著高于安慰剂组 [17]。然而，所给材料并未提供任何关于具体分子机制（如GLP-1受体激动剂如何调控能量代谢或脂肪组织）的数据，因此无法据此确定分子机制 [17]。同样，材料中未报告按年龄、性别、基线体重等分层的亚组效果，故无法评估亚组差异 [17]。关于primary estimand，论文明确将其定义为“评估效应不考虑治疗中断或救援干预”，即无论参与者是否停药或接受补救措施，均纳入分析，这一定义在材料中有直接描述 [17]。综上，论文直接报告了主要体重结果和primary estimand的定义，但分子机制与亚组效果因材料缺失而无法讨论。",
+          "review": {
+            "verdict": "issues_found",
+            "issues": [
+              {
+                "claim": "材料中未报告按年龄、性别、基线体重等分层的亚组效果",
+                "citations": [
+                  17
+                ],
+                "verdict": "unverifiable",
+                "reason": "Source [17] does not mention subgroup analyses; absence is not a contradiction."
+              },
+              {
+                "claim": "论文直接报告了primary estimand的定义",
+                "citations": [
+                  17
+                ],
+                "verdict": "supported",
+                "reason": "Source [17] explicitly defines the primary estimand; no issue."
+              }
+            ]
+          },
+          "display_sources": [
+            {
+              "index": 1,
+              "original_indices": [
+                17
+              ],
+              "paper_id": "doi:10.1056/nejmoa2032183",
+              "artifact_id": "text-v1:8ee584e2cc10a15b1130a800759f4f6b41d2cbb280db029d2baec411ffabf295",
+              "title": "Once-Weekly Semaglutide in Adults with Overweight or Obesity.",
+              "url": "https://pubmed.ncbi.nlm.nih.gov/33567185/"
+            }
+          ],
+          "warnings": [],
+          "elapsed_s": 0.809
+        }
+      ],
+      "review_parse_succeeded": true,
+      "report_mode": "frozen_comparison_reports",
+      "scope": "Controlled two-public-abstract synthesis; seeded drafts are artificial. Same-model reviews are not independent accuracy acceptance."
+    },
+    {
+      "variant": "patched",
+      "model": "deepseek-v4-flash",
+      "source_hashes": {
+        "33567185": "b3cd54b0520753ec0d22d6c7b2c9c09e100a9bb705e8cfe859d37b8f8e840375",
+        "22591295": "d4477b582e6fff994af33cd2b5581d8f7ab81c370c91e23ba4b1999e4abfb75f"
+      },
+      "structural_checks_passed": true,
+      "cases": [
+        {
+          "case": "ordinary",
+          "report": "根据您的要求，以下是关于STEP 1试验和咖啡队列研究的事实陈述，每句均附有来源编号：\n\n1. **STEP 1试验人群**：该试验纳入了1961名体重指数（BMI）为30或以上（若伴有至少一种体重相关合并症则BMI≥27）且未患糖尿病的成人，按2:1比例随机分配至每周一次皮下注射2.4 mg司美格鲁肽或安慰剂，并联合生活方式干预，治疗持续68周[17]。\n\n2. **STEP 1试验主要终点**：共同主要终点为体重百分比变化和体重减轻至少5%，主要估计量评估的是无论治疗中断或救援干预如何的效果[17]。\n\n3. **STEP 1试验68周体重结果（百分比）**：从基线至第68周，司美格鲁肽组的平均体重变化为-14.9%，安慰剂组为-2.4%，估计治疗差异为-12.4个百分点（95%置信区间，-13.4至-11.5；P<0.001）[17]。\n\n4. **STEP 1试验68周体重结果（绝对重量及达标率）**：司美格鲁肽组体重变化为-15.3 kg，安慰剂组为-2.6 kg（估计治疗差异为-12.7 kg；95%置信区间，-13.7至-11.7）；司美格鲁肽组中86.4%的参与者实现体重减轻≥5%，而安慰剂组为31.5%[17]。\n\n5. **咖啡队列的死亡风险发现**：在NIH-AARP饮食与健康研究中，对229,119名男性和173,141名女性（基线年龄50至71岁）随访5,148,760人年后，调整吸烟状态及其他潜在混杂因素后，咖啡摄入与总死亡率及多种死因特异性死亡率呈显著负相关；例如，男性每日饮用2-3杯咖啡的死亡风险比为0.90（95%置信区间，0.86至0.93），女性为0.87（95%置信区间，0.83至0.92）[23]。\n\n6. **咖啡队列的因果局限**：该研究作者明确指出，虽然咖啡摄入与总死亡率和死因特异性死亡率呈负相关，但“这是因果关联还是相关性发现，无法从我们的数据中确定”，因此该结果不能解释为咖啡直接降低死亡风险的因果证据[23]。",
+          "review": {
+            "verdict": "supported",
+            "issues": []
+          },
+          "display_sources": [
+            {
+              "index": 1,
+              "original_indices": [
+                17
+              ],
+              "paper_id": "doi:10.1056/nejmoa2032183",
+              "artifact_id": "text-v1:8ee584e2cc10a15b1130a800759f4f6b41d2cbb280db029d2baec411ffabf295",
+              "title": "Once-Weekly Semaglutide in Adults with Overweight or Obesity.",
+              "url": "https://pubmed.ncbi.nlm.nih.gov/33567185/"
+            },
+            {
+              "index": 2,
+              "original_indices": [
+                23
+              ],
+              "paper_id": "doi:10.1056/nejmoa1112010",
+              "artifact_id": "text-v1:fa608f711b605796547c5b27c9327361be877e32fd71c532e80357ac936f6455",
+              "title": "Association of coffee drinking with total and cause-specific mortality.",
+              "url": "https://pubmed.ncbi.nlm.nih.gov/22591295/"
+            }
+          ],
+          "warnings": [],
+          "elapsed_s": 0.466
+        },
+        {
+          "case": "incorrect_draft",
+          "report": "**第一段：STEP 1 试验的主要发现与限制**\n\nSTEP 1 是一项双盲随机对照试验，纳入 1961 名无糖尿病的超重或肥胖成人（体质指数≥30，或≥27 且伴至少一种体重相关合并症），按 2:1 比例分配至每周一次皮下注射司美格鲁肽 2.4 mg 或安慰剂，并联合生活方式干预，持续 68 周 [17]。结果显示，司美格鲁肽组体重平均下降 14.9%，安慰剂组下降 2.4%，估计治疗差异为 -12.4 个百分点（95% CI -13.4 至 -11.5；P<0.001）；司美格鲁肽组 86.4% 的参与者实现至少 5% 的体重下降，而安慰剂组为 31.5% [17]。此外，司美格鲁肽组在心血管代谢危险因素和患者自报身体功能方面也有更大改善 [17]。该试验的主要限制包括：恶心和腹泻是最常见的不良事件，且因胃肠道事件停药的比例在司美格鲁肽组更高（4.5% vs. 0.8%）[17]；同时，该研究仅持续 68 周，未提供长期维持体重效果或更广泛安全性数据，且研究对象为无糖尿病人群，结果不能直接外推至糖尿病患者。\n\n**第二段：咖啡队列研究的主要发现与限制**\n\n该研究基于美国国立卫生研究院-AARP 饮食与健康研究队列，纳入 229,119 名男性和 173,141 名女性，基线年龄 50 至 71 岁，排除癌症、心脏病和中风患者，咖啡摄入量仅在基线时评估一次 [23]。在调整吸烟状态及其他潜在混杂因素后，咖啡摄入与总死亡率呈显著负相关：与不喝咖啡者相比，男性每日喝 2-3 杯的死亡风险比为 0.90（95% CI 0.86-0.93），女性为 0.87（95% CI 0.83-0.92）；每日 4-5 杯时男性为 0.88（95% CI 0.84-0.93），女性为 0.84（95% CI 0.79-0.90），趋势检验均 P<0.001 [23]。负相关见于心脏病、呼吸系统疾病、中风、意外伤害、糖尿病和感染导致的死亡，但未见于癌症死亡 [23]。该研究的限制包括：咖啡摄入仅测量一次，可能未反映长期习惯变化；作者明确指出，该关联是因果性还是相关性无法从数据中确定 [23]；此外，尽管调整了吸烟等混杂因素，仍可能存在残余混杂，且研究人群为 50 岁以上美国成年人，结果推广至其他人群需谨慎。",
+          "review": {
+            "verdict": "issues_found",
+            "issues": [
+              {
+                "claim": "该试验的主要限制包括：恶心和腹泻是最常见的不良事件，且因胃肠道事件停药的比例在司美格鲁肽组更高（4.5% vs. 0.8%）[17]；同时，该研究仅持续 68 周，未提供长期维持体重效果或更广泛安全性数据，且研究对象为无糖尿病人群，结果不能直接外推至糖尿病患者。",
+                "citations": [
+                  17
+                ],
+                "verdict": "partial",
+                "reason": "恶心/腹泻和停药比例有来源支持，但‘未提供长期数据’和‘不能外推’是报告作者推断，来源未提及，属未提供信息，非矛盾。"
+              },
+              {
+                "claim": "负相关见于心脏病、呼吸系统疾病、中风、意外伤害、糖尿病和感染导致的死亡，但未见于癌症死亡 [23]。",
+                "citations": [
+                  23
+                ],
+                "verdict": "supported",
+                "reason": "来源明确列出这些死因的负相关及癌症无关联，无问题。"
+              },
+              {
+                "claim": "该研究的限制包括：咖啡摄入仅测量一次，可能未反映长期习惯变化；作者明确指出，该关联是因果性还是相关性无法从数据中确定 [23]；此外，尽管调整了吸烟等混杂因素，仍可能存在残余混杂，且研究人群为 50 岁以上美国成年人，结果推广至其他人群需谨慎。",
+                "citations": [
+                  23
+                ],
+                "verdict": "partial",
+                "reason": "‘仅测量一次’和‘因果性无法确定’有来源支持；但‘残余混杂’和‘推广需谨慎’是报告推断，来源未提供，属未验证。"
+              }
+            ]
+          },
+          "display_sources": [
+            {
+              "index": 1,
+              "original_indices": [
+                17
+              ],
+              "paper_id": "doi:10.1056/nejmoa2032183",
+              "artifact_id": "text-v1:8ee584e2cc10a15b1130a800759f4f6b41d2cbb280db029d2baec411ffabf295",
+              "title": "Once-Weekly Semaglutide in Adults with Overweight or Obesity.",
+              "url": "https://pubmed.ncbi.nlm.nih.gov/33567185/"
+            },
+            {
+              "index": 2,
+              "original_indices": [
+                23
+              ],
+              "paper_id": "doi:10.1056/nejmoa1112010",
+              "artifact_id": "text-v1:fa608f711b605796547c5b27c9327361be877e32fd71c532e80357ac936f6455",
+              "title": "Association of coffee drinking with total and cause-specific mortality.",
+              "url": "https://pubmed.ncbi.nlm.nih.gov/22591295/"
+            }
+          ],
+          "warnings": [],
+          "elapsed_s": 2.505
+        },
+        {
+          "case": "unprovided_detail",
+          "report": "根据STEP 1试验的摘要，研究纳入1961名体重指数≥30（或≥27且伴有至少一种体重相关合并症）且无糖尿病的成人，按2:1随机分配接受每周一次2.4 mg司美格鲁肽或安慰剂，并联合生活方式干预，持续68周[17]。主要结果显示，司美格鲁肽组体重自基线平均下降14.9%，安慰剂组下降2.4%，估计治疗差异为−12.4个百分点（95% CI，−13.4至−11.5；P<0.001）[17]。摘要还报告了达到体重下降≥5%、≥10%和≥15%的参与者比例，以及体重下降的绝对千克数（−15.3 kg vs. −2.6 kg）[17]。然而，所给材料仅为摘要，未提供任何关于具体分子机制（如减重与降糖机制分离）的探讨或数据，因此无法据此确定分子机制[17]。同样，摘要未报告亚组分析结果（如按性别、年龄或合并症分层），故亚组效果无法从现有材料中确定[17]。关于primary estimand，摘要仅说明其“评估不论停药或救援干预的效应”，但未提供该estimand的完整定义细节（如处理策略或复合策略的具体规定），因此只能确认其基本方向，无法进一步展开[17]。",
+          "review": {
+            "verdict": "issues_found",
+            "issues": [
+              {
+                "claim": "摘要未提供任何关于具体分子机制（如减重与降糖机制分离）的探讨或数据，因此无法据此确定分子机制",
+                "citations": [
+                  17
+                ],
+                "verdict": "unverifiable",
+                "reason": "Source [17] abstract indeed lacks molecular mechanism details; statement correctly notes absence, not a contradiction."
+              },
+              {
+                "claim": "摘要未报告亚组分析结果（如按性别、年龄或合并症分层），故亚组效果无法从现有材料中确定",
+                "citations": [
+                  17
+                ],
+                "verdict": "unverifiable",
+                "reason": "Source [17] abstract does not report subgroup analyses; statement accurately reflects missing information."
+              },
+              {
+                "claim": "关于primary estimand，摘要仅说明其“评估不论停药或救援干预的效应”，但未提供该estimand的完整定义细节",
+                "citations": [
+                  17
+                ],
+                "verdict": "unverifiable",
+                "reason": "Source [17] provides only a brief estimand description; full details are absent, so statement is accurate but unverifiable beyond abstract."
+              }
+            ]
+          },
+          "display_sources": [
+            {
+              "index": 1,
+              "original_indices": [
+                17
+              ],
+              "paper_id": "doi:10.1056/nejmoa2032183",
+              "artifact_id": "text-v1:8ee584e2cc10a15b1130a800759f4f6b41d2cbb280db029d2baec411ffabf295",
+              "title": "Once-Weekly Semaglutide in Adults with Overweight or Obesity.",
+              "url": "https://pubmed.ncbi.nlm.nih.gov/33567185/"
+            }
+          ],
+          "warnings": [],
+          "elapsed_s": 1.607
+        }
+      ],
+      "review_parse_succeeded": true,
+      "report_mode": "frozen_comparison_reports",
+      "scope": "Controlled two-public-abstract synthesis; seeded drafts are artificial. Same-model reviews are not independent accuracy acceptance."
+    }
+  ],
+  "review_input": "docs/citation-grounding-comparison-20261019.json",
+  "identical_source_text": true,
+  "structural_checks_passed": true
+}

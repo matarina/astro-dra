@@ -1,0 +1,715 @@
+{
+  "generated_utc": "2026-10-19T01:33:26.437060+00:00",
+  "report": "search-engine-audit-20261019.md",
+  "scope": "29 built-in engines: installed defaults + environment; runnable adapters searched, others checked for prerequisites. Private account overrides and account-level Library/Collection/Retriever searches are not verified. No LLM generation or production configuration change.",
+  "adapter_probe_count": 73,
+  "searxng_probe_count": 23,
+  "triage_counts": {
+    "search_returned_in_at_least_one_existing_instance": 13,
+    "conditional_proxy_registration_or_credentials": 5,
+    "rate_limited_adapter": 2,
+    "missing_credentials_or_default_registration": 8,
+    "unreachable_self_hosted_backend": 1
+  },
+  "current_5002_agent_and_auto_enabled": [
+    "pubmed",
+    "searxng"
+  ],
+  "raw_artifacts": [
+    "search-audit-5000-20261019.json",
+    "search-audit-5000-content-20261019.json",
+    "search-audit-5000-content-proxy9876-20261019.json",
+    "search-audit-5000-proxy9876-20261019.json",
+    "search-audit-5000-recheck-20261019.json",
+    "search-audit-5001-20261019.json",
+    "search-audit-5001-backends-20261019.json",
+    "search-audit-5002-20261019.json",
+    "search-audit-5002-content-20261019.json",
+    "search-audit-5002-direct-20261019.json",
+    "search-audit-5002-expanded-20261019.json",
+    "search-audit-5002-pipeline-20261019.json",
+    "search-audit-biomedical-services-20261019.json",
+    "search-audit-github-anonymous-20261019.json",
+    "search-audit-github-anonymous9876-20261019.json",
+    "search-audit-local-rag-20261019.json",
+    "search-audit-pubmed-knownpaper-20261019.json",
+    "search-audit-runtime-20261019.json",
+    "search-audit-searxng-backends-20261019.json"
+  ],
+  "engines": [
+    {
+      "engine": "arxiv",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 25,
+          "elapsed_seconds": 5.676
+        },
+        {
+          "artifact": "search-audit-5002-expanded-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 25,
+          "elapsed_seconds": 5.691
+        }
+      ]
+    },
+    {
+      "engine": "brave",
+      "triage": "conditional_proxy_registration_or_credentials",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 6.932
+        },
+        {
+          "artifact": "search-audit-5000-proxy9876-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 3.497,
+          "temporary_process_proxy": "http://host.docker.internal:9876"
+        }
+      ]
+    },
+    {
+      "engine": "exa",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 7.904
+        },
+        {
+          "artifact": "search-audit-5000-content-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_and_content_checked",
+          "count": 2,
+          "elapsed_seconds": 6.473
+        }
+      ]
+    },
+    {
+      "engine": "github",
+      "triage": "conditional_proxy_registration_or_credentials",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 3.36
+        },
+        {
+          "artifact": "search-audit-5000-proxy9876-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 5.123,
+          "temporary_process_proxy": "http://host.docker.internal:9876"
+        },
+        {
+          "artifact": "search-audit-github-anonymous-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 14.162,
+          "diagnostic_direct_adapter": true
+        },
+        {
+          "artifact": "search-audit-github-anonymous9876-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 4.633,
+          "diagnostic_direct_adapter": true,
+          "temporary_process_proxy": "http://host.docker.internal:9876"
+        }
+      ]
+    },
+    {
+      "engine": "google_pse",
+      "triage": "missing_credentials_or_default_registration",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 1.702
+        },
+        {
+          "artifact": "search-audit-5000-recheck-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 1.919
+        }
+      ]
+    },
+    {
+      "engine": "mojeek",
+      "triage": "missing_credentials_or_default_registration",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 1.699
+        },
+        {
+          "artifact": "search-audit-5000-recheck-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 1.903
+        }
+      ]
+    },
+    {
+      "engine": "pubmed",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 25,
+          "elapsed_seconds": 10.796
+        },
+        {
+          "artifact": "search-audit-5001-20261019.json",
+          "container": "astro-dra-local-deep-research-1",
+          "status": "search_ok",
+          "count": 25,
+          "elapsed_seconds": 14.086
+        },
+        {
+          "artifact": "search-audit-5002-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 25,
+          "elapsed_seconds": 10.358
+        },
+        {
+          "artifact": "search-audit-5002-content-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_and_content_checked",
+          "count": 25,
+          "elapsed_seconds": 14.093
+        },
+        {
+          "artifact": "search-audit-5002-pipeline-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 25,
+          "elapsed_seconds": 16.741
+        },
+        {
+          "artifact": "search-audit-pubmed-knownpaper-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_and_content_checked",
+          "count": 1,
+          "elapsed_seconds": 11.689
+        }
+      ]
+    },
+    {
+      "engine": "searxng",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 4.746
+        },
+        {
+          "artifact": "search-audit-5000-recheck-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 5.077
+        },
+        {
+          "artifact": "search-audit-5001-20261019.json",
+          "container": "astro-dra-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 4.8
+        },
+        {
+          "artifact": "search-audit-5002-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 2.509
+        },
+        {
+          "artifact": "search-audit-5002-content-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_and_content_checked",
+          "count": 2,
+          "elapsed_seconds": 2.665
+        },
+        {
+          "artifact": "search-audit-5002-pipeline-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 2.856
+        }
+      ]
+    },
+    {
+      "engine": "serpapi",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 8,
+          "elapsed_seconds": 13.056
+        },
+        {
+          "artifact": "search-audit-5000-content-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_and_content_checked",
+          "count": 8,
+          "elapsed_seconds": 24.015
+        }
+      ]
+    },
+    {
+      "engine": "tavily",
+      "triage": "conditional_proxy_registration_or_credentials",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 5.421
+        },
+        {
+          "artifact": "search-audit-5000-content-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 17.265
+        },
+        {
+          "artifact": "search-audit-5000-content-proxy9876-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_and_content_checked",
+          "count": 2,
+          "elapsed_seconds": 6.039,
+          "temporary_process_proxy": "http://host.docker.internal:9876"
+        }
+      ]
+    },
+    {
+      "engine": "tinyfish",
+      "triage": "missing_credentials_or_default_registration",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 1.71
+        },
+        {
+          "artifact": "search-audit-5000-recheck-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 2.117
+        }
+      ]
+    },
+    {
+      "engine": "wayback",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 6.943
+        },
+        {
+          "artifact": "search-audit-5002-expanded-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 3,
+          "elapsed_seconds": 3.922
+        }
+      ]
+    },
+    {
+      "engine": "wikinews",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 16.784
+        },
+        {
+          "artifact": "search-audit-5002-expanded-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 4.877
+        }
+      ]
+    },
+    {
+      "engine": "wikipedia",
+      "triage": "rate_limited_adapter",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 2.012
+        },
+        {
+          "artifact": "search-audit-5002-expanded-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 6.038
+        }
+      ]
+    },
+    {
+      "engine": "elasticsearch",
+      "triage": "unreachable_self_hosted_backend",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 1.586
+        },
+        {
+          "artifact": "search-audit-5002-expanded-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 2.295
+        }
+      ]
+    },
+    {
+      "engine": "paperless",
+      "triage": "missing_credentials_or_default_registration",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 1.363
+        },
+        {
+          "artifact": "search-audit-5000-recheck-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 2.083
+        }
+      ]
+    },
+    {
+      "engine": "scaleserp",
+      "triage": "missing_credentials_or_default_registration",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 1.738
+        },
+        {
+          "artifact": "search-audit-5000-recheck-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 2.126
+        }
+      ]
+    },
+    {
+      "engine": "serper",
+      "triage": "conditional_proxy_registration_or_credentials",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 5.567
+        },
+        {
+          "artifact": "search-audit-5000-content-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 12.564
+        },
+        {
+          "artifact": "search-audit-5000-content-proxy9876-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_and_content_checked",
+          "count": 2,
+          "elapsed_seconds": 4.181,
+          "temporary_process_proxy": "http://host.docker.internal:9876"
+        }
+      ]
+    },
+    {
+      "engine": "sofya",
+      "triage": "missing_credentials_or_default_registration",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 1.75
+        },
+        {
+          "artifact": "search-audit-5000-recheck-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 1.993
+        }
+      ]
+    },
+    {
+      "engine": "nasa_ads",
+      "triage": "missing_credentials_or_default_registration",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 1.73
+        },
+        {
+          "artifact": "search-audit-5000-recheck-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "constructor_unavailable",
+          "elapsed_seconds": 2.056
+        }
+      ]
+    },
+    {
+      "engine": "openalex",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 5.236
+        },
+        {
+          "artifact": "search-audit-5002-content-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_and_content_checked",
+          "count": 2,
+          "elapsed_seconds": 6.537
+        },
+        {
+          "artifact": "search-audit-5002-expanded-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 5.998
+        }
+      ]
+    },
+    {
+      "engine": "semantic_scholar",
+      "triage": "rate_limited_adapter",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 10.047
+        },
+        {
+          "artifact": "search-audit-5002-expanded-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 9.455
+        }
+      ]
+    },
+    {
+      "engine": "gutenberg",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 2.659
+        },
+        {
+          "artifact": "search-audit-5002-content-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_and_content_checked",
+          "count": 2,
+          "elapsed_seconds": 7.497
+        },
+        {
+          "artifact": "search-audit-5002-expanded-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 3.029
+        }
+      ]
+    },
+    {
+      "engine": "openlibrary",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "empty",
+          "count": 0,
+          "elapsed_seconds": 6.893
+        },
+        {
+          "artifact": "search-audit-5002-expanded-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 3.975
+        }
+      ]
+    },
+    {
+      "engine": "pubchem",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 15.859
+        },
+        {
+          "artifact": "search-audit-5002-expanded-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 12.739
+        }
+      ]
+    },
+    {
+      "engine": "stackexchange",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 3.795
+        },
+        {
+          "artifact": "search-audit-5002-content-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_and_content_checked",
+          "count": 2,
+          "elapsed_seconds": 4.411
+        },
+        {
+          "artifact": "search-audit-5002-expanded-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 3.304
+        }
+      ]
+    },
+    {
+      "engine": "zenodo",
+      "triage": "search_returned_in_at_least_one_existing_instance",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 5.616
+        },
+        {
+          "artifact": "search-audit-5002-expanded-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 2,
+          "elapsed_seconds": 4.164
+        }
+      ]
+    },
+    {
+      "engine": "ddg",
+      "triage": "conditional_proxy_registration_or_credentials",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "error",
+          "elapsed_seconds": 1.904
+        },
+        {
+          "artifact": "search-audit-5002-direct-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "search_ok",
+          "count": 1,
+          "elapsed_seconds": 4.659,
+          "diagnostic_direct_adapter": true
+        }
+      ]
+    },
+    {
+      "engine": "guardian",
+      "triage": "missing_credentials_or_default_registration",
+      "checks": [
+        {
+          "artifact": "search-audit-5000-20261019.json",
+          "container": "local_deep_research-local-deep-research-1",
+          "status": "error",
+          "elapsed_seconds": 1.746
+        },
+        {
+          "artifact": "search-audit-5002-direct-20261019.json",
+          "container": "astro-dra-test-5002-local-deep-research-1",
+          "status": "error",
+          "elapsed_seconds": 2.139
+        }
+      ]
+    }
+  ]
+}

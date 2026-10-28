@@ -1,0 +1,1064 @@
+{
+  "run_at_utc": "2026-10-14T06:10:55.122982+00:00",
+  "code_commit": "7f885ee7b7c3101ba554ae9d0f5b5ad446ebe1eb",
+  "model": "deepseek-v4-flash",
+  "temperature": 0,
+  "synthetic": false,
+  "working_tree_dirty": true,
+  "fixture_sha256": "7557f3af1c8a5960e43be007dd24b7ba9e5e6473bca7a968596744586c708c81",
+  "verification_source_sha256": {
+    "__init__.py": "11538d04e2443ee3571d687989ffac6af46c4abdff816fb7e189f927853af4f3",
+    "__main__.py": "e8aba19bda5166eca8ffc06bd4647381c51bd8abd6dec15514d05f25292b9dcf",
+    "citation_qc.py": "5c3d2f8f5cb4536cea0d18b37d3805f30e935a3b25d0df6dd2fe7a3f61426a72",
+    "claims.py": "aba5974314f0d22c88c1dfa0383532b548d7ef78243cb27ac8c33dc925b52dd6",
+    "cli_check.py": "85cf079a8717d6387e73220ae986fdfbe8ec3fa0548984c40bff82ca37334d2a",
+    "config.py": "57ee453c13cee163ec71f718a770cc72c354f634a41ec749f4bba7d9dce6bee7",
+    "constraint_matcher.py": "fde82942bf3a0ebe67603be94ce8960272bc7643c16a345fc641da6b2671317e",
+    "contracts.py": "30a461f449b2446b693c45775fb613791743adffd0b22c1008c7c1a1dc274b2a",
+    "doi_validator.py": "9656f05d4c506ed56c2faae16fa0132f1fc5effb0b0423ef6c78263172ab1606",
+    "evidence.py": "b986eda63f70544c608e9082fafa8605785aba18b8c3419c405b24326a6ba5fd",
+    "http_client.py": "d3dfcf448315b093ffbb243bf9b6a0bf82c257cda48dc0de301c52e01a8a1198",
+    "keyword_cov.py": "560579e7217fe734337455e3494693a2d550b8f04544d76b2f38439ff61771da",
+    "models.py": "eaa2690ce2a5d456bb5060f38ec1317c4c93f7786c3d6710136e0205df64922f",
+    "passages.py": "0cb026fc22bbc185b962caeaba3f72c135f6479c53a3d7c5ffd2ec7536aa5b16",
+    "semantics.py": "5884aafb85e64c8577ab26975e98928100ac16e2aa5c7463dcaf094489c50434",
+    "textutil.py": "702db5973b2b6cd192a5f7276590e1ce7357011c03584a487695966331a48a3a"
+  },
+  "label_provenance": "Agent review of PubMed short excerpts; not independent expert adjudication.",
+  "config": {
+    "enable_verify": true,
+    "enable_doi_validation": true,
+    "enable_constraint_match": true,
+    "enable_keyword_coverage": true,
+    "enable_citation_qc": true,
+    "http_timeout": 10.0,
+    "http_max_retries": 2,
+    "http_concurrency": 8,
+    "crossref_mailto": "ldr-research-verify@example.com",
+    "min_if": null,
+    "strict_year": false,
+    "min_keyword_hits": 3,
+    "keyword_threshold_ratio": 0.75,
+    "qc_batch_size": 5,
+    "qc_passage_chars": 1600,
+    "qc_max_passages": 3,
+    "qc_passage_overlap_chars": 200,
+    "judge_temperature": 0.0
+  },
+  "scope": "Existing branch CitationQc with real model; verified abstract excerpts or synthetic controls, not complete report validation.",
+  "summary": {
+    "cases": 6,
+    "positive_cases": 3,
+    "negative_cases": 3,
+    "exact_matches": 6,
+    "negative_fully_supported": 0,
+    "positive_supported": 3,
+    "model_calls": 6,
+    "transport_or_http_errors": 0,
+    "elapsed_s": 11.028
+  },
+  "cases": [
+    {
+      "id": "R01",
+      "category": "real_numeric_support",
+      "expected": "supported",
+      "actual": "supported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim_sha256": "249ce7d59306fb198cc19cd809fe56474f12343718e3cef47caef65e602f6301",
+          "claim_id": "claim:44679d2187242a1f0593b550b4602db14b537b12f2b041a96341a4802288d32e",
+          "report_start": 0,
+          "report_end": 78,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "doi:10.1056/nejmoa2032183",
+              "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+              "basis": "abstract",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 91,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 91,
+                  "score": 9.213594362117865
+                }
+              ],
+              "verdict": "supported",
+              "reason_code": "located_quote",
+              "model_reason_sha256": "079ca0156ac41ca0d0866f7e09a3198a7cc99aae44f918e597e5a699f3b70292",
+              "model_verdict": "supported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason_sha256": "a760e4053b775471493c5ff737714a40ec376bb623728a6ca357971d1ebaff27",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa2032183",
+                    "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+                    "content_sha256": "56df35266f22e28819f76d57f65e81b7b30067658a11c66f2e9933178aa3ebb5",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/33567185/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 67,
+                    "end": 91,
+                    "quote_sha256": "c399092733280712c05db93d7326c49871f151e411801e9b2f94f5382d907318"
+                  }
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason_sha256": "9c29a8b3da4cdc67f18927b2df510613af3fe474868f4dedeb0d0eb1cb694dcc",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa2032183",
+                    "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+                    "content_sha256": "56df35266f22e28819f76d57f65e81b7b30067658a11c66f2e9933178aa3ebb5",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/33567185/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 60,
+                    "end": 66,
+                    "quote_sha256": "dfb89ae5291877f3fe4c8f39cc6f86d6843b436df4c1dc15021ba81b828fcc2a"
+                  }
+                },
+                {
+                  "dimension": "direction",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason_sha256": "9f85d08275e7b541e71d781e8776ff9f1b31e3f03f48e846d02e6d94685f34f0",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa2032183",
+                    "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+                    "content_sha256": "56df35266f22e28819f76d57f65e81b7b30067658a11c66f2e9933178aa3ebb5",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/33567185/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 9,
+                    "end": 66,
+                    "quote_sha256": "1b8ef7759c256b7a62fc8a6f05176e6008038b312465d0766956c400690a784c"
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "59bdad1c6196b8e30bbc2086e9655ffe00e8df2c2e183f3a3614dd5d86fd1c95",
+                  "locator": null
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "63184162ea552d15e8603f095b3260b6ff9ee734aafb561a878fa08ea3a80221",
+                  "locator": null
+                },
+                {
+                  "dimension": "scope",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason_sha256": "6959677adcb0655040bbf09edc7492ce37fd928544e90528009cc961ce70327e",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa2032183",
+                    "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+                    "content_sha256": "56df35266f22e28819f76d57f65e81b7b30067658a11c66f2e9933178aa3ebb5",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/33567185/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 67,
+                    "end": 91,
+                    "quote_sha256": "c399092733280712c05db93d7326c49871f151e411801e9b2f94f5382d907318"
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:44679d2187242a1f0593b550b4602db14b537b12f2b041a96341a4802288d32e",
+                "claim_sha256": "249ce7d59306fb198cc19cd809fe56474f12343718e3cef47caef65e602f6301",
+                "paper_id": "doi:10.1056/nejmoa2032183",
+                "verdict": "supported",
+                "locator": {
+                  "paper_id": "doi:10.1056/nejmoa2032183",
+                  "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+                  "content_sha256": "56df35266f22e28819f76d57f65e81b7b30067658a11c66f2e9933178aa3ebb5",
+                  "source_url": "https://pubmed.ncbi.nlm.nih.gov/33567185/",
+                  "basis": "abstract",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 91,
+                  "quote_sha256": "b49234b668da8f8297721e8f4c1f7c918b5e03e90c6b19606f762425158ab6b8"
+                },
+                "quote_verified": true,
+                "reason_code": "located_quote"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "doi:10.1056/nejmoa2032183"
+          ],
+          "verdict": "supported",
+          "supporting_fragment_sha256": "b49234b668da8f8297721e8f4c1f7c918b5e03e90c6b19606f762425158ab6b8",
+          "reason_sha256": "49e524ee3de26b996337b3a00effaf0120886c136cfcb53e6c42f3eea75342ff"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 4.642,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 505,
+            "prompt_tokens": 476,
+            "total_tokens": 981
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content_sha256": "e9f1df450eb5568958e8ff9ad1c05731de9521cc6ab220b22a325ed7c57ddf48"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "R02",
+      "category": "real_numeric_mutation",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim_sha256": "d23448fe075490a7ed400680242739d0f53e6f35e5fc4a40acb46c252762c959",
+          "claim_id": "claim:cfc94a133af781f24b0bd88dbe36ec6731dcb516675d7de2e07827e78b691d42",
+          "report_start": 0,
+          "report_end": 78,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "doi:10.1056/nejmoa2032183",
+              "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+              "basis": "abstract",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 91,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 91,
+                  "score": 7.897366596101028
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "semantic_dimension_mismatch",
+              "model_reason_sha256": "949e2523265ea58e1ec688f9a5289e0bd3d1cc507b01b2e2c733284c6da47d7e",
+              "model_verdict": "unsupported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "e8bc0028d4dfff28d6d9db52d979d76292d80f0dae95f674973ecec069efaa89",
+                  "locator": null
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason_sha256": "fd0d942daeab5c22a804d99b32cb0d056c404861e6b78e224730cf69a00241a8",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa2032183",
+                    "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+                    "content_sha256": "56df35266f22e28819f76d57f65e81b7b30067658a11c66f2e9933178aa3ebb5",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/33567185/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 91,
+                    "quote_sha256": "b49234b668da8f8297721e8f4c1f7c918b5e03e90c6b19606f762425158ab6b8"
+                  }
+                },
+                {
+                  "dimension": "direction",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason_sha256": "fc9335b9de3d20d1140d4e31f4478041e628eeb4998a8dd9927765a70951e153",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa2032183",
+                    "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+                    "content_sha256": "56df35266f22e28819f76d57f65e81b7b30067658a11c66f2e9933178aa3ebb5",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/33567185/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 91,
+                    "quote_sha256": "b49234b668da8f8297721e8f4c1f7c918b5e03e90c6b19606f762425158ab6b8"
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "387adeff68e560432d7957801d795f22c0a7882a5fff1ea957a3a6a1717f02a9",
+                  "locator": null
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "0c7714e948a518afe299ae9bdfe7e2da217ba7eb920af9387c71bb0859c1c9e9",
+                  "locator": null
+                },
+                {
+                  "dimension": "scope",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "947d90066b18d649ce78a97ce8473f1071e7357d0296b9d774ccffd5162bfe12",
+                  "locator": null
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:cfc94a133af781f24b0bd88dbe36ec6731dcb516675d7de2e07827e78b691d42",
+                "claim_sha256": "d23448fe075490a7ed400680242739d0f53e6f35e5fc4a40acb46c252762c959",
+                "paper_id": "doi:10.1056/nejmoa2032183",
+                "verdict": "unsupported",
+                "locator": {
+                  "paper_id": "doi:10.1056/nejmoa2032183",
+                  "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+                  "content_sha256": "56df35266f22e28819f76d57f65e81b7b30067658a11c66f2e9933178aa3ebb5",
+                  "source_url": "https://pubmed.ncbi.nlm.nih.gov/33567185/",
+                  "basis": "abstract",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 91,
+                  "quote_sha256": "b49234b668da8f8297721e8f4c1f7c918b5e03e90c6b19606f762425158ab6b8"
+                },
+                "quote_verified": true,
+                "reason_code": "semantic_dimension_mismatch"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "doi:10.1056/nejmoa2032183"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment_sha256": "b49234b668da8f8297721e8f4c1f7c918b5e03e90c6b19606f762425158ab6b8",
+          "reason_sha256": "30a4e0eb104fd23961d5dbe9b4f1fa5364f923f111eb6d9c26f4cd112cb9d062"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 4.198,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 457,
+            "prompt_tokens": 476,
+            "total_tokens": 933
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content_sha256": "5751c4942570e0fd0ab2d568a7e471e163cb659a8730a03abd99050f5a14aed1"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "R03",
+      "category": "real_population_mutation",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim_sha256": "68dc05cf16cb3d734f00400de869e197384ff55fc3c16a856ea037d1d676be18",
+          "claim_id": "claim:7d542c0c9c32473718951a211f48367ad958acb7305bd5c95a7965dc96c04aa0",
+          "report_start": 0,
+          "report_end": 53,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "doi:10.1056/nejmoa2032183",
+              "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+              "basis": "abstract",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 25,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 93,
+                  "end": 118,
+                  "score": 2.8944271909999157
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "semantic_dimension_mismatch",
+              "model_reason_sha256": "941b03dc9ea962d3043ecc4f9eb47aef303243f34405ba339505fc146dc16993",
+              "model_verdict": "unsupported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason_sha256": "0ec0b7df2830797fcbd356c6c14b01a76c0212be0443b33da4a454efbaab1047",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa2032183",
+                    "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+                    "content_sha256": "56df35266f22e28819f76d57f65e81b7b30067658a11c66f2e9933178aa3ebb5",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/33567185/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 93,
+                    "end": 118,
+                    "quote_sha256": "352c4b73573c08cccfa4eb074ddade34b76d956f5b1be99ddda5a05d8e16cc63"
+                  }
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "9bf9b6d3e29ce7983e312e3f3f4fdf3b47ff2181916588e5ea4ead730d90929a",
+                  "locator": null
+                },
+                {
+                  "dimension": "direction",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "2d7cd6f1fe8c0d061ddeca6711dae2a6008142724645f9d60086a0b178bec563",
+                  "locator": null
+                },
+                {
+                  "dimension": "causality",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "cf8d60a5d2e94f46ad0cf030ce11d9a5cf38d3eb086b4edef95f790ef7346dec",
+                  "locator": null
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "2d09eb6987bc0c901f19686d2e56e70c2f4d68206cf0481c738b43dabd0c0577",
+                  "locator": null
+                },
+                {
+                  "dimension": "scope",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "5e7b097ab3df6502aeb0acc7ad46720918b463f342305eccf272f3d221ea7127",
+                  "locator": null
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:7d542c0c9c32473718951a211f48367ad958acb7305bd5c95a7965dc96c04aa0",
+                "claim_sha256": "68dc05cf16cb3d734f00400de869e197384ff55fc3c16a856ea037d1d676be18",
+                "paper_id": "doi:10.1056/nejmoa2032183",
+                "verdict": "unsupported",
+                "locator": {
+                  "paper_id": "doi:10.1056/nejmoa2032183",
+                  "artifact_id": "text-v1:c07d73e48ede56c71cab17b3101f4707f18692867fd8e9e5d40d69ccc1d1ff89",
+                  "content_sha256": "56df35266f22e28819f76d57f65e81b7b30067658a11c66f2e9933178aa3ebb5",
+                  "source_url": "https://pubmed.ncbi.nlm.nih.gov/33567185/",
+                  "basis": "abstract",
+                  "section": null,
+                  "page": null,
+                  "start": 93,
+                  "end": 118,
+                  "quote_sha256": "352c4b73573c08cccfa4eb074ddade34b76d956f5b1be99ddda5a05d8e16cc63"
+                },
+                "quote_verified": true,
+                "reason_code": "semantic_dimension_mismatch"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "doi:10.1056/nejmoa2032183"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment_sha256": "352c4b73573c08cccfa4eb074ddade34b76d956f5b1be99ddda5a05d8e16cc63",
+          "reason_sha256": "30a4e0eb104fd23961d5dbe9b4f1fa5364f923f111eb6d9c26f4cd112cb9d062"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 2.688,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 328,
+            "prompt_tokens": 440,
+            "total_tokens": 768
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content_sha256": "c38e0744859682b14cc27ebca40f6b1084d6db1c4586a2c17d65da5af96055ed"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "R04",
+      "category": "real_association_support",
+      "expected": "supported",
+      "actual": "supported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim_sha256": "a2880592b6a5f2ab544f82f50ee2a1a84089075cc2cf2ec22927eae070e3f07f",
+          "claim_id": "claim:b23596c5e8c0f382d8bf5eb1937aa36be93e669428042aa03edef2b0cd05c575",
+          "report_start": 0,
+          "report_end": 111,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "doi:10.1056/nejmoa1112010",
+              "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+              "basis": "abstract",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 83,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 83,
+                  "score": 6.889822365046136
+                }
+              ],
+              "verdict": "supported",
+              "reason_code": "located_quote",
+              "model_reason_sha256": "644b76ee264417488f6403f6dcc2607a04a72933f1f5018071738ffd0d881581",
+              "model_verdict": "supported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "c258da0a2e6ff240cd190a66a00611cd87d4aa180968ecdfecde4924ff7f761f",
+                  "locator": null
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "b03bd0eee8d293ebe3d56bc27b08dcc47c6d8effc21ede0dc05c2458619c6d91",
+                  "locator": null
+                },
+                {
+                  "dimension": "direction",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason_sha256": "da832f6ad1ca2f94c0bce2521e64013e1562dc4aa099a8bb70b042ed15ae714a",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa1112010",
+                    "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                    "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 23,
+                    "end": 43,
+                    "quote_sha256": "481dced36b24a69a20b145454657e62b0764565ed2ceeaffe1c646f5cb630c7f"
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason_sha256": "62cd51045665424fb94a565adcab86cb899a363584de1bfe91f48790111c1c20",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa1112010",
+                    "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                    "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 33,
+                    "end": 43,
+                    "quote_sha256": "de38e0881e31dde689abdc0bf1aaeb73f574613924c446959331a425642985ae"
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "78ea30631aa66dfb756e3f60bdec99cbe4a418b5e5b480cdb98db36b7af90f70",
+                  "locator": null
+                },
+                {
+                  "dimension": "scope",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason_sha256": "dec4b05d4b76a7f5a50bf6ed54ff57f020dcbab9930e62799b41eea9f8c83b6d",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa1112010",
+                    "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                    "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 49,
+                    "end": 83,
+                    "quote_sha256": "7811786b7775b1d6431b167ddfc5b4b5c2096823cb9d65c113c6df251758001e"
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:b23596c5e8c0f382d8bf5eb1937aa36be93e669428042aa03edef2b0cd05c575",
+                "claim_sha256": "a2880592b6a5f2ab544f82f50ee2a1a84089075cc2cf2ec22927eae070e3f07f",
+                "paper_id": "doi:10.1056/nejmoa1112010",
+                "verdict": "supported",
+                "locator": {
+                  "paper_id": "doi:10.1056/nejmoa1112010",
+                  "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                  "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                  "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                  "basis": "abstract",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 83,
+                  "quote_sha256": "acfbfdf5c55035254db61ae37e5d8570db36a6d57faf71497b778aca70f38120"
+                },
+                "quote_verified": true,
+                "reason_code": "located_quote"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "doi:10.1056/nejmoa1112010"
+          ],
+          "verdict": "supported",
+          "supporting_fragment_sha256": "acfbfdf5c55035254db61ae37e5d8570db36a6d57faf71497b778aca70f38120",
+          "reason_sha256": "49e524ee3de26b996337b3a00effaf0120886c136cfcb53e6c42f3eea75342ff"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 3.625,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 463,
+            "prompt_tokens": 454,
+            "total_tokens": 917
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content_sha256": "0a818e6f1da7c782468cdda844b4ecd1d9d87f019d41ede4483a8a7a76559233"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "R05",
+      "category": "real_causality_mutation",
+      "expected": "unsupported",
+      "actual": "unsupported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim_sha256": "36e0d06e51235f93caa0684ae6b2afc81a4f14e03aeba8062058979bb757a221",
+          "claim_id": "claim:b967d933d303257a2c32b7cf76b7302c6a7b33163796c031e0ef59a9a5ceff56",
+          "report_start": 0,
+          "report_end": 66,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "doi:10.1056/nejmoa1112010",
+              "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+              "basis": "abstract",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 83,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 83,
+                  "score": 2.7559289460184546
+                }
+              ],
+              "verdict": "unsupported",
+              "reason_code": "semantic_dimension_mismatch",
+              "model_reason_sha256": "ccc42540be47958028d0971010ea6bf5207529d984d52238cbb1c557315e1ede",
+              "model_verdict": "unsupported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "uncertain",
+                  "origin": "model",
+                  "reason_code": "semantic_uncertain",
+                  "reason_sha256": "555599d6a36a339779957c9d4e7e8928f8671ffc61d39c9174d3ad80556291ec",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa1112010",
+                    "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                    "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 83,
+                    "quote_sha256": "acfbfdf5c55035254db61ae37e5d8570db36a6d57faf71497b778aca70f38120"
+                  }
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "uncertain",
+                  "origin": "model",
+                  "reason_code": "semantic_uncertain",
+                  "reason_sha256": "a97ed3bac122fca0d34d0226285b3160e1c5c88030613394692fc65a1d4965de",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa1112010",
+                    "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                    "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 83,
+                    "quote_sha256": "acfbfdf5c55035254db61ae37e5d8570db36a6d57faf71497b778aca70f38120"
+                  }
+                },
+                {
+                  "dimension": "direction",
+                  "status": "partial",
+                  "origin": "model",
+                  "reason_code": "semantic_partial",
+                  "reason_sha256": "126357e0f7cb751992c36283a1a7777756ae199345f95228199029abd82565af",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa1112010",
+                    "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                    "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 23,
+                    "end": 43,
+                    "quote_sha256": "481dced36b24a69a20b145454657e62b0764565ed2ceeaffe1c646f5cb630c7f"
+                  }
+                },
+                {
+                  "dimension": "causality",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason_sha256": "897e30109a00d0ec3a5414f42019191d3a34d27440ad6c7fdd85f9693c1a4b48",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa1112010",
+                    "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                    "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 23,
+                    "end": 43,
+                    "quote_sha256": "481dced36b24a69a20b145454657e62b0764565ed2ceeaffe1c646f5cb630c7f"
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason_sha256": "a6bf6ad122b678aa640688282d9e6867a32970e3b025a0b4896f13d624616553",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa1112010",
+                    "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                    "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 0,
+                    "end": 43,
+                    "quote_sha256": "5da636ed59f6cf6e5f9eb7f6306a7a2bc1fe66d30566f29491b3c5ef75fd9a10"
+                  }
+                },
+                {
+                  "dimension": "scope",
+                  "status": "mismatch",
+                  "origin": "model",
+                  "reason_code": "semantic_mismatch",
+                  "reason_sha256": "ed4675d3d6c3ec90fdb01d0cca1733f56bbfe5eb50210d2fac9d0c9ff5426f5e",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa1112010",
+                    "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                    "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 23,
+                    "end": 83,
+                    "quote_sha256": "a343087250c610d1430526596d8ff4464a6f62d20f5c8064d58b42785a862cb9"
+                  }
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:b967d933d303257a2c32b7cf76b7302c6a7b33163796c031e0ef59a9a5ceff56",
+                "claim_sha256": "36e0d06e51235f93caa0684ae6b2afc81a4f14e03aeba8062058979bb757a221",
+                "paper_id": "doi:10.1056/nejmoa1112010",
+                "verdict": "unsupported",
+                "locator": {
+                  "paper_id": "doi:10.1056/nejmoa1112010",
+                  "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                  "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                  "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                  "basis": "abstract",
+                  "section": null,
+                  "page": null,
+                  "start": 0,
+                  "end": 83,
+                  "quote_sha256": "acfbfdf5c55035254db61ae37e5d8570db36a6d57faf71497b778aca70f38120"
+                },
+                "quote_verified": true,
+                "reason_code": "semantic_dimension_mismatch"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "doi:10.1056/nejmoa1112010"
+          ],
+          "verdict": "unsupported",
+          "supporting_fragment_sha256": "acfbfdf5c55035254db61ae37e5d8570db36a6d57faf71497b778aca70f38120",
+          "reason_sha256": "30a4e0eb104fd23961d5dbe9b4f1fa5364f923f111eb6d9c26f4cd112cb9d062"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 4.021,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 528,
+            "prompt_tokens": 448,
+            "total_tokens": 976
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content_sha256": "990d2f06c22ede88aa89a61a4d974cd2ffe4de07f7acbc1586dd6d21ff604498"
+        }
+      ],
+      "model_errors": []
+    },
+    {
+      "id": "R06",
+      "category": "real_negated_causality_support",
+      "expected": "supported",
+      "actual": "supported",
+      "exact_match": true,
+      "negative_fully_supported": false,
+      "checks": [
+        {
+          "claim_sha256": "44b2c2ba3fde4c8a597cb8c692c98f899ff371f1761e2b0b89e5b5d09e9836db",
+          "claim_id": "claim:8132f7e305cc7df28949cbbd746739080e1db292d3d7d934c03700fc9b8e21a5",
+          "report_start": 0,
+          "report_end": 84,
+          "claim_kind": "factual_candidate",
+          "claim_context": "",
+          "citation_checks": [
+            {
+              "citation_index": 1,
+              "paper_id": "doi:10.1056/nejmoa1112010",
+              "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+              "basis": "abstract",
+              "source_field": "full_content",
+              "text_version": "raw-text-v1",
+              "assessed_chars": 169,
+              "retrieval_method": "lexical-v1",
+              "retrieved_passages": [
+                {
+                  "start": 0,
+                  "end": 83,
+                  "score": 1.3779644730092273
+                },
+                {
+                  "start": 85,
+                  "end": 171,
+                  "score": 6.767766952966369
+                }
+              ],
+              "verdict": "supported",
+              "reason_code": "located_quote",
+              "model_reason_sha256": "0a30a5b4e904776f6fce69b3bf82e80a96f7c70bba53209748c7a9d962c4307b",
+              "model_verdict": "supported",
+              "semantic_schema_version": "1.0",
+              "semantic_checks": [
+                {
+                  "dimension": "population",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "2db7aa9b16b4d1fb3216dd5b77e6423f409a327b43d5c5625ab85aa44667cf7d",
+                  "locator": null
+                },
+                {
+                  "dimension": "quantities",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "25dded8ffdc7fca40f9efaace50fc1d8d8769eda7d616c4c8b8bd5f4dfe073a9",
+                  "locator": null
+                },
+                {
+                  "dimension": "direction",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "a10b2e606f26e70b57afb71f66ab618cdd91a1cb0c753e65845a779238a109f9",
+                  "locator": null
+                },
+                {
+                  "dimension": "causality",
+                  "status": "matched",
+                  "origin": "model",
+                  "reason_code": "semantic_matched",
+                  "reason_sha256": "f469d0a80d62f205ea3b58191a63d52ec9fb9db9fd9fd9c2ce023ef64dfc6ae5",
+                  "locator": {
+                    "paper_id": "doi:10.1056/nejmoa1112010",
+                    "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                    "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                    "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                    "basis": "abstract",
+                    "section": null,
+                    "page": null,
+                    "start": 85,
+                    "end": 171,
+                    "quote_sha256": "ee5239f76781682afa001b64515a7edfa89c52ec5cc6d654ec7266b4a66313f8"
+                  }
+                },
+                {
+                  "dimension": "study_design",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "370671bc1774dd06282d39e2f50c3760da855191e0464e6efe83be0d6a6702bc",
+                  "locator": null
+                },
+                {
+                  "dimension": "scope",
+                  "status": "not_applicable",
+                  "origin": "model",
+                  "reason_code": "semantic_not_applicable",
+                  "reason_sha256": "893f22fa811ee8e0bf8bfa5b10e371c9299cf6be46ac0090e7bb2a5138d60cee",
+                  "locator": null
+                }
+              ],
+              "evidence": {
+                "claim_id": "claim:8132f7e305cc7df28949cbbd746739080e1db292d3d7d934c03700fc9b8e21a5",
+                "claim_sha256": "44b2c2ba3fde4c8a597cb8c692c98f899ff371f1761e2b0b89e5b5d09e9836db",
+                "paper_id": "doi:10.1056/nejmoa1112010",
+                "verdict": "supported",
+                "locator": {
+                  "paper_id": "doi:10.1056/nejmoa1112010",
+                  "artifact_id": "text-v1:eed4924cf47532c2b8bf8d778c16ed9a1edf836a56c34e2103e6d7e900b68428",
+                  "content_sha256": "1e39ea4a5f5136c2ce8cf85ce5323544fbfd55cebef700b03852b46df1afb0e2",
+                  "source_url": "https://pubmed.ncbi.nlm.nih.gov/22591295/",
+                  "basis": "abstract",
+                  "section": null,
+                  "page": null,
+                  "start": 85,
+                  "end": 171,
+                  "quote_sha256": "ee5239f76781682afa001b64515a7edfa89c52ec5cc6d654ec7266b4a66313f8"
+                },
+                "quote_verified": true,
+                "reason_code": "located_quote"
+              }
+            }
+          ],
+          "citations": [
+            1
+          ],
+          "sources": [
+            "doi:10.1056/nejmoa1112010"
+          ],
+          "verdict": "supported",
+          "supporting_fragment_sha256": "ee5239f76781682afa001b64515a7edfa89c52ec5cc6d654ec7266b4a66313f8",
+          "reason_sha256": "49e524ee3de26b996337b3a00effaf0120886c136cfcb53e6c42f3eea75342ff"
+        }
+      ],
+      "model_calls": [
+        {
+          "elapsed_s": 2.752,
+          "finish_reason": "stop",
+          "usage": {
+            "completion_tokens": 361,
+            "prompt_tokens": 477,
+            "total_tokens": 838
+          },
+          "response_model": "deepseek-v4-flash",
+          "response_content_sha256": "693a9c052f88b8bfeb21b908b634afe62477dd3d44261983a83b68c7ee69843b"
+        }
+      ],
+      "model_errors": []
+    }
+  ]
+}

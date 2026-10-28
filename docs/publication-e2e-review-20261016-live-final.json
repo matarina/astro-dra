@@ -1,0 +1,60 @@
+{
+  "run": "publication-e2e-20261016-live-final.json",
+  "reviewer_type": "agent_internal_source_comparison",
+  "independent_expert": false,
+  "source_basis": "abstract",
+  "source_url": "https://pubmed.ncbi.nlm.nih.gov/33567185/",
+  "method": "Compare each emitted final REVIEW claim with its located live abstract passage. Do not infer support for withheld or pending statements.",
+  "retained_claims_reviewed": 5,
+  "retained_claims_supported": 5,
+  "retained_claim_review_accepted": true,
+  "whole_run_accepted": false,
+  "whole_run_reason": "Quick report retained zero verified claims; automated positive-path acceptance failed.",
+  "reviews": [
+    {
+      "mode": "detailed",
+      "claim_sha256": "6ad531e862136eb2cf67abf39162c7bd3659f61ec1c204cabc13c723c936f947",
+      "evidence_quote_sha256": [
+        "30770645109d916f2f9884a89cca182f6c6f680dd924c39b649abd7496ef0761"
+      ],
+      "internal_verdict": "supported",
+      "note": "Population size, BMI thresholds, comorbidity qualifier and exclusion of diabetes agree with the located abstract passage."
+    },
+    {
+      "mode": "detailed",
+      "claim_sha256": "1a1b8b29083377cd3efb70e1f611e6e39721394d8b2baeabde392763ef0572e0",
+      "evidence_quote_sha256": [
+        "6f69c4589955363631e2927f45f2249d006306ce88494f9ccc070df9791720ae"
+      ],
+      "internal_verdict": "supported",
+      "note": "Allocation ratio, duration, route, dose, placebo and lifestyle intervention agree with the located abstract passage."
+    },
+    {
+      "mode": "detailed",
+      "claim_sha256": "6a8b768563b0c951098b8d08f60879b60182c3a615cf94a07601409d01219c5b",
+      "evidence_quote_sha256": [
+        "e01482f90845fedb511e9b63fb9afab833651650c23a369cae7390f4f59a4d31"
+      ],
+      "internal_verdict": "supported",
+      "note": "The definition of estimand is explicitly present in the abstract parenthesis; this claim does not assert an absent analysis name."
+    },
+    {
+      "mode": "detailed",
+      "claim_sha256": "9b4b9972884b65a4ec04666b16ef0c2693db49d1045cd698aa0d7c6485183bb0",
+      "evidence_quote_sha256": [
+        "66c405ee7ad4067453feabaddbadbccc5e0f491aa59ec09b19b8dcd26ae8deaf"
+      ],
+      "internal_verdict": "supported",
+      "note": "Week-68 percentage changes, group assignments, treatment difference, CI and P value agree with the located abstract passage."
+    },
+    {
+      "mode": "detailed",
+      "claim_sha256": "23a42d7a0c067bcdb0fe703cb23472ab3902605a68c59b8d4cc61d66e0e1e977",
+      "evidence_quote_sha256": [
+        "1758ec0a589de10344eed126868f4ae37f3884d6f1eeeddedc48782b94adbf5a"
+      ],
+      "internal_verdict": "supported",
+      "note": "Week-68 kilogram changes, group assignments, treatment difference and CI agree with the located abstract passage."
+    }
+  ]
+}

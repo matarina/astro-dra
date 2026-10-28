@@ -1,0 +1,39 @@
+{
+  "native_flags": {
+    "agent_enabled": [
+      "pubmed",
+      "searxng"
+    ],
+    "use_in_auto_search": [
+      "pubmed",
+      "searxng"
+    ]
+  },
+  "actual_registry": {
+    "check_agent_enabled": [
+      "pubmed",
+      "searxng"
+    ],
+    "check_auto_search": [
+      "pubmed",
+      "searxng"
+    ]
+  },
+  "searx_engines": [
+    "bing"
+  ],
+  "searx_enabled": [
+    "bing"
+  ],
+  "search": {
+    "results": 7,
+    "engines": [
+      "bing"
+    ],
+    "unresponsive_engines": []
+  },
+  "pubmed_ids": [
+    "33567185"
+  ],
+  "checks_passed": true
+}

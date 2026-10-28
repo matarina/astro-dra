@@ -1,0 +1,140 @@
+{
+  "research_id": "06641267-b2b2-415a-9759-b506eabde61a",
+  "model": "deepseek-v4-flash",
+  "strategy": "langgraph-agent",
+  "state_from_logs": "completed_successfully",
+  "started_beijing": "2026-10-21 13:10:38",
+  "saved_beijing": "2026-10-21 13:20:24",
+  "report_before_publication_chars": 9120,
+  "sources_for_synthesis": 82,
+  "saved_cited_sources": 67,
+  "synchronous_check_and_save_seconds": 191,
+  "model_starts_during_check_and_save": 130,
+  "runtime": {
+    "image_tag": "astro-dra:full-20261020",
+    "image_id": "sha256:4c860f0abb4a81188ea139337e97cb82ee6b12024f760b5d1b267e8b31f567f5",
+    "started": "2026-10-20T07:32:44.061744006Z",
+    "health": "healthy",
+    "restart_count": 0,
+    "oom_killed": false
+  },
+  "log_counts": {
+    "pubmed_searches": 50,
+    "searxng_searches": 22,
+    "filter_model_returns": 184,
+    "all_filter_batches_failed_fallback": 4,
+    "empty_selection_warnings": 50,
+    "fetch_starts": 12,
+    "fetch_failed_tool_messages": 2,
+    "http403_log_lines": 8,
+    "pdf_wrong_content_type": 6,
+    "filter_timeout_lines": 0,
+    "http429_message_lines": 0
+  },
+  "filter_parse_failed_batches": 50,
+  "filter_parse_failed_by_engine": {
+    "europepmc": 31,
+    "pubmed": 19
+  },
+  "searxng_zero_valid_raw_searches": 20,
+  "searxng_searches": 22,
+  "pubmed_searches": 50,
+  "europepmc_search_count": null,
+  "pmc_identity": {
+    "pmc_summary": {
+      "status": 200,
+      "detail": {
+        "title": "From density to spatial function: spatial multi-omics, composite biomarker design, and therapeutic engineering of tertiary lymphoid structures in solid tumors.",
+        "pubdate": "2026",
+        "articleids": [
+          {
+            "idtype": "pmid",
+            "value": "42898662"
+          },
+          {
+            "idtype": "pmcid",
+            "value": "PMC13678460"
+          },
+          {
+            "idtype": "doi",
+            "value": "10.3389/fimmu.2026.1865949"
+          }
+        ]
+      }
+    },
+    "pubmed_pmc_links": {
+      "status": 200,
+      "detail": [
+        {
+          "linkname": "pubmed_pmc_refs",
+          "dbto": "pmc",
+          "first_links": [
+            "13678460",
+            "13677061",
+            "13675511"
+          ],
+          "count": 1042
+        }
+      ]
+    }
+  },
+  "fetch_scope": [
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41952215/",
+      "logged_page_chars": 10029,
+      "summary_chars": 991,
+      "truncation_marker": true,
+      "abstract_position": -1,
+      "main_position": -1,
+      "methods_heading_found": false
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40082609/",
+      "logged_page_chars": 10029,
+      "summary_chars": 807,
+      "truncation_marker": true,
+      "abstract_position": -1,
+      "main_position": 6230,
+      "methods_heading_found": true
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42743262/",
+      "logged_page_chars": 10029,
+      "summary_chars": 1553,
+      "truncation_marker": true,
+      "abstract_position": 881,
+      "main_position": -1,
+      "methods_heading_found": false
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42056516/",
+      "logged_page_chars": 10029,
+      "summary_chars": 1147,
+      "truncation_marker": true,
+      "abstract_position": 6825,
+      "main_position": 8411,
+      "methods_heading_found": false
+    }
+  ],
+  "installed_format_check": {
+    "checks": {
+      "title": true,
+      "link": true,
+      "doi": false,
+      "pubdate": false,
+      "journal": false,
+      "abstract": true
+    },
+    "rendered": "[7]\nTitle: Evidence formatting example\nURL: https://example.org/paper\nEvidence type: abstract (not the full paper)\nBEGIN SOURCE TEXT\nNo improvement was observed.\nEND SOURCE TEXT"
+  },
+  "limits": [
+    "No encrypted user database or final report was read.",
+    "No report-level accuracy or citation verdict statistics established.",
+    "Wrong PMC mapping confirmed, but that fetch failed; wrong text ingestion is unproven.",
+    "Visible main progress feedback is incomplete; do not total all collector actions from it.",
+    "Log occurrences are not always independent HTTP requests."
+  ],
+  "application_changed": false,
+  "monitor_continues_in_background": false,
+  "private_evidence_directory": "/data/ningh/nh/ldr-experiments/web-monitor-20261021-06641267"
+}

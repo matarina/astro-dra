@@ -1,0 +1,83 @@
+{
+  "existing_containers_unchanged": true,
+  "containers": [
+    {
+      "name": "/astro-dra-test-5002-local-deep-research-1",
+      "id": "890cda7c8ee6ea6f5ba8501b74e5c3b90457c1a9a507cd0187cb066b10b794d2",
+      "image": "astro-dra:abstract-context-20261021",
+      "started": "2026-10-26T02:23:04.808777289Z"
+    },
+    {
+      "name": "/local_deep_research-local-deep-research-1",
+      "id": "3cd64119d61e68c91b31b0011eb43db47beda07ca23b6cf17188b92aa73945ab",
+      "image": "localdeepresearch/local-deep-research:astro-dra-d7d874b",
+      "started": "2026-10-15T08:59:54.908821447Z"
+    },
+    {
+      "name": "/astro-dra-test-5002-searxng-1",
+      "id": "9655738081a5fad292ecc54fa731aa706d9f53e14de1d61db61f36060efcd735",
+      "image": "searxng/searxng@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "started": "2026-10-16T07:57:47.700526115Z"
+    },
+    {
+      "name": "/astro-dra-test-5002-proxy-relay-1",
+      "id": "41ef5cc8f21f718d545f79b011c8f48c44e323aeb41c48c0ba08bf1b17ac904d",
+      "image": "astro-dra:search-stability-20261016-v2",
+      "started": "2026-10-16T07:26:42.115715988Z"
+    }
+  ],
+  "running_model": "gpt-5.6-sol",
+  "running_provider": "openai_endpoint",
+  "running_has_new_deepseek_key": false,
+  "health": "healthy",
+  "login_http_status": 200,
+  "restart_performed": false,
+  "status": "staged_not_loaded",
+  "api": {
+    "model": "deepseek-flash",
+    "base_url": "https://api.deepseek.com/v1",
+    "credential_staged": true,
+    "models": {
+      "http_status": 200,
+      "elapsed_s": 8.131,
+      "model_ids": [
+        "deepseek-flash",
+        "deepseek-v4-pro"
+      ]
+    },
+    "completion": {
+      "http_status": 200,
+      "elapsed_s": 0.685,
+      "content": "DEEPSEEK_OK",
+      "finish_reason": "stop"
+    }
+  },
+  "native_check": {
+    "model": "deepseek-flash",
+    "provider": "deepseek",
+    "checks_passed": true,
+    "temperature": 0.7,
+    "max_tokens_setting": 30000,
+    "consistency_enabled": true,
+    "configured_host": "api.deepseek.com",
+    "checks": [
+      "environment_default_and_native_provider",
+      "ldr_get_llm_chinese_completion",
+      "streaming",
+      "structured_tool_call",
+      "tool_result_roundtrip",
+      "relevance_filter",
+      "native_consistency_and_final_writer"
+    ],
+    "timings": {
+      "completion_s": 1.979,
+      "stream_s": 1.237,
+      "tool_roundtrip_s": 1.527,
+      "relevance_s": 0.776,
+      "writer_s": 7.433
+    },
+    "elapsed_s": 12.952,
+    "scope": "Backend integration smoke; no full research or account changes."
+  },
+  "backup_directory": "/data/ningh/nh/ldr-test-5002-backups/deepseek-flash-stage-20261026-103017"
+}

@@ -2101,34 +2101,15 @@ def run_research_process(research_id, query, mode, **kwargs):
                         {"phase": "report_complete"},
                     )
 
-                    # Keep only works cited by the answer, deduplicate them
-                    # at the paper level, and renumber in first-appearance
-                    # order before hyperlinking or saving anything.
-                    formatter = get_citation_formatter()
-                    try:
-                        source_start, _ = formatter._find_sources_section(
-                            clean_markdown, trust_sentinel=False
-                        )
-                        answer_body = (
-                            clean_markdown[:source_start]
-                            if source_start >= 0
-                            else clean_markdown
-                        )
-                        answer_body, all_links = _compact_citations(
-                            answer_body, all_links
-                        )
-                        answer_with_links = formatter.apply_inline_hyperlinks(
-                            answer_body, all_links
-                        )
-                    except Exception:
-                        # Hyperlinking is quality-of-life, not a hard
-                        # requirement. If anything blows up, save the
-                        # raw LLM text rather than fail the research.
-                        logger.exception(
-                            "Citation formatter failed for research {}; saving raw answer",
-                            research_id,
-                        )
-                        answer_with_links = clean_markdown
+                    # Preserve the answer; link known citations and store advisory
+                    # citation checks separately from the report body.
+                    from research_verify.publication import publish_report, collect_publication_sources
+                    publication = publish_report(
+                        clean_markdown, collect_publication_sources(system, all_links), use_llm
+                    )
+                    answer_with_links = publication.content
+                    all_links = [dict(index=str(src.index), title=src.title, url=src.url,
+                                      paper_id=src.paper_id) for src in publication.sources]
 
                     # report_content stores ONLY the synthesized answer.
                     # The legacy "answer + ## Sources + ## Research
@@ -2150,6 +2131,7 @@ def run_research_process(research_id, query, mode, **kwargs):
                         metadata = {
                             "iterations": results["iterations"],
                             "generated_at": datetime.now(UTC).isoformat(),
+                            **publication.metadata(),
                         }
 
                         # Save report using storage abstraction
@@ -2424,29 +2406,16 @@ def run_research_process(research_id, query, mode, **kwargs):
             all_links = (
                 getattr(search_system, "all_links_of_system", None) or []
             )
-            formatter = get_citation_formatter()
-            try:
-                source_start, _ = formatter._find_sources_section(
-                    final_report["content"], trust_sentinel=True
-                )
-                answer_body = (
-                    final_report["content"][:source_start]
-                    if source_start >= 0
-                    else final_report["content"]
-                )
-                answer_body, all_links = _compact_citations(
-                    answer_body, all_links
-                )
-                answer_with_links = formatter.apply_inline_hyperlinks(
-                    answer_body, all_links
-                )
-            except Exception:
-                logger.exception(
-                    "Citation formatter failed for research {}; saving raw answer",
-                    research_id,
-                )
-                answer_with_links = final_report["content"]
-            formatted_content = answer_with_links
+            from research_verify.publication import publication_for_report, collect_publication_sources
+            publication = publication_for_report(
+                final_report["content"], final_report.get("metadata"),
+                collect_publication_sources(search_system, all_links), use_llm
+            )
+            formatted_content = publication.content
+            final_report["content"] = publication.content
+            all_links = [dict(index=str(src.index), title=src.title, url=src.url,
+                              paper_id=src.paper_id) for src in publication.sources]
+            final_report["metadata"].update(publication.metadata())
 
             # Save report FIRST, sources after.
             # See quick-summary path for rationale.
@@ -2832,18 +2801,9 @@ def run_research_process(research_id, query, mode, **kwargs):
                 # Generate comprehensive error report
                 # ErrorReportGenerator does not use LLM (kept for compat)
                 error_generator = ErrorReportGenerator()
-                enhanced_report_content = error_generator.generate_error_report(
-                    # Use the sanitized user_friendly_error (curated for known
-                    # errors, generic for unexpected ones) instead of raw {e!s}:
-                    # this report is persisted and retrievable via the report
-                    # routes, so embedding raw exception text would leak server
-                    # internals (CWE-209). Full detail stays in the logs.
-                    error_message=f"Research failed: {user_friendly_error}",
-                    query=query,
-                    partial_results=partial_results,
-                    search_iterations=search_iterations,
-                    research_id=research_id,
-                )
+                from research_verify.publication import publish_report
+                error_publication = publish_report(user_friendly_error, [])
+                enhanced_report_content = error_publication.content
 
                 logger.info(
                     "Generated enhanced error report for failed research (length: {})",
@@ -2861,7 +2821,7 @@ def run_research_process(research_id, query, mode, **kwargs):
                             success = storage.save_report(
                                 research_id=research_id,
                                 content=enhanced_report_content,
-                                metadata={"error_report": True},
+                                metadata={"error_report": True, **error_publication.metadata()},
                                 username=username,
                             )
                             if success:

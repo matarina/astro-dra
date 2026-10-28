@@ -1,0 +1,351 @@
+{
+  "before": [
+    {
+      "name": "astro-dra-test-5002-local-deep-research-1",
+      "id": "fd0096374d8771fbd59c8dc956e468347ef26e6a5f607290a507d5bcf87dde6f",
+      "image": "astro-dra:citations-20261016",
+      "image_id": "sha256:9c44b43188b328b43bf9d9a19f44e4ae44bdfc2859149417c06aadbbb1621e07",
+      "started_at": "2026-10-16T09:29:53.193895911Z",
+      "mounts": [
+        {
+          "name": "astro-dra-test-5002_ldr_data",
+          "destination": "/data"
+        },
+        {
+          "name": "astro-dra-test-5002_ldr_config",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "ldr-lab-off-1",
+      "id": "024a5a8505fccaf87e5d0bf5106be0458e3edddb7fd1a82e42b6608a1f2eb3b5",
+      "image": "ldr-lab:verify-20261016",
+      "image_id": "sha256:bb962bbe2ce2877cfa06b1d757be59436a7ac17b90e9013e89438b9ae8073142",
+      "started_at": "2026-10-16T09:17:32.677140535Z",
+      "mounts": [
+        {
+          "name": "ldr-lab_off_data",
+          "destination": "/data"
+        },
+        {
+          "name": "d4090190fe2ee2ab5fba61f638aed8df98b3f277986f7520de1cdb116ed381a4",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "ldr-lab-bib-1",
+      "id": "5feaedd4870876395998a33cc5ea602020c0d3daac46a96c88e15e3f30fb25f3",
+      "image": "ldr-lab:verify-20261016",
+      "image_id": "sha256:bb962bbe2ce2877cfa06b1d757be59436a7ac17b90e9013e89438b9ae8073142",
+      "started_at": "2026-10-16T09:17:31.941957631Z",
+      "mounts": [
+        {
+          "name": "ldr-lab_bib_data",
+          "destination": "/data"
+        },
+        {
+          "name": "d7c5b2572df68dd43aa1ce573ec99c358eaf8cf5713004baade7fd279b0d5964",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "ldr-lab-grobid-arm-1",
+      "id": "5c1a5c9a08152a784a7191305871adc121fc4539bb93f21a16cf312df6865fd6",
+      "image": "ldr-lab:verify-20261016",
+      "image_id": "sha256:bb962bbe2ce2877cfa06b1d757be59436a7ac17b90e9013e89438b9ae8073142",
+      "started_at": "2026-10-16T09:17:32.324818428Z",
+      "mounts": [
+        {
+          "name": "ldr-lab_grobidarm_data",
+          "destination": "/data"
+        },
+        {
+          "name": "b8372d1ee5e1674eef1faa7410482291080a64821f410baf75e63e9bccef41f0",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "ldr-lab-lettuce-1",
+      "id": "4abee060f3e87fd93b14c4afc9dafc376377a7d8987321f8c3288c1c5c4ca116",
+      "image": "ldr-lab:verify-20261016",
+      "image_id": "sha256:bb962bbe2ce2877cfa06b1d757be59436a7ac17b90e9013e89438b9ae8073142",
+      "started_at": "2026-10-16T09:17:31.117935215Z",
+      "mounts": [
+        {
+          "name": "ldr-lab_lettuce_data",
+          "destination": "/data"
+        },
+        {
+          "name": "de0d6b4fa98c3ae4cbd4313809a1cd095360838db7630cdd97528392e79cffd6",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "ldr-lab-refcheck-1",
+      "id": "1e55ee240ec011173f8105a5cbfe3b1fe9ba58998fc48db1880b86868489dcbe",
+      "image": "ldr-lab:verify-20261016",
+      "image_id": "sha256:bb962bbe2ce2877cfa06b1d757be59436a7ac17b90e9013e89438b9ae8073142",
+      "started_at": "2026-10-16T09:17:31.452005706Z",
+      "mounts": [
+        {
+          "name": "ldr-lab_refcheck_data",
+          "destination": "/data"
+        },
+        {
+          "name": "b2b226fc8bee4aa7a6ea0a720a3cc2b4c96929ab13d65eade90ed4cd1e1cfc92",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "sad_faraday",
+      "id": "e7340d097d158b7a0710a497c492f3813f4d5614691b17ea9a85e61c5009a0d1",
+      "image": "ghcr.io/github/github-mcp-server",
+      "image_id": "sha256:03f565ea952662cd14a8a0373d910aeced3aff7197ab6afef786755db8d25994",
+      "started_at": "2026-10-16T07:47:14.877371417Z",
+      "mounts": []
+    },
+    {
+      "name": "astro-dra-test-5002-proxy-relay-1",
+      "id": "41ef5cc8f21f718d545f79b011c8f48c44e323aeb41c48c0ba08bf1b17ac904d",
+      "image": "astro-dra:search-stability-20261016-v2",
+      "image_id": "sha256:fc50ef18b85cc5943cf5965be121dd36d1fe01e3fb14403a73a0a29731220bad",
+      "started_at": "2026-10-16T07:26:42.115715988Z",
+      "mounts": [
+        {
+          "name": "f6297686575020e6c8c31e3d64834d9358d768905dff7ff3a0c253d41df2e54e",
+          "destination": "/data"
+        },
+        {
+          "name": null,
+          "destination": "/relay/proxy_relay.py"
+        },
+        {
+          "name": "fbaf6e4a59d09fff464cfa7078d0ae848427a134c2606784c7380d8abb41a1dc",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "astro-dra-test-5002-searxng-1",
+      "id": "9655738081a5fad292ecc54fa731aa706d9f53e14de1d61db61f36060efcd735",
+      "image": "searxng/searxng@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "image_id": "sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "started_at": "2026-10-16T07:57:47.700526115Z",
+      "mounts": [
+        {
+          "name": "46cf2139f8f079045ed675f0d10c22f7ea384ffccd3ee7ab540f6c00d7d473e4",
+          "destination": "/etc/searxng"
+        },
+        {
+          "name": null,
+          "destination": "/etc/searxng/settings.yml"
+        },
+        {
+          "name": "a834ad90ba84d39442a1e9482753ad1b7c37a2514bc2c23ecc2969e379786203",
+          "destination": "/var/cache/searxng"
+        }
+      ]
+    },
+    {
+      "name": "deepseek-v41-flash-uncensored-vllm",
+      "id": "d7b7a2d85aaf346a06d2973ec3401eac6531bbd51b505f83481fa77f73a080a6",
+      "image": "vllm/vllm-openai:nightly",
+      "image_id": "sha256:f3b756ede21083a9415baac77b38998b89c738d2a9c1441c22de2d49cacf5282",
+      "started_at": "2026-10-15T11:35:42.564087385Z",
+      "mounts": [
+        {
+          "name": null,
+          "destination": "/model"
+        },
+        {
+          "name": null,
+          "destination": "/root/.cache"
+        }
+      ]
+    },
+    {
+      "name": "astro-dra-local-deep-research-1",
+      "id": "3e6fbce8b83063a69fc2a36e9055d99e7c1d1363837059a8812ceabbfab215f0",
+      "image": "astro-dra:local",
+      "image_id": "sha256:b2aab06d79a028446d39143f0254c8249b6033b368e83f3bbdd1e9e7e4a03785",
+      "started_at": "2026-10-15T08:59:54.876194332Z",
+      "mounts": [
+        {
+          "name": "astro-dra_ldr_data",
+          "destination": "/data"
+        },
+        {
+          "name": "astro-dra_ldr_config",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "astro-dra-searxng-1",
+      "id": "f9dbdce6a1c1f9f41e9cf96ef02c97b15d2e69554892f0b4985987d2b0a72afb",
+      "image": "searxng/searxng@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "image_id": "sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "started_at": "2026-10-15T08:59:54.878086649Z",
+      "mounts": [
+        {
+          "name": "29cd6c770227554fd397d8189299e4ac4c1d791de9795933018619ec72fc8db6",
+          "destination": "/etc/searxng"
+        },
+        {
+          "name": null,
+          "destination": "/etc/searxng/settings.yml"
+        },
+        {
+          "name": "15cac39aae1734d09f18ad6fd08844b0b0e0ca7d5aad98246bc0c69d1d126713",
+          "destination": "/var/cache/searxng"
+        }
+      ]
+    },
+    {
+      "name": "local_deep_research-local-deep-research-1",
+      "id": "3cd64119d61e68c91b31b0011eb43db47beda07ca23b6cf17188b92aa73945ab",
+      "image": "localdeepresearch/local-deep-research:astro-dra-d7d874b",
+      "image_id": "sha256:e94a4b527a6f61778da2aa7b2994722562fbfadac0dda9c6b499f64a16a5b1b2",
+      "started_at": "2026-10-15T08:59:54.908821447Z",
+      "mounts": [
+        {
+          "name": "local_deep_research_ldr_data",
+          "destination": "/data"
+        },
+        {
+          "name": "local_deep_research_ldr_scripts",
+          "destination": "/scripts"
+        },
+        {
+          "name": null,
+          "destination": "/var/ldr-userlog"
+        },
+        {
+          "name": "168b5447226d9598063bd5cbc837e908d45de059111b5714a2cb7a9880ff6f38",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "gpt-researcher-gpt-researcher-1",
+      "id": "c122de6f0342a14dc5f5e5dff21f82f7d7e9b2603155812e1af96ff6e05133ea",
+      "image": "gpt-researcher-local:latest",
+      "image_id": "sha256:b62619bf530844d875bf75574337536eb45f60d234aa76c1a5f1d381b19708c2",
+      "started_at": "2026-10-15T08:59:54.8796674Z",
+      "mounts": [
+        {
+          "name": null,
+          "destination": "/usr/src/app/logs"
+        },
+        {
+          "name": null,
+          "destination": "/usr/src/app/my-docs"
+        },
+        {
+          "name": null,
+          "destination": "/usr/src/app/outputs"
+        }
+      ]
+    },
+    {
+      "name": "gpt-researcher-gptr-nextjs-1",
+      "id": "82f97e138048ff81a4aac5f1f892ceb655dec441d7aed30555c196163782a3ed",
+      "image": "gptresearcher/gptr-nextjs:latest",
+      "image_id": "sha256:69e7e2fa02d23666e7c00774faed154af1684ac06dc97d2c29c8b6e77f98710a",
+      "started_at": "2026-10-15T08:59:54.877668087Z",
+      "mounts": [
+        {
+          "name": null,
+          "destination": "/app/outputs"
+        }
+      ]
+    },
+    {
+      "name": "searxng-mine",
+      "id": "ba826d473432168a9446f8db325f330cf929881e4a47eb9429fca6e2da9796a1",
+      "image": "searxng/searxng:latest",
+      "image_id": "sha256:ba0a344c566ecc6e4429e81d02d93a01fa05c80e9fb6d08f0a1e57a729aa6d87",
+      "started_at": "2026-10-15T08:59:54.878412888Z",
+      "mounts": [
+        {
+          "name": "e60b3287effa3f2fd268693bd1b1b68acc48f9580cf9e9dca2012cd150506a31",
+          "destination": "/etc/searxng"
+        },
+        {
+          "name": null,
+          "destination": "/etc/searxng/settings.yml"
+        },
+        {
+          "name": "820c14b3fc368dee8e83d173afe48702d5d76f0d4b3119185ef1e3608d36c813",
+          "destination": "/var/cache/searxng"
+        }
+      ]
+    },
+    {
+      "name": "searxng",
+      "id": "c7b39a4dd59385541510bbae1b749353cf4a00f2d6eebc574ba4e80cdf668beb",
+      "image": "searxng/searxng:latest@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "image_id": "sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "started_at": "2026-10-15T08:59:54.878180971Z",
+      "mounts": [
+        {
+          "name": "local_deep_research_searxng_data",
+          "destination": "/etc/searxng"
+        },
+        {
+          "name": "4e100f5ea626f0de962d447889a5fbc937662999474fcb00a3fe4c81d6e7b1a2",
+          "destination": "/var/cache/searxng"
+        }
+      ]
+    },
+    {
+      "name": "nvidia_gpu_exporter",
+      "id": "6e9c5632cd11ee07b0a349f7dd18621d73891052b92010038c669422c18895e1",
+      "image": "rphb.repugene.com/tools/nvidia_gpu_exporter:1.14.0",
+      "image_id": "sha256:13203bdc81bfd06c5937a5af86d17e1aae04fe7ed770099bdefe415ae061d59f",
+      "started_at": "2026-10-15T09:17:49.199873825Z",
+      "mounts": []
+    }
+  ],
+  "after": {
+    "name": "astro-dra-test-5002-local-deep-research-1",
+    "id": "671721e7f7645e8db3a80143b0419191b61b79c599a39bdc56e7b9ae2ccf3c92",
+    "image": "astro-dra:qwen-flash-20261016",
+    "image_id": "sha256:1b2e7c4264b830e96ddd25f87d7c20576c45d851e76d95a8e0eea9a9de0e4cb0",
+    "mounts": [
+      {
+        "name": "astro-dra-test-5002_ldr_data",
+        "destination": "/data"
+      },
+      {
+        "name": "astro-dra-test-5002_ldr_config",
+        "destination": "/app/.config/local_deep_research"
+      }
+    ],
+    "health": "healthy",
+    "default_provider": "openai_endpoint",
+    "default_model": "deepseek-v4-flash",
+    "qwen_endpoint": "http://27.30.76.162:6183/ai/v1",
+    "qwen_bypasses_proxy": true,
+    "served_javascript_sha256": {
+      "research.js": "a087b728c32936610e49d767e6ad88b40027547d1b0d056b4d61e5eb0014654a",
+      "settings_sync.js": "ecf0db2df1cb0ca313b16984c41030f3e235322601617ca7d0cc16ba33a93012"
+    }
+  },
+  "checks": {
+    "same_data_volumes": true,
+    "other_containers_unchanged": true,
+    "login_http_status": 200,
+    "served_overlays_match": true,
+    "native_model_smoke": true,
+    "model_selection_javascript": true,
+    "regression_tests_passed": 258
+  },
+  "checks_passed": true
+}

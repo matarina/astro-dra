@@ -1,0 +1,165 @@
+{
+  "scope": "Read-only diagnosis of saved 5002 reports, primary-paper evidence, and offline probes; no application change or restart",
+  "reports": [
+    {
+      "id": "e757ef8a-ede9-4277-87a7-e8eb1c698375",
+      "models": [
+        {
+          "model_name": "deepseek-flash",
+          "n": 338
+        }
+      ],
+      "created_at": "2026-10-26T05:14:16.008634+00:00",
+      "status": "completed",
+      "citation_audit": "disabled"
+    },
+    {
+      "id": "7e3e4453-d9ff-4373-a8ac-21d889fa2478",
+      "models": [
+        {
+          "model_name": "deepseek-flash",
+          "n": 355
+        }
+      ],
+      "created_at": "2026-10-26T03:11:30.254021+00:00",
+      "status": "completed",
+      "citation_audit": "disabled"
+    },
+    {
+      "id": "79568c38-d53c-43e6-955e-5c832bb7e639",
+      "models": [
+        {
+          "model_name": "deepseek-v4-flash",
+          "n": 396
+        }
+      ],
+      "created_at": "2026-10-26T01:36:46.941933+00:00",
+      "status": "completed",
+      "citation_audit": "disabled"
+    }
+  ],
+  "confirmed_cases": [
+    {
+      "case": "imc_named_4i",
+      "research_id": "79568c38-d53c-43e6-955e-5c832bb7e639",
+      "pmid": "42568117",
+      "original_indices": [
+        12
+      ],
+      "display_index": 39,
+      "paper_id": "doi:10.1158/2767-9764.crc-26-0182",
+      "url": "https://europepmc.org/article/MED/42568117",
+      "canonical_abstract_has_correct_term": true,
+      "error_before_publication": true,
+      "error_after_publication": true,
+      "saved_body_equals_publication": true,
+      "audit_status": "disabled",
+      "models": [
+        {
+          "model_name": "deepseek-v4-flash",
+          "n": 396
+        }
+      ],
+      "correct_statement": "Xenium with imaging mass cytometry (IMC); not 4i",
+      "status": "confirmed_saved_report_error"
+    },
+    {
+      "case": "kidney_samples_named_mice",
+      "research_id": "e757ef8a-ede9-4277-87a7-e8eb1c698375",
+      "pmid": "40813851",
+      "original_indices": [
+        283
+      ],
+      "display_index": 56,
+      "paper_id": "doi:10.1038/s41467-025-62599-9",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40813851/",
+      "canonical_abstract_has_correct_term": true,
+      "error_before_publication": true,
+      "error_after_publication": true,
+      "saved_body_equals_publication": true,
+      "audit_status": "disabled",
+      "models": [
+        {
+          "model_name": "deepseek-flash",
+          "n": 338
+        }
+      ],
+      "correct_statement": "12 kidney samples from 6 mice; not 12 mice",
+      "status": "confirmed_saved_report_error"
+    }
+  ],
+  "related_analysis_scope_case": {
+    "research_id": "7e3e4453-d9ff-4373-a8ac-21d889fa2478",
+    "source": {
+      "index": 47,
+      "original_indices": [
+        106
+      ],
+      "paper_id": "doi:10.1136/gutjnl-2024-332901",
+      "artifact_id": "text-v1:8aa464fea2cf774ff42c038bf099bb4b00d46aa0b57a66471b4e7cc3f904ace7",
+      "title": "Spatial dissection of tumour microenvironments in gastric cancers reveals the immunosuppressive crosstalk between <i>CCL2+</i> fibroblasts and <i>STAT3</i>-activated macrophages.",
+      "url": "https://europepmc.org/article/MED/39580151"
+    },
+    "status": "confirmed_omission_of_analysis_input_scope; not asserted identical to user unspecified Visium case",
+    "report_issue": "Clinical outcome association is listed in a Visium analysis paragraph without specifying the bulk-cohort input",
+    "actual_input": "ACRG and TCGA bulk RNA-seq/microarray data for prognosis; Visium for spatial mapping"
+  },
+  "formatter_renderer_probe": {
+    "checks": [
+      {
+        "pmid": "42568117",
+        "full_abstract_retained": true,
+        "source_index_retained": true,
+        "imc_retained": true,
+        "kidney_count_unit_retained": null
+      },
+      {
+        "pmid": "40813851",
+        "full_abstract_retained": true,
+        "source_index_retained": true,
+        "imc_retained": null,
+        "kidney_count_unit_retained": true
+      },
+      {
+        "render_exactly_reproduces_saved_content": true,
+        "source_count": 85
+      },
+      {
+        "render_exactly_reproduces_saved_content": true,
+        "source_count": 64
+      }
+    ],
+    "model_calls": 0
+  },
+  "native_check_order_probe": {
+    "scope": "Synthetic model replies through actual installed citation handler; no live-model accuracy conclusion",
+    "calls": 2,
+    "first_call_checks_draft": true,
+    "first_call_includes_user_question": false,
+    "first_call_draft_has_4i": false,
+    "final_output_has_new_wrong_heading": true,
+    "post_writer_check_calls": 0
+  },
+  "runtime": {
+    "container_id": "0139142d67a6d1e84c705bba242ede73b227ff44ae622c8c78e6084b20e6b842",
+    "started_at": "2026-10-26T03:06:13.378375527Z",
+    "health": "healthy",
+    "model": "deepseek-flash",
+    "application_or_configuration_changed": false,
+    "service_restarted": false,
+    "database_reads_only": true,
+    "diagnostic_model_calls": 0
+  },
+  "primary_urls": [
+    "https://pubmed.ncbi.nlm.nih.gov/42568117/",
+    "https://www.nature.com/articles/s41467-025-62599-9",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC12013559/"
+  ],
+  "limitations": [
+    "Historical web tasks did not retain the full agent draft, actual selected source prompt, native review feedback, or raw final model request/reply separately. Cannot determine first introduction between research agent and final writer for the two historical errors.",
+    "Current-source formatter replay uses newly fetched canonical abstracts and demonstrates code behavior; it is not recovery of original exact prompts.",
+    "The dry-run check-order proof uses synthetic responses and is not an accuracy test of a live model.",
+    "The exact third user-specified sentence was not provided; a related saved-report scope omission was found instead."
+  ],
+  "private_artifacts": "/data/ningh/nh/ldr-experiments/citation-cases-20261026"
+}

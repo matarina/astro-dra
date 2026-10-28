@@ -1,0 +1,176 @@
+{
+  "http_status": 200,
+  "default_results": 10,
+  "result_engines": [
+    "bing"
+  ],
+  "unresponsive_engines": [],
+  "paused_searx_entries_absent": 14,
+  "bing_enabled": true,
+  "verified_at_utc": "2026-10-16T06:32:14.497561+00:00",
+  "previous_runtime_receipt": "search-stability-runtime-20261016.json",
+  "carried_forward_unchanged_app_checks": {
+    "operator_flags": {
+      "arxiv.agent_enabled": false,
+      "arxiv.use_in_auto_search": false,
+      "semantic_scholar.agent_enabled": false,
+      "semantic_scholar.use_in_auto_search": false,
+      "brave.agent_enabled": false,
+      "brave.use_in_auto_search": false,
+      "ddg.agent_enabled": false,
+      "ddg.use_in_auto_search": false
+    },
+    "native_registry_exclusion": true,
+    "installed_files_match": 32,
+    "indirect_ddg_paused": true,
+    "wayback_503_typed": true,
+    "crossref": {
+      "http_status": 200
+    },
+    "pubmed": {
+      "http_status": 200,
+      "matching_ids": 1
+    },
+    "model": {
+      "http_status": 200,
+      "bypasses_proxy": true
+    }
+  },
+  "containers": [
+    {
+      "name": "/astro-dra-test-5002-local-deep-research-1",
+      "container_id": "cabd35e96ed41384f7b054f4d199408b27cef77eaf786424933b8550ab80b1e2",
+      "image_id": "sha256:fc50ef18b85cc5943cf5965be121dd36d1fe01e3fb14403a73a0a29731220bad",
+      "health": "healthy",
+      "restart_count": 0,
+      "oom_killed": false
+    },
+    {
+      "name": "/astro-dra-test-5002-searxng-1",
+      "container_id": "9655738081a5fad292ecc54fa731aa706d9f53e14de1d61db61f36060efcd735",
+      "image_id": "sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "health": "healthy",
+      "restart_count": 0,
+      "oom_killed": false
+    },
+    {
+      "name": "/astro-dra-test-5002-proxy-relay-1",
+      "container_id": "41ef5cc8f21f718d545f79b011c8f48c44e323aeb41c48c0ba08bf1b17ac904d",
+      "image_id": "sha256:fc50ef18b85cc5943cf5965be121dd36d1fe01e3fb14403a73a0a29731220bad",
+      "health": "healthy",
+      "restart_count": 0,
+      "oom_killed": false
+    }
+  ],
+  "relay": {
+    "recent_successful_healthchecks": 5,
+    "legacy_reset_lines": 0,
+    "transport_events": [
+      {
+        "event": "proxy_relay_transport_error",
+        "severity": "error",
+        "stage": "transfer",
+        "direction": "upstream_to_client",
+        "error_type": "TimeoutError",
+        "client_bytes_forwarded": 2181,
+        "upstream_bytes_forwarded": 8174
+      },
+      {
+        "event": "proxy_relay_transport_error",
+        "severity": "error",
+        "stage": "transfer",
+        "direction": "upstream_to_client",
+        "error_type": "TimeoutError",
+        "client_bytes_forwarded": 2059,
+        "upstream_bytes_forwarded": 8282
+      },
+      {
+        "event": "proxy_relay_transport_error",
+        "severity": "error",
+        "stage": "transfer",
+        "direction": "upstream_to_client",
+        "error_type": "TimeoutError",
+        "client_bytes_forwarded": 2174,
+        "upstream_bytes_forwarded": 8169
+      },
+      {
+        "event": "proxy_relay_transport_error",
+        "severity": "error",
+        "stage": "transfer",
+        "direction": "upstream_to_client",
+        "error_type": "TimeoutError",
+        "client_bytes_forwarded": 2028,
+        "upstream_bytes_forwarded": 5479
+      },
+      {
+        "event": "proxy_relay_transport_error",
+        "severity": "error",
+        "stage": "transfer",
+        "direction": "upstream_to_client",
+        "error_type": "TimeoutError",
+        "client_bytes_forwarded": 2074,
+        "upstream_bytes_forwarded": 5310
+      },
+      {
+        "event": "proxy_relay_transport_error",
+        "severity": "error",
+        "stage": "transfer",
+        "direction": "upstream_to_client",
+        "error_type": "TimeoutError",
+        "client_bytes_forwarded": 2101,
+        "upstream_bytes_forwarded": 4261
+      },
+      {
+        "event": "proxy_relay_transport_error",
+        "severity": "error",
+        "stage": "transfer",
+        "direction": "upstream_to_client",
+        "error_type": "TimeoutError",
+        "client_bytes_forwarded": 2695,
+        "upstream_bytes_forwarded": 9154
+      }
+    ]
+  },
+  "web_http_status": 200,
+  "settings_sha256": "6e5ae4270e599e6fcdb314c9448ea6df08efa729fc511a185317bfbc5f34d840",
+  "code_sha256": {
+    "local_deep_research/research_service.py": "0d85453d5d0cd3a701f535a12ebb18accfd49032d9bc448e4b83a846b44ad874",
+    "local_deep_research/langgraph_agent_strategy.py": "cf5f2f7009ab879fbb6016f7f27016b06419b8f87d9c5ed5dca4d4c8e450e176",
+    "local_deep_research/overlay/tracker.py": "da1f6bfee544d805bb34073108acf26dd8505012da4a42cb08830f5f4c630561",
+    "local_deep_research/search_engine_serper.py": "5e600d10c6124bac879b84cb7b77a56e8281dc6e76f2133679fd7830f03efe49",
+    "local_deep_research/search_engine_pubmed.py": "9a20462c2a52c5cdbb8b529b233e1f201975336ec52d5292022e124758e81f6a",
+    "local_deep_research/overlay/database_storage.py": "700074c528b2d93acb4b1ec4dbc8d947f6d716242d497c6508146b16655473c7",
+    "local_deep_research/overlay/file_storage.py": "25d7a047681f4725046c0ae95d648517fe9e1bc52803fc9930edade34ccd5d30",
+    "local_deep_research/overlay/report_assembly_service.py": "73920b894df5de57bb44cb5929b7d1dd7911547f208cc2fb025ab4971d14820c",
+    "local_deep_research/overlay/scheduler_background.py": "b99a6a18e48e2174e06c40946036a15fab9f979104db707ab73361800d0ea099",
+    "local_deep_research/overlay/report_generator.py": "8123f46b04a670b6524faeea4bc3e6f8c3f771eb3134fb6f250aaf8c389963e0",
+    "local_deep_research/overlay/quarto_exporter.py": "ceb8752f53bd94e108be2acc913fea53e8d69900cbb1b60bf2dadf3b2e6cb330",
+    "local_deep_research/overlay/search_engine_wayback.py": "b645cc4b291afcdfc9ae5d6dccb3bda2fc65e4e01405165a120f16a5f4ffe054",
+    "local_deep_research/overlay/search_engines_config.py": "32ab6d995a70783eb335b1ceda45c9efcd0bb2393f5b6c97a99911c47069214b",
+    "local_deep_research/research_verify/config.py": "3260e211d780e356e1a2992ed9fb4a325a2197ca2e5705b77d5d2ceac2d7f458",
+    "local_deep_research/research_verify/http_client.py": "d3dfcf448315b093ffbb243bf9b6a0bf82c257cda48dc0de301c52e01a8a1198",
+    "local_deep_research/research_verify/__init__.py": "11538d04e2443ee3571d687989ffac6af46c4abdff816fb7e189f927853af4f3",
+    "local_deep_research/research_verify/__main__.py": "e8aba19bda5166eca8ffc06bd4647381c51bd8abd6dec15514d05f25292b9dcf",
+    "local_deep_research/research_verify/models.py": "eaa2690ce2a5d456bb5060f38ec1317c4c93f7786c3d6710136e0205df64922f",
+    "local_deep_research/research_verify/textutil.py": "702db5973b2b6cd192a5f7276590e1ce7357011c03584a487695966331a48a3a",
+    "local_deep_research/research_verify/doi_validator.py": "9656f05d4c506ed56c2faae16fa0132f1fc5effb0b0423ef6c78263172ab1606",
+    "local_deep_research/research_verify/constraint_matcher.py": "fde82942bf3a0ebe67603be94ce8960272bc7643c16a345fc641da6b2671317e",
+    "local_deep_research/research_verify/keyword_cov.py": "560579e7217fe734337455e3494693a2d550b8f04544d76b2f38439ff61771da",
+    "local_deep_research/research_verify/cli_check.py": "85cf079a8717d6387e73220ae986fdfbe8ec3fa0548984c40bff82ca37334d2a",
+    "local_deep_research/research_verify/citation_qc.py": "9ccf88653bc2214f17b6fb844d6f1eaaa341078d801d4c3daed28dab631df65a",
+    "local_deep_research/research_verify/contracts.py": "30a461f449b2446b693c45775fb613791743adffd0b22c1008c7c1a1dc274b2a",
+    "local_deep_research/research_verify/evidence.py": "b986eda63f70544c608e9082fafa8605785aba18b8c3419c405b24326a6ba5fd",
+    "local_deep_research/research_verify/passages.py": "0cb026fc22bbc185b962caeaba3f72c135f6479c53a3d7c5ffd2ec7536aa5b16",
+    "local_deep_research/research_verify/claims.py": "ef1eea19d3972d2b3ed80f72395fed104ebc79721872d3cba703a59e06ede08d",
+    "local_deep_research/research_verify/semantics.py": "2aa1640406ecf920f7b1ee922235cad3f79abe8da3757425c2b112e310f7d5dc",
+    "local_deep_research/research_verify/revision.py": "4e23b63b4af6b5723faab20c4930b762c926266dfb3e405465dbbe139627f4b2",
+    "local_deep_research/research_verify/publication.py": "dc3e4c690a983d5d8beaa9e6c6c5c59c9cbe39fec02493afba25ee76f9a816b8",
+    "local_deep_research/research_verify/search_policy.py": "903daae5ec4d341017a649a316324cada6f8172e8445ad4176dabeb8bf417c76"
+  },
+  "metadata_note": "Normalized repeated local_deep_research/ prefix in prior receipt's verification-module hash keys; hash values unchanged. Prior false result is retained.",
+  "test_result": {
+    "passed": 329,
+    "elapsed_s": 1.6
+  },
+  "checks_passed": true
+}
