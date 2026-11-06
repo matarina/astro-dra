@@ -1,0 +1,21 @@
+{
+  "image": "astro-dra:themes-5002-20261030",
+  "image_id": "sha256:f396ffd872a4ec6ba26bbb5ff869762c1766076337a2f6d8e707f8d6cd401b5f",
+  "health": "healthy",
+  "env_unchanged": true,
+  "volumes_unchanged": true,
+  "protected_containers_unchanged": true,
+  "runtime_changes": [
+    "web/templates/base.html",
+    "web/static/js/services/theme.js"
+  ],
+  "browser_checks": {
+    "three_options": true,
+    "system_changes": true,
+    "persisted_selection": true,
+    "legacy_fallback": true,
+    "dynamic_settings": true,
+    "page_errors": []
+  },
+  "backup": "/data/ningh/nh/ldr-experiments/themes-5002-20261030"
+}

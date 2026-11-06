@@ -1,85 +1,69 @@
-# Docker 部署与迁移
+# 部署、构建与回退
 
-2026-10-28当前行为：默认来源为PubMed、SearXNG、Europe PMC；候选12/筛后6、常规来源池500。事实检查开关控制最终writer后的证据核对和有限修订；`LDR_VERIFY_ENABLE_CITATION_QC=false`关闭的是另行保存前逐引用审计，二者不同。旧四项附表和强制发布门槛不走主报告路径。PubMed自动全文默认关，按需fetch保留；模型与端点由私有环境配置，表单允许按次选择。完整行为及限制见[累计变化](5002-vs-main-20261028.md)；下面带2026-10-16日期的实现描述属于历史阶段。
+更新：2026-11-05。先区分本机既有5000/5002与首次部署；[旧说明原文](deployment-history-20261104.md)保留历史，不作为当前实例命令来源。[当前状态](current-status.md) · [5002说明](test-instance-5002.md)。
 
+## 本机既有部署
 
-根目录的 `compose.yaml` 使用独立项目名 `astro-dra`，包含应用和 SearXNG。SearXNG 默认配置启用 HTML/JSON 搜索结果，只通过 Compose 内部网络提供服务；应用连接 `http://searxng:8080`，不依赖原机器的 8888 端口或代理。应用继承基础镜像的入口与健康检查，并在入口完成卷权限设置后切换到普通用户。
+| 项目 | 5000主实例 | 5002开发实例 |
+| --- | --- | --- |
+| 代码工作区 | `/data/ningh/nh/astro-dra` | `/data/ningh/nh/astro-dra-ui-5002` |
+| Compose项目 | `local_deep_research` | `astro-dra-test-5002` |
+| 配置 | 主工作区`local_deep_research/docker-compose.yml`及`compose.production.local.yml` | 主工作区根`compose.yaml`，环境文件`.env.test-5002` |
+| 应用容器 | `local_deep_research-local-deep-research-1` | `astro-dra-test-5002-local-deep-research-1` |
+| 镜像基线 | `astro-dra:main-20261028` | `astro-dra:subtask-scope-v3-5002-20261105` |
+| 数据/配置 | 5000原数据、脚本、日志及配置挂载 | 独立`astro-dra-test-5002_ldr_data`和`astro-dra-test-5002_ldr_config` |
 
-## 配置
+5002的Compose文件放在main目录，并不表示使用5000的容器或数据。代码随构建进入镜像，应用不是宿主源码热挂载。开发构建须使用UI工作区；部署沿用现有5002项目、env和卷，不能无参数启动另一项目。
 
-复制根目录 `.env.example` 为 `.env`。填写 `LDR_LLM_OPENAI_ENDPOINT_URL`、`LDR_LLM_MODEL` 和模型凭据，生成随机 `SEARXNG_SECRET`。示例端点和模型名仅为占位，不能直接发起研究。根目录 `.env` 与旧部署目录内的 `.env` 分别管理，旧凭据不会自动迁入。
+## 5002开发与更新步骤
 
-| 变量 | 默认行为 |
-| --- | --- |
-| `LDR_PORT` / `LDR_BIND_ADDRESS` | 宿主机 `127.0.0.1:5000` |
-| `ASTRO_DRA_IMAGE` | 输出镜像 `astro-dra:local`；发布时用独立版本标签 |
-| `LDR_BASE_IMAGE` | 已捕获的上游镜像 digest；更新时需审核补丁兼容性 |
-| `LDR_LLM_LLAMACPP_URL` / `LDR_LLM_LLAMACPP_API_KEY` | 可选第二模型服务，独立于默认OpenAI endpoint；默认localhost:8080/v1，密钥可空 |
-| `LDR_APP_ALLOW_REGISTRATIONS` | 初次启动允许创建账号，之后可关闭 |
-| `LDR_VERIFY_ENABLE_VERIFY` | 独立核验模块总开关；不是报告准入门槛，关闭不代表核验通过 |
-| `LDR_GENERAL_ENABLE_FACT_CHECKING` | 默认true；最终成文后核对引用与研究属性，可有限补证、确认和修订 |
-| `LDR_VERIFY_ENABLE_CITATION_QC` | 默认false；单独的保存前逐引用语义审计 |
-| `LDR_RESEARCH_TRACE_ENABLED` | 通用部署默认false；5002私有测试环境开启，过程存`/data/research_traces` |
-| `LDR_SEARCH_SNIPPETS_ONLY` | 新部署默认false，允许获取摘要/内容；true时搜索片段不能证明论文原文支持 |
-| `LDR_HTTP_PROXY` / `LDR_HTTPS_PROXY` | 默认http://host.docker.internal:9876，大小写变量保持一致 |
-| `LDR_NO_PROXY` | 包含 Compose 服务和宿主别名，私有模型端点需另行加入 |
-| `LDR_VERIFY_CROSSREF_MAILTO` | 建议替换为维护者联系邮箱 |
-
-其他核验开关在 `VerifyConfig` 中定义，可通过本地 Compose 覆盖文件的 `environment` 添加。Compose 的 `.env` 用于变量插值，并非自动传入所有环境变量。额外搜索引擎密钥也需显式添加环境映射。
-
-5002新增Qwen Flash时，将`LDR_LLM_LLAMACPP_URL`设为`http://27.30.76.162:6183/ai/v1`，并把该IP加入`LDR_NO_PROXY`。研究表单高级选项选择`llama.cpp`，刷新模型列表后选择包含`Qwen3.8-Flash-Next`的模型；必须保留服务返回的完整模型ID。模型/提供方允许按次选择，部署环境指定的默认值不被写回修改；重新加载页面恢复默认DeepSeek。模型地址与凭据仍由部署配置管理。此选择用于普通/详细研究，聊天模式沿用原有默认模型逻辑。
-
-前端部署补丁为`local_deep_research/overlay/research.js`和`settings_sync.js`，取自当前固定基础镜像，通过manifest安装；旁置上游目录中的同名文件不参与部署。修改前端后执行`node --check`与`node scripts/check_model_selection.cjs`，构建新镜像。真实接口烟测可在应用容器内执行`scripts/check_qwen_flash.py`，覆盖模型发现、LDR客户端、中文回复、流式和工具往返，不等同于完整生物医学研究质量验收。
-
-项目代理统一使用9876：应用通过大小写HTTP_PROXY/HTTPS_PROXY变量配置，SearXNG在deployment/searxng/settings.yml的outgoing.proxies中配置，两者均指向http://host.docker.internal:9876。SearXNG和应用均配置host-gateway解析。私有模型端点、localhost和searxng保留在NO_PROXY，避免模型或内部服务绕行代理。
-
-若宿主机代理仅监听127.0.0.1:9876，在私有.env文件中加入COMPOSE_PROFILES=loopback-proxy；root Compose的proxy-relay服务以host网络运行，仅绑定Docker网关地址9876，转发到宿主127.0.0.1:9876。脚本deployment/proxy_relay.py只做TCP转发，不记录请求正文或凭据。同一宿主机只需启用一份转发服务，其他实例可复用该网关端口，不应重复绑定。宿主代理已监听Docker可访问地址时，无需启用此profile。
-
-## 验证与远程访问
+1. 在UI工作区修改实际部署补丁，查看现有未提交变化，完成对应离线/隔离验证。
+2. 从该工作区用完整Dockerfile构建独立标签。下例标签需替换为本次版本，不在文档整理时执行：
 
 ```bash
-docker compose config --quiet
-docker compose build
-docker compose up -d
-docker compose ps
-docker compose logs --tail=100 local-deep-research searxng
-docker compose exec local-deep-research /install/.venv/bin/python -c 'import research_verify; print(research_verify.__version__)'
+cd /data/ningh/nh/astro-dra-ui-5002
+docker build -f deployment/Dockerfile -t astro-dra:dev-YYYYMMDD-purpose .
 ```
 
-检查容器健康状态后，用真实模型配置完成一个短研究，核实检索、报告、引用、保存和导出。模块导入和健康检查不能证明模型或所有搜索引擎可用。
+3. 核对候选的安装文件、角色/界面及相应流程，检查没有活跃研究；记录原镜像、容器、配置和卷，按改动完成备份。
+4. 在主工作区私有`.env.test-5002`中持久更新`ASTRO_DRA_IMAGE`为已验证标签；修改应保留原模型、密钥、端口、项目和卷。
+5. 使用既有配置仅替换5002应用，明确禁止此步隐式从main目录构建：
 
-远程主机可通过 SSH 转发访问：`ssh -L 5000:127.0.0.1:5000 user@server`。需要直接公开服务时，明确配置监听地址，并由部署环境提供 HTTPS、反向代理与访问控制。
-
-## 已有部署迁移与回滚
-
-旧部署的 `local_deep_research/docker-compose.yml`、本地生产覆盖文件及数据保持原状。新入口不会自动复用它们的数据卷。若宿主机 5000 已被占用，先设置根目录 `.env` 中 `LDR_PORT=5001`，使用独立数据验收。
-
-迁移前记录旧镜像 ID、实际 Compose 文件、卷名、配置和数据库备份。在没有活跃研究任务时进行最终备份与切换。只有确认数据兼容后，才通过本地覆盖文件将新服务的卷映射到实际旧卷；不同版本不要同时写同一数据库。
-
-示例覆盖文件 `compose.migration.local.yml`（将卷名替换为实测名称）：
-
-```yaml
-volumes:
-  ldr_data:
-    external: true
-    name: actual_old_data_volume
-  ldr_config:
-    external: true
-    name: actual_old_config_volume
+```bash
+docker compose --env-file /data/ningh/nh/astro-dra/.env.test-5002 \
+  -p astro-dra-test-5002 -f /data/ningh/nh/astro-dra/compose.yaml \
+  up -d --no-build --no-deps local-deep-research
 ```
 
-部署时显式指定 `docker compose -f compose.yaml -f compose.migration.local.yml up -d`。所有后续管理命令应使用同一组 Compose 文件。
+6. 核对实际镜像/安装文件、登录、权限及改动相关链路，确认原卷保留，并记录5000和其他依赖未被重建。
 
-发布前给已验证镜像设置独立标签，并记录镜像 ID。回滚时将 `ASTRO_DRA_IMAGE` 指回保留的旧版本，执行 `docker compose up -d --no-build`。数据库迁移兼容性需单独验证，恢复数据必须使用相应备份；不要用代码回滚代替数据库恢复。
+UI-only或accounts分层构建必须明确基础镜像；不能沿用旧默认标签导致遗漏最近已部署的功能。修改Compose/deployment文件也需区分开发版本与主目录实际运行版本，合并Git不会自动同步已运行容器。
 
-`docker compose stop` 保留容器与数据。`docker compose down` 移除容器和项目网络，但保留命名卷；`down -v` 会删除项目数据卷，不应用于普通停止或回滚。
+## 合入main和更新5000
 
-应用通用日志位于 `/data/logs/`，补丁另将用户名、任务 ID 和提问保存为 `user_questions.log`。这份明文日志由补丁独立写入，与通用文件日志开关分离；管理员需要按业务要求管理其访问和保留周期。
+5002验证完成后整理并提交功能、申请/完成合并；这一步不自动更新5000服务。合并后从main构建独立已验证版本标签，更新5000原私有`compose.production.local.yml`的镜像。沿用原项目和两份配置，仅替换应用：
 
-## 报告保存与辅助引用核查（2026-10-16最新方向）
+```bash
+cd /data/ningh/nh/astro-dra/local_deep_research
+docker compose -p local_deep_research \
+  -f docker-compose.yml -f compose.production.local.yml \
+  up -d --no-build --no-deps local-deep-research
+```
 
-普通/详细/定时报告保留生成内容，`publish_report`只处理引用链接及独立辅助审计。新`claim_publication`为schema 2.0、status unverified，核查明细在metadata，不追加正文，不依据判定删改或阻断报告。数据库/文件允许不带核验记录的普通调用；携带发布metadata时只检查内容、来源映射和序列化一致性。历史schema 1.0只读兼容；过期审计不能在展示时替换实际正文。
+此前生产切换、原卷及备份依据见[5000部署记录](deploy-main-5000-20261028.md)。不能将5002账号/数据库复制覆盖5000；新角色功能到5000时应验证其原账号迁移和root初始化策略，5002的历史测试不自动覆盖5000数据场景。
 
-根Compose的自动与Agent来源仅保留PubMed、SearXNG，SearXNG仅Bing。私有账号快照仍由运行注册策略覆盖；用户动态Collection/Retriever及手动显式调用不在本次全局禁用范围。PubMed摘要/PMC正文获取与既有网页正文提取保留，不保证每篇全文可得。
+## 配置与网络
 
-代码需构建新镜像才生效；只改旁置上游源码不会部署。当前轮已构建astro-dra:advisory-20261016用于隔离验证，运行5002仍需核对实际镜像，不能根据工作区推断已部署。备份、模型/代理配置及旧实例数据隔离要求保持适用。完整流程见current-research-flow-20261016.md。
+实例有效配置以实际Compose和容器环境为准，不能把`.env`里任意变量都视作已传入容器。当前两实例默认模型为deepseek-v4-flash，事实检查开、保存前QC关、私有trace开；通用首次部署的trace默认值可能不同。
+
+应用代理通过大小写HTTP_PROXY/HTTPS_PROXY变量，SearXNG代理在自身settings.yml，两者不是同一项配置；内部服务和模型端点按实际NO_PROXY直连。宿主代理仅监听回环时，loopback-proxy profile可用relay转发；同一网关端口不能重复绑定。5002 relay UID/GID已按宿主允许身份配置并独立固定镜像，见[连通性修复](search-connectivity-20261028.md)。
+
+当前5002的SearXNG settings和relay脚本仍从main目录只读挂载。更新这些共享运行文件前，应核对实际使用者；普通应用代码更新使用版本镜像，不修改它们。
+
+## 数据、回退和首次部署
+
+更新前按改动备份私有环境/覆盖配置及相关数据库/卷，数据库一致性备份需要合适的停写窗口。代码回退恢复原镜像标签并用相同Compose项目和卷重建应用；数据库恢复是另一操作，不能靠回退镜像还原数据。旧账号权限回退限制见[账号说明](account-roles-5002-20261102.md)。
+
+正常停止保留数据卷；不要以`down -v`作为更新或回退方式。私有trace、问题日志和实验资料不提交。当前备份目录位置见[整理核查](documentation-audit-20261104.md)，历史已删除的备份不视为可恢复。
+
+首次部署从根`.env.example`建立私有`.env`，配置实际模型、凭据、SearXNG密钥、网络、端口与项目名，再验证Compose和构建。5000/5002已占用，不在本机直接执行默认首次启动命令。[项目README](../README.md)提供通用使用说明；新角色部署的root初始化见[账号文档](account-roles-5002-20261102.md)。

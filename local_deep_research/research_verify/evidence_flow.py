@@ -623,11 +623,23 @@ def synthesize(handler, question, sources, draft, trace, nr_of_links=0):
         required = required_sources(working,sources)
         trace.record('evidence_plan',{'batch':number,'batches':len(batches),'required_ids':sorted(required),
             'unresolved_ids':sorted(required - {int(d.metadata['index']) for d in documents})})
-        from .generation import format_source_documents
+        from .generation import format_source_documents, format_reading_scope, prepare_draft_for_writing
+        writing_draft, interpretation_notes = prepare_draft_for_writing(working)
+        trace.record('writer_interpretation_notes',{'notes':interpretation_notes,'batch':number,
+                     'draft_sha256':text_digest(working),'purpose':'planning_questions_not_study_findings'})
+        reading_scope = []
         material = format_source_documents(documents,question,
             selector=lambda p:handler._invoke_text(p,trace=trace,stage='source_selection'),
-            max_chars=budget,trace=trace,required_ids=required)
+            max_chars=budget,trace=trace,required_ids=required,reading_scope=reading_scope)
         trace.record('writer_sources',{'text':material,'source_ids':source_ids(material),'batch':number})
+        trace.record('writer_reading_scope',{'sources':reading_scope,'batch':number,
+                                          'purpose':'reading_limits_not_study_findings'})
+        reading_notes = ''
+        if handler.get_setting('citation.enable_source_reading',True):
+            from .source_reading import read_source_notes, render_reading_notes
+            notes = read_source_notes(question,material,visible_texts(material),
+                lambda p:handler._invoke_text(p,trace=trace,stage='source_reading'),trace,batch=number)
+            reading_notes = render_reading_notes(notes)
         instruction = '' if len(batches)==1 else f'This is report part {number}/{len(batches)}. Write only this draft section; retain its headings, and omit a global introduction, conclusion or bibliography. Parts will be joined without rewriting facts.\n'
         prompt = f"""{handler._get_output_instruction_prefix()}{GROUNDING_INSTRUCTIONS}
 Using the supplied source text, answer the question. Use Previous Knowledge only
@@ -637,12 +649,16 @@ for missing source text. Prefer a linked published version only after comparing
 the actual text; versions are separate sources, not interchangeable evidence.
 {instruction}
 Previous Knowledge:
-{working}
+{writing_draft}
 
 Question: {question}
 
 New Sources:
 {material}
+
+{reading_notes}
+
+{format_reading_scope(reading_scope)}
 
 Current time is {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')} UTC.
 

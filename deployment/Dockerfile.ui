@@ -1,0 +1,11 @@
+# Apply the UI to an existing Astro DRA runtime without reinstalling backend overlays.
+ARG LDR_UI_BASE_IMAGE=astro-dra:review-repairs-20261027
+FROM ${LDR_UI_BASE_IMAGE}
+USER root
+COPY local_deep_research/overlay/ui/ /tmp/astro-ui/overlays/overlay/ui/
+COPY deployment/install_overlays.py deployment/ui-overlay-manifest.json /tmp/astro-ui/
+RUN /install/.venv/bin/python /tmp/astro-ui/install_overlays.py \
+      --source /tmp/astro-ui/overlays \
+      --manifest /tmp/astro-ui/ui-overlay-manifest.json --ui-only \
+    && rm -rf /tmp/astro-ui
+# The base entrypoint still switches to the application user.

@@ -1,0 +1,49 @@
+{
+  "container_id": "d90d7018a447801d35d4b53ac16378424ea8d819030fd94a2bdb48daa0f5d293",
+  "image": "astro-dra:ui-5002-20261028",
+  "image_id": "sha256:8d2548309befda0d80a283cbcd7962d9f1f2bda962952c8e6aaea44aeda3ac88",
+  "health": "healthy",
+  "login_http": 200,
+  "static_hashes_match": true,
+  "env_unchanged": true,
+  "volumes_unchanged": true,
+  "backend_unchanged": true,
+  "protected_containers_unchanged": true,
+  "backup": "/data/ningh/nh/ldr-test-5002-backups/ui-20261028-135302",
+  "branch": "work/ui-5002-20261028",
+  "base_commit": "e9be10309214dcad54e036663c04534cf52c9337",
+  "unit_tests": {
+    "passed": 394
+  },
+  "browser_checks": {
+    "home": true,
+    "submit_intercepted": true,
+    "model_provider_unchanged": true,
+    "report_fixture": true,
+    "toc": true,
+    "focus_mode": true,
+    "export_menu": true,
+    "mobile_nav": true,
+    "mobile_overflow": false,
+    "auth_forms": true,
+    "page_errors": []
+  },
+  "compared_package_files": 927,
+  "changed_runtime_files": [
+    "ldr/web/static/css/astro-workspace.css",
+    "ldr/web/static/js/astro-workspace.js",
+    "ldr/web/templates/auth/login.html",
+    "ldr/web/templates/auth/register.html",
+    "ldr/web/templates/base.html",
+    "ldr/web/templates/components/sidebar.html",
+    "ldr/web/templates/pages/history.html",
+    "ldr/web/templates/pages/progress.html",
+    "ldr/web/templates/pages/research.html",
+    "ldr/web/templates/pages/results.html"
+  ],
+  "limitations": [
+    "Report screenshots use an intercepted synthetic fixture, not a new research run.",
+    "Authenticated browser testing uses only the isolated preview account; no production account was created.",
+    "The complete image build uses the existing backend image plus the UI-only Dockerfile; the general full overlay build was not rerun."
+  ]
+}

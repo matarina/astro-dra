@@ -136,11 +136,12 @@ services:
   # Enable COMPOSE_PROFILES=loopback-proxy when the host proxy listens only on 127.0.0.1.
   proxy-relay:
     profiles: ["loopback-proxy"]
-    image: ${ASTRO_DRA_IMAGE:-astro-dra:local}
+    image: ${PROXY_RELAY_IMAGE:-${ASTRO_DRA_IMAGE:-astro-dra:local}}
     network_mode: host
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    user: "1000:1000"
+    # Match the host account permitted to use the loopback proxy.
+    user: "${PROXY_RELAY_UID:-1000}:${PROXY_RELAY_GID:-1000}"
     entrypoint: ["/install/.venv/bin/python"]
     command: ["-u", "/relay/proxy_relay.py", "--port", "9876"]
     environment:

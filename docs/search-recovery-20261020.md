@@ -1,5 +1,7 @@
 # 检索阶段恢复与改进（2026-10-20）
 
+> 文档定位：演进记录；后续进入main/5000。本页记录当时过程；当前状态见[状态总览](current-status.md)，有效后续见[待办](roadmap.md)。
+
 本轮按用户要求先比较原始 LDR、5000 和 5002，恢复可复现的检索参数基线，再只修改检索模块。自动/Agent 文献发现来源明确为 **PubMed、SearXNG、Europe PMC**；默认主引擎保留 SearXNG，策略仍为 langgraph-agent，实测模型仍为 deepseek-v4-flash。
 
 代码已在工作区完成，并安装到与当前5002镜像/网络相同的一次性容器中验证。**没有部署到运行中的5000或5002**，没有重启服务、修改代理或SearXNG后端配置。两服务镜像、启动时间保持不变，均healthy。机器检查见[search-recovery-20261020.json](search-recovery-20261020.json)。

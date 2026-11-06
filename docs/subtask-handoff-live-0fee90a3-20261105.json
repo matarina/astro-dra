@@ -1,0 +1,261 @@
+{
+  "date": "2026-11-05",
+  "research_id": "0fee90a3-71fc-4f75-8998-8d4ba64d96b5",
+  "query": "POI疾病中的线粒体代谢研究",
+  "status": "completed",
+  "started_beijing": "2026-11-05 08:50:57.419",
+  "finished_beijing": "2026-11-05 08:56:16.440",
+  "elapsed_s": 319.021,
+  "runtime_image": "sha256:90cc95ab9a4354786514766d6a44d4d2768f44ec1567d60b77075f2c2b654bef",
+  "version": "subtask_v2",
+  "trace": {
+    "units": 16,
+    "events": 179,
+    "verified_artifacts": 179,
+    "status_counts": {
+      "recorded": 179
+    },
+    "stages": {
+      "start": 16,
+      "tool_messages": 10,
+      "finish": 16,
+      "subtask_request": 3,
+      "subtask_budget": 3,
+      "subtask_messages_step": 41,
+      "subtask_source": 45,
+      "subtask_messages": 3,
+      "subtask_sources": 3,
+      "subtask_search_end": 3,
+      "subtask_handoff": 3,
+      "subtask_delivery_request": 1,
+      "subtask_delivery_response": 1,
+      "agent_draft": 2,
+      "agent_messages": 1,
+      "collector_sources": 1,
+      "input_sources": 1,
+      "evidence_plan": 1,
+      "source_material_views": 1,
+      "writer_sources": 1,
+      "writer_request": 1,
+      "writer_response": 1,
+      "review_snapshot": 1,
+      "review_target_plan": 1,
+      "native_check_request": 5,
+      "native_check_response": 5,
+      "review_issue_state": 5,
+      "grounded_repairs": 1,
+      "final_response": 1,
+      "publication_input": 1,
+      "publication_output": 1
+    }
+  },
+  "subtasks": [
+    {
+      "trace": "subtask-496634e2007c4afcb14aa417e79f55f3",
+      "topic": "What therapeutic strategies targeting mitochondrial metabolism have been tested in POI models (antioxidants, mitochondrial transfer, CoQ10, etc.)?",
+      "execution": {
+        "search_end": "completed",
+        "delivery_status": "natural",
+        "model_rounds": 7,
+        "search_round_budget": 7,
+        "available_source_ids": [
+          13,
+          23,
+          10,
+          24,
+          25,
+          26,
+          27,
+          32,
+          33,
+          36,
+          37,
+          11,
+          38
+        ]
+      },
+      "elapsed_s": 57.715,
+      "material_cards": 10,
+      "original_material_chars": 21612,
+      "material_status_counts": {
+        "complete_abstract": 9,
+        "complete_acquired_text": 1
+      },
+      "quote_status_counts": {
+        "located": 10
+      },
+      "source12_selected": false
+    },
+    {
+      "trace": "subtask-3065f3cdc92942e7a869f7a2162acf4f",
+      "topic": "What mitochondrial-related genes and mutations are associated with premature ovarian insufficiency (POI) pathogenesis?",
+      "execution": {
+        "search_end": "completed",
+        "delivery_status": "natural",
+        "model_rounds": 6,
+        "search_round_budget": 7,
+        "available_source_ids": [
+          14,
+          15,
+          11,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          28,
+          29,
+          30,
+          31
+        ]
+      },
+      "elapsed_s": 70.804,
+      "material_cards": 12,
+      "original_material_chars": 19858,
+      "material_status_counts": {
+        "complete_abstract": 12
+      },
+      "quote_status_counts": {
+        "located": 3,
+        "not_located": 9
+      },
+      "source12_selected": false
+    },
+    {
+      "trace": "subtask-beb60941b21c4e64b8ec764282d28c83",
+      "topic": "What are the specific mitochondrial dysfunction mechanisms (oxidative stress, mtDNA, mitochondrial dynamics, mitophagy) in premature ovarian insufficiency (POI) granulosa cells and oocytes?",
+      "execution": {
+        "search_end": "search_budget",
+        "delivery_status": "finalized",
+        "model_rounds": 7,
+        "search_round_budget": 7,
+        "available_source_ids": [
+          11,
+          12,
+          3,
+          6,
+          7,
+          8,
+          9,
+          10,
+          34,
+          27,
+          35,
+          14,
+          17
+        ]
+      },
+      "elapsed_s": 75.428,
+      "material_cards": 12,
+      "original_material_chars": 23086,
+      "material_status_counts": {
+        "complete_abstract": 12
+      },
+      "quote_status_counts": {
+        "located": 10,
+        "not_located": 2
+      },
+      "source12_selected": false
+    }
+  ],
+  "handoff_cards": 34,
+  "all_cards_match_own_subtask_acquired_sources": true,
+  "quote_status_counts": {
+    "located": 23,
+    "not_located": 11
+  },
+  "source_counts": {
+    "collector": 42,
+    "writer": 42,
+    "displayed": 39
+  },
+  "writer_material_chars": 101670,
+  "lrrc4": {
+    "pmid": "40317712",
+    "source_id": "12",
+    "display_source_id": 6,
+    "abstract_in_writer_input": true,
+    "abstract_in_writer_prompt": true,
+    "agent_draft_mentions": 0,
+    "selected_in_subtask_cards": false,
+    "writer_and_final_direction": "correct_for_target_paragraph",
+    "interpretation": "Writer used the shared original source pool; this is not a demonstration that a child summary of this particular LRRC4 mechanism was corrected."
+  },
+  "native_review": {
+    "groups": 5,
+    "planned_units": 33,
+    "returned_records": 47,
+    "status_counts": {
+      "supported": 46,
+      "report_context": 1
+    },
+    "applied": 0,
+    "unresolved": 0,
+    "semantic_pass": false
+  },
+  "remaining_findings": [
+    {
+      "kind": "summary_overbroad_gap",
+      "stage": "mechanism_subtask_handoff",
+      "finding": "Map says no single-model interaction between mitochondrial dysfunction mechanisms; own sources7/8 explicitly describe mechanistic chains in the same experiments.",
+      "final_propagation": "That exact negative gap was not copied to final report."
+    },
+    {
+      "kind": "body_material_lost_on_quote_mismatch",
+      "source_id": 19,
+      "pmid": "39095891",
+      "finding": "Removing Table2/Fig3 parentheticals prevents exact match; falls back to abstract and drops selected body details. Body exists and budget suffices.",
+      "offline_data_only_replay": {
+        "reproduced_raw_quote_fallback": true,
+        "only_quote_changed_in_replay": true,
+        "summary_changed": false,
+        "body_was_acquired_chars": 118240,
+        "actual_handoff_source19": {
+          "field": "abstract",
+          "quote_status": "not_located",
+          "chars": 1552,
+          "contains_CLPB": false
+        },
+        "data_only_counterfactual": {
+          "field": "fetched_content",
+          "quote_status": "located",
+          "chars": 4908,
+          "contains_CLPB": true
+        },
+        "original_material_chars": 19858,
+        "replay_material_chars": 23214,
+        "budget": 24000,
+        "application_code_changed": false,
+        "live_service_changed": false,
+        "model_calls": 0
+      }
+    },
+    {
+      "kind": "abstract_scope_expanded_and_checker_missed",
+      "finding": "Therapy child says supplied abstracts do not report certain outcomes; main draft and final assert most studies did not report them. Supplied source quotation does not establish that population-level negative assertion.",
+      "claim_id": 31,
+      "source_id": 11,
+      "judge_status": "supported",
+      "evidence_used": "current therapies rarely restore lasting ovarian function",
+      "correction_status": "not_modified; review finding only"
+    }
+  ],
+  "publication": {
+    "audit_status": "disabled",
+    "warnings": [],
+    "writer_final_input_text_equal": true
+  },
+  "scope": {
+    "new_model_calls": 0,
+    "application_changed": false,
+    "production_config_changed": false,
+    "service_restarted": false,
+    "historical_report_changed": false,
+    "user_database_decrypted": false,
+    "offline_replay_only": true,
+    "whole_report_independently_fact_checked": false
+  },
+  "private_artifacts": "/data/ningh/nh/ldr-experiments/subtask-live-review-0fee90a3-20261105"
+}

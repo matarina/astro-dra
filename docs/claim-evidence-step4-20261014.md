@@ -1,5 +1,7 @@
 # M3-A 第4项：有界结论修订与复核
 
+> 文档定位：旧规则循环已撤回；区别于当前写后有限修订。本页记录当时过程；当前状态见[状态总览](current-status.md)，有效后续见[待办](roadmap.md)。
+
 日期：2026-10-14；分支：work/ldr-20261012；开发基线：dedbc0d。
 本项当前版实现、控制测试、有限真实模型试跑与隔离构建完成；完整 M3-A 尚未完成。
 提交标题：Add bounded claim revision and reverify report facts；提交 ID 用 git log 查阅。

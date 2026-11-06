@@ -55,7 +55,13 @@ def handler(model):
           "get_llm_response_text": lambda response: response if isinstance(response, str) else response.content}
     definitions("overlay/base_citation_handler.py", {"BaseCitationHandler"}, ns)
     definitions("overlay/standard_citation_handler.py", {"StandardCitationHandler"}, ns)
-    return ns["StandardCitationHandler"](model)
+    instance = ns["StandardCitationHandler"](model)
+    # These legacy seams isolate writing/review behavior. The source-only
+    # reading stage has explicit enabled-flow and failure tests of its own.
+    get_setting = instance.get_setting
+    instance.get_setting = lambda key, default=None: get_setting(
+        key, False if key == "citation.enable_source_reading" else default)
+    return instance
 
 
 class Capture:

@@ -840,6 +840,8 @@ def _make_research_subtopic_tool(
         # lock-protected, so sharing the tool objects across pool workers
         # is safe. ``research_subtopic`` is itself excluded so subagents
         # cannot recurse.
+        from research_verify.subtask_research import SubtaskCollector, track_sources, run_subtask
+        sub_collector = SubtaskCollector(collector)
         sub_tools: list = []
         if search_enabled:
             sub_tools.append(
@@ -847,14 +849,14 @@ def _make_research_subtopic_tool(
                     search_engine_name,
                     model,
                     settings_snapshot,
-                    collector,
+                    sub_collector,
                     programmatic_mode=programmatic_mode,
                     description=web_search_description,
                 )
             )
         sub_fetch = build_fetch_tool(
             fetch_mode,
-            collector,
+            sub_collector,
             model=model,
             overall_query=overall_query,
             settings_snapshot=settings_snapshot,
@@ -876,7 +878,7 @@ def _make_research_subtopic_tool(
                 search_engine_name if search_enabled else None,
                 model,
                 settings_snapshot,
-                collector,
+                sub_collector,
                 programmatic_mode=programmatic_mode,
                 egress_context=egress_context,
             )
@@ -926,12 +928,15 @@ def _make_research_subtopic_tool(
 
         current_date = datetime.now(UTC).strftime("%Y-%m-%d")
         from research_verify.generation import GROUNDING_INSTRUCTIONS
+        from research_verify.subtask_handoff import SUBTASK_HANDOFF_INSTRUCTIONS
+        from research_verify.synthesis_trace import start_trace
         subagent_prompt = (
             f"You are a focused research assistant. Today's date: {current_date}. "
-            "Search thoroughly and return a concise factual summary. "
+            "Search thoroughly and deliver a research map with original source selections. "
             "Reference sources by their [N] index numbers. "
             "Do NOT ask clarifying questions — provide your findings directly."
             f"\n{GROUNDING_INSTRUCTIONS}"
+            f"\n{SUBTASK_HANDOFF_INSTRUCTIONS}"
         )
         specialized_names = [
             t.name
@@ -965,17 +970,10 @@ def _make_research_subtopic_tool(
                     tools=sub_tools,
                     system_prompt=subagent_prompt,
                 )
-                result = agent.invoke(
-                    {"messages": [{"role": "user", "content": topic}]},
-                    {"recursion_limit": max_sub_iterations * 2 + 1},
-                )
-                messages = result.get("messages", [])
-                if messages:
-                    last = messages[-1]
-                    content = getattr(last, "content", str(last))
-                    if content:
-                        return content
-                return f"No findings for: {topic}"
+                with start_trace("subtask") as trace:
+                    trace.record("subtask_request", {"topic": topic, "prompt": subagent_prompt})
+                    with track_sources(trace) as acquired:
+                        return run_subtask(agent, model, topic, max_sub_iterations, acquired, trace)
             except GraphRecursionError:
                 return f"Research on '{topic}' reached iteration limit. Partial findings above."
             except Exception as exc:
@@ -1963,6 +1961,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                 "agent will see the unmodified prompt"
             )
 
+        from research_verify.subtask_handoff import LEAD_HANDOFF_INSTRUCTIONS
         system_prompt = (
             f"You are a research assistant writing a research report. Today's date: {current_date}.\n"
             "This is NOT a chat conversation. Your only job is to research the "
@@ -1993,6 +1992,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             "for unrelated claims.\n"
             f"{policy_addendum}"
             f"\n{GROUNDING_INSTRUCTIONS}"
+            f"\n{LEAD_HANDOFF_INSTRUCTIONS}"
         )
 
         # Create agent — may fail if model doesn't support tool calling.

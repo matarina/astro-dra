@@ -1,5 +1,7 @@
 # LDR 搜索引擎全景与现状梳理
 
+> 历史说明：本页为2026年9月的模型/搜索基线，默认模型、来源、代理及操作路径不代表当前实例。最新见[当前状态](../docs/current-status.md)及[文档目录](../docs/document-catalog.md)。
+
 > 基于 2026-09-21 重建后容器内实测（SettingsManager snapshot → create_search_engine → run() 逐引擎验证）
 > 关键区分：**「搜索引擎」在 LDR 里是一个统称**，包含了学术库、医学库、通用网页搜索 API、自托管聚合器、书籍库、化学库等，本质都是"给 LLM 提供结果的检索源"。
 

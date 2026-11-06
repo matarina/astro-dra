@@ -1,0 +1,35 @@
+{
+  "image": "astro-dra:sidebar-5002-20261030",
+  "image_id": "sha256:4aea55c5abd348564573c4ef944a38681dae2e4be395247d683d733d2303a023",
+  "container_id": "2538fb35be5ba7624f4a1371a4387603eccacb71af57fa418d6af08e35fa8ba9",
+  "health": "healthy",
+  "login_http": 200,
+  "sidebar_assets_sha_match": true,
+  "env_unchanged": true,
+  "volumes_unchanged": true,
+  "protected_containers_unchanged": true,
+  "backend_unchanged": true,
+  "compared_files": 931,
+  "runtime_changes": [
+    "ldr/web/static/css/astro-workspace.css",
+    "ldr/web/static/js/astro-workspace.js",
+    "ldr/web/templates/base.html",
+    "ldr/web/templates/components/sidebar.html"
+  ],
+  "private_backup": "/data/ningh/nh/ldr-experiments/sidebar-5002-20261030",
+  "branch": "work/ui-5002-20261028",
+  "browser_checks": {
+    "desktop_toggle": true,
+    "user_scoped_persistence": true,
+    "reload_and_navigation": true,
+    "keyboard_focus": true,
+    "mobile_close_escape_scrim_and_links": true,
+    "viewport_390_768_1024_1440": true,
+    "reading_mode": true,
+    "report_content_unchanged": true,
+    "footer_links_and_version_removed": true,
+    "workspace_regression": true,
+    "page_errors": []
+  },
+  "full_research_rerun": false
+}

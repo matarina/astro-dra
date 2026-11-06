@@ -1,0 +1,465 @@
+{
+  "date": "2026-10-28",
+  "main_commit": "e9be10309214dcad54e036663c04534cf52c9337",
+  "main_tree": "592161dae89088a65dea80a5af319d85c5d5ab9d",
+  "branch": "main",
+  "before": [
+    {
+      "name": "/local_deep_research-local-deep-research-1",
+      "id": "3cd64119d61e68c91b31b0011eb43db47beda07ca23b6cf17188b92aa73945ab",
+      "image": "localdeepresearch/local-deep-research:astro-dra-d7d874b",
+      "image_id": "sha256:e94a4b527a6f61778da2aa7b2994722562fbfadac0dda9c6b499f64a16a5b1b2",
+      "started": "2026-10-15T08:59:54.908821447Z",
+      "health": "healthy",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "local_deep_research_ldr_data",
+          "destination": "/data"
+        },
+        {
+          "type": "volume",
+          "name": "local_deep_research_ldr_scripts",
+          "destination": "/scripts"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/var/ldr-userlog"
+        },
+        {
+          "type": "volume",
+          "name": "168b5447226d9598063bd5cbc837e908d45de059111b5714a2cb7a9880ff6f38",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ],
+      "settings": {
+        "LDR_LLM_MODEL": "deepseek-v4-flash",
+        "LDR_LLM_PROVIDER": "openai_endpoint",
+        "LDR_SEARCH_TOOL": "searxng",
+        "LDR_SEARCH_MAX_RESULTS": "12",
+        "LDR_SEARCH_MAX_FILTERED_RESULTS": "6",
+        "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": "80",
+        "LDR_GENERAL_ENABLE_FACT_CHECKING": "true",
+        "LDR_VERIFY_ENABLE_CITATION_QC": "true",
+        "LDR_RESEARCH_TRACE_ENABLED": null,
+        "LDR_RESEARCH_TRACE_DIR": null
+      }
+    },
+    {
+      "name": "/astro-dra-test-5002-local-deep-research-1",
+      "id": "ed27d095c54692a9f95c2f12acc87b5a47f2edf37d9a88bb26ae3cc88fbc9d79",
+      "image": "astro-dra:review-repairs-20261027",
+      "image_id": "sha256:10fdab3c8de8b663822261cb3ec61a58d00e4f80fbdc29c267659ff973ea747d",
+      "started": "2026-10-27T09:40:34.445087188Z",
+      "health": "healthy",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "astro-dra-test-5002_ldr_data",
+          "destination": "/data"
+        },
+        {
+          "type": "volume",
+          "name": "astro-dra-test-5002_ldr_config",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ],
+      "settings": {
+        "LDR_LLM_MODEL": "deepseek-v4-flash",
+        "LDR_LLM_PROVIDER": "openai_endpoint",
+        "LDR_SEARCH_TOOL": "searxng",
+        "LDR_SEARCH_MAX_RESULTS": "12",
+        "LDR_SEARCH_MAX_FILTERED_RESULTS": "6",
+        "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": "500",
+        "LDR_GENERAL_ENABLE_FACT_CHECKING": "true",
+        "LDR_VERIFY_ENABLE_CITATION_QC": "false",
+        "LDR_RESEARCH_TRACE_ENABLED": "true",
+        "LDR_RESEARCH_TRACE_DIR": "/data/research_traces"
+      }
+    },
+    {
+      "name": "/searxng-mine",
+      "id": "ba826d473432168a9446f8db325f330cf929881e4a47eb9429fca6e2da9796a1",
+      "image": "searxng/searxng:latest",
+      "image_id": "sha256:ba0a344c566ecc6e4429e81d02d93a01fa05c80e9fb6d08f0a1e57a729aa6d87",
+      "started": "2026-10-15T08:59:54.878412888Z",
+      "health": null,
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "e60b3287effa3f2fd268693bd1b1b68acc48f9580cf9e9dca2012cd150506a31",
+          "destination": "/etc/searxng"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/etc/searxng/settings.yml"
+        },
+        {
+          "type": "volume",
+          "name": "820c14b3fc368dee8e83d173afe48702d5d76f0d4b3119185ef1e3608d36c813",
+          "destination": "/var/cache/searxng"
+        }
+      ],
+      "settings": {
+        "LDR_LLM_MODEL": null,
+        "LDR_LLM_PROVIDER": null,
+        "LDR_SEARCH_TOOL": null,
+        "LDR_SEARCH_MAX_RESULTS": null,
+        "LDR_SEARCH_MAX_FILTERED_RESULTS": null,
+        "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": null,
+        "LDR_GENERAL_ENABLE_FACT_CHECKING": null,
+        "LDR_VERIFY_ENABLE_CITATION_QC": null,
+        "LDR_RESEARCH_TRACE_ENABLED": null,
+        "LDR_RESEARCH_TRACE_DIR": null
+      }
+    },
+    {
+      "name": "/astro-dra-test-5002-searxng-1",
+      "id": "9655738081a5fad292ecc54fa731aa706d9f53e14de1d61db61f36060efcd735",
+      "image": "searxng/searxng@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "image_id": "sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "started": "2026-10-16T07:57:47.700526115Z",
+      "health": "healthy",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "46cf2139f8f079045ed675f0d10c22f7ea384ffccd3ee7ab540f6c00d7d473e4",
+          "destination": "/etc/searxng"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/etc/searxng/settings.yml"
+        },
+        {
+          "type": "volume",
+          "name": "a834ad90ba84d39442a1e9482753ad1b7c37a2514bc2c23ecc2969e379786203",
+          "destination": "/var/cache/searxng"
+        }
+      ],
+      "settings": {
+        "LDR_LLM_MODEL": null,
+        "LDR_LLM_PROVIDER": null,
+        "LDR_SEARCH_TOOL": null,
+        "LDR_SEARCH_MAX_RESULTS": null,
+        "LDR_SEARCH_MAX_FILTERED_RESULTS": null,
+        "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": null,
+        "LDR_GENERAL_ENABLE_FACT_CHECKING": null,
+        "LDR_VERIFY_ENABLE_CITATION_QC": null,
+        "LDR_RESEARCH_TRACE_ENABLED": null,
+        "LDR_RESEARCH_TRACE_DIR": null
+      }
+    },
+    {
+      "name": "/astro-dra-test-5002-proxy-relay-1",
+      "id": "41ef5cc8f21f718d545f79b011c8f48c44e323aeb41c48c0ba08bf1b17ac904d",
+      "image": "astro-dra:search-stability-20261016-v2",
+      "image_id": "sha256:fc50ef18b85cc5943cf5965be121dd36d1fe01e3fb14403a73a0a29731220bad",
+      "started": "2026-10-16T07:26:42.115715988Z",
+      "health": "healthy",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "f6297686575020e6c8c31e3d64834d9358d768905dff7ff3a0c253d41df2e54e",
+          "destination": "/data"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/relay/proxy_relay.py"
+        },
+        {
+          "type": "volume",
+          "name": "fbaf6e4a59d09fff464cfa7078d0ae848427a134c2606784c7380d8abb41a1dc",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ],
+      "settings": {
+        "LDR_LLM_MODEL": null,
+        "LDR_LLM_PROVIDER": null,
+        "LDR_SEARCH_TOOL": null,
+        "LDR_SEARCH_MAX_RESULTS": null,
+        "LDR_SEARCH_MAX_FILTERED_RESULTS": null,
+        "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": null,
+        "LDR_GENERAL_ENABLE_FACT_CHECKING": null,
+        "LDR_VERIFY_ENABLE_CITATION_QC": null,
+        "LDR_RESEARCH_TRACE_ENABLED": null,
+        "LDR_RESEARCH_TRACE_DIR": null
+      }
+    }
+  ],
+  "after": [
+    {
+      "name": "/local_deep_research-local-deep-research-1",
+      "id": "3b1785827e9e848c75422527d0ab4e58146d3263c77b7ae82bd4fc035a7c1407",
+      "image": "astro-dra:main-20261028",
+      "image_id": "sha256:84ea05a427a6efde4522d2d6dbaddb776e5cb259d538ca93dd566aac0f17c2b2",
+      "started": "2026-10-28T02:32:52.53975715Z",
+      "health": "healthy",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "local_deep_research_ldr_data",
+          "destination": "/data"
+        },
+        {
+          "type": "volume",
+          "name": "local_deep_research_ldr_scripts",
+          "destination": "/scripts"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/var/ldr-userlog"
+        },
+        {
+          "type": "volume",
+          "name": "168b5447226d9598063bd5cbc837e908d45de059111b5714a2cb7a9880ff6f38",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ],
+      "settings": {
+        "LDR_LLM_MODEL": "deepseek-v4-flash",
+        "LDR_LLM_PROVIDER": "openai_endpoint",
+        "LDR_SEARCH_TOOL": "searxng",
+        "LDR_SEARCH_MAX_RESULTS": "12",
+        "LDR_SEARCH_MAX_FILTERED_RESULTS": "6",
+        "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": "500",
+        "LDR_GENERAL_ENABLE_FACT_CHECKING": "true",
+        "LDR_VERIFY_ENABLE_CITATION_QC": "false",
+        "LDR_RESEARCH_TRACE_ENABLED": "true",
+        "LDR_RESEARCH_TRACE_DIR": "/data/research_traces"
+      }
+    },
+    {
+      "name": "/astro-dra-test-5002-local-deep-research-1",
+      "id": "ed27d095c54692a9f95c2f12acc87b5a47f2edf37d9a88bb26ae3cc88fbc9d79",
+      "image": "astro-dra:review-repairs-20261027",
+      "image_id": "sha256:10fdab3c8de8b663822261cb3ec61a58d00e4f80fbdc29c267659ff973ea747d",
+      "started": "2026-10-27T09:40:34.445087188Z",
+      "health": "healthy",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "astro-dra-test-5002_ldr_data",
+          "destination": "/data"
+        },
+        {
+          "type": "volume",
+          "name": "astro-dra-test-5002_ldr_config",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ],
+      "settings": {
+        "LDR_LLM_MODEL": "deepseek-v4-flash",
+        "LDR_LLM_PROVIDER": "openai_endpoint",
+        "LDR_SEARCH_TOOL": "searxng",
+        "LDR_SEARCH_MAX_RESULTS": "12",
+        "LDR_SEARCH_MAX_FILTERED_RESULTS": "6",
+        "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": "500",
+        "LDR_GENERAL_ENABLE_FACT_CHECKING": "true",
+        "LDR_VERIFY_ENABLE_CITATION_QC": "false",
+        "LDR_RESEARCH_TRACE_ENABLED": "true",
+        "LDR_RESEARCH_TRACE_DIR": "/data/research_traces"
+      }
+    },
+    {
+      "name": "/searxng-mine",
+      "id": "ba826d473432168a9446f8db325f330cf929881e4a47eb9429fca6e2da9796a1",
+      "image": "searxng/searxng:latest",
+      "image_id": "sha256:ba0a344c566ecc6e4429e81d02d93a01fa05c80e9fb6d08f0a1e57a729aa6d87",
+      "started": "2026-10-15T08:59:54.878412888Z",
+      "health": null,
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "e60b3287effa3f2fd268693bd1b1b68acc48f9580cf9e9dca2012cd150506a31",
+          "destination": "/etc/searxng"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/etc/searxng/settings.yml"
+        },
+        {
+          "type": "volume",
+          "name": "820c14b3fc368dee8e83d173afe48702d5d76f0d4b3119185ef1e3608d36c813",
+          "destination": "/var/cache/searxng"
+        }
+      ],
+      "settings": {
+        "LDR_LLM_MODEL": null,
+        "LDR_LLM_PROVIDER": null,
+        "LDR_SEARCH_TOOL": null,
+        "LDR_SEARCH_MAX_RESULTS": null,
+        "LDR_SEARCH_MAX_FILTERED_RESULTS": null,
+        "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": null,
+        "LDR_GENERAL_ENABLE_FACT_CHECKING": null,
+        "LDR_VERIFY_ENABLE_CITATION_QC": null,
+        "LDR_RESEARCH_TRACE_ENABLED": null,
+        "LDR_RESEARCH_TRACE_DIR": null
+      }
+    },
+    {
+      "name": "/astro-dra-test-5002-searxng-1",
+      "id": "9655738081a5fad292ecc54fa731aa706d9f53e14de1d61db61f36060efcd735",
+      "image": "searxng/searxng@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "image_id": "sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "started": "2026-10-16T07:57:47.700526115Z",
+      "health": "healthy",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "46cf2139f8f079045ed675f0d10c22f7ea384ffccd3ee7ab540f6c00d7d473e4",
+          "destination": "/etc/searxng"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/etc/searxng/settings.yml"
+        },
+        {
+          "type": "volume",
+          "name": "a834ad90ba84d39442a1e9482753ad1b7c37a2514bc2c23ecc2969e379786203",
+          "destination": "/var/cache/searxng"
+        }
+      ],
+      "settings": {
+        "LDR_LLM_MODEL": null,
+        "LDR_LLM_PROVIDER": null,
+        "LDR_SEARCH_TOOL": null,
+        "LDR_SEARCH_MAX_RESULTS": null,
+        "LDR_SEARCH_MAX_FILTERED_RESULTS": null,
+        "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": null,
+        "LDR_GENERAL_ENABLE_FACT_CHECKING": null,
+        "LDR_VERIFY_ENABLE_CITATION_QC": null,
+        "LDR_RESEARCH_TRACE_ENABLED": null,
+        "LDR_RESEARCH_TRACE_DIR": null
+      }
+    },
+    {
+      "name": "/astro-dra-test-5002-proxy-relay-1",
+      "id": "41ef5cc8f21f718d545f79b011c8f48c44e323aeb41c48c0ba08bf1b17ac904d",
+      "image": "astro-dra:search-stability-20261016-v2",
+      "image_id": "sha256:fc50ef18b85cc5943cf5965be121dd36d1fe01e3fb14403a73a0a29731220bad",
+      "started": "2026-10-16T07:26:42.115715988Z",
+      "health": "healthy",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "f6297686575020e6c8c31e3d64834d9358d768905dff7ff3a0c253d41df2e54e",
+          "destination": "/data"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/relay/proxy_relay.py"
+        },
+        {
+          "type": "volume",
+          "name": "fbaf6e4a59d09fff464cfa7078d0ae848427a134c2606784c7380d8abb41a1dc",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ],
+      "settings": {
+        "LDR_LLM_MODEL": null,
+        "LDR_LLM_PROVIDER": null,
+        "LDR_SEARCH_TOOL": null,
+        "LDR_SEARCH_MAX_RESULTS": null,
+        "LDR_SEARCH_MAX_FILTERED_RESULTS": null,
+        "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": null,
+        "LDR_GENERAL_ENABLE_FACT_CHECKING": null,
+        "LDR_VERIFY_ENABLE_CITATION_QC": null,
+        "LDR_RESEARCH_TRACE_ENABLED": null,
+        "LDR_RESEARCH_TRACE_DIR": null
+      }
+    }
+  ],
+  "backup": {
+    "directory": "/data/ningh/nh/ldr-5000-backups/main-20261028-102820",
+    "archive": "data-and-config.tar",
+    "bytes": 8169164800,
+    "archive_members_verified": true,
+    "private_permissions": "directory 0700, files 0600"
+  },
+  "preservation": {
+    "auth_users_before": 27,
+    "auth_users_after": 27,
+    "encrypted_databases": 27,
+    "missing_core_files": 0,
+    "core_file_size_changes": 0,
+    "original_volumes_preserved": true,
+    "model_credentials_preserved": true,
+    "private_env_file_unchanged": true,
+    "other_service_ids_and_start_times_unchanged": true
+  },
+  "validation": {
+    "candidate_native_backend_checks": 7,
+    "candidate_backend_elapsed_s": 4.831,
+    "production_default_model_generation_passed": true,
+    "installed_pipeline_simulation_passed": true,
+    "application_overlay_modules_matching_5002": 24,
+    "verification_modules_matching_5002": 29,
+    "http_login": {
+      "5000": 200,
+      "5002": 200
+    },
+    "startup_error_lines": 0,
+    "full_new_research_run": false
+  },
+  "private_override": "local_deep_research/compose.production.local.yml",
+  "changed_environment_keys": [
+    "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES",
+    "LDR_RESEARCH_TRACE_DIR",
+    "LDR_RESEARCH_TRACE_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_ELASTICSEARCH_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_ELASTICSEARCH_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_EUROPEPMC_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_EUROPEPMC_DEFAULT_PARAMS_ENABLE_LLM_RELEVANCE_FILTER",
+    "LDR_SEARCH_ENGINE_WEB_EUROPEPMC_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_GOOGLE_PSE_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_GOOGLE_PSE_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_GUARDIAN_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_GUARDIAN_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_GUTENBERG_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_GUTENBERG_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_LIBRARY_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_LIBRARY_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_MOJEEK_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_MOJEEK_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_NASA_ADS_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_NASA_ADS_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_OPENALEX_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_OPENALEX_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_OPENLIBRARY_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_OPENLIBRARY_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_PAPERLESS_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_PAPERLESS_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_PUBCHEM_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_PUBCHEM_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_PUBMED_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_PUBMED_DEFAULT_PARAMS_ENABLE_LLM_RELEVANCE_FILTER",
+    "LDR_SEARCH_ENGINE_WEB_PUBMED_DEFAULT_PARAMS_OPTIMIZE_QUERIES",
+    "LDR_SEARCH_ENGINE_WEB_PUBMED_DESCRIPTION",
+    "LDR_SEARCH_ENGINE_WEB_PUBMED_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_SCALESERP_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_SCALESERP_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_SEARXNG_DEFAULT_PARAMS_ENABLE_LLM_RELEVANCE_FILTER",
+    "LDR_SEARCH_ENGINE_WEB_SERPER_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_SERPER_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_SOFYA_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_SOFYA_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_STACKEXCHANGE_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_STACKEXCHANGE_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_TINYFISH_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_TINYFISH_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_ENGINE_WEB_ZENODO_AGENT_ENABLED",
+    "LDR_SEARCH_ENGINE_WEB_ZENODO_USE_IN_AUTO_SEARCH",
+    "LDR_SEARCH_SNIPPETS_ONLY",
+    "LDR_VERIFY_ENABLE_CITATION_QC"
+  ],
+  "git_auth": "Git CLI HTTPS remains unavailable; main synced with authenticated GitHub connector and exact signed merge object",
+  "private_artifacts": "/data/ningh/nh/ldr-experiments/deploy-main-5000-20261028"
+}

@@ -37,15 +37,70 @@ GROUNDING_INSTRUCTIONS = """Evidence and citation instructions:
 - Distinguish reported findings from your interpretation or proposed research.
   Keep useful synthesis, but do not present an inference as a cited study result.
   If details are absent, explain the gap rather than inventing them.
-- Introduce a limitation or implication not stated by the authors explicitly as
-  your interpretation (for example, 'Interpretation:' or '解读：'), in a separate
-  sentence from the reported finding. Do not attach a study citation to imply
-  that the authors established your additional interpretation. With abstract-only
-  evidence, say 'the supplied abstract does not report X', not 'the study did not
-  measure X' or 'the full paper does not contain X'.
+- Interpretations may connect explicitly reported observations or propose
+  questions; they may not invent empirical findings or literature-wide gaps.
+  An 'Interpretation' or 'Limitations' heading never relaxes factual grounding.
+  Claims about how many studies measured/reported an endpoint are empirical
+  survey claims, not interpretations. Establish them from an explicit source
+  statement and defined study set; otherwise preserve the reading boundary:
+  'the supplied abstracts/excerpts do not provide X', or ask a follow-up question.
+  Keep a factor's own action separate from the effects of its loss/inhibition;
+  a paragraph that shifts subjects must not become a single causal chain.
 - Use the supplied [N] labels unchanged, including gaps; never assign new source
   numbers or invent bibliography entries. The application formats references.
 """
+
+READING_SCOPE_INSTRUCTIONS = """Preserve evidence-reading scope during synthesis:
+- Missing information is a limit of the supplied view, not a measured result.
+  Say 'the supplied abstract/excerpts do not provide X' when that is all that
+  was read. It does not establish what full studies did or did not report.
+- Do not turn optional follow-up questions or a previous draft's generic
+  limitations into claims that no/all/most studies measured or reported X.
+  Those frequency or absence claims need explicit source statements and a
+  defined study set, not a lack of detail in abstracts or excerpts.
+- Keep a treatment's effect distinct from whether an endpoint was reported:
+  'benefits were not sustained' does not establish 'durability was not measured'.
+  Authors may explicitly report an absence; preserve their actual scope and
+  cited wording when that statement is supplied.
+- Follow-up questions are proposals for further reading. Answer them from the
+  acquired sources when an explicit answer is available. For a draft's tagged
+  interpretation, keep unresolved implications as interrogative questions for
+  further reading in the report. Do not answer them by inventing an omission
+  in a study (for example, missing prospective validation in a supplied abstract
+  does not establish its absence from the study). Describe authors' explicit
+  limitations separately as supported facts. Empty question lists are valid.
+"""
+
+GROUNDING_INSTRUCTIONS += "\n" + READING_SCOPE_INSTRUCTIONS
+
+
+def prepare_draft_for_writing(draft):
+    """Separate explicitly tagged draft interpretations from empirical prose.
+
+    This prepares writing input, never edits a report. No scientific assertion
+    is classified by keywords: only the draft author's explicit Interpretation/
+    解读 annotation is used. Ordinary prose, tables, source reservations and the
+    original draft remain intact; the caller records these planning notes.
+    """
+    from .citation_display import cited_indices
+    marker = re.compile(r"^\s*(?:\*\*|__)?(?:Interpretation|解读)"
+                        r"(?:\s*[（(](?:Interpretation|解读)[）)])?"
+                        r"\s*(?:\*\*|__)?\s*[:：]", re.I)
+    parts = re.split(r"(\n[ \t]*\n)", draft)
+    notes = []
+    for i in range(0, len(parts), 2):
+        if not marker.match(parts[i]):
+            continue
+        ids = list(cited_indices(parts[i]))
+        notes.append({"original": parts[i], "source_ids": ids, "kind": "draft_interpretation"})
+        refs = ", ".join(f"[{index}]" for index in ids)
+        parts[i] = ("Draft interpretation follow-up questions (unverified): "
+                    "What do the supplied source texts explicitly establish about study settings, "
+                    "outcomes and limitations? Which implications remain questions at the available "
+                    "reading scope? Keep unresolved items as questions for further reading; "
+                    "do not replace them with assertions that the original studies omitted something."
+                    + (" Sources to consult: " + refs if refs else ""))
+    return "".join(parts), notes
 
 
 def source_material(source: dict) -> tuple[str, str]:
@@ -110,13 +165,17 @@ def _source_blocks(documents, query, views=None):
             if extra:
                 text += "\n\nADDITIONAL ACQUIRED TEXT (selected excerpts):\n" + page_excerpts(extra, query, 6000)
             scope = "; complete supplied abstract" + ("; additional excerpts" if extra else "")
+            view_kind = "abstract_with_excerpts" if extra else "abstract_only"
         elif str(meta.get("evidence_type", "")).startswith("abstract"):
             scope = "; complete supplied abstract"
+            view_kind = "abstract_only"
         elif len(text) > 6000:
             text = page_excerpts(text, query, 6000)
             scope = "; selected excerpts, other text not shown"
+            view_kind = "selected_excerpts"
         else:
             scope = ""
+            view_kind = "acquired_text"
         # Identity metadata is single-line so it cannot accidentally create a
         # second numbered source block. Source text is otherwise left untouched.
         title = " ".join(str(meta.get("title") or "").splitlines())
@@ -153,6 +212,7 @@ def _source_blocks(documents, query, views=None):
             from hashlib import sha256
             views.append({"index": meta["index"], "available_chars": len(doc.page_content or ""),
                           "model_view_chars": len(text), "scope": scope,
+                          "view_kind": view_kind, "exhaustive_assessment": False,
                           "available_sha256": sha256((doc.page_content or "").encode()).hexdigest(),
                           "model_view_sha256": sha256(text.encode()).hexdigest(),
                           "related_notice_indices": [n.get("source_index") for n in meta.get("related_notices") or []]})
@@ -184,16 +244,36 @@ def _selection_ids(reply, allowed):
     return out
 
 
+def format_reading_scope(views):
+    """Describe only supplied views, without inferring omissions in the papers."""
+    groups = {}
+    for view in views:
+        groups.setdefault(view["view_kind"], []).append(view["index"])
+    lines = ["EVIDENCE READING LIMITS (application metadata, not study findings):"]
+    for kind, indices in groups.items():
+        lines.append(kind + ": " + ", ".join(f"[{index}]" for index in indices))
+    if not groups:
+        lines.append("No original source views supplied; the draft alone does not establish facts.")
+    lines.append("These views do not establish what full studies did or did not report. "
+                 "They are not an exhaustive assessment of outcomes or a systematic study set. "
+                 "Resolve draft claims from the supplied text. If a detail remains unavailable, "
+                 "keep the statement about the supplied abstract/excerpts; do not generalize to most/no studies. "
+                 "Use an explicit author statement when describing an actual study omission. "
+                 "Keep unresolved draft-interpretation items interrogative in a further-reading section. "
+                 "Do not copy this inventory or internal labels into the report.")
+    return "\n".join(lines)
+
+
 def format_source_documents(documents, query: str = "", *, selector=None,
                             max_chars: int = SOURCE_CONTEXT_CHARS, trace=None,
-                            required_ids=()) -> str:
+                            required_ids=(), reading_scope=None) -> str:
     """Keep abstracts whole; select original source blocks only when necessary.
 
     A large research pool is considered in batches, without replacing source
     text by generated summaries. Selection never changes stored sources or IDs.
     The caller supplies the model callback; small inputs need no extra call.
     """
-    views = [] if trace else None
+    views = [] if trace or reading_scope is not None else None
     blocks = list(_source_blocks(documents, query, views))
     if trace:
         trace.record("source_material_views", {"sources": views})
@@ -204,6 +284,8 @@ def format_source_documents(documents, query: str = "", *, selector=None,
         raise EvidenceBudgetExceeded("Draft-cited source blocks require separate writing batches")
     total = sum(len(block) + 2 for _, block in blocks)
     if total <= max_chars or selector is None:
+        if reading_scope is not None:
+            reading_scope.extend(views)
         return "\n\n".join(block for _, block in blocks)
 
     blocks = [(i, b) for i, b in blocks if int(i) not in required_ids]
@@ -271,6 +353,9 @@ Sources:
     notice = (f"Writing sources: {len(selected)} selected from {len(blocks)} collected candidates. "
               "Only the source texts below are supplied as evidence in this request. "
               "Source IDs retain their original values; gaps are intentional.\n\n")
+    if reading_scope is not None:
+        selected_ids = {int(index) for index, _ in selected}
+        reading_scope.extend(v for v in views if int(v["index"]) in selected_ids)
     return notice + "\n\n".join(block for _, block in selected)
 
 

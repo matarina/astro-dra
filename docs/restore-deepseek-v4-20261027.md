@@ -1,5 +1,7 @@
 # 5002恢复原deepseek-v4-flash（2026-10-27）
 
+> 文档定位：恢复事件；当前模型以current-status为准。本页记录当时过程；当前状态见[状态总览](current-status.md)，有效后续见[待办](roadmap.md)。
+
 用户要求切回原模型，已将5002默认由原生deepseek/deepseek-flash恢复为openai_endpoint/deepseek-v4-flash，并恢复此前实际使用的OpenAI兼容地址和对应凭据。原配置从Azure切换前的私有备份`azure-gpt56-20261026-101806/.env.test-5002`取回；不是在官方DeepSeek接口上仅改模型名。
 
 私有env只改模型、提供方、OpenAI兼容地址与对应密钥四项；Compose校验确认其余配置相同，部署后全部配置环境与实际容器一致。当前Azure地址/凭据已随本轮变更前env备份，可恢复；官方DeepSeek配置仍保留。密钥不写文档或公开JSON。

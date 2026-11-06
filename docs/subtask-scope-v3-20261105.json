@@ -1,0 +1,263 @@
+{
+  "date": "2026-11-05",
+  "status": "implemented_tested_not_deployed",
+  "candidate_image": {
+    "tag": "astro-dra:subtask-subject-groups-v3-test-20261105",
+    "image_id": "sha256:9258c8da0f344856cad0fd4df7708c62fa8d7281921d1bc6caa33c1130b02b13",
+    "files": {
+      "subtask_handoff.py": "6f8ebac2e3a4c78e16c1f74ded2c8ee413b3e2ae96d8e8c174216b04c9bb7049",
+      "subtask_research.py": "78f787ce97cd34b73dbfb2763811a656ab7d67415cc2a712d16e2d2da1dcde45",
+      "generation.py": "6a55c3ccaf022b1b5e550d6870804ae119bcba13ff03763bf5d920900f8fee5a",
+      "evidence_flow.py": "430944fcacf26782daa463c28c2384bd9d36675522d96e28453350149169628c",
+      "source_reading.py": "127660e51867ee27895b0ad0a8516f09c503633d7646f313535ff64ff3be2b85",
+      "install.py": "3f0b9ca6a7d012bded830a453196f5c99984768c15bb264c966d47aeb14b5995"
+    }
+  },
+  "changed_code_files": {
+    "local_deep_research/research_verify/subtask_handoff.py": "6f8ebac2e3a4c78e16c1f74ded2c8ee413b3e2ae96d8e8c174216b04c9bb7049",
+    "local_deep_research/research_verify/subtask_research.py": "78f787ce97cd34b73dbfb2763811a656ab7d67415cc2a712d16e2d2da1dcde45",
+    "local_deep_research/research_verify/generation.py": "6a55c3ccaf022b1b5e550d6870804ae119bcba13ff03763bf5d920900f8fee5a",
+    "local_deep_research/research_verify/evidence_flow.py": "430944fcacf26782daa463c28c2384bd9d36675522d96e28453350149169628c",
+    "local_deep_research/research_verify/source_reading.py": "127660e51867ee27895b0ad0a8516f09c503633d7646f313535ff64ff3be2b85"
+  },
+  "validation": {
+    "regression_passed": 465,
+    "regression_elapsed_s": 2.94,
+    "new_test_cases": 23,
+    "frozen_handoff_replay": [
+      {
+        "topic": "What mitochondrial-related genes and mutations are associated with premature ovarian insufficiency (POI) pathogenesis?",
+        "old_cards": 12,
+        "new_cards": 12,
+        "old_material_chars": 19858,
+        "new_material_chars": 23214,
+        "budget": 24000,
+        "changes": [
+          {
+            "source_id": 18,
+            "old_field": "abstract",
+            "new_field": "abstract",
+            "new_quote_status": "not_located",
+            "selection_method": "verbatim_anchors"
+          },
+          {
+            "source_id": 16,
+            "old_field": "abstract",
+            "new_field": "abstract",
+            "new_quote_status": "not_located",
+            "selection_method": "verbatim_anchors"
+          },
+          {
+            "source_id": 31,
+            "old_field": "abstract",
+            "new_field": "abstract",
+            "new_quote_status": "not_located",
+            "selection_method": "verbatim_anchors"
+          },
+          {
+            "source_id": 22,
+            "old_field": "abstract",
+            "new_field": "abstract",
+            "new_quote_status": "not_located",
+            "selection_method": "verbatim_anchors"
+          },
+          {
+            "source_id": 19,
+            "old_field": "abstract",
+            "new_field": "fetched_content",
+            "new_quote_status": "not_located",
+            "selection_method": "verbatim_anchors"
+          },
+          {
+            "source_id": 14,
+            "old_field": "abstract",
+            "new_field": "abstract",
+            "new_quote_status": "not_located",
+            "selection_method": "verbatim_anchors"
+          },
+          {
+            "source_id": 15,
+            "old_field": "abstract",
+            "new_field": "abstract",
+            "new_quote_status": "not_located",
+            "selection_method": "verbatim_anchors"
+          }
+        ],
+        "all_originals_exact": true
+      },
+      {
+        "topic": "What therapeutic strategies targeting mitochondrial metabolism have been tested in POI models (antioxidants, mitochondrial transfer, CoQ10, etc.)?",
+        "old_cards": 10,
+        "new_cards": 10,
+        "old_material_chars": 21612,
+        "new_material_chars": 21612,
+        "budget": 24000,
+        "changes": [],
+        "all_originals_exact": true
+      },
+      {
+        "topic": "What are the specific mitochondrial dysfunction mechanisms (oxidative stress, mtDNA, mitochondrial dynamics, mitophagy) in premature ovarian insufficiency (POI) granulosa cells and oocytes?",
+        "old_cards": 12,
+        "new_cards": 12,
+        "old_material_chars": 23086,
+        "new_material_chars": 23086,
+        "budget": 24000,
+        "changes": [
+          {
+            "source_id": 6,
+            "old_field": "abstract",
+            "new_field": "abstract",
+            "new_quote_status": "not_located",
+            "selection_method": "verbatim_anchors"
+          },
+          {
+            "source_id": 14,
+            "old_field": "abstract",
+            "new_field": "abstract",
+            "new_quote_status": "not_located",
+            "selection_method": "verbatim_anchors"
+          }
+        ],
+        "all_originals_exact": true
+      }
+    ],
+    "installation": {
+      "baseline_files": 941,
+      "candidate_files": 942,
+      "changed_files": [
+        "research_verify/evidence_flow.py",
+        "research_verify/generation.py",
+        "research_verify/source_reading.py",
+        "research_verify/subtask_handoff.py",
+        "research_verify/subtask_research.py"
+      ],
+      "evidence_flow_changed_definitions": [
+        "synthesize"
+      ],
+      "native_review_functions_unchanged": true,
+      "uid1000_offline_graph_and_trace_permissions": "passed"
+    },
+    "final_real_model_runs": {
+      "completed": true,
+      "elapsed_s": 68.548,
+      "model": "deepseek-v4-flash",
+      "outcomes": {
+        "run-b": {
+          "completed": true,
+          "chars": 6218,
+          "source_documents": 42
+        },
+        "run-a": {
+          "completed": true,
+          "chars": 6336,
+          "source_documents": 42
+        }
+      },
+      "fixed_sources": 42,
+      "scope": "Two actual StandardCitationHandler runs with source-only reading then writing, frozen original 42 sources/draft. Native review disabled in this isolated process; production unchanged. No fresh search/user DB."
+    },
+    "final_artifact_checks": [
+      {
+        "research_id": "diagnostic-source-reading-v3-run-a",
+        "events": 16,
+        "all_snapshot_hashes_match": true,
+        "observations": 33,
+        "reported_author_statements": 12,
+        "notes_status": "partial",
+        "rejected_selections": 5,
+        "validated_original_notes": 45,
+        "writer_sources": 42,
+        "original_draft_retained_in_trace": true,
+        "native_review_calls": 0,
+        "reader_calls": 1,
+        "writer_calls": 1
+      },
+      {
+        "research_id": "diagnostic-source-reading-v3-run-b",
+        "events": 16,
+        "all_snapshot_hashes_match": true,
+        "observations": 26,
+        "reported_author_statements": 3,
+        "notes_status": "partial",
+        "rejected_selections": 7,
+        "validated_original_notes": 29,
+        "writer_sources": 42,
+        "original_draft_retained_in_trace": true,
+        "native_review_calls": 0,
+        "reader_calls": 1,
+        "writer_calls": 1
+      }
+    ],
+    "cached_subject_group_replay": {
+      "completed": true,
+      "elapsed_s": 39.91,
+      "scope": "Two writer repetitions; only cached original reading-note grouping/order changed; frozen source text, draft and notes themselves unchanged."
+    }
+  },
+  "manual_target_assessment": {
+    "final_actual_runs": 2,
+    "lrrc4_subject_state_direction": "correct_in_both_final_samples",
+    "original_unqualified_outcome_absence_claim": "not_reproduced_in_final_samples",
+    "whole_report_independently_audited": false,
+    "cross_topic_accuracy_measured": false
+  },
+  "accepted_changes": [
+    "Recover original context using sufficiently long unique exact anchors while keeping edited quotes not_located.",
+    "Replace generated gap assertions by task-scoped follow-up questions; retain legacy notes as unverified.",
+    "Provide actual selected source-view scope to writing; preserve tagged draft interpretations in trace and provide them as reading questions.",
+    "One source-only reading call per writing batch, original subject/state/quote validation, grouping distinct quoted subjects before writing, graceful fallback."
+  ],
+  "rejected_or_insufficient_trials": [
+    {
+      "name": "reading-scope prompt only",
+      "finding": "Original unqualified most-studies statement persisted."
+    },
+    {
+      "name": "headings-only draft",
+      "finding": "Scope statement improved but LRRC4 direction inverted; not adopted."
+    },
+    {
+      "name": "interpretation-boundary prompt only",
+      "finding": "Did not remove unqualified absence assertion; LRRC4 inversion occurred."
+    },
+    {
+      "name": "interpretation questions without original subject reading",
+      "finding": "Target absence assertion removed, but scope and LRRC4 failures recurred in some repetitions."
+    },
+    {
+      "name": "flat original reading notes",
+      "finding": "Notes themselves correctly separated LRRC4 states but writer still inverted one of two samples. Grouped-subject presentation followed."
+    }
+  ],
+  "review_boundary": {
+    "native_review_functions_changed": false,
+    "evidence_flow_changed_definitions": [
+      "synthesize"
+    ],
+    "native_checking_configuration_changed": false,
+    "extra_source_reading_is_semantic_verification": false
+  },
+  "source_reading_budget": {
+    "application_calls_per_writing_batch": 1,
+    "requested_max_sources": 24,
+    "quotation_chars": 24000,
+    "original_source_context_budget_unchanged": true,
+    "uses_existing_provider_timeouts_and_retries": true
+  },
+  "production_unchanged": true,
+  "production_image": "sha256:90cc95ab9a4354786514766d6a44d4d2768f44ec1567d60b77075f2c2b654bef",
+  "current_5002_version": "v2",
+  "user_db_decrypted": false,
+  "historical_reports_modified": false,
+  "fresh_research_tested": false,
+  "limitations": [
+    "Fixed 42-source replay and two final model samples are not a cross-topic factual accuracy benchmark.",
+    "Reading notes validate provenance and selected subject/state spans, not semantic truth; partial/rejected notes do not mean papers lack evidence.",
+    "Native semantic checking leaks remain unchanged; overall hallucination problem not declared solved.",
+    "Added one model reading call per writing batch; latency and cost require production observation.",
+    "Current native-review scope clarification requested from user; no dependent review changes made."
+  ],
+  "private_artifacts": "/data/ningh/nh/ldr-experiments/subtask-scope-v3-20261105",
+  "git_commit_push_merge": false,
+  "git_fetch": "HTTPS authentication failed"
+}

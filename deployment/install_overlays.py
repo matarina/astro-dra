@@ -9,6 +9,20 @@ import shutil
 import sysconfig
 
 NEW_MODULES = {"web_search_engines/engines/search_engine_europepmc.py"}
+UI_ASSETS = {"web/static/js/astro-subscription-simple.js", "web/static/js/astro-research-simple.js", "web/templates/auth/accounts.html", "web/templates/auth/forbidden.html", "web/static/js/astro-i18n.js", "web/static/js/astro-locale-zh.js", "web/static/css/astro-workspace.css", "web/static/js/astro-workspace.js"}
+UI_TARGETS = UI_ASSETS | {
+    "web/templates/pages/news-subscription-form.html", "web/templates/pages/news.html", "web/static/js/pages/news.js",
+    "web/static/js/mobile-navigation.js",
+    "web/templates/pages/chat.html",
+    "web/static/js/components/chat.js",
+    "web/templates/auth/change_password.html", "web/templates/settings_dashboard.html",
+    'web/static/js/components/logpanel.js', 'web/static/js/services/socket.js', 'web/static/js/components/progress.js', 'web/static/js/components/settings.js',
+    "web/static/js/services/theme.js",
+    "web/templates/base.html", "web/templates/components/sidebar.html",
+    "web/templates/pages/research.html", "web/templates/pages/progress.html",
+    "web/templates/pages/results.html", "web/templates/pages/history.html",
+    "web/templates/auth/login.html", "web/templates/auth/register.html",
+}
 SEARCH_MODULES = NEW_MODULES | {
     "web_search_engines/engines/search_engine_pubmed.py",
     "web_search_engines/search_engines_config.py",
@@ -39,6 +53,8 @@ def main():
                         help="Install only retrieval.py from research_verify")
     mode.add_argument("--collection-only", action="store_true",
                       help="Install search modules plus source collection corrections")
+    mode.add_argument("--ui-only", action="store_true",
+                      help="Install only templates and workspace assets; leave backend modules unchanged")
     args = parser.parse_args()
     spec = importlib.util.find_spec("local_deep_research")
     if spec is None or not spec.submodule_search_locations:
@@ -48,15 +64,25 @@ def main():
     restricted = args.search_only or args.collection_only
     if restricted and set(manifest.values()) - SEARCH_MODULES:
         parser.error("search-only manifest contains modules outside retrieval")
+    if args.ui_only and set(manifest.values()) - UI_TARGETS:
+        parser.error("ui-only manifest contains modules outside the workspace UI")
     # Validate every source and target before changing the installed package.
     for source, target in manifest.items():
         content = (args.source / source).read_text(encoding="utf-8")
         if Path(source).suffix == ".py":
             ast.parse(content, filename=source)
-        elif Path(source).suffix != ".js":
+        elif Path(source).suffix == ".html":
+            from jinja2 import Environment
+            Environment().parse(content)
+        elif Path(source).suffix not in {".js", ".css"}:
             parser.error(f"unsupported overlay type: {source}")
-        if not (package / target).is_file() and target not in NEW_MODULES:
+        if not (package / target).is_file() and target not in NEW_MODULES | UI_ASSETS:
             parser.error(f"incompatible base image: missing {target}")
+    if args.ui_only:
+        for source, target in manifest.items():
+            shutil.copy2(args.source / source, package / target)
+            print(f"ui overlay: {source} -> {target}")
+        return
     defaults_path = package / "defaults/default_settings.json"
     search_defaults = args.source / "search_defaults.json"
     defaults = None

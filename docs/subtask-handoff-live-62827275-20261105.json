@@ -1,0 +1,120 @@
+{
+  "date": "2026-11-05",
+  "research_id": "62827275-1633-4809-8f7c-000ede85e06a",
+  "query": "POI疾病中的线粒体代谢研究",
+  "status": "completed",
+  "started_beijing": "2026-11-05 08:24:23.609",
+  "completed_socket_beijing": "2026-11-05 08:30:38.026",
+  "elapsed_s": 374.417,
+  "runtime": {
+    "container_id": "c4783450008d4d34f32bb251260606536d9a0c984351ab31718c9953ec138da5",
+    "image_id": "sha256:84c1b5fd8d58693a9aef363e74a42284302dd477d018d232508a3a0d8eead671",
+    "started_at": "2026-11-04T06:59:45.338814844Z",
+    "subtask_version": "v1",
+    "v2_installed": false
+  },
+  "trace": {
+    "units": 19,
+    "events": 100,
+    "verified_artifacts": 100,
+    "statuses": {
+      "recorded": 100
+    },
+    "stages": {
+      "start": 19,
+      "tool_messages": 13,
+      "finish": 19,
+      "subtask_request": 3,
+      "agent_draft": 2,
+      "agent_messages": 1,
+      "collector_sources": 1,
+      "input_sources": 1,
+      "evidence_plan": 1,
+      "source_material_views": 1,
+      "source_selection_request": 5,
+      "source_selection_response": 5,
+      "source_selection_result": 5,
+      "writer_sources": 1,
+      "writer_request": 1,
+      "writer_response": 1,
+      "review_snapshot": 1,
+      "review_target_plan": 1,
+      "native_check_request": 5,
+      "native_check_response": 5,
+      "review_issue_state": 5,
+      "grounded_repairs": 1,
+      "final_response": 1,
+      "publication_input": 1,
+      "publication_output": 1
+    }
+  },
+  "subtasks": [
+    {
+      "topic": "What is the role of mitochondrial metabolism and bioenergetics in POI pathogenesis, including specific genes and pathways (e.g., mitochondrial DNA mutations, POLG, TFAM, sirtuins)?",
+      "elapsed_s": 96.995,
+      "status": "failed",
+      "error_type": "GraphRecursionError"
+    },
+    {
+      "topic": "What are the specific mitochondrial dysfunction mechanisms (oxidative stress, mtDNA, mitochondrial dynamics, mitophagy) in premature ovarian insufficiency (POI) granulosa cells and oocytes?",
+      "elapsed_s": 83.862,
+      "status": "failed",
+      "error_type": "GraphRecursionError"
+    },
+    {
+      "topic": "What therapeutic strategies targeting mitochondrial function have been studied in POI models (e.g., mitochondrial transfer, antioxidants, MitoQ, CoQ10, stem cell therapy)?",
+      "elapsed_s": 87.371,
+      "status": "failed",
+      "error_type": "GraphRecursionError"
+    }
+  ],
+  "handoffs": 0,
+  "sources": {
+    "collector": 105,
+    "writer": 76,
+    "writer_material_chars": 197718,
+    "publication": 51
+  },
+  "native_review": {
+    "groups": 5,
+    "planned_units": 33,
+    "returned_issue_status_counts": {
+      "supported": 54
+    },
+    "applied": 0,
+    "unresolved": 0,
+    "quality_validated": false
+  },
+  "lrrc4": {
+    "pmid": "40317712",
+    "doi": "10.1002/advs.202417717",
+    "original_source_id": "102",
+    "display_source_id": 8,
+    "abstract_sha256": "c298da34c5c44a669f861e007b0c0a116e6588e29480c338416174b15bafc9fe",
+    "complete_abstract_in_writer_input": true,
+    "complete_abstract_in_writer_request": true,
+    "agent_draft_direction": "correct_for_target_sentence",
+    "writer_direction": "correct_for_target_sentence",
+    "final_direction": "correct_for_target_sentence",
+    "review_statuses": [
+      {
+        "claim_id": 4,
+        "status": "supported"
+      }
+    ]
+  },
+  "writer_final_text_equal": true,
+  "publication": {
+    "warnings": [],
+    "audit_status": "disabled"
+  },
+  "limitations": [
+    "Production v1 run, not a v2 effectiveness test.",
+    "All three subtasks exhausted graph steps before messages/handoffs were recorded; exact per-subtask model rounds, sources and token lengths unavailable.",
+    "Target LRRC4 sentence read against original; rest of report not independently audited.",
+    "No decrypted user database readback; completion/save inferred from process logs and publication trace.",
+    "One Loguru non-reentrant handler error; task nevertheless completed.",
+    "No new model calls, rerun, deployment, application/config/report changes or service restart by monitor."
+  ],
+  "private_artifacts": "/data/ningh/nh/ldr-experiments/subtask-live-review-62827275-20261105"
+}

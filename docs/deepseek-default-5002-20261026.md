@@ -1,5 +1,7 @@
 # 5002 默认模型改为官方 DeepSeek Flash（2026-10-26）
 
+> 文档定位：已被10月27日恢复原V4替代。本页记录当时过程；当前状态见[状态总览](current-status.md)，有效后续见[待办](roadmap.md)。
+
 用户明确要求把 `gpt-5.6-sol` 换成 `deepseek-flash`。已设置私有 `.env.test-5002` 的 `LDR_LLM_PROVIDER=deepseek`、`LDR_LLM_MODEL=deepseek-flash`，沿用上一轮替换并验证的官方密钥。原生 DeepSeek 提供方使用 `https://api.deepseek.com/v1`。Azure 连接保留作为可选提供方配置，不再是全局默认。
 
 根 Compose 的提供方从固定 `openai_endpoint` 改为 `${LDR_LLM_PROVIDER:-openai_endpoint}`，示例环境新增原默认值，兼容原有部署。重建前比较实际与候选环境，差异只有模型和提供方；没有变动密钥、镜像、检索配置、来源容量和核查开关。

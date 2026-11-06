@@ -1,5 +1,7 @@
 # 5002 DeepSeek 密钥替换并加载（2026-10-26）
 
+> 文档定位：历史操作摘要；凭据不在文档集合。本页记录当时过程；当前状态见[状态总览](current-status.md)，有效后续见[待办](roadmap.md)。
+
 用户明确要求替换此前官方 DeepSeek 密钥，并在接入后重启。已替换 Git 忽略、0600 的 `.env.test-5002` 中 `LDR_LLM_DEEPSEEK_API_KEY`，没有把密钥写入源码或公开记录；此前新增的 Compose 原生 DeepSeek 环境映射本轮正式加载。
 
 新密钥 `/v1/models` 返回 HTTP200，包含 `deepseek-flash`、`deepseek-v4-pro`；指定 `deepseek-flash` 的最小生成 HTTP200。模型连接继续使用原生 DeepSeek 提供方和 `https://api.deepseek.com/v1`。

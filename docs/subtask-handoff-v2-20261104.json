@@ -1,0 +1,261 @@
+{
+  "date": "2026-11-04",
+  "status": "implemented_and_tested_not_deployed",
+  "worktree": "/data/ningh/nh/astro-dra-ui-5002",
+  "default_model": "openai_endpoint / deepseek-v4-flash",
+  "files_sha256": {
+    "local_deep_research/langgraph_agent_strategy.py": "54e5a36b3c919db6ceb90008e0d9376107f29445d114b0c2bbbe6ea3c51a32e5",
+    "local_deep_research/research_verify/subtask_handoff.py": "abeefb1548fc9f8dd7d49a4e69b19a910babd3201f9ec14397aec566d3c5a424",
+    "local_deep_research/research_verify/subtask_research.py": "38b88896c5734087a5820a0f06addee028baf5ccd4e6f71f9c8a9f9ea3a1f3c6",
+    "local_deep_research/tests/test_subtask_handoff.py": "6f473be1de7dcc33d56c9a3c07a97774810f81028f8c863395de04804330fb0b",
+    "local_deep_research/tests/test_subtask_research.py": "b5454082b18d52d93f29f60f82c72046181ff7dede338ba0ec0f5dbe53e40df8"
+  },
+  "final_tests": {
+    "passed": 442,
+    "elapsed_s": 2.64,
+    "subtask_tests": 39,
+    "real_langgraph_with_mock_model": {
+      "passed": true,
+      "parallel_tasks": 2,
+      "search_calls": 4,
+      "delivery_calls": 2,
+      "isolated_sources": true,
+      "network": "none",
+      "api_calls": 0
+    }
+  },
+  "image_inventory": {
+    "baseline_files": 940,
+    "candidate_files": 941,
+    "changed": [
+      "local_deep_research/advanced_search_system/strategies/langgraph_agent_strategy.py",
+      "research_verify/subtask_handoff.py",
+      "research_verify/subtask_research.py"
+    ],
+    "unchanged_modules": {
+      "local_deep_research/research_verify/evidence_flow.py": true,
+      "local_deep_research/research_verify/generation.py": true,
+      "local_deep_research/research_verify/synthesis_trace.py": true
+    }
+  },
+  "candidate_images": {
+    "full_search_test": "sha256:37ac61b500e14fb65278c86a5f29f3fc3c38836814bebffd1befdd6801ef7ce0",
+    "final": "sha256:90cc95ab9a4354786514766d6a44d4d2768f44ec1567d60b77075f2c2b654bef"
+  },
+  "runs": {
+    "full-netns-run": {
+      "summary": {
+        "completed": true,
+        "elapsed_s": 389.01,
+        "sources": 64,
+        "references": 41,
+        "error": null
+      },
+      "artifact_verification": {
+        "trace_events_checked": 255,
+        "original_cards_checked": 46,
+        "handoffs": [
+          {
+            "topic": "Role of mitophagy, mitochondrial dynamics, and mitochondrial quality control in premature ovarian insufficiency",
+            "execution": {
+              "search_end": "search_budget",
+              "delivery_status": "finalized",
+              "model_rounds": 7,
+              "search_round_budget": 7,
+              "available_source_ids": [
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                24,
+                37,
+                38,
+                39
+              ]
+            },
+            "checked_material_cards": 10
+          },
+          {
+            "topic": "Mitochondrial metabolism and energy metabolism in granulosa cells and oocytes in premature ovarian insufficiency",
+            "execution": {
+              "search_end": "search_budget",
+              "delivery_status": "finalized",
+              "model_rounds": 7,
+              "search_round_budget": 7,
+              "available_source_ids": [
+                4,
+                5,
+                12,
+                54,
+                55,
+                28,
+                20,
+                56,
+                57,
+                58,
+                59,
+                60,
+                61,
+                62,
+                63
+              ]
+            },
+            "checked_material_cards": 11
+          },
+          {
+            "topic": "Mitochondrial dysfunction and oxidative stress mechanisms in premature ovarian insufficiency (POI) granulosa cells and oocytes",
+            "execution": {
+              "search_end": "search_budget",
+              "delivery_status": "finalized",
+              "model_rounds": 7,
+              "search_round_budget": 7,
+              "available_source_ids": [
+                5,
+                26,
+                28,
+                29,
+                30,
+                31,
+                32,
+                13,
+                14,
+                40
+              ]
+            },
+            "checked_material_cards": 10
+          },
+          {
+            "topic": "Mitochondrial DNA mutations, copy number and mtDNA deletions in premature ovarian insufficiency pathogenesis",
+            "execution": {
+              "search_end": "search_budget",
+              "delivery_status": "finalized",
+              "model_rounds": 7,
+              "search_round_budget": 7,
+              "available_source_ids": [
+                8,
+                9,
+                10,
+                33,
+                35,
+                36,
+                41,
+                42,
+                43,
+                44,
+                45,
+                48,
+                49,
+                50,
+                51
+              ]
+            },
+            "checked_material_cards": 8
+          },
+          {
+            "topic": "Mitochondrial therapeutic strategies for premature ovarian insufficiency including mitochondrial transfer and mitochondrial transplantation",
+            "execution": {
+              "search_end": "search_budget",
+              "delivery_status": "finalized",
+              "model_rounds": 7,
+              "search_round_budget": 7,
+              "available_source_ids": [
+                7,
+                27,
+                34,
+                20,
+                46,
+                47,
+                26,
+                52,
+                53
+              ]
+            },
+            "checked_material_cards": 7
+          }
+        ],
+        "all_checks_passed": true
+      }
+    },
+    "replay-run": {
+      "summary": {
+        "completed": true,
+        "elapsed_s": 21.464,
+        "model": "deepseek-v4-flash",
+        "source_pool": 2,
+        "scope": "Final candidate, real configured model, two fixed public abstracts, max_rounds3 to force bounded handoff; no user database or fresh search"
+      },
+      "artifact_verification": {
+        "trace_events_checked": 31,
+        "original_cards_checked": 4,
+        "handoffs": [
+          {
+            "topic": "The KDM3A–ABCA7 pathway and mitochondrial homeostasis in premature ovarian insufficiency",
+            "execution": {
+              "search_end": "completed",
+              "delivery_status": "natural",
+              "model_rounds": 2,
+              "search_round_budget": 2,
+              "available_source_ids": [
+                1,
+                2
+              ]
+            },
+            "checked_material_cards": 2
+          },
+          {
+            "topic": "LRRC4 and mitochondrial metabolism in premature ovarian insufficiency",
+            "execution": {
+              "search_end": "search_budget",
+              "delivery_status": "finalized",
+              "model_rounds": 2,
+              "search_round_budget": 2,
+              "available_source_ids": [
+                1,
+                2
+              ]
+            },
+            "checked_material_cards": 2
+          }
+        ],
+        "all_checks_passed": true
+      }
+    }
+  },
+  "version_scope": "Full fresh search used first candidate. Final candidate differs only in waiting for the current tool round when providers reuse tool_call_id; final suite, installed graph test and fixed-abstract replay passed. Full fresh search was not rerun on that final patch.",
+  "semantic_scope": {
+    "full_report_lrrc4_mentions": 0,
+    "fixed_abstract_replay_lrrc4_direction": "correct_in_limited_manual_read",
+    "overall_accuracy": "not_established",
+    "checker_changed": false
+  },
+  "failures_retained": [
+    "Before-fix actual factory/graph iteration exhaustion produced no handoff.",
+    "Initial bridge-network fresh test returned zero sources; probe ProxyError; repeated with existing network namespace.",
+    "Artifact verification helper initially used integer keys against string snapshot IDs; normalized identifiers and checks passed."
+  ],
+  "runtime_5002_unchanged": {
+    "Id": true,
+    "Image": true,
+    "Mounts": true,
+    "started_at": true,
+    "environment": true
+  },
+  "production_db_accessed": false,
+  "historical_reports_modified": false,
+  "private_artifacts": "/data/ningh/nh/ldr-experiments/subtask-handoff-v2-20261104",
+  "not_validated": [
+    "Cross-topic factual accuracy",
+    "All-paper retrieval coverage",
+    "Real account web save/display/export on final candidate",
+    "Independent semantic checker correction",
+    "Global hard walltime/cancelled-thread cleanup"
+  ]
+}
