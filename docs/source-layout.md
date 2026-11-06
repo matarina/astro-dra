@@ -15,7 +15,7 @@
 | 应用后端/既有JS覆盖目标 | 24 | 任务、Agent、搜索、相关性、抓取、引用、报告、存储/装配及原生模型选择 |
 | 工作台/UI覆盖目标 | 29 | 模板、样式、中文词典/显示层、主题、侧栏、角色页面与简化表单 |
 | 应用覆盖目标合计 | 53 | [完整manifest](../deployment/overlay-manifest.json)；其中UI另有[子清单](../deployment/ui-overlay-manifest.json) |
-| research_verify独立模块 | 32个Python文件，已部署5002 | 身份、材料、子任务交付、核对、publication及trace，也含历史兼容和CLI |
+| research_verify独立模块 | 32个Python文件，已部署两实例 | 身份、材料、子任务交付、核对、publication及trace，也含历史兼容和CLI |
 | astro_accounts独立模块 | 5个Python文件 | store、web、policy、cli及包入口 |
 | 原生账号钩子目标 | 7个文件 | [账号安装器](../deployment/install_accounts.py)检查明确位置后安装，不能简单当作上述manifest文件 |
 
@@ -26,6 +26,8 @@
 随后新增`research_verify/subtask_research.py`，负责有界检索、独立交付及按子任务保全消息/来源，11月5日已随第二版部署5002；实际三目标安装SHA与昨日最终测试镜像相符。见[第二版](subtask-handoff-v2-20261104.md)及[部署](subtask-handoff-v2-deploy-5002-20261105.md)。
 
 11月5日开发候选新增`research_verify/source_reading.py`，在写作前选取原句及其原文主体/状态并分组，和选段/范围修补一起构成[第三版](subtask-scope-v3-20261105.md)。942包文件相对第二版仅5个辅助模块变化；11月5日13:48:57已将相同测试镜像部署5002，安装文件SHA一致，见[部署测试](subtask-scope-v3-deploy-5002-20261105.md)。共享generation和evidence_flow的synthesize写作部分已改，核查函数保持。
+
+11月6日累计功能已提交并合入main，5000同步main-20261106。生产镜像基于最终5002镜像，仅清理模板空白并增加提交标签，90目标计入安装转换后匹配，见[部署](deploy-main-5000-20261106.md)。
 
 ## 构建入口
 

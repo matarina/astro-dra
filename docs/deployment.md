@@ -1,6 +1,6 @@
 # 部署、构建与回退
 
-更新：2026-11-05。先区分本机既有5000/5002与首次部署；[旧说明原文](deployment-history-20261104.md)保留历史，不作为当前实例命令来源。[当前状态](current-status.md) · [5002说明](test-instance-5002.md)。
+更新：2026-11-06。先区分本机既有5000/5002与首次部署；[旧说明原文](deployment-history-20261104.md)保留历史，不作为当前实例命令来源。[当前状态](current-status.md) · [5002说明](test-instance-5002.md)。
 
 ## 本机既有部署
 
@@ -10,7 +10,7 @@
 | Compose项目 | `local_deep_research` | `astro-dra-test-5002` |
 | 配置 | 主工作区`local_deep_research/docker-compose.yml`及`compose.production.local.yml` | 主工作区根`compose.yaml`，环境文件`.env.test-5002` |
 | 应用容器 | `local_deep_research-local-deep-research-1` | `astro-dra-test-5002-local-deep-research-1` |
-| 镜像基线 | `astro-dra:main-20261028` | `astro-dra:subtask-scope-v3-5002-20261105` |
+| 镜像基线 | `astro-dra:main-20261106` | `astro-dra:subtask-scope-v3-5002-20261105` |
 | 数据/配置 | 5000原数据、脚本、日志及配置挂载 | 独立`astro-dra-test-5002_ldr_data`和`astro-dra-test-5002_ldr_config` |
 
 5002的Compose文件放在main目录，并不表示使用5000的容器或数据。代码随构建进入镜像，应用不是宿主源码热挂载。开发构建须使用UI工作区；部署沿用现有5002项目、env和卷，不能无参数启动另一项目。
@@ -40,6 +40,8 @@ docker compose --env-file /data/ningh/nh/astro-dra/.env.test-5002 \
 UI-only或accounts分层构建必须明确基础镜像；不能沿用旧默认标签导致遗漏最近已部署的功能。修改Compose/deployment文件也需区分开发版本与主目录实际运行版本，合并Git不会自动同步已运行容器。
 
 ## 合入main和更新5000
+
+11月6日已完成本次合并和5000部署，原32账号按用户要求设为普通用户，独立root另建；实际版本、验证和回退见[部署记录](deploy-main-5000-20261106.md)。下面保留后续更新方式。
 
 5002验证完成后整理并提交功能、申请/完成合并；这一步不自动更新5000服务。合并后从main构建独立已验证版本标签，更新5000原私有`compose.production.local.yml`的镜像。沿用原项目和两份配置，仅替换应用：
 

@@ -1,0 +1,107 @@
+{
+  "date": "2026-11-06",
+  "status": "deployed_5000",
+  "feature_commit": "b2f284847092b069d377c2136166ca5d6aa5753d",
+  "commit_message": "同步5002界面、权限与研究流程",
+  "github_url": "https://github.com/matarina/astro-dra/commit/b2f284847092b069d377c2136166ca5d6aa5753d",
+  "main_pushed": true,
+  "branch_merged": "work/ui-5002-20261028",
+  "runtime": {
+    "image": "astro-dra:main-20261106",
+    "image_id": "sha256:77df4c68f63dfa6223a299f26562a41a48b389fe2086aeba9e01781b5b0d01de",
+    "container": "9b2fcf84dc0d76baea26ec7f5ad85a35a127d70534c570be471e6254298a80c2",
+    "started_at_utc": "2026-11-06T09:14:07.443379886Z",
+    "health": "healthy",
+    "http_login": 200,
+    "root_login": true,
+    "root_accounts": 200,
+    "env_changed_keys": [
+      "LDR_LANGGRAPH_AGENT_MAX_SUB_ITERATIONS"
+    ],
+    "original_mounts_and_ports_preserved": true,
+    "other_service_ids_and_starts_unchanged": true,
+    "revision_label": "b2f284847092b069d377c2136166ca5d6aa5753d"
+  },
+  "started_at_beijing": "2026-11-06 17:14:07",
+  "accounts": {
+    "users": 33,
+    "roles": {
+      "root": 1,
+      "user": 32
+    },
+    "ordinary_pending_requests": 0,
+    "audit": 32,
+    "quick_check": "ok"
+  },
+  "backup": {
+    "archive": "/data/ningh/nh/ldr-experiments/merge-5002-main-5000-20261106/data-config-scripts-and-userlog.tar",
+    "bytes": 8987402240,
+    "members": 15570,
+    "verified_auth_and_encrypted_data_members": true,
+    "elapsed_s": 262.165
+  },
+  "data_preservation": {
+    "original_files": 112,
+    "identical": 112,
+    "changed_or_missing": 0,
+    "paths": []
+  },
+  "validation": {
+    "regression_passed": 465,
+    "regression_seconds": 2.72,
+    "javascript_syntax_files": 18,
+    "model_selection_script": "passed",
+    "isolated_32_account_migration_and_native_HTTP": "passed",
+    "candidate_install": {
+      "targets": 90,
+      "matches": 90,
+      "normalized_install_transforms": [
+        "Agent collection hook",
+        "scheduler account hook"
+      ],
+      "expected_template_only_change_vs_5002": true
+    },
+    "running_install": {
+      "candidate_matches": 856,
+      "runtime_package_files": 857,
+      "all_match": true,
+      "source_targets": 90
+    },
+    "actual_model_smoke": {
+      "actual_default_model_call": "passed",
+      "model": "deepseek-v4-flash",
+      "provider": "openai_endpoint",
+      "research_started": false,
+      "user_database_access": false,
+      "production_setting_modified": false
+    },
+    "startup_errors": 0,
+    "full_new_research": false
+  },
+  "changes_vs_5002_image": [
+    "results template: removed whitespace on five blank lines",
+    "OCI revision/source labels"
+  ],
+  "settings_changed": [
+    "application image",
+    "LDR_LANGGRAPH_AGENT_MAX_SUB_ITERATIONS:4→8"
+  ],
+  "original_passwords_and_encrypted_databases_preserved": true,
+  "root_new_and_separate": true,
+  "root_credentials_private_file": "/data/ningh/nh/ldr-experiments/merge-5002-main-5000-20261106/root-5000-initial.json",
+  "private_artifacts_dir": "/data/ningh/nh/ldr-experiments/merge-5002-main-5000-20261106",
+  "preserved_original_main_stash": "4f37817708d4b049c69871a31209e46fa38545dc",
+  "protected_services": [
+    "5002 app",
+    "5002 SearXNG",
+    "5002 relay",
+    "5018 verification app"
+  ],
+  "rollback": "Restore pre-deploy compose.production.local.yml and recreate only app with original volumes; restoring auth/data requires stopped consistent archive restoration. Old code ignores roles and restores broad account capabilities.",
+  "limits": [
+    "Existing retrieval/API failures, search pages in references and semantic review misses remain unresolved.",
+    "No real new research or full historical report/export revalidation in this deployment.",
+    "Old users were not logged in with their passwords; encrypted files unchanged and isolated account HTTP behavior verified.",
+    "Git CLI still lacks HTTPS auth; used GitHub connector and byte-exact Git commit/tree objects."
+  ]
+}
