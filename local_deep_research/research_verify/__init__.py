@@ -18,6 +18,9 @@ from .config import VerifyConfig, get_config
 from .http_client import HttpClient, HttpResult
 from .models import (
     ClaimCheck,
+    EvidenceSpan,
+    SourceClaimCheck,
+    ReportCheck,
     ConstraintMatch,
     KeywordCov,
     ResearchConstraint,
@@ -30,6 +33,9 @@ __all__ = [
     "HttpClient",
     "HttpResult",
     "ClaimCheck",
+    "EvidenceSpan",
+    "SourceClaimCheck",
+    "ReportCheck",
     "ConstraintMatch",
     "KeywordCov",
     "ResearchConstraint",

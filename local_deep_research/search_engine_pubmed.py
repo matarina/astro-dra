@@ -2,11 +2,10 @@ import re
 from typing import Any, Dict, List, Optional, Tuple
 
 from defusedxml import ElementTree as ET
-from research_verify.retrieval import academic_snippet, service_get, xml_text
-from research_verify.source_relations import pubmed_relations
 
 from langchain_core.language_models import BaseLLM
 
+from ...constants import SNIPPET_LENGTH_LONG
 from ...security.safe_requests import safe_get
 from ...security.secure_logging import logger
 from ..rate_limiting import RateLimitError
@@ -54,7 +53,6 @@ class PubMedSearchEngine(BaseSearchEngine):
         include_citation_in_context: bool = False,
         include_language_in_context: bool = False,
         settings_snapshot: Optional[Dict[str, Any]] = None,
-        search_snippets_only: Optional[bool] = None,
     ):
         """
         Initialize the PubMed search engine.
@@ -87,12 +85,8 @@ class PubMedSearchEngine(BaseSearchEngine):
             max_results=max_results,
             preview_filters=preview_filters,  # type: ignore[arg-type]
             settings_snapshot=settings_snapshot,
-            search_snippets_only=(
-                not (get_abstracts or get_full_text)
-                if search_snippets_only is None else search_snippets_only
-            ),
         )
-        self.max_results = max(1, min(1000, int(max_results)))
+        self.max_results = max(self.max_results, 25)
         self.api_key = api_key
         self.days_limit = days_limit
         self.get_abstracts = get_abstracts
@@ -127,33 +121,6 @@ class PubMedSearchEngine(BaseSearchEngine):
 
         # PMC base URL for full text
         self.pmc_url = "https://www.ncbi.nlm.nih.gov/pmc/articles/"
-        self._record_cache = {}
-
-    def _request(self, url, **kwargs):
-        return service_get(url, service="ncbi", interval=0.37,
-                           get=safe_get, **kwargs)
-
-    def _get_record_xml(self, id_list):
-        """Reuse one EFetch record for abstracts and detailed metadata."""
-        requested = list(dict.fromkeys(str(i) for i in id_list))
-        missing = [i for i in requested if i not in self._record_cache]
-        if missing:
-            params = {"db": "pubmed", "id": ",".join(missing), "retmode": "xml"}
-            if self.api_key:
-                params["api_key"] = self.api_key
-            response = self._request(self.fetch_url, params=params)
-            root = ET.fromstring(response.text)
-            if root.tag != "PubmedArticleSet" or root.find(".//ERROR") is not None:
-                raise ValueError("NCBI returned no valid PubMed article set")
-            found = {a.findtext(".//PMID"): a for a in root.findall(".//PubmedArticle")}
-            for pmid in missing:
-                self._record_cache[pmid] = found.get(pmid)
-        result = ET.fromstring("<PubmedArticleSet/>")
-        for pmid in requested:
-            article = self._record_cache.get(pmid)
-            if article is not None:
-                result.append(article)
-        return result
 
     @staticmethod
     def _remove_stray_quotes(query: str) -> str:
@@ -226,7 +193,7 @@ class PubMedSearchEngine(BaseSearchEngine):
             )
 
             # Execute search request
-            response = self._request(self.search_url, params=params)
+            response = safe_get(self.search_url, params=params)
             response.raise_for_status()
 
             # Parse response
@@ -308,38 +275,223 @@ class PubMedSearchEngine(BaseSearchEngine):
         return '"last 10 years"[pdat]'
 
     def _optimize_query_for_pubmed(self, query: str) -> str:
-        # Agent-generated Boolean/field queries already encode constraints.
-        if not self.llm or not self.optimize_queries or re.search(r"\[[^]]+\]|\b(?:AND|OR|NOT)\b", query):
-            return self._remove_stray_quotes(query)
-        prompt = f"""Translate this question into a PubMed search query.
-Return only the query. Preserve required entities, named assays, quoted phrases,
-publication types, and explicit dates. Join different concepts with AND; use OR
-only for synonyms of the same concept. Never replace a specific entity with
-OR plus a broader field name. Never add a recency restriction not requested.
-An explicit year range must remain a [Date - Publication] range.
-Do not truncate the question to its first words or silently relax constraints.
-Question: {query}"""
-        try:
-            response = self.llm.invoke(prompt)
-            output = str(response.content if hasattr(response, "content") else response).strip()
-            lines = [line.strip() for line in output.splitlines() if line.strip()]
-            candidate = lines[0] if len(lines) == 1 else query
-            # If an optimizer loses explicit years or quoted entities, retain
-            # the supplied query. Users can issue a separate broader search.
-            years = set(re.findall(r"\b(?:19|20)\d{2}\b", query))
-            phrases = re.findall(r'"([^"\n]+)"', query)
-            if not candidate or not years.issubset(set(re.findall(r"\b(?:19|20)\d{2}\b", candidate))):
-                return query
-            if any(phrase.casefold() not in candidate.casefold() for phrase in phrases):
-                return query
-            return self._remove_stray_quotes(candidate)
-        except Exception:
-            logger.warning("PubMed query optimization unavailable; retaining supplied query")
+        """
+        Optimize a natural language query for PubMed search.
+        Uses LLM to transform questions into effective keyword-based queries.
+
+        Args:
+            query: Natural language query
+
+        Returns:
+            Optimized query string for PubMed
+        """
+        if not self.llm or not self.optimize_queries:
+            # Return original query if no LLM available or optimization disabled
             return query
 
+        try:
+            # Prompt for query optimization
+            prompt = f"""Transform this natural language question into an optimized PubMed search query.
+
+Original query: "{query}"
+
+CRITICAL RULES:
+1. ONLY RETURN THE EXACT SEARCH QUERY - NO EXPLANATIONS, NO COMMENTS
+2. DO NOT wrap the entire query in quotes
+3. DO NOT include ANY date restrictions or year filters
+4. Use parentheses around OR statements: (term1[Field] OR term2[Field])
+5. Use only BASIC MeSH terms - stick to broad categories like "Vaccines"[Mesh]
+6. KEEP IT SIMPLE - use 2-3 main concepts maximum
+7. Focus on Title/Abstract searches for reliability: term[Title/Abstract]
+8. Use wildcards for variations: vaccin*[Title/Abstract]
+
+EXAMPLE QUERIES:
+✓ GOOD: (mRNA[Title/Abstract] OR "messenger RNA"[Title/Abstract]) AND vaccin*[Title/Abstract]
+✓ GOOD: (influenza[Title/Abstract] OR flu[Title/Abstract]) AND treatment[Title/Abstract]
+✗ BAD: (mRNA[Title/Abstract]) AND "specific disease"[Mesh] AND treatment[Title/Abstract] AND 2023[dp]
+✗ BAD: "Here's a query to find articles about vaccines..."
+
+Return ONLY the search query without any explanations.
+"""
+
+            # Get response from LLM
+            response = self.llm.invoke(prompt)
+            raw_response = (
+                str(response.content)
+                if hasattr(response, "content")
+                else str(response)
+            ).strip()
+
+            # Clean up the query - extract only the actual query and remove any explanations
+            # First check if there are multiple lines and take the first non-empty line
+            lines = raw_response.split("\n")
+            cleaned_lines = [line.strip() for line in lines if line.strip()]
+
+            if cleaned_lines:
+                optimized_query = cleaned_lines[0]
+
+                # Remove any quotes that wrap the entire query
+                if optimized_query.startswith('"') and optimized_query.endswith(
+                    '"'
+                ):
+                    optimized_query = optimized_query[1:-1]
+
+                # Remove any explanation phrases that might be at the beginning
+                explanation_starters = [
+                    "here is",
+                    "here's",
+                    "this query",
+                    "the following",
+                ]
+                for starter in explanation_starters:
+                    if optimized_query.lower().startswith(starter):
+                        # Find the actual query part - typically after a colon
+                        colon_pos = optimized_query.find(":")
+                        if colon_pos > 0:
+                            optimized_query = optimized_query[
+                                colon_pos + 1 :
+                            ].strip()
+
+                # Check if the query still seems to contain explanations
+                if (
+                    len(optimized_query) > 200
+                    or "this query will" in optimized_query.lower()
+                ):
+                    # It's probably still an explanation - try to extract just the query part
+                    # Look for common patterns in the explanation like parentheses
+                    pattern = r"\([^)]+\)\s+AND\s+"
+                    import re
+
+                    matches = re.findall(pattern, optimized_query)
+                    if matches:
+                        # Extract just the query syntax parts
+                        query_parts = []
+                        for part in re.split(r"\.\s+", optimized_query):
+                            if (
+                                "(" in part
+                                and ")" in part
+                                and ("AND" in part or "OR" in part)
+                            ):
+                                query_parts.append(part)
+                        if query_parts:
+                            optimized_query = " ".join(query_parts)
+            else:
+                # Fall back to original query if cleaning fails
+                logger.warning(
+                    "Failed to extract a clean query from LLM response"
+                )
+                optimized_query = query
+
+            # Final safety check - if query looks too much like an explanation, use original
+            if len(optimized_query.split()) > 30:
+                logger.warning(
+                    "Query too verbose, falling back to simpler form"
+                )
+                # Create a simple query from the original
+                words = [
+                    w
+                    for w in query.split()
+                    if len(w) > 3
+                    and w.lower()
+                    not in (
+                        "what",
+                        "are",
+                        "the",
+                        "and",
+                        "for",
+                        "with",
+                        "from",
+                        "have",
+                        "been",
+                        "recent",
+                    )
+                ]
+                optimized_query = " AND ".join(words[:3])
+
+            # Basic cleanup: standardize field tag case for consistency
+            import re
+
+            optimized_query = re.sub(
+                r"\[mesh\]", "[Mesh]", optimized_query, flags=re.IGNORECASE
+            )
+            optimized_query = re.sub(
+                r"\[title/abstract\]",
+                "[Title/Abstract]",
+                optimized_query,
+                flags=re.IGNORECASE,
+            )
+            optimized_query = re.sub(
+                r"\[publication type\]",
+                "[Publication Type]",
+                optimized_query,
+                flags=re.IGNORECASE,
+            )
+
+            # Fix unclosed quotes followed by field tags
+            # Pattern: "term[Field] -> "term"[Field]
+            optimized_query = re.sub(r'"([^"]+)\[', r'"\1"[', optimized_query)
+
+            # Simplify the query if still no results are found
+            self._simplify_query_cache = optimized_query
+
+            # Log original and optimized queries
+            logger.info("Original query: '{}'", query)
+            logger.info(f"Optimized for PubMed: '{optimized_query}'")
+            logger.debug(
+                f"Query optimization complete: '{query[:50]}...' -> '{optimized_query[:100]}...'"
+            )
+
+            return optimized_query
+
+        except Exception as e:
+            safe_msg = self._scrub_error(e)
+            logger.exception(
+                f"Error optimizing query ({type(e).__name__}): {safe_msg}"
+            )
+            logger.debug(f"Falling back to original query: '{query}'")
+            return query  # Fall back to original query on error
+
     def _simplify_query(self, query: str) -> str:
-        # A zero hit is not permission to remove platform/date constraints.
-        return query
+        """
+        Simplify a PubMed query that returned no results.
+        Progressively removes elements to get a more basic query.
+
+        Args:
+            query: The original query that returned no results
+
+        Returns:
+            Simplified query
+        """
+        logger.info(f"Simplifying query: {query}")
+        logger.debug(f"Query simplification started for: '{query[:100]}...'")
+
+        # Simple approach: remove field restrictions to broaden the search
+        import re
+
+        # Remove field tags to make search broader
+        simplified = query
+
+        # Remove [Mesh] tags - search in all fields instead
+        simplified = re.sub(r"\[Mesh\]", "", simplified, flags=re.IGNORECASE)
+
+        # Remove [Publication Type] tags
+        simplified = re.sub(
+            r"\[Publication Type\]", "", simplified, flags=re.IGNORECASE
+        )
+
+        # Keep [Title/Abstract] as it's usually helpful
+        # Clean up any double spaces
+        simplified = re.sub(r"\s+", " ", simplified).strip()
+
+        # If no simplification was possible, return the original query
+        if simplified == query:
+            logger.debug("No simplification possible, returning original query")
+
+        logger.info(f"Simplified query: {simplified}")
+        logger.debug(
+            f"Query simplified from {len(query)} to {len(simplified)} chars"
+        )
+        return simplified
 
     def _is_historical_focused(self, query: str) -> bool:
         """
@@ -429,9 +581,82 @@ The default assumption should be that medical and scientific queries want RECENT
             return any(term in query.lower() for term in historical_terms)
 
     def _adaptive_search(self, query: str) -> Tuple[List[str], str]:
-        # Search the requested scope once. The previous volume-based 1/3/5-year
-        # windows biased a 2022-2026 review toward the newest publications.
-        return self._search_pubmed(query), "requested_scope"
+        """
+        Perform an adaptive search that adjusts based on topic volume and whether
+        the query focuses on historical information.
+
+        Args:
+            query: The search query (already optimized)
+
+        Returns:
+            Tuple of (list of PMIDs, search strategy used)
+        """
+        # Estimate topic volume
+        estimated_volume = self._get_result_count(query)
+
+        # Determine if the query is focused on historical information
+        is_historical_focused = self._is_historical_focused(query)
+
+        if is_historical_focused:
+            # User wants historical information - no date filtering
+            time_filter = None
+            strategy = "historical_focus"
+        elif estimated_volume > 5000:
+            # Very common topic - use tighter recency filter
+            time_filter = '"last 1 year"[pdat]'
+            strategy = "high_volume"
+        elif estimated_volume > 1000:
+            # Common topic
+            time_filter = '"last 3 years"[pdat]'
+            strategy = "common_topic"
+        elif estimated_volume > 100:
+            # Moderate volume
+            time_filter = '"last 5 years"[pdat]'
+            strategy = "moderate_volume"
+        else:
+            # Rare topic - still use recency but with wider range
+            time_filter = '"last 10 years"[pdat]'
+            strategy = "rare_topic"
+
+        # Run search based on strategy
+        if time_filter:
+            # Try with adaptive time filter
+            query_with_time = f"({query}) AND {time_filter}"
+            logger.info(
+                f"Using adaptive search strategy: {strategy} with filter: {time_filter}"
+            )
+            results = self._search_pubmed(query_with_time)
+
+            # If too few results, gradually expand time window
+            if len(results) < 5 and '"last 10 years"[pdat]' not in time_filter:
+                logger.info(
+                    f"Insufficient results ({len(results)}), expanding time window"
+                )
+                expanded_time = self._expand_time_window(time_filter)
+                query_with_expanded_time = f"({query}) AND {expanded_time}"
+                expanded_results = self._search_pubmed(query_with_expanded_time)
+
+                if len(expanded_results) > len(results):
+                    logger.info(
+                        f"Expanded time window yielded {len(expanded_results)} results"
+                    )
+                    return expanded_results, f"{strategy}_expanded"
+
+            # If still no results, try without time filter
+            if not results:
+                logger.info(
+                    "No results with time filter, trying without time restrictions"
+                )
+                results = self._search_pubmed(query)
+                strategy = "no_time_filter"
+        else:
+            # Historical query - run without time filter
+            logger.info(
+                "Using historical search strategy without date filtering"
+            )
+            results = self._search_pubmed(query)
+
+        return results, strategy
 
     def _search_pubmed(self, query: str) -> List[str]:
         """
@@ -486,7 +711,7 @@ The default assumption should be that medical and scientific queries want RECENT
 
             # Execute search request
             logger.debug(f"Sending request to PubMed API: {self.search_url}")
-            response = self._request(self.search_url, params=params)
+            response = safe_get(self.search_url, params=params)
             response.raise_for_status()
             logger.debug(f"PubMed API response status: {response.status_code}")
 
@@ -549,7 +774,7 @@ The default assumption should be that medical and scientific queries want RECENT
 
             # Execute request
             logger.debug(f"Requesting summaries from: {self.summary_url}")
-            response = self._request(self.summary_url, params=params)
+            response = safe_get(self.summary_url, params=params)
             response.raise_for_status()
             logger.debug(f"Summary API response status: {response.status_code}")
 
@@ -658,7 +883,38 @@ The default assumption should be that medical and scientific queries want RECENT
         logger.debug(f"Fetching abstracts for {len(id_list)} PubMed articles")
 
         try:
-            root = self._get_record_xml(id_list)
+            # Prepare parameters
+            params = {
+                "db": "pubmed",
+                "id": ",".join(id_list),
+                "retmode": "xml",
+                "rettype": "abstract",
+            }
+
+            # Add API key if available
+            if self.api_key:
+                params["api_key"] = self.api_key
+
+            self._last_wait_time = self.rate_tracker.apply_rate_limit(
+                self.engine_type
+            )
+            logger.debug(
+                f"Applied rate limit wait: {self._last_wait_time:.2f}s"
+            )
+
+            # Execute request
+            logger.debug(f"Requesting abstracts from: {self.fetch_url}")
+            response = safe_get(self.fetch_url, params=params)
+            response.raise_for_status()
+            logger.debug(
+                f"Abstract fetch response status: {response.status_code}, size: {len(response.text)} bytes"
+            )
+
+            # Parse XML response
+            root = ET.fromstring(response.text)
+            logger.debug(
+                f"Parsing abstracts from XML for {len(id_list)} articles"
+            )
 
             # Extract abstracts
             abstracts = {}
@@ -672,6 +928,11 @@ The default assumption should be that medical and scientific queries want RECENT
 
                 # Find abstract text
                 abstract_text = ""
+                abstract_elem = article.find(".//AbstractText")
+
+                if abstract_elem is not None:
+                    abstract_text = abstract_elem.text or ""
+
                 # Some abstracts are split into multiple sections
                 abstract_sections = article.findall(".//AbstractText")
                 if len(abstract_sections) > 1:
@@ -682,9 +943,7 @@ The default assumption should be that medical and scientific queries want RECENT
                 for section in abstract_sections:
                     # Get section label if it exists
                     label = section.get("Label")
-                    # Inline XML (gene names, superscripts, emphasis) carries
-                    # meaningful text/tails. Read each section exactly once.
-                    section_text = xml_text(section).strip()
+                    section_text = section.text or ""
 
                     if label and section_text:
                         if abstract_text:
@@ -735,7 +994,29 @@ The default assumption should be that medical and scientific queries want RECENT
             return {}
 
         try:
-            root = self._get_record_xml(id_list)
+            # Prepare parameters
+            params = {
+                "db": "pubmed",
+                "id": ",".join(id_list),
+                "retmode": "xml",
+                "rettype": "medline",
+            }
+
+            # Add API key if available
+            if self.api_key:
+                params["api_key"] = self.api_key
+
+            self._last_wait_time = self.rate_tracker.apply_rate_limit(
+                self.engine_type
+            )
+
+            # Execute request
+            response = safe_get(self.fetch_url, params=params)
+            response.raise_for_status()
+
+            # Parse XML response
+            root = ET.fromstring(response.text)
+
             metadata = {}
 
             for article in root.findall(".//PubmedArticle"):
@@ -745,7 +1026,7 @@ The default assumption should be that medical and scientific queries want RECENT
                 if pmid is None:
                     continue
 
-                article_metadata: Dict[str, Any] = {"related_articles": pubmed_relations(article)}
+                article_metadata: Dict[str, Any] = {}
 
                 # Extract publication types
                 pub_types = []
@@ -967,7 +1248,7 @@ The default assumption should be that medical and scientific queries want RECENT
             )
 
             # Execute request
-            response = self._request(self.link_url, params=params)
+            response = safe_get(self.link_url, params=params)
             response.raise_for_status()
 
             # Parse response
@@ -1028,7 +1309,7 @@ The default assumption should be that medical and scientific queries want RECENT
             )
 
             # Execute request
-            response = self._request(self.fetch_url, params=params)
+            response = safe_get(self.fetch_url, params=params)
             response.raise_for_status()
 
             # Parse XML response
@@ -1235,10 +1516,11 @@ The default assumption should be that medical and scientific queries want RECENT
             # Create preview with basic information
             preview = {
                 "id": summary["id"],
-                "pmid": summary["id"],
                 "title": summary["title"],
                 "link": summary["link"],
                 "snippet": enriched_snippet,  # Use enriched snippet with title and abstract
+                # Keep the complete abstract separate from the truncated preview.
+                "abstract": abstracts.get(pmid, ""),
                 "authors": summary.get("authors", []),
                 "journal": summary.get("journal", ""),
                 # Alias for the journal reputation filter, which reads
@@ -1254,16 +1536,10 @@ The default assumption should be that medical and scientific queries want RECENT
                 "pubdate": summary.get("pubdate", ""),
                 "doi": summary.get("doi", ""),
                 "source": "PubMed",
-                # Screening needs the complete abstract too; the display
-                # snippet may end before the assay or method is mentioned.
-                "abstract": abstracts.get(pmid, ""),
-                "content_type": "abstract" if abstracts.get(pmid) else "metadata",
-                "publication_types": summary.get("pubtype", []),
                 "_pmid": summary["id"],  # Store PMID for later use
                 "_search_strategy": strategy,  # Store search strategy for analytics
             }
 
-            preview["snippet"] = academic_snippet(preview, abstracts.get(pmid, ""))
             previews.append(preview)
 
         logger.info(
@@ -1339,9 +1615,6 @@ The default assumption should be that medical and scientific queries want RECENT
                             result["snippet"] = (
                                 f"[{pub_type}] {result['snippet']}"
                             )
-
-                if metadata.get("related_articles"):
-                    result["related_articles"] = metadata["related_articles"]
 
                 # Add MeSH terms for medical categorization
                 if "mesh_terms" in metadata:
@@ -1426,7 +1699,26 @@ The default assumption should be that medical and scientific queries want RECENT
                     result, abstracts[pmid]
                 )
 
-                result["snippet"] = academic_snippet(result, abstracts[pmid])
+                # ALWAYS include title and abstract in snippet for LLM analysis
+                # Build comprehensive snippet with title and abstract
+                title = result.get("title", "")
+                abstract_text = (
+                    abstracts[pmid][:SNIPPET_LENGTH_LONG]
+                    if len(abstracts[pmid]) > SNIPPET_LENGTH_LONG
+                    else abstracts[pmid]
+                )
+
+                # Prepend title and abstract to the existing metadata snippet
+                if "snippet" in result:
+                    # Keep metadata snippet and add content
+                    result["snippet"] = (
+                        f"Title: {title}\n\nAbstract: {abstract_text}\n\nMetadata: {result['snippet']}"
+                    )
+                else:
+                    # No metadata snippet, just title and abstract
+                    result["snippet"] = (
+                        f"Title: {title}\n\nAbstract: {abstract_text}"
+                    )
 
                 # Use abstract as content if no full text
                 if pmid not in pmid_to_pmcid:

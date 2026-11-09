@@ -1,0 +1,57 @@
+{
+  "checked_at": "2026-10-20T09:37:17.640799+00:00",
+  "git_head": "115e2638fb89d643a0afb8f80134b627e6aa323a",
+  "python_version": "3.10.9",
+  "source": "local_deep_research/research_verify/citation_qc.py",
+  "source_sha256": "d2f9efaae602fbe471ba2120b05c6b345c5896b54de474e34a87d26e9d8f7108",
+  "probe_sha256": "f1455b5dd21eaa3ddeff5ccc54d696a30335fa845c68eea878e178f7ce484632",
+  "scope": "deterministic probes with a synthetic judge; no model accuracy or end-to-end evaluation",
+  "probes": [
+    {
+      "id": "uncited_claim_coverage",
+      "observed": {
+        "extracted": [
+          "The method improves accuracy [1]."
+        ]
+      },
+      "gap_reproduced": true
+    },
+    {
+      "id": "evidence_after_1500_characters",
+      "observed": {
+        "late_evidence_visible": false
+      },
+      "gap_reproduced": true
+    },
+    {
+      "id": "fabricated_supporting_quote",
+      "observed": {
+        "verdict": "supported",
+        "quote": "THIS QUOTE DOES NOT EXIST"
+      },
+      "gap_reproduced": true
+    },
+    {
+      "id": "abstract_preferred_over_body",
+      "observed": {
+        "abstract_visible": true,
+        "body_visible": false
+      },
+      "gap_reproduced": true
+    }
+  ],
+  "existing_tests": {
+    "runner": "direct invocation of test functions, not pytest",
+    "passed": [
+      "test_check_judge_error_degrades_to_unverifiable",
+      "test_check_supported_via_judge",
+      "test_check_unsupported_and_partial",
+      "test_check_unverifiable_when_no_fragment",
+      "test_extract_claims_only_cited_sentences",
+      "test_missing_judge_is_unverifiable",
+      "test_render_section_and_inline_markers",
+      "test_verdict_whitelist_rejects_garbage"
+    ],
+    "count": 8
+  }
+}

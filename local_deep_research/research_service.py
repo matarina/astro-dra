@@ -235,18 +235,95 @@ def _extract_synthesized_answer(results: dict) -> str:
     Saving the blob would leak sources/findings into ``report_content``.
 
     Resolution order:
-      1. ``Final synthesis`` finding (set by source_based, parallel,
+      1. ``final_report.content`` when a checked final object is present.
+      2. ``Final synthesis`` finding (set by source_based, parallel,
          rapid, focused_iteration, iterdrag).
-      2. ``current_knowledge`` (other strategies expose the answer
+      3. ``current_knowledge`` (other strategies expose the answer
          there).
-      3. Empty string — caller decides whether to fall back further.
+      4. Empty string — caller decides whether to fall back further.
     """
+    # A checked report takes precedence over earlier synthesis drafts, including
+    # an intentionally empty result. Do not fall back to an unchecked draft.
+    final_report = results.get("final_report")
+    if isinstance(final_report, dict) and isinstance(final_report.get("content"), str):
+        return final_report["content"]
     for finding in results.get("findings") or []:
         if finding.get("phase") == "Final synthesis":
             content = finding.get("content") or ""
             if content:
                 return content
     return results.get("current_knowledge") or ""
+
+
+def _ground_report_content(
+    content: str, sources: list[dict], model
+) -> tuple[str, dict]:
+    """Final gate for detailed synthesis, after generation and before saving."""
+    try:
+        from research_verify import get_config
+        from research_verify.citation_qc import CitationQc
+        from research_verify.evidence import SourceLookup
+
+        cfg = get_config()
+        if not cfg.enable_verify or not cfg.module_enabled("citation_qc"):
+            return content, {"status": "disabled"}
+        qc = CitationQc(judge_model=model, cfg=cfg)
+        from research_verify.source_evidence import active_egress_context, prepare_cited_evidence
+        lookup = SourceLookup(sources)
+        evidence_preparation = prepare_cited_evidence(
+            qc.extract_claims(content), lookup, cfg,
+            egress_context=active_egress_context(),
+        ) if cfg.qc_require_body else {"status": "abstract_only_policy"}
+        result = qc.verify_report(content, lookup)
+        from research_verify.audit_io import publication_sources, write_audit
+        sections = [
+            result.content,
+            qc.render_paper_section(result.paper_checks),
+            qc.render_section(result.original_checks),
+        ]
+        checked = "\n\n".join(section for section in sections if section)
+        audit = result.model_dump(exclude={"content"})
+        audit["evidence_preparation"] = evidence_preparation
+        frozen = qc.source_snapshot.records()
+        sources[:] = publication_sources(frozen)
+        try:
+            audit["evidence_artifact_file"] = write_audit(audit, frozen)
+        except OSError:
+            audit["evidence_storage_status"] = "unavailable"
+        audit["rendered_content_sha256"] = hashlib.sha256(
+            checked.encode()
+        ).hexdigest()
+        return checked, audit
+    except Exception as exc:
+        logger.warning("Final report QC failed: {}", type(exc).__name__)
+        return "结论核验未完成，未发布未经核验的研究正文。", {
+            "status": "unverifiable", "reason_code": "qc_error"
+        }
+
+
+def _trusted_final_report(final_report, content):
+    """Reuse only the current verifier's sealed, unchanged publication object."""
+    if not isinstance(final_report, dict) or not isinstance(content, str):
+        return None
+    audit = final_report.get("verification")
+    if not isinstance(audit, dict) or audit.get("policy_version") != "abstract-body-v2":
+        return None
+    digest = hashlib.sha256(content.encode()).hexdigest()
+    if final_report.get("content_sha256") != digest or audit.get("sealed_content_sha256") != digest:
+        return None
+    size = audit.get("verified_body_chars")
+    if not isinstance(size, int) or isinstance(size, bool) or not 0 <= size <= len(content):
+        return None
+    if hashlib.sha256(content[:size].encode()).hexdigest() != audit.get("content_sha256"):
+        return None
+    if audit.get("scope") != "claim_grounding_only" or audit.get("status") not in {"supported", "partial", "unverifiable"}:
+        return None
+    if audit["status"] in {"supported", "partial"} and not audit.get("checks"):
+        return None
+    sources = final_report.get("sources_for_publication")
+    if not isinstance(sources, list) or hashlib.sha256(json.dumps(sources, sort_keys=True, ensure_ascii=False).encode()).hexdigest() != audit.get("source_metadata_sha256"):
+        return None
+    return audit
 
 
 def get_citation_formatter():
@@ -275,7 +352,7 @@ def get_citation_formatter():
 # prevents thousands of merely-discovered URLs from being saved and rendered
 # as references.
 _INLINE_CITATION_RE = re.compile(
-    r"(?<![\[【])[\[【](\d+(?:\s*,\s*\d+)*?)[\]】](?![\]】])"
+    r"(?<![\[【])[\[【](\d+(?:\s*[,，]\s*\d+)*?)[\]】](?![\]】])"
 )
 
 
@@ -352,15 +429,22 @@ def _compact_citations(
             continue
         copied = dict(source)
         raw_index = copied.get("index", position)
-        source_by_index.setdefault(str(raw_index), copied)
+        if isinstance(raw_index, bool) or not str(raw_index).isdigit() or int(raw_index) < 1:
+            continue
+        source_by_index.setdefault(str(int(raw_index)), copied)
 
     identity_to_source: dict[str, dict] = {}
     old_to_new_index: dict[str, str] = {}
     selected: list[dict] = []
 
-    for match in _INLINE_CITATION_RE.finditer(answer):
-        for raw_number in re.split(r"\s*,\s*", match.group(1)):
-            old_index = str(raw_number)
+    from research_verify.citation_qc import _strip_appendices
+    audit_start = re.search(r"(?im)^#{1,6}\s+(?:摘要支持情况|结论可溯源性核查|条件匹配核验|关键词覆盖核验|文献真实性核验)\s*$", answer)
+    if audit_start:
+        answer = answer[:audit_start.start()] + _INLINE_CITATION_RE.sub(
+            lambda m: "〔原引用" + m[1] + "〕", answer[audit_start.start():])
+    for match in _INLINE_CITATION_RE.finditer(_strip_appendices(answer)):
+        for raw_number in re.split(r"\s*[,，]\s*", match.group(1)):
+            old_index = str(int(raw_number))
             source = source_by_index.get(old_index)
             if source is None:
                 continue
@@ -368,19 +452,22 @@ def _compact_citations(
             existing = identity_to_source.get(identity)
             if existing is not None:
                 _merge_citation_source(existing, source)
+                if old_index not in existing["original_indices"]:
+                    existing["original_indices"].append(old_index)
                 old_to_new_index[old_index] = str(existing["index"])
                 continue
 
             new_index = str(len(selected) + 1)
             source["index"] = new_index
+            source["original_indices"] = [old_index]
             identity_to_source[identity] = source
             old_to_new_index[old_index] = new_index
             selected.append(source)
 
     def replace_marker(match: re.Match) -> str:
         mapped: list[str] = []
-        for raw_number in re.split(r"\s*,\s*", match.group(1)):
-            new_index = old_to_new_index.get(str(raw_number))
+        for raw_number in re.split(r"\s*[,，]\s*", match.group(1)):
+            new_index = old_to_new_index.get(str(int(raw_number)))
             if new_index and new_index not in mapped:
                 mapped.append(new_index)
         if not mapped:
@@ -394,6 +481,21 @@ def _compact_citations(
         len(selected),
     )
     return rewritten, selected
+
+
+def _format_checked_answer(content, sources, formatter=None):
+    """Keep checked text and its citation mapping together on every fallback."""
+    try:
+        compacted, selected = _compact_citations(content, sources)
+    except Exception:
+        logger.warning("Citation compaction failed; preserving checked text and its original source mapping")
+        return content, sources
+    try:
+        formatter = formatter or get_citation_formatter()
+        return formatter.apply_inline_hyperlinks(compacted, selected), selected
+    except Exception:
+        logger.warning("Citation hyperlinking failed; preserving checked text with compacted citation indices")
+        return compacted, selected
 
 
 def export_report_to_memory(
@@ -2046,10 +2148,9 @@ def run_research_process(research_id, query, mode, **kwargs):
                         # blob only when neither Final synthesis nor
                         # current_knowledge is populated — leaks
                         # sources, but at least we save *something*.
-                        clean_markdown = (
-                            _extract_synthesized_answer(results)
-                            or raw_formatted_findings
-                        )
+                        clean_markdown = _extract_synthesized_answer(results)
+                        if not isinstance(results.get("final_report"), dict):
+                            clean_markdown = clean_markdown or raw_formatted_findings
 
                     # Pull sources from the search-system's accumulated link
                     # buffer first — same source the detailed-report path
@@ -2087,6 +2188,15 @@ def run_research_process(research_id, query, mode, **kwargs):
                         len(clean_markdown),
                     )
 
+                    final_object = results.get("final_report")
+                    final_qc = _trusted_final_report(final_object, clean_markdown)
+                    if final_qc is not None:
+                        all_links = final_object["sources_for_publication"]
+                    if final_qc is None:
+                        clean_markdown, final_qc = _ground_report_content(
+                            clean_markdown, all_links, getattr(system, "model", None)
+                        )
+
                     # First send a progress update for generating the summary
                     progress_callback(
                         "Generating clean summary from research data...",
@@ -2101,21 +2211,18 @@ def run_research_process(research_id, query, mode, **kwargs):
                         {"phase": "report_complete"},
                     )
 
-                    # Preserve the answer; link known citations and store advisory
-                    # citation checks separately from the report body.
-                    from research_verify.publication import publish_report, collect_publication_sources
-                    publication = publish_report(
-                        clean_markdown, collect_publication_sources(system, all_links), use_llm
-                    )
-                    answer_with_links = publication.content
-                    all_links = [dict(index=str(src.index), title=src.title, url=src.url,
-                                      paper_id=src.paper_id) for src in publication.sources]
+                    # Keep only works cited by the answer, deduplicate them
+                    # at the paper level, and renumber in first-appearance
+                    # order before hyperlinking or saving anything.
+                    answer_with_links, all_links = _format_checked_answer(clean_markdown, all_links)
 
                     # report_content stores ONLY the synthesized answer.
                     # The legacy "answer + ## Sources + ## Research
                     # Metrics" view is reconstructed at render time by
                     # report_assembly_service.assemble_full_report.
                     full_report_content = answer_with_links
+                    final_qc["claim_offsets_scope"] = "checked_body_before_citation_formatting"
+                    final_qc["display_citation_map"] = {s["index"]: s.get("original_indices", []) for s in all_links if isinstance(s, dict) and s.get("index")}
 
                     # Save report FIRST, then sources:
                     # a chat read between commits sees a report with no
@@ -2131,7 +2238,8 @@ def run_research_process(research_id, query, mode, **kwargs):
                         metadata = {
                             "iterations": results["iterations"],
                             "generated_at": datetime.now(UTC).isoformat(),
-                            **publication.metadata(),
+                            "citation_verification": final_qc,
+                            "saved_content_sha256": hashlib.sha256(full_report_content.encode()).hexdigest(),
                         }
 
                         # Save report using storage abstraction
@@ -2403,19 +2511,31 @@ def run_research_process(research_id, query, mode, **kwargs):
             # assign new citation numbers in first-appearance order. The
             # generated Sources tail is intentionally discarded and rebuilt
             # from this compact list by report assembly.
-            all_links = (
+            all_links = list(
                 getattr(search_system, "all_links_of_system", None) or []
             )
-            from research_verify.publication import publication_for_report, collect_publication_sources
-            publication = publication_for_report(
-                final_report["content"], final_report.get("metadata"),
-                collect_publication_sources(search_system, all_links), use_llm
+            formatter = None
+            try:
+                formatter = get_citation_formatter()
+                source_start, _ = formatter._find_sources_section(
+                    final_report["content"], trust_sentinel=True
+                )
+                answer_body = (
+                    final_report["content"][:source_start]
+                    if source_start >= 0
+                    else final_report["content"]
+                )
+            except Exception:
+                logger.warning("Could not separate detailed-report bibliography")
+                answer_body = final_report["content"]
+            answer_body, final_qc = _ground_report_content(
+                answer_body, all_links, getattr(report_generator, "model", None)
             )
-            formatted_content = publication.content
-            final_report["content"] = publication.content
-            all_links = [dict(index=str(src.index), title=src.title, url=src.url,
-                              paper_id=src.paper_id) for src in publication.sources]
-            final_report["metadata"].update(publication.metadata())
+            final_report.setdefault("metadata", {})["citation_verification"] = final_qc
+            answer_with_links, all_links = _format_checked_answer(answer_body, all_links, formatter)
+            formatted_content = answer_with_links
+            final_qc["claim_offsets_scope"] = "checked_body_before_citation_formatting"
+            final_qc["display_citation_map"] = {s["index"]: s.get("original_indices", []) for s in all_links if isinstance(s, dict) and s.get("index")}
 
             # Save report FIRST, sources after.
             # See quick-summary path for rationale.
@@ -2428,6 +2548,7 @@ def run_research_process(research_id, query, mode, **kwargs):
                 # the detailed file backup's _metadata.json has parity with
                 # quick-mode (the detailed path previously omitted it).
                 metadata = final_report["metadata"]
+                metadata["saved_content_sha256"] = hashlib.sha256(formatted_content.encode()).hexdigest()
                 metadata["iterations"] = results["iterations"]
                 metadata["generated_at"] = datetime.now(UTC).isoformat()
 
@@ -2801,9 +2922,18 @@ def run_research_process(research_id, query, mode, **kwargs):
                 # Generate comprehensive error report
                 # ErrorReportGenerator does not use LLM (kept for compat)
                 error_generator = ErrorReportGenerator()
-                from research_verify.publication import publish_report
-                error_publication = publish_report(user_friendly_error, [])
-                enhanced_report_content = error_publication.content
+                enhanced_report_content = error_generator.generate_error_report(
+                    # Use the sanitized user_friendly_error (curated for known
+                    # errors, generic for unexpected ones) instead of raw {e!s}:
+                    # this report is persisted and retrievable via the report
+                    # routes, so embedding raw exception text would leak server
+                    # internals (CWE-209). Full detail stays in the logs.
+                    error_message=f"Research failed: {user_friendly_error}",
+                    query=query,
+                    partial_results=partial_results,
+                    search_iterations=search_iterations,
+                    research_id=research_id,
+                )
 
                 logger.info(
                     "Generated enhanced error report for failed research (length: {})",
@@ -2821,7 +2951,7 @@ def run_research_process(research_id, query, mode, **kwargs):
                             success = storage.save_report(
                                 research_id=research_id,
                                 content=enhanced_report_content,
-                                metadata={"error_report": True, **error_publication.metadata()},
+                                metadata={"error_report": True},
                                 username=username,
                             )
                             if success:

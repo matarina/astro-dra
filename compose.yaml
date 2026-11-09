@@ -16,110 +16,33 @@ services:
       LDR_WEB_PORT: "5000"
       LDR_DATA_DIR: /data
       TZ: ${TZ:-Asia/Shanghai}
-      LDR_LLM_PROVIDER: ${LDR_LLM_PROVIDER:-openai_endpoint}
+      LDR_LLM_PROVIDER: openai_endpoint
       LDR_LLM_OPENAI_ENDPOINT_URL: ${LDR_LLM_OPENAI_ENDPOINT_URL:?Set LDR_LLM_OPENAI_ENDPOINT_URL in .env}
       LDR_LLM_OPENAI_ENDPOINT_API_KEY: ${LDR_LLM_OPENAI_ENDPOINT_API_KEY:-}
       LDR_LLM_MODEL: ${LDR_LLM_MODEL:?Set LDR_LLM_MODEL in .env}
-      # Optional official DeepSeek backend; select DeepSeek / deepseek-flash in the form.
-      LDR_LLM_DEEPSEEK_API_KEY: ${LDR_LLM_DEEPSEEK_API_KEY:-}
-      # Private synthesis artifacts; general logs contain only stage/timing metadata.
-      LDR_RESEARCH_TRACE_ENABLED: ${LDR_RESEARCH_TRACE_ENABLED:-false}
-      LDR_RESEARCH_TRACE_DIR: /data/research_traces
-      # Optional second backend (e.g. Qwen Flash served by llama-server).
-      LDR_LLM_LLAMACPP_URL: ${LDR_LLM_LLAMACPP_URL:-http://localhost:8080/v1}
-      LDR_LLM_LLAMACPP_API_KEY: ${LDR_LLM_LLAMACPP_API_KEY:-}
-      LDR_SEARCH_TOOL: ${LDR_SEARCH_TOOL:-searxng}
-      # Restore 5000's relevance filtering and bounded per-query candidates.
-      LDR_SEARCH_SKIP_RELEVANCE_FILTER: ${LDR_SEARCH_SKIP_RELEVANCE_FILTER:-false}
-      LDR_SEARCH_MAX_RESULTS: ${LDR_SEARCH_MAX_RESULTS:-12}
-      LDR_SEARCH_MAX_FILTERED_RESULTS: ${LDR_SEARCH_MAX_FILTERED_RESULTS:-6}
-      LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES: ${LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES:-500}
-      # Enable final-answer consistency review; keep separate save-time citation QC off.
-      LDR_GENERAL_ENABLE_FACT_CHECKING: ${LDR_GENERAL_ENABLE_FACT_CHECKING:-true}
-      LDR_SEARCH_ENGINE_WEB_PUBMED_DEFAULT_PARAMS_OPTIMIZE_QUERIES: "false"
-      LDR_SEARCH_ENGINE_WEB_PUBMED_DESCRIPTION: "Search PubMed biomedical publications and abstracts. Use PubMed Boolean and field syntax, e.g. \"Visium HD\"[Title/Abstract] AND (\"2022/01/01\"[Date - Publication] : \"2026/12/31\"[Date - Publication]). Preserve required platforms and dates; use OR only for equivalent terms. Abstracts do not establish full-paper details or journal impact factors."
-      # Factory requires explicit per-engine switches; global false is insufficient.
-      LDR_SEARCH_ENGINE_WEB_PUBMED_DEFAULT_PARAMS_ENABLE_LLM_RELEVANCE_FILTER: "true"
-      LDR_SEARCH_ENGINE_WEB_SEARXNG_DEFAULT_PARAMS_ENABLE_LLM_RELEVANCE_FILTER: "true"
-      LDR_SEARCH_ENGINE_WEB_EUROPEPMC_DEFAULT_PARAMS_ENABLE_LLM_RELEVANCE_FILTER: "true"
-      # Explicit source pool: PubMed, SearXNG, Europe PMC.
-      LDR_SEARCH_ENGINE_WEB_ARXIV_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_ARXIV_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_BRAVE_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_BRAVE_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_EXA_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_EXA_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_GITHUB_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_GITHUB_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_GOOGLE_PSE_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_GOOGLE_PSE_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_MOJEEK_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_MOJEEK_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_PUBMED_AGENT_ENABLED: "true"
-      LDR_SEARCH_ENGINE_WEB_PUBMED_USE_IN_AUTO_SEARCH: "true"
-      LDR_SEARCH_ENGINE_WEB_EUROPEPMC_AGENT_ENABLED: "true"
-      LDR_SEARCH_ENGINE_WEB_EUROPEPMC_USE_IN_AUTO_SEARCH: "true"
-      LDR_SEARCH_ENGINE_WEB_SEARXNG_AGENT_ENABLED: "true"
-      LDR_SEARCH_ENGINE_WEB_SEARXNG_USE_IN_AUTO_SEARCH: "true"
-      LDR_SEARCH_ENGINE_WEB_SERPAPI_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_SERPAPI_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_TAVILY_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_TAVILY_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_TINYFISH_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_TINYFISH_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_WAYBACK_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_WAYBACK_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_WIKINEWS_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_WIKINEWS_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_WIKIPEDIA_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_WIKIPEDIA_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_ELASTICSEARCH_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_ELASTICSEARCH_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_PAPERLESS_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_PAPERLESS_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_SCALESERP_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_SCALESERP_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_SERPER_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_SERPER_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_SOFYA_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_SOFYA_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_NASA_ADS_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_NASA_ADS_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_OPENALEX_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_OPENALEX_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_SEMANTIC_SCHOLAR_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_SEMANTIC_SCHOLAR_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_GUTENBERG_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_GUTENBERG_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_OPENLIBRARY_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_OPENLIBRARY_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_PUBCHEM_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_PUBCHEM_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_STACKEXCHANGE_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_STACKEXCHANGE_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_ZENODO_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_ZENODO_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_DDG_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_DDG_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_GUARDIAN_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_GUARDIAN_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_ENGINE_WEB_LIBRARY_AGENT_ENABLED: "false"
-      LDR_SEARCH_ENGINE_WEB_LIBRARY_USE_IN_AUTO_SEARCH: "false"
-      LDR_SEARCH_SNIPPETS_ONLY: ${LDR_SEARCH_SNIPPETS_ONLY:-false}
+      LDR_SEARCH_TOOL: searxng
       LDR_SEARCH_ENGINE_WEB_SEARXNG_DEFAULT_PARAMS_INSTANCE_URL: http://searxng:8080
       LDR_SEARCH_ENGINE_WEB_SEARXNG_DEFAULT_PARAMS_RESULT_FORMAT: json
       LDR_SEARCH_ENGINE_WEB_PUBMED_API_KEY: ${LDR_SEARCH_ENGINE_WEB_PUBMED_API_KEY:-}
       LDR_VERIFY_ENABLE_VERIFY: ${LDR_VERIFY_ENABLE_VERIFY:-true}
-      LDR_VERIFY_ENABLE_CITATION_QC: ${LDR_VERIFY_ENABLE_CITATION_QC:-false}
+      LDR_VERIFY_ENABLE_CITATION_QC: ${LDR_VERIFY_ENABLE_CITATION_QC:-true}
+      LDR_VERIFY_QC_REQUIRE_BODY: ${LDR_VERIFY_QC_REQUIRE_BODY:-true}
+      LDR_VERIFY_QC_MAX_CLAIMS: ${LDR_VERIFY_QC_MAX_CLAIMS:-80}
+      LDR_VERIFY_QC_MAX_MODEL_CALLS: ${LDR_VERIFY_QC_MAX_MODEL_CALLS:-200}
+      LDR_VERIFY_QC_REVIEW_ROUNDS: ${LDR_VERIFY_QC_REVIEW_ROUNDS:-1}
+      LDR_VERIFY_QC_REPAIR_ROUNDS: ${LDR_VERIFY_QC_REPAIR_ROUNDS:-1}
+      LDR_VERIFY_QC_CONTEXT_CHARS: ${LDR_VERIFY_QC_CONTEXT_CHARS:-6000}
+      LDR_VERIFY_QC_CHUNK_CHARS: ${LDR_VERIFY_QC_CHUNK_CHARS:-1200}
+      LDR_VERIFY_QC_TOP_K: ${LDR_VERIFY_QC_TOP_K:-4}
       LDR_VERIFY_CROSSREF_MAILTO: ${LDR_VERIFY_CROSSREF_MAILTO:-ldr-research-verify@example.com}
       LDR_ENABLE_FILE_LOGGING: ${LDR_ENABLE_FILE_LOGGING:-true}
       LDR_USER_QUESTIONS_LOG: /data/logs/user_questions.log
       LDR_APP_ALLOW_REGISTRATIONS: ${LDR_APP_ALLOW_REGISTRATIONS:-true}
-      HTTP_PROXY: ${LDR_HTTP_PROXY:-http://host.docker.internal:9876}
-      HTTPS_PROXY: ${LDR_HTTPS_PROXY:-http://host.docker.internal:9876}
+      HTTP_PROXY: ${LDR_HTTP_PROXY:-}
+      HTTPS_PROXY: ${LDR_HTTPS_PROXY:-}
       NO_PROXY: ${LDR_NO_PROXY:-localhost,127.0.0.1,::1,host.docker.internal,searxng}
-      http_proxy: ${LDR_HTTP_PROXY:-http://host.docker.internal:9876}
-      https_proxy: ${LDR_HTTPS_PROXY:-http://host.docker.internal:9876}
+      http_proxy: ${LDR_HTTP_PROXY:-}
+      https_proxy: ${LDR_HTTPS_PROXY:-}
       no_proxy: ${LDR_NO_PROXY:-localhost,127.0.0.1,::1,host.docker.internal,searxng}
     volumes:
       - ldr_data:/data
@@ -133,35 +56,8 @@ services:
       searxng:
         condition: service_healthy
     restart: unless-stopped
-  # Enable COMPOSE_PROFILES=loopback-proxy when the host proxy listens only on 127.0.0.1.
-  proxy-relay:
-    profiles: ["loopback-proxy"]
-    image: ${PROXY_RELAY_IMAGE:-${ASTRO_DRA_IMAGE:-astro-dra:local}}
-    network_mode: host
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    # Match the host account permitted to use the loopback proxy.
-    user: "${PROXY_RELAY_UID:-1000}:${PROXY_RELAY_GID:-1000}"
-    entrypoint: ["/install/.venv/bin/python"]
-    command: ["-u", "/relay/proxy_relay.py", "--port", "9876"]
-    environment:
-      PYTHONDONTWRITEBYTECODE: "1"
-    volumes:
-      - ./deployment/proxy_relay.py:/relay/proxy_relay.py:ro
-    read_only: true
-    security_opt: ["no-new-privileges:true"]
-    cap_drop: [ALL]
-    healthcheck:
-      test: ["CMD", "/install/.venv/bin/python", "-c", "import socket; socket.create_connection(('127.0.0.1',9876),3).close(); socket.create_connection(('host.docker.internal',9876),3).close()"]
-      interval: 15s
-      timeout: 8s
-      start_period: 5s
-      retries: 3
-    restart: unless-stopped
   searxng:
     image: searxng/searxng@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     environment:
       SEARXNG_SECRET: ${SEARXNG_SECRET:?Set a random SEARXNG_SECRET in .env}
     volumes:
