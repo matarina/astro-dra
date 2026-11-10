@@ -1,5 +1,9 @@
 # LDR 开发接续记录
 
+## README English update (2026-11-10)
+
+Replaced the root README with an English version, added the repository banner at `assets/banner.png`, and aligned the evidence-workflow description with the current PubMed/SearXNG/Europe PMC flow. No application code, deployment configuration, user data, or running services were changed. `git diff --check` and the banner/link checks passed. The changes are local and uncommitted; no deployment or remote push was performed.
+
 最后整理：2026-11-04。此文件保留短接续信息；完整历史已按原始字节保留，见文末。当前事实集中在[当前状态](current-status.md)，后续任务集中在[待办](roadmap.md)，所有记录见[总索引](README.md)和[完整目录](document-catalog.md)。
 
 ## 开始开发前
