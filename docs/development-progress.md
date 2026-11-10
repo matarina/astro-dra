@@ -1,5 +1,9 @@
 # LDR 开发接续记录
 
+## `local-main` 合入 `main`（2026-11-10）
+
+按用户要求，在现有 `main` 上保留 `local-main` 的当前树，并记录 `origin/main` 历史为合并提交 `dc44449`。随后将合并后的 `main` 推送到远程，并删除远程 `local-main`；本地没有单独的 `local-main` 分支可删。工作区保持干净，未部署或修改应用代码。
+
 ## README English update (2026-11-10)
 
 Replaced the root README with an English version, added the repository banner at `assets/banner.png`, and aligned the evidence-workflow description with the current PubMed/SearXNG/Europe PMC flow. No application code, deployment configuration, user data, or running services were changed. `git diff --check` and the banner/link checks passed. The changes are local and uncommitted; no deployment or remote push was performed.
