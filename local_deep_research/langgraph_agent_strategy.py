@@ -8,8 +8,6 @@ questions can be decomposed into subtopics researched in parallel by subagents.
 
 from __future__ import annotations
 
-import hashlib
-import json
 import math
 import re
 import threading
@@ -92,7 +90,7 @@ _TOOL_ERROR_MAX_LEN = 500
 # candidate returned by every lead/sub-agent search, which made a detailed
 # report's bibliography grow into thousands of entries.  This is a candidate
 # budget, not the number of references that must appear in the final answer.
-DEFAULT_MAX_UNIQUE_SOURCES = 80
+DEFAULT_MAX_UNIQUE_SOURCES = 500
 
 # Preprint repositories are useful for discovery, but are not suitable as the
 # default evidence set for a bioinformatics service.  Blocking their pages at
@@ -163,17 +161,12 @@ class SearchResultsCollector:
         """Return stable identifiers for exact and cross-engine duplicates."""
         keys: list[str] = []
 
-        doi = str(result.get("doi") or "").strip().lower()
-        doi = re.sub(r"^(?:https?://(?:dx\.)?doi\.org/|doi:\s*)", "", doi)
-        if doi:
-            keys.append(f"doi:{doi}")
-
-        for field in ("pmid", "pmcid", "arxiv_id"):
-            value = str(result.get(field) or "").strip().lower()
-            if value:
-                if field == "arxiv_id":
-                    value = re.sub(r"v\d+$", "", value)
-                keys.append(f"{field}:{value}")
+        from research_verify.source_identity import identity_fields
+        for field, value in identity_fields(result).items():
+            keys.append(f"{field}:{value}")
+        arxiv_id = str(result.get("arxiv_id") or "").strip().lower()
+        if arxiv_id:
+            keys.append("arxiv_id:" + re.sub(r"v\d+$", "", arxiv_id))
 
         url = str(result.get("link", result.get("url", "")) or "").strip()
         if url:
@@ -203,20 +196,11 @@ class SearchResultsCollector:
 
     def _merge_duplicate(self, existing: dict, incoming: dict) -> None:
         """Keep richer metadata while preserving the original citation index."""
-        raw = incoming.get("raw_content")
-        previous_raw = existing.get("raw_content")
-        if isinstance(raw, str) and (
-            not isinstance(previous_raw, str) or len(raw) > len(previous_raw)
-        ):
-            existing["raw_content"] = raw
-            existing["raw_content_sha256"] = hashlib.sha256(raw.encode()).hexdigest()
-            if incoming.get("_fetched_evidence"):
-                existing["_fetched_evidence"] = incoming["_fetched_evidence"]
         for field, value in incoming.items():
             value_is_empty = value is None or (
                 isinstance(value, (str, list, tuple, dict, set)) and not value
             )
-            if field in {"index", "link", "url", "source_engine", "raw_content", "raw_content_sha256", "_fetched_evidence"} or value_is_empty:
+            if field in {"index", "link", "url", "source_engine"} or value_is_empty:
                 continue
             current = existing.get(field)
             current_is_empty = current is None or (
@@ -225,7 +209,7 @@ class SearchResultsCollector:
             if current_is_empty or (
                 isinstance(value, str)
                 and isinstance(current, str)
-                and field in {"snippet", "body", "abstract", "full_content"}
+                and field in {"snippet", "body", "abstract", "full_content", "fetched_content"}
                 and len(value) > len(current)
             ):
                 existing[field] = value
@@ -269,6 +253,12 @@ class SearchResultsCollector:
                 duplicate = self._find_duplicate(r)
                 if duplicate is not None:
                     self._merge_duplicate(duplicate, r)
+                    # Reuse its ID, but still expose this hit to the current
+                    # agent and final synthesis (including later subsections).
+                    if not any(item is duplicate for item in self._results):
+                        self._results.append(duplicate)
+                    if not any(item is duplicate for item in unique_results):
+                        unique_results.append(duplicate)
                     continue
 
                 if len(self._results) >= self._max_results:
@@ -309,6 +299,8 @@ class SearchResultsCollector:
             duplicate = self._find_duplicate(result)
             if duplicate is not None:
                 self._merge_duplicate(duplicate, result)
+                if not any(item is duplicate for item in self._results):
+                    self._results.append(duplicate)
                 idx = duplicate.get("index")
                 if idx is not None:
                     return int(idx)
@@ -362,22 +354,6 @@ class SearchResultsCollector:
         with self._lock:
             self._results.clear()
             self._sources.clear()
-
-    def snapshot(self, indices):
-        """Capture citation evidence under the same lock used by writers."""
-        from copy import deepcopy
-        from research_verify.evidence import SourceLookup
-        wanted = set(indices)
-        with self._lock:
-            records = []
-            for source in self._all_links:
-                try:
-                    index = int(source.get("index", 0))
-                except (TypeError, ValueError, AttributeError):
-                    continue
-                if index in wanted:
-                    records.append(deepcopy(source))
-            return SourceLookup(records)
 
     @property
     def results(self) -> list[dict]:
@@ -864,6 +840,8 @@ def _make_research_subtopic_tool(
         # lock-protected, so sharing the tool objects across pool workers
         # is safe. ``research_subtopic`` is itself excluded so subagents
         # cannot recurse.
+        from research_verify.subtask_research import SubtaskCollector, track_sources, run_subtask
+        sub_collector = SubtaskCollector(collector)
         sub_tools: list = []
         if search_enabled:
             sub_tools.append(
@@ -871,14 +849,14 @@ def _make_research_subtopic_tool(
                     search_engine_name,
                     model,
                     settings_snapshot,
-                    collector,
+                    sub_collector,
                     programmatic_mode=programmatic_mode,
                     description=web_search_description,
                 )
             )
         sub_fetch = build_fetch_tool(
             fetch_mode,
-            collector,
+            sub_collector,
             model=model,
             overall_query=overall_query,
             settings_snapshot=settings_snapshot,
@@ -900,7 +878,7 @@ def _make_research_subtopic_tool(
                 search_engine_name if search_enabled else None,
                 model,
                 settings_snapshot,
-                collector,
+                sub_collector,
                 programmatic_mode=programmatic_mode,
                 egress_context=egress_context,
             )
@@ -949,13 +927,16 @@ def _make_research_subtopic_tool(
             )
 
         current_date = datetime.now(UTC).strftime("%Y-%m-%d")
+        from research_verify.generation import GROUNDING_INSTRUCTIONS
+        from research_verify.subtask_handoff import SUBTASK_HANDOFF_INSTRUCTIONS
+        from research_verify.synthesis_trace import start_trace
         subagent_prompt = (
             f"You are a focused research assistant. Today's date: {current_date}. "
-            "Search thoroughly and return a concise factual summary. "
+            "Search thoroughly and deliver a research map with original source selections. "
             "Reference sources by their [N] index numbers. "
-            "Cite every factual sentence and table row individually; do not put the only citation "
-            "in a heading or at the end of a multi-sentence paragraph. "
             "Do NOT ask clarifying questions — provide your findings directly."
+            f"\n{GROUNDING_INSTRUCTIONS}"
+            f"\n{SUBTASK_HANDOFF_INSTRUCTIONS}"
         )
         specialized_names = [
             t.name
@@ -989,17 +970,10 @@ def _make_research_subtopic_tool(
                     tools=sub_tools,
                     system_prompt=subagent_prompt,
                 )
-                result = agent.invoke(
-                    {"messages": [{"role": "user", "content": topic}]},
-                    {"recursion_limit": max_sub_iterations * 2 + 1},
-                )
-                messages = result.get("messages", [])
-                if messages:
-                    last = messages[-1]
-                    content = getattr(last, "content", str(last))
-                    if content:
-                        return content
-                return f"No findings for: {topic}"
+                with start_trace("subtask") as trace:
+                    trace.record("subtask_request", {"topic": topic, "prompt": subagent_prompt})
+                    with track_sources(trace) as acquired:
+                        return run_subtask(agent, model, topic, max_sub_iterations, acquired, trace)
             except GraphRecursionError:
                 return f"Research on '{topic}' reached iteration limit. Partial findings above."
             except Exception as exc:
@@ -1288,7 +1262,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             "langgraph_agent.max_unique_sources", DEFAULT_MAX_UNIQUE_SOURCES
         )
         try:
-            self.max_unique_sources = max(10, min(200, int(raw_max_sources)))
+            self.max_unique_sources = max(10, min(500, int(raw_max_sources)))
         except (TypeError, ValueError):
             self.max_unique_sources = DEFAULT_MAX_UNIQUE_SOURCES
             logger.warning(
@@ -1298,9 +1272,6 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         self.collector = SearchResultsCollector(
             self.all_links_of_system, max_results=self.max_unique_sources
         )
-        # research_verify: last parsed constraint (set by _attach_constraint_match)
-        self._constraint_spec = None
-        self._keyword_spec = None
         self._citation_checks: list = []
         self._collection_tool_display_names: dict[str, str] = {}
         self._collection_tool_display_names_loaded = False
@@ -1901,6 +1872,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
 
     def analyze_topic(self, query: str) -> Dict[str, Any]:
         from langchain.agents import create_agent
+        from research_verify.generation import GROUNDING_INSTRUCTIONS
 
         logger.info(f"LangGraph agent research: {query[:100]}")
 
@@ -1989,6 +1961,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                 "agent will see the unmodified prompt"
             )
 
+        from research_verify.subtask_handoff import LEAD_HANDOFF_INSTRUCTIONS
         system_prompt = (
             f"You are a research assistant writing a research report. Today's date: {current_date}.\n"
             "This is NOT a chat conversation. Your only job is to research the "
@@ -2017,12 +1990,9 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             "citing sources as [1], [2], etc. Keep each citation close to the "
             "claim it supports; one citation must not be used to imply support "
             "for unrelated claims.\n"
-            "7. Cite every factual sentence and table row individually, including "
-            "when summarizing one paper. Do not leave citations only in a heading "
-            "or at the end of a multi-sentence paragraph. Abstracts guide initial "
-            "checks; obtain body evidence for detailed claims. Do not describe "
-            "an abstract or search snippet as a verified full-text reading.\n"
             f"{policy_addendum}"
+            f"\n{GROUNDING_INSTRUCTIONS}"
+            f"\n{LEAD_HANDOFF_INSTRUCTIONS}"
         )
 
         # Create agent — may fail if model doesn't support tool calling.
@@ -2138,6 +2108,8 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
 
                 elif "tools" in chunk:
                     msgs = chunk["tools"].get("messages", [])
+                    from research_verify.synthesis_trace import record_tool_results
+                    record_tool_results(msgs)
                     for msg in msgs:
                         obs_event = self._observation_event(msg)
                         # _observation_event returns None when the tool
@@ -2216,19 +2188,26 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         results = self.collector.results
         if not results:
             return "Research could not be completed within the iteration limit."
-        summaries = []
+        from types import SimpleNamespace
+        from research_verify.generation import (
+            GROUNDING_INSTRUCTIONS, source_material, format_source_documents,
+        )
+        documents = []
         for r in results[:20]:
-            summaries.append(
-                f"[{r.get('index', '?')}] {r.get('title', '')}: "
-                f"{r.get('snippet', '')}"
-            )
+            text, basis = source_material(r)
+            documents.append(SimpleNamespace(page_content=text, metadata={
+                "index": r.get("index", "?"), "title": r.get("title", ""),
+                "source": r.get("link") or r.get("url") or "",
+                "evidence_type": basis,
+            }))
         prompt = (
             f"Synthesize a comprehensive answer to: {query}\n\n"
             "Use only the evidence in the sources below. Every factual claim "
             "must have a nearby [N] citation. Do not invent missing details or "
             "metadata; if a point cannot be verified from these snippets, say "
             "it is unverified and leave it out.\n\n"
-            f"Based on these sources:\n" + "\n".join(summaries)
+            f"{GROUNDING_INSTRUCTIONS}\nBased on these sources:\n"
+            + format_source_documents(documents, query)
         )
         try:
             response = self.model.invoke(prompt)
@@ -2254,27 +2233,23 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
     ) -> Dict[str, Any]:
         """Apply citation handling and build the return dict."""
         all_search_results = self.collector.results
+        # Working drafts / earlier detailed sections may cite registered sources
+        # not newly searched in this call. Supply their real text to the writer
+        # instead of asking it to carry citations forward from draft prose alone.
+        known = {str(r.get("index")) for r in all_search_results}
+        for text in (final_answer, query):
+            for match in re.finditer(r"\[(\d+(?:\s*,\s*\d+)*)\]", text or ""):
+                for raw_index in re.split(r"\s*,\s*", match.group(1)):
+                    if raw_index in known:
+                        continue
+                    source = self.collector.find_by_index(int(raw_index))
+                    if source is not None:
+                        all_search_results.append(source)
+                        known.add(raw_index)
 
-        # --- research_verify: requirement 1 (DOI/PMID authenticity) --------
-        # Runs on the deduplicated result set only; never blocks the report.
-        self._attach_doi_verification(all_search_results)
-
-        # --- research_verify: requirement 2 (year/IF/language constraints) --
-        constraint_all_excluded = self._attach_constraint_match(
-            query, all_search_results
-        )
-
-        # A subsection call in detailed-report mode can answer purely
-        # from previously-written sections without running new searches,
-        # leaving the per-call collector empty. The citation pass below
-        # is then skipped and the section is saved as raw agent prose
-        # even though ## Sources renders the full accumulated bibliography
-        # (#4969). Running the pass against all_links_of_system instead is
-        # NOT safe as-is: the widened prompt overflows default local-model
-        # context windows, the rewrite has no structure-preservation
-        # guarantees, and the empty-collector condition is also reachable
-        # from chat follow-ups. Until that is redesigned, make the skip
-        # loud and report whether the raw answer already contains markers.
+        # Recover only cited earlier sources above, not the entire accumulated
+        # bibliography. If none can be resolved, retain the existing skip signal
+        # so a missing-material synthesis is visible in progress/log metadata.
         if (
             not all_search_results
             and self.all_links_of_system
@@ -2333,12 +2308,24 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                     {"phase": "synthesis", "type": "milestone"},
                 )
 
+        from research_verify.synthesis_trace import (
+            start_trace, source_snapshot, message_snapshot, text_digest,
+        )
+        with start_trace("agent_finalization") as trace:
+            trace.record("agent_draft", {"question": query, "text": final_answer,
+                         "text_sha256": text_digest(final_answer), "iteration": iteration})
+            if trace:
+                trace.record("agent_messages", {"messages": message_snapshot(agent_messages)})
+                trace.record("collector_sources", {"sources": source_snapshot(all_search_results)})
+
         synthesized_content = final_answer
         documents: list = []
 
         # Citation handling — only if we have results
         if all_search_results:
             try:
+                handler_impl = getattr(self.citation_handler, "_handler", self.citation_handler)
+                handler_impl.source_registrar = self.collector.find_or_add_result
                 citation_result = self.citation_handler.analyze_followup(
                     query,
                     all_search_results,
@@ -2363,49 +2350,12 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                     f"query ('{query[:80]}')"
                 )
 
-        # Check the actual synthesis BEFORE bibliography/metadata are appended.
-        # Every output below uses this same revised body, including findings
-        # consumed by the detailed report generator.
-        checked_content, citation_checks = self._attach_citation_qc(
+        # Preserve the generated answer and citation structure. Advisory checks run
+        # once on the final report at publication, not on every research subsection.
+        formatted_output = self._format_citations(
             synthesized_content, all_search_results
         )
-        all_search_results = getattr(self, "_citation_evidence_sources", all_search_results)
-        # Evidence preparation in the QC gate may have fetched missing bodies.
-        # Compute coverage afterwards so its evidence basis matches the actual
-        # source fields used for the published claim checks.
-        self._attach_keyword_coverage(query, all_search_results)
-        from research_verify.audit_io import publication_sources
-        published_sources = publication_sources(all_search_results)
-        if isinstance(getattr(self, "_citation_audit", None), dict):
-            self._citation_audit["source_metadata_sha256"] = hashlib.sha256(
-                json.dumps(published_sources, sort_keys=True, ensure_ascii=False).encode()
-            ).hexdigest()
-
-        # --- research_verify: append verification evidence section ---------
-        verify_parts = []
-        if constraint_all_excluded:
-            verify_parts.append(
-                "### 条件匹配提示\n\n"
-                "> 当前未找到完全满足这些条件的文献，未放宽条件填充。"
-            )
-        constraint_section = self._render_constraint_section(all_search_results)
-        if constraint_section:
-            verify_parts.append(constraint_section)
-        keyword_section = self._render_keyword_section(all_search_results)
-        if keyword_section:
-            verify_parts.append(keyword_section)
-        verify_section = self._render_verify_section(all_search_results)
-        if verify_section:
-            verify_parts.append(verify_section)
-        verify_block = "\n\n".join(verify_parts)
-        current_knowledge = checked_content
-        if verify_block:
-            current_knowledge = f"{current_knowledge}\n\n{verify_block}"
-        if isinstance(getattr(self, "_citation_audit", None), dict):
-            self._citation_audit["sealed_content_sha256"] = hashlib.sha256(current_knowledge.encode()).hexdigest()
-        formatted_output = self._format_citations(
-            current_knowledge, all_search_results
-        )
+        current_knowledge = synthesized_content
 
         # Build reasoning trace from agent messages
         reasoning_trace = []
@@ -2430,7 +2380,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         return {
             "findings": [
                 {
-                    "content": current_knowledge,
+                    "content": synthesized_content,
                     "question": query,
                     "search_results": all_search_results,
                     "documents": documents,
@@ -2440,359 +2390,67 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             "questions": {},
             "formatted_findings": formatted_output,
             "current_knowledge": current_knowledge,
-            "final_report": {
-                "content": current_knowledge,
-                "content_sha256": hashlib.sha256(
-                    current_knowledge.encode()
-                ).hexdigest(),
-                "verification": getattr(
-                    self, "_citation_audit", {"status": "unverifiable"}
-                ),
-                "sources_for_publication": published_sources,
-            },
             "sources": list(set(self.collector.sources)),
             "search_results": all_search_results,
             "documents": documents,
             "reasoning_trace": reasoning_trace,
             "error": None,
-            "citation_qc": [
-                c.model_dump() for c in getattr(self, "_citation_checks", [])
-            ],
+
         }
 
     # -- research_verify helpers -------------------------------------------
 
-    @staticmethod
-    def _run_async(coro):
-        """Run *coro* from the synchronous ``_finalize`` context.
-
-        ``_finalize`` runs in a worker thread without a running event loop, so
-        a plain ``asyncio.run`` is safe. If a loop ever happens to be running
-        in this thread we fall back to a throw-away thread to avoid
-        ``RuntimeError: event loop already running``.
-        """
-        import asyncio
-
-        try:
-            asyncio.get_running_loop()
-        except RuntimeError:
-            return asyncio.run(coro)
-
-        import concurrent.futures
-
-        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-            return pool.submit(lambda: asyncio.run(coro)).result()
-
-    def _attach_doi_verification(self, sources: list[dict]) -> None:
-        """Requirement 1: verify each source's DOI/PMID and stash the result.
-
-        Mutates each source dict in place (``_verify`` / ``_verify_badge``).
-        Silently degrades on any failure so the report always renders.
-        """
-        try:
-            from research_verify import get_config
-            from research_verify.doi_validator import DoiValidator, badge_for
-            from research_verify.http_client import HttpClient
-        except Exception as exc:  # package not shipped
-            logger.warning(f"research_verify import failed: {exc}")
-            return
-
-        cfg = get_config()
-        if not cfg.enable_verify or not cfg.module_enabled("doi_validation"):
-            return
-        if not sources:
-            return
-
-        async def _run():
-            context = self._build_egress_context() if hasattr(self, "_build_egress_context") else None
-            async with HttpClient(cfg, egress_context=context) as http:
-                return await DoiValidator(http, cfg).verify_many(sources)
-
-        try:
-            results = self._run_async(_run())
-        except Exception as exc:
-            logger.warning(f"doi_validation skipped: {exc}")
-            return
-
-        for idx, vr in results.items():
-            src = self.collector.find_by_index(idx)
-            if src is None:
-                continue
-            src["_verify"] = vr.model_dump()
-            src["_verify_badge"] = badge_for(vr)
-        logger.info(f"doi_validation: verified {len(results)} sources")
-
-    @staticmethod
-    def _render_verify_section(sources: list[dict]) -> str:
-        """Render the '文献真实性核验' Markdown table (empty when no data)."""
-        rows = [s for s in sources if isinstance(s, dict) and s.get("_verify")]
-        if not rows:
-            return ""
-        lines = [
-            "### 文献真实性核验",
-            "",
-            "| # | 标题 | 状态 | 来源 | 备注 |",
-            "|---|------|------|------|------|",
-        ]
-        for s in rows:
-            v = s.get("_verify") or {}
-            badge = s.get("_verify_badge", "❓未能核验")
-            warnings = "; ".join(v.get("warnings") or []) or ""
-            warnings = warnings.replace("|", "/")[:160]
-            title = str(s.get("title", ""))[:80].replace("|", "/")
-            lines.append(
-                f"| {s.get('index', '?')} | {title} | {badge} | "
-                f"{v.get('source', '')} | {warnings} |"
-            )
-        return "\n".join(lines)
-
-    def _attach_constraint_match(
-        self, query: str, sources: list[dict]
-    ) -> bool:
-        """Requirement 2: parse user constraints and match each source.
-
-        Writes ``_constraint`` / ``_constraint_badge`` onto each source and
-        returns ``True`` when every source was excluded by hard constraints
-        (so the report can state that no fully-matching paper was found).
-        """
-        try:
-            from research_verify import get_config
-            from research_verify.constraint_matcher import ConstraintMatcher
-            from research_verify.models import ResearchConstraint
-        except Exception as exc:
-            logger.warning(f"research_verify import failed: {exc}")
-            return False
-
-        cfg = get_config()
-        if not cfg.enable_verify or not cfg.module_enabled("constraint_match"):
-            return False
-        if not sources:
-            return False
-
-        try:
-            matcher = ConstraintMatcher(cfg, model=getattr(self, "model", None))
-            settings = {
-                "year_from": self.get_setting("report.year_from", None),
-                "year_to": self.get_setting("report.year_to", None),
-                "min_if": self.get_setting("report.min_if", None),
-                "language": self.get_setting("report.language", None),
-            }
-            constraint = matcher.parse(query, settings)
-            if constraint.is_empty:
-                return False
-            matches = matcher.match_many(sources, constraint)
-        except Exception as exc:
-            logger.warning(f"constraint_match skipped: {exc}")
-            return False
-
-        excluded = 0
-        for idx, m in matches.items():
-            src = self.collector.find_by_index(idx)
-            if src is None:
-                continue
-            src["_constraint"] = m.model_dump()
-            if m.excluded:
-                src["_constraint_badge"] = "❌不符合条件"
-                excluded += 1
-            elif m.if_unknown:
-                src["_constraint_badge"] = "⚠️IF未收录"
-            elif m.detail.get("pending"):
-                src["_constraint_badge"] = "❓条件待核验"
-            else:
-                src["_constraint_badge"] = "✅满足条件"
-        self._constraint_spec = constraint
-        logger.info(
-            f"constraint_match: {excluded}/{len(matches)} sources excluded"
-        )
-        return bool(matches) and excluded == len(matches)
-
-    @staticmethod
-    def _render_constraint_section(sources: list[dict]) -> str:
-        rows = [s for s in sources if isinstance(s, dict) and s.get("_constraint")]
-        if not rows:
-            return ""
-        lines = [
-            "### 条件匹配核验",
-            "",
-            "| # | 期刊 | 年份 | IF | 结论 | 说明 |",
-            "|---|------|------|----|------|------|",
-        ]
-        for s in rows:
-            m = s.get("_constraint") or {}
-            badge = s.get("_constraint_badge", "")
-            detail = m.get("detail") or {}
-            if_ = detail.get("if")
-            notes = []
-            if m.get("if_unknown"):
-                notes.append("期刊IF未收录")
-            if m.get("hard_violations"):
-                notes.append("越界:" + ",".join(m["hard_violations"]))
-            if detail.get("pending"):
-                notes.append("待核验:" + ",".join(detail["pending"]))
-            journal = str(s.get("journal", ""))[:40].replace("|", "/")
-            lines.append(
-                f"| {s.get('index', '?')} | {journal} | {s.get('year', '')} | "
-                f"{if_ if if_ is not None else '—'} | {badge} | {'; '.join(notes)} |"
-            )
-        return "\n".join(lines)
-
     def _attach_citation_qc(
         self, report_text: str, sources: list[dict]
     ) -> tuple[str, list]:
-        """Requirement 4: judge claim support and append the QC section.
-
-        Returns ``(report_text, checks)``. Appends a '结论可溯源性核查'
-        section and writes a JSON audit file next to the app logs.
-        """
-        self._citation_checks = []
-        self._citation_evidence_sources = sources
-        self._citation_publication_sources = sources
-        self._citation_audit = {"status": "unverifiable"}
-        if report_text == NO_RESULTS_MESSAGE:
-            return report_text, []
+        """Optional advisory audit; return the report unchanged."""
         try:
             from research_verify import get_config
             from research_verify.citation_qc import CitationQc
         except Exception as exc:
             logger.warning(f"research_verify import failed: {exc}")
-            return "结论核验模块不可用，未发布未经核验的研究正文。", []
+            return report_text, []
 
         cfg = get_config()
         if not cfg.enable_verify or not cfg.module_enabled("citation_qc"):
-            self._citation_audit = {"status": "disabled"}
             return report_text, []
         if not report_text:
             return report_text, []
 
         try:
-            qc = CitationQc(
-                judge_model=getattr(self, "model", None),
-                cfg=cfg,
-                review_model=getattr(self, "citation_review_model", None),
-            )
-            from research_verify.source_evidence import prepare_cited_evidence
-            # The collector can resolve accumulated citations from earlier
-            # detailed sections, even when this call collected no new sources.
-            evidence_preparation = prepare_cited_evidence(
-                qc.extract_claims(report_text), self.collector, cfg,
-                egress_context=(
-                    self._build_egress_context()
-                    if hasattr(self, "_build_egress_context") else None
-                ),
-            ) if cfg.qc_require_body else {"status": "abstract_only_policy"}
-            result = qc.verify_report(report_text, self.collector)
-            from research_verify.audit_io import publication_sources
-            self._citation_evidence_sources = qc.source_snapshot.records()
-            self._citation_publication_sources = publication_sources(self._citation_evidence_sources)
-            checks = result.original_checks
-            sections = [
-                result.content,
-                qc.render_paper_section(result.paper_checks),
-                qc.render_section(checks),
-            ]
-            out = "\n\n".join(section for section in sections if section)
-            self._citation_audit = result.model_dump(exclude={"content"})
-            self._citation_audit["verified_body_chars"] = len(result.content)
-            self._citation_audit["evidence_preparation"] = evidence_preparation
-            self._citation_audit["rendered_content_sha256"] = hashlib.sha256(
-                out.encode()
-            ).hexdigest()
-            self._citation_audit["source_metadata_sha256"] = hashlib.sha256(
-                json.dumps(self._citation_publication_sources, sort_keys=True, ensure_ascii=False).encode()
-            ).hexdigest()
-            path = self._write_citation_qc_json(checks, {**self._citation_audit, "source_artifacts": qc.source_snapshot.records()})
-            if path:
-                self._citation_audit["evidence_artifact_file"] = path
-            else:
-                self._citation_audit["evidence_storage_status"] = "unavailable"
+            qc = CitationQc(judge_model=getattr(self, "model", None), cfg=cfg)
+            claims = [c for c in qc.extract_claims(report_text) if c.citations]
+            if not claims:
+                return report_text, []
+            checks = qc.check(claims, self.collector)
+            self._write_citation_qc_json(checks)
             self._citation_checks = checks
             logger.info(
                 f"citation_qc: judged {len(checks)} claims "
                 f"({sum(1 for c in checks if c.verdict == 'unsupported')} unsupported)"
             )
-            return out, checks
+            return report_text, checks
         except Exception as exc:
-            logger.warning("citation_qc failed: {}", type(exc).__name__)
-            self._citation_audit = {"status": "unverifiable", "reason_code": "qc_error"}
-            return "结论核验未完成，未发布未经核验的研究正文。", []
+            logger.warning(f"citation_qc skipped: {exc}")
+            return report_text, []
 
     @staticmethod
-    def _write_citation_qc_json(checks: list, audit: dict | None = None) -> str | None:
+    def _write_citation_qc_json(checks: list) -> None:
         try:
-            from research_verify.audit_io import write_audit
-            payload = dict(audit) if audit is not None else {"checks": [c.model_dump() for c in checks]}
-            sources = payload.pop("source_artifacts", [])
-            path = write_audit(payload, sources)
+            import json
+            import os
+            from datetime import datetime, timezone
+
+            data_dir = os.environ.get("LDR_DATA_DIR", "/data")
+            logs_dir = os.path.join(data_dir, "logs")
+            os.makedirs(logs_dir, exist_ok=True)
+            ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+            path = os.path.join(logs_dir, f"citation_qc_{ts}.json")
+            with open(path, "w", encoding="utf-8") as fh:
+                json.dump([c.model_dump() for c in checks], fh, ensure_ascii=False, indent=2)
             logger.info(f"citation_qc audit written: {path}")
-            return path
         except Exception as exc:
-            logger.debug("citation_qc json write failed: {}", type(exc).__name__)
-            return None
-
-    def _attach_keyword_coverage(
-        self, query: str, sources: list[dict]
-    ) -> None:
-        """Requirement 3: compute keyword coverage and stash per source."""
-        try:
-            from research_verify import get_config
-            from research_verify.keyword_cov import KeywordCoverage
-        except Exception as exc:
-            logger.warning(f"research_verify import failed: {exc}")
-            return
-
-        cfg = get_config()
-        if not cfg.enable_verify or not cfg.module_enabled("keyword_coverage"):
-            return
-        if not sources:
-            return
-
-        try:
-            kc = KeywordCoverage(cfg, model=getattr(self, "model", None))
-            settings = {"keywords": self.get_setting("report.keywords", None)}
-            keywords = kc.extract_keywords(query, settings)
-            if not keywords:
-                return
-            for src in sources:
-                if not isinstance(src, dict):
-                    continue
-                cov = kc.compute(src, keywords)
-                src["_keyword_cov"] = cov.model_dump()
-                if cov.threshold_ok:
-                    src["_keyword_badge"] = "✅达标"
-                else:
-                    src["_keyword_badge"] = (
-                        "⚠️不达标(未验证全文)"
-                        if cov.basis != "fulltext"
-                        else "⚠️不达标"
-                    )
-            self._keyword_spec = keywords
-            logger.info(f"keyword_coverage: keywords={keywords}")
-        except Exception as exc:
-            logger.warning(f"keyword_coverage skipped: {exc}")
-
-    @staticmethod
-    def _render_keyword_section(sources: list[dict]) -> str:
-        rows = [s for s in sources if isinstance(s, dict) and s.get("_keyword_cov")]
-        if not rows:
-            return ""
-        lines = [
-            "### 关键词覆盖核验",
-            "",
-            "| # | 命中 | 缺失 | 覆盖 | 依据 | 结论 |",
-            "|---|------|------|------|------|------|",
-        ]
-        for s in rows:
-            cov = s.get("_keyword_cov") or {}
-            badge = s.get("_keyword_badge", "")
-            basis = cov.get("basis", "")
-            basis_label = "全文" if basis == "fulltext" else ("摘要" if basis == "abstract" else "无")
-            hits = ",".join(cov.get("hits") or [])[:80].replace("|", "/")
-            missed = ",".join(cov.get("missed") or [])[:80].replace("|", "/")
-            lines.append(
-                f"| {s.get('index', '?')} | {hits} | {missed} | "
-                f"{len(cov.get('hits') or [])}/{cov.get('total', 0)} | {basis_label} | {badge} |"
-            )
-        return "\n".join(lines)
+            logger.debug(f"citation_qc json write failed: {exc}")
 
     @staticmethod
     def _format_agent_error(exc: BaseException) -> str:

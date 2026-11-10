@@ -13,12 +13,15 @@ Status vocabularies (never silently pass a bad item):
   source must be flagged/dropped for the report's condition.
 * requirement 3 ``KeywordCov.threshold_ok`` -- ``False`` means under-covered.
 * requirement 4 ``ClaimCheck.verdict`` -- one of
-  ``supported``/``partial``/``unsupported``/``contradicted``/``unverifiable``.
+  ``supported``/``partial``/``unsupported``/``unverifiable``.
 """
 
 from __future__ import annotations
 
 from pydantic import BaseModel, Field
+
+from .contracts import ClaimEvidence
+from .semantics import SemanticCheck
 
 
 class VerifyResult(BaseModel):
@@ -31,7 +34,6 @@ class VerifyResult(BaseModel):
     source: str = "unavailable"  # crossref | pubmed | link | unavailable
     title_ok: bool | None = None
     year_ok: bool | None = None
-    retracted: bool | None = None
     warnings: list[str] = Field(default_factory=list)
     verified_at: str = ""
 
@@ -42,14 +44,14 @@ class ResearchConstraint(BaseModel):
     year_from: int | None = None
     year_to: int | None = None
     min_if: float | None = None
-    min_if_inclusive: bool = True
     language: str | None = None
-    unresolved: list[str] = Field(default_factory=list)
     is_hard_default: bool = True
 
     @property
     def is_empty(self) -> bool:
-        return not (any(value is not None for value in (self.year_from, self.year_to, self.min_if, self.language)) or self.unresolved)
+        return not any(
+            (self.year_from, self.year_to, self.min_if, self.language)
+        )
 
 
 class ConstraintMatch(BaseModel):
@@ -78,63 +80,45 @@ class KeywordCov(BaseModel):
     basis: str = "unavailable"  # fulltext | abstract | unavailable
 
 
-class EvidenceSpan(BaseModel):
-    """An exact quote located in a specific source field, not model prose."""
-
-    citation: int
-    source: str
-    field: str
-    basis: str  # abstract | body
-    content_sha256: str
-    quote: str
-    start: int
-    end: int
+class RetrievedPassage(BaseModel):
+    """A range in the source artifact actually presented to the judge."""
+    start: int = Field(ge=0)
+    end: int = Field(gt=0)
+    score: float = Field(ge=0)
 
 
-class SourceClaimCheck(BaseModel):
-    """Separate abstract/body assessments for one claim and one citation."""
-
-    citation: int
-    source: str = ""
-    abstract_verdict: str = "unverifiable"
-    body_verdict: str = "unverifiable"
+class CitationSupport(BaseModel):
+    """One cited work's outcome; missing citations remain explicit audit rows."""
+    citation_index: int
+    paper_id: str | None = None
+    artifact_id: str | None = None
+    basis: str | None = None
+    source_field: str | None = None
+    text_version: str = "raw-text-v1"
+    assessed_chars: int = 0
+    retrieval_method: str = ""
+    retrieved_passages: list[RetrievedPassage] = Field(default_factory=list)
     verdict: str = "unverifiable"
-    reason: str = ""
-    reason_code: str = ""
-    evidence: list[EvidenceSpan] = Field(default_factory=list)
-    review_count: int = 0
-    assessments: list[dict] = Field(default_factory=list)
+    reason_code: str = "unresolved_citation"
+    model_reason: str = ""
+    model_verdict: str | None = None
+    semantic_schema_version: str = "1.0"
+    semantic_checks: list[SemanticCheck] = Field(default_factory=list)
+    evidence: ClaimEvidence | None = None
 
 
 class ClaimCheck(BaseModel):
     """Support verdict for one report claim and its citations (requirement 4)."""
 
     claim: str
+    claim_id: str = ""
+    report_start: int | None = None
+    report_end: int | None = None
+    claim_kind: str = "factual_candidate"
+    claim_context: str = ""
+    citation_checks: list[CitationSupport] = Field(default_factory=list)
     citations: list[int] = Field(default_factory=list)
     sources: list[str] = Field(default_factory=list)
-    verdict: str = "unverifiable"  # supported | partial | unsupported | contradicted | unverifiable
+    verdict: str = "unverifiable"  # supported | partial | unsupported | unverifiable
     supporting_fragment: str | None = None
     reason: str = ""
-    reason_code: str = ""
-    start: int | None = None
-    end: int | None = None
-    source_checks: list[SourceClaimCheck] = Field(default_factory=list)
-    retained: bool = False
-    replacement: str | None = None
-
-
-class ReportCheck(BaseModel):
-    """One checked body shared by every report output, plus revision history."""
-
-    content: str
-    content_sha256: str
-    status: str  # supported | partial | unverifiable
-    input_content_sha256: str = ""
-    checks: list[ClaimCheck] = Field(default_factory=list)
-    original_checks: list[ClaimCheck] = Field(default_factory=list)
-    paper_checks: list[dict] = Field(default_factory=list)
-    removed_claims: int = 0
-    revised_claims: int = 0
-    model_calls: int = 0
-    policy_version: str = "abstract-body-v2"
-    scope: str = "claim_grounding_only"
