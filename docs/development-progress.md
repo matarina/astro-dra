@@ -2,7 +2,7 @@
 
 ## `local-main` 合入 `main`（2026-11-10）
 
-按用户要求，在现有 `main` 上保留 `local-main` 的当前树，并记录 `origin/main` 历史为合并提交 `dc44449`。随后将合并后的 `main` 推送到远程，并删除远程 `local-main`；本地没有单独的 `local-main` 分支可删。工作区保持干净，未部署或修改应用代码。
+按用户要求，在现有 `main` 上保留 `local-main` 的当前树，并记录 `origin/main` 历史为合并提交 `dc44449`。随后将合并后的 `main` 推送到远程，并删除远程 `local-main`；本地没有单独的 `local-main` 分支可删。提交时无已跟踪改动，未部署或修改应用代码；验证时发现一个未跟踪的用户归档文件，未触碰。
 
 ## README English update (2026-11-10)
 
