@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0",
+  "synthetic": true,
+  "note": "工程验收规格，非真实论文，不证明线上语义准确性。M0仅准备样本，目标检测尚未实现。多篇案例集成时需展开逐篇artifact。",
+  "cases": [
+    {
+      "id": "T01",
+      "category": "结论",
+      "evidence": "The trial observed a 12% reduction.",
+      "claim": "The trial observed a 12% reduction [1].",
+      "expected_status": "supported",
+      "expected_reason": "located_quote"
+    },
+    {
+      "id": "T02",
+      "category": "结论",
+      "evidence": "The trial observed a 12% reduction.",
+      "claim": "The trial observed a 42% reduction [1].",
+      "expected_status": "unsupported",
+      "expected_reason": "numeric_mismatch"
+    },
+    {
+      "id": "T03",
+      "category": "结论",
+      "evidence": "X was associated with Y in an observational study.",
+      "claim": "X causes Y [1].",
+      "expected_status": "unsupported",
+      "expected_reason": "causality_overstatement"
+    },
+    {
+      "id": "T04",
+      "category": "结论",
+      "evidence": "X was associated with Y.",
+      "claim": "X was associated with Y.",
+      "expected_status": "unverifiable",
+      "expected_reason": "missing_citation"
+    },
+    {
+      "id": "T05",
+      "category": "结论",
+      "evidence": "No outcomes were measured.",
+      "claim": "The intervention reduced mortality [1].",
+      "expected_status": "unsupported",
+      "expected_reason": "fabricated_quote"
+    },
+    {
+      "id": "T06",
+      "category": "结论",
+      "evidence": "",
+      "claim": "X improved survival [9].",
+      "expected_status": "unverifiable",
+      "expected_reason": "unresolved_citation"
+    },
+    {
+      "id": "T07",
+      "category": "结论",
+      "evidence": "An abstract discusses cell growth.",
+      "claim": "X improved clinical survival [1].",
+      "expected_status": "unsupported",
+      "expected_reason": "evidence_scope_mismatch"
+    },
+    {
+      "id": "T08",
+      "category": "结论",
+      "evidence": "Study A supports X; study B measured unrelated Y.",
+      "claim": "X improves survival [1, 2].",
+      "expected_status": "partial",
+      "expected_reason": "one_citation_unsupported"
+    },
+    {
+      "id": "T09",
+      "category": "真实性",
+      "evidence": "",
+      "claim": "A valid DOI belongs to a different title.",
+      "expected_status": "fail",
+      "expected_reason": "identity_mismatch"
+    },
+    {
+      "id": "T10",
+      "category": "条件",
+      "evidence": "",
+      "claim": "Requested 2026, observed 2027.",
+      "expected_status": "fail",
+      "expected_reason": "year_outside_exact_range"
+    },
+    {
+      "id": "T11",
+      "category": "条件",
+      "evidence": "",
+      "claim": "JIF value present without confirmed release/source.",
+      "expected_status": "unknown",
+      "expected_reason": "jif_version_unknown"
+    },
+    {
+      "id": "T12",
+      "category": "条件",
+      "evidence": "",
+      "claim": "PubMed record has no language metadata.",
+      "expected_status": "unknown",
+      "expected_reason": "language_unknown"
+    },
+    {
+      "id": "T13",
+      "category": "关键词",
+      "evidence": "Body: A B. References: C D.",
+      "claim": "Require 3 of A B C D.",
+      "expected_status": "fail",
+      "expected_reason": "body_only_two_hits"
+    },
+    {
+      "id": "T14",
+      "category": "关键词",
+      "evidence": "Abstract: A B C. No full text.",
+      "claim": "Require fulltext 3 of A B C D.",
+      "expected_status": "unknown",
+      "expected_reason": "fulltext_unavailable"
+    }
+  ]
+}

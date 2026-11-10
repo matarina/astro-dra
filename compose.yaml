@@ -1,0 +1,75 @@
+name: astro-dra
+services:
+  local-deep-research:
+    image: ${ASTRO_DRA_IMAGE:-astro-dra:local}
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile
+      args:
+        LDR_BASE_IMAGE: ${LDR_BASE_IMAGE:-localdeepresearch/local-deep-research@sha256:ce95481a35d3eebc2c1ae7bd34fad426108c3fb8d1a22f66c9e772276869c2f0}
+    ports:
+      - "${LDR_BIND_ADDRESS:-127.0.0.1}:${LDR_PORT:-5000}:5000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      LDR_WEB_HOST: 0.0.0.0
+      LDR_WEB_PORT: "5000"
+      LDR_DATA_DIR: /data
+      TZ: ${TZ:-Asia/Shanghai}
+      LDR_LLM_PROVIDER: openai_endpoint
+      LDR_LLM_OPENAI_ENDPOINT_URL: ${LDR_LLM_OPENAI_ENDPOINT_URL:?Set LDR_LLM_OPENAI_ENDPOINT_URL in .env}
+      LDR_LLM_OPENAI_ENDPOINT_API_KEY: ${LDR_LLM_OPENAI_ENDPOINT_API_KEY:-}
+      LDR_LLM_MODEL: ${LDR_LLM_MODEL:?Set LDR_LLM_MODEL in .env}
+      LDR_SEARCH_TOOL: searxng
+      LDR_SEARCH_ENGINE_WEB_SEARXNG_DEFAULT_PARAMS_INSTANCE_URL: http://searxng:8080
+      LDR_SEARCH_ENGINE_WEB_SEARXNG_DEFAULT_PARAMS_RESULT_FORMAT: json
+      LDR_SEARCH_ENGINE_WEB_PUBMED_API_KEY: ${LDR_SEARCH_ENGINE_WEB_PUBMED_API_KEY:-}
+      LDR_VERIFY_ENABLE_VERIFY: ${LDR_VERIFY_ENABLE_VERIFY:-true}
+      LDR_VERIFY_ENABLE_CITATION_QC: ${LDR_VERIFY_ENABLE_CITATION_QC:-true}
+      LDR_VERIFY_QC_REQUIRE_BODY: ${LDR_VERIFY_QC_REQUIRE_BODY:-true}
+      LDR_VERIFY_QC_MAX_CLAIMS: ${LDR_VERIFY_QC_MAX_CLAIMS:-80}
+      LDR_VERIFY_QC_MAX_MODEL_CALLS: ${LDR_VERIFY_QC_MAX_MODEL_CALLS:-200}
+      LDR_VERIFY_QC_REVIEW_ROUNDS: ${LDR_VERIFY_QC_REVIEW_ROUNDS:-1}
+      LDR_VERIFY_QC_REPAIR_ROUNDS: ${LDR_VERIFY_QC_REPAIR_ROUNDS:-1}
+      LDR_VERIFY_QC_CONTEXT_CHARS: ${LDR_VERIFY_QC_CONTEXT_CHARS:-6000}
+      LDR_VERIFY_QC_CHUNK_CHARS: ${LDR_VERIFY_QC_CHUNK_CHARS:-1200}
+      LDR_VERIFY_QC_TOP_K: ${LDR_VERIFY_QC_TOP_K:-4}
+      LDR_VERIFY_CROSSREF_MAILTO: ${LDR_VERIFY_CROSSREF_MAILTO:-ldr-research-verify@example.com}
+      LDR_ENABLE_FILE_LOGGING: ${LDR_ENABLE_FILE_LOGGING:-true}
+      LDR_USER_QUESTIONS_LOG: /data/logs/user_questions.log
+      LDR_APP_ALLOW_REGISTRATIONS: ${LDR_APP_ALLOW_REGISTRATIONS:-true}
+      HTTP_PROXY: ${LDR_HTTP_PROXY:-}
+      HTTPS_PROXY: ${LDR_HTTPS_PROXY:-}
+      NO_PROXY: ${LDR_NO_PROXY:-localhost,127.0.0.1,::1,host.docker.internal,searxng}
+      http_proxy: ${LDR_HTTP_PROXY:-}
+      https_proxy: ${LDR_HTTPS_PROXY:-}
+      no_proxy: ${LDR_NO_PROXY:-localhost,127.0.0.1,::1,host.docker.internal,searxng}
+    volumes:
+      - ldr_data:/data
+      - ldr_config:/app/.config/local_deep_research
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, FOWNER, DAC_OVERRIDE, SETUID, SETGID]
+    ulimits:
+      memlock: {soft: -1, hard: -1}
+    depends_on:
+      searxng:
+        condition: service_healthy
+    restart: unless-stopped
+  searxng:
+    image: searxng/searxng@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4
+    environment:
+      SEARXNG_SECRET: ${SEARXNG_SECRET:?Set a random SEARXNG_SECRET in .env}
+    volumes:
+      - ./deployment/searxng/settings.yml:/etc/searxng/settings.yml:ro
+    security_opt: ["no-new-privileges:true"]
+    healthcheck:
+      test: [CMD, wget, -qO-, "http://localhost:8080/healthz"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    restart: unless-stopped
+volumes:
+  ldr_data:
+  ldr_config:

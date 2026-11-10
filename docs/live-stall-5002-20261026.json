@@ -1,0 +1,93 @@
+{
+  "research_id": "50dec514-8e43-4d75-8964-bc0a6c1ed47e",
+  "observed_at": "2026-10-26T10:52:51.173118+08:00",
+  "last_llm_start": "2026-10-26T10:32:13.470000+08:00",
+  "no_new_model_start_seconds": 1238,
+  "last_prompt_chars": 82389,
+  "last_milestone": "Researching 5 subtopics in parallel",
+  "important_stacks": [
+    {
+      "tid": 417,
+      "frames": [
+        [
+          "/usr/local/lib/python3.14/ssl.py",
+          1140,
+          "SSLSocket.read"
+        ],
+        [
+          "/usr/local/lib/python3.14/ssl.py",
+          1285,
+          "SSLSocket.recv"
+        ],
+        [
+          "/install/.venv/lib/python3.14/site-packages/httpcore2/_backends/sync.py",
+          127,
+          "SyncStream.read"
+        ],
+        [
+          "/install/.venv/lib/python3.14/site-packages/httpcore2/_sync/http11.py",
+          200,
+          "HTTP11Connection._receive_event"
+        ],
+        [
+          "/install/.venv/lib/python3.14/site-packages/httpcore2/_sync/http11.py",
+          167,
+          "HTTP11Connection._receive_response_headers"
+        ]
+      ]
+    },
+    {
+      "tid": 415,
+      "frames": [
+        [
+          "/usr/local/lib/python3.14/threading.py",
+          373,
+          "Condition.wait"
+        ],
+        [
+          "/install/.venv/lib/python3.14/site-packages/local_deep_research/advanced_search_system/strategies/langgraph_agent_strategy.py",
+          1113,
+          "_make_research_subtopic_tool.<locals>.research_subtopic"
+        ],
+        [
+          "/install/.venv/lib/python3.14/site-packages/langchain_core/tools/structured.py",
+          97,
+          "StructuredTool._run"
+        ]
+      ]
+    }
+  ],
+  "thread_stack_count": 28,
+  "sdk_factory_probe": {
+    "scope": "fresh native get_llm from current container environment/defaults; not original in-flight request object",
+    "request_timeout": null,
+    "sdk_timeout": null,
+    "sdk_max_retries": 2
+  },
+  "subagent_timeout_seconds": 1800,
+  "health": "healthy",
+  "started_at": "2026-10-26T02:23:04.808777289Z",
+  "restart_count": 0,
+  "oom_killed": false,
+  "azure_short_probe": {
+    "http_status": 200,
+    "elapsed_s": 2.697,
+    "model": "gpt-5.6-sol-2026-07-09",
+    "completion_present": true
+  },
+  "log_summary": {
+    "counts": {
+      "QueuePool limit": 24,
+      "Failed to write metrics": 12,
+      "Failed to write search metrics": 12,
+      "HTTP 404 fetching": 5,
+      "No SearXNG results found": 95,
+      "on_llm_start": 328
+    },
+    "last_llm_start": "2026-10-26 10:32:13.470 | DEBUG    | local_deep_research.metrics.token_counter:on_llm_start:124 - Estimated prompt tokens: 20597 (from 82389 chars)",
+    "observed_at": "2026-10-26T10:52:10.898453+08:00"
+  },
+  "application_modified": false,
+  "service_restarted": false,
+  "live_task_interrupted": false
+}

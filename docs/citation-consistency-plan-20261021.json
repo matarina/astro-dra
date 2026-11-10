@@ -1,0 +1,66 @@
+{
+  "scope": "Diagnosis and implementation proposal only; no application changes/deployment in this turn",
+  "runtime": "astro-dra:abstract-context-20261021; started 2026-10-21T07:41:53Z; healthy",
+  "duplicate_same_version": {
+    "pmid": "42345756",
+    "display_numbers": [
+      50,
+      51
+    ],
+    "original_indices": [
+      151,
+      88
+    ],
+    "records": [
+      {
+        "index": 88,
+        "doi": "10.3390/biology15120900",
+        "pmid": "42345756",
+        "url": "https://europepmc.org/article/MED/42345756"
+      },
+      {
+        "index": 151,
+        "doi": null,
+        "pmid": null,
+        "url": "https://pubmed.ncbi.nlm.nih.gov/42345756/"
+      }
+    ],
+    "offline_current_publish_sources": 2,
+    "offline_after_metadata_alignment_sources": 1,
+    "aligned_original_indices": [
+      88,
+      151
+    ]
+  },
+  "related_versions": {
+    "title": "Halo: a pretrained model for whole-cell segmentation from nuclei images in spatial transcriptomics.",
+    "display_numbers": [
+      44,
+      45
+    ],
+    "preprint_pmid": "41993456",
+    "published_pmid": "42752546",
+    "preprint_doi": "10.64898/2026.04.02.716237",
+    "published_doi": "10.1093/bib/bbag515",
+    "europepmc_core_relation": "MED 42752546 commentCorrectionList: Update of MED 41993456",
+    "pubmed_xml_relation": "PMID 41993456 CommentsCorrections RefType=UpdateIn PMID 42752546",
+    "current_loss": "Explicit version relation exists in captured raw responses but is not retained by current search adapters."
+  },
+  "task_attribution": {
+    "source": "STARS",
+    "pmid": "42151140",
+    "original_index": 27,
+    "display_index": 16,
+    "report_heading": "3D重建 / 三维组织重建",
+    "provided_abstract_support": "Region-of-interest identification and reconstruction of single-cell gene-expression profiles, among other analyses; no supplied statement establishing 3D reconstruction.",
+    "agent_draft_contains_STARS_or_3D": false,
+    "new_heading_appears_in": "Final writer output after native pre-synthesis consistency feedback"
+  },
+  "proposed_order": [
+    "Shared DOI/PMID/PMCID/URL identity aliases across collection and publication; do not merge by title.",
+    "Retain explicit version relations separately from same-version identity; prefer formal version for writing with actual supporting text, preserve version provenance.",
+    "Bind each source to research purpose, data/modality and actual analysis in the working notes; separate compared/cited methods from performed analyses.",
+    "Make native pre-synthesis feedback question-aware and examine heading+claim+citation; acknowledge it cannot inspect errors introduced after that stage.",
+    "Writer must align section task with evidence; test frozen real examples before considering optional final targeted review/revision. Do not re-enable disabled citation audit or automatic content revision without a subsequent explicit decision."
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "research_id": "2ac66cfe-9187-455f-a860-fafe66e11ece",
+  "runtime_image": "astro-dra:generic-sources-20261026",
+  "error_confirmed": true,
+  "classification": "Explicit animal-count error, not merely ambiguous wording.",
+  "paper": {
+    "pmid": "40813851",
+    "pmcid": "PMC12354736",
+    "doi": "10.1038/s41467-025-62599-9",
+    "original_index": 265,
+    "display_index": 25,
+    "official_url": "https://www.nature.com/articles/s41467-025-62599-9"
+  },
+  "official_facts": {
+    "mice": 6,
+    "kidney_samples": 12,
+    "timepoints": 6,
+    "replicates": "Left/right kidneys, called technical replicates by authors",
+    "final_xenium_cells": 1374915
+  },
+  "trace_integrity": {
+    "artifact_count": 274,
+    "sha256_passed": 274,
+    "byte_counts_passed": 274,
+    "event_status_counts": {
+      "recorded": 274
+    }
+  },
+  "material": {
+    "source_content_type": "abstract",
+    "abstract_chars": 1139,
+    "fetched_content_present": false,
+    "complete_abstract_present_in_native_and_writer": true,
+    "writer_pool_chars": 190752,
+    "selected_count": 103,
+    "collected_count": 271,
+    "native_prompt_chars": 208546,
+    "writer_prompt_chars": 215425
+  },
+  "chain": {
+    "source": "12 male mouse kidneys",
+    "agent_draft": "12 只小鼠肾",
+    "writer": "12 只雄鼠",
+    "native_feedback_mentions_source": false,
+    "native_feedback_mentions_kidney": false,
+    "feedback_in_writer": true,
+    "writer_equals_publication_input": true,
+    "final_original_indices": [
+      265
+    ]
+  },
+  "model": {
+    "native_check_response": {
+      "model_name": "deepseek-flash",
+      "finish_reason": "stop"
+    },
+    "writer_response": {
+      "model_name": "deepseek-flash",
+      "finish_reason": "stop"
+    }
+  },
+  "times_utc": {
+    "agent_draft": "2026-10-27T00:49:38.993575+00:00",
+    "native_check_response": "2026-10-27T01:00:18.589598+00:00",
+    "writer_response": "2026-10-27T01:02:50.744900+00:00",
+    "publication_output": "2026-10-27T01:02:51.058242+00:00"
+  },
+  "selected_in_batches": [
+    11
+  ],
+  "not_proven": [
+    "Long context is a plausible risk, not a demonstrated sole cause",
+    "Unrecorded internal subagent actions cannot be reconstructed",
+    "No automatic full-text download failure for this paper is demonstrated"
+  ],
+  "changes_this_turn": "Diagnosis and documentation only; no application/config/report/user DB changes, model calls, or restart."
+}

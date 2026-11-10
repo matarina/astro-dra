@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-27",
+  "requested_model": "deepseek-v4-flash",
+  "provider": "openai_endpoint",
+  "checks_passed": true,
+  "candidate": {
+    "model": "deepseek-v4-flash",
+    "provider": "openai_endpoint",
+    "checks_passed": true,
+    "temperature": 0.7,
+    "max_tokens_setting": 30000,
+    "consistency_enabled": true,
+    "configured_host": "27.30.76.162",
+    "checks": [
+      "environment_default_and_native_provider",
+      "ldr_get_llm_chinese_completion",
+      "streaming",
+      "structured_tool_call",
+      "tool_result_roundtrip",
+      "relevance_filter",
+      "native_consistency_and_final_writer"
+    ],
+    "timings": {
+      "completion_s": 0.861,
+      "stream_s": 0.102,
+      "tool_roundtrip_s": 0.694,
+      "relevance_s": 0.115,
+      "writer_s": 1.418
+    },
+    "elapsed_s": 3.191,
+    "scope": "Backend integration smoke; no full research or account changes."
+  },
+  "deployment": {
+    "application": {
+      "id": "a89770db55ec3a14393ddb1a29937d4dbeff0f2e812236d22d32259b97202135",
+      "image": "astro-dra:generic-sources-20261026",
+      "started_at": "2026-10-27T02:05:42.954145565Z",
+      "health": "healthy"
+    },
+    "login_http_status": 200,
+    "image_unchanged": true,
+    "original_volumes_preserved": true,
+    "other_services_unchanged": true,
+    "configured_environment_matches_runtime": true,
+    "live_smoke": {
+      "default_provider": "openai_endpoint",
+      "default_model": "deepseek-v4-flash",
+      "chinese_generation_passed": true
+    },
+    "configuration": {
+      "LDR_LLM_MODEL": "deepseek-v4-flash",
+      "LDR_LLM_PROVIDER": "openai_endpoint",
+      "LDR_GENERAL_ENABLE_FACT_CHECKING": "true",
+      "LDR_VERIFY_ENABLE_CITATION_QC": "false",
+      "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": "500",
+      "LDR_RESEARCH_TRACE_ENABLED": "true"
+    }
+  },
+  "startup_error_lines": 0,
+  "backup": "/data/ningh/nh/ldr-test-5002-backups/restore-deepseek-v4-20261027-100419",
+  "restored_connection_from": "/data/ningh/nh/ldr-test-5002-backups/azure-gpt56-20261026-101806/.env.test-5002",
+  "changes": [
+    "Default model",
+    "Provider",
+    "Original OpenAI-compatible endpoint and matching credential"
+  ],
+  "unchanged": [
+    "Application image/code",
+    "Search settings",
+    "Source budget500",
+    "Native fact-checking enabled",
+    "Saved-report QC disabled",
+    "PubMed auto-fulltext default disabled",
+    "Private tracing enabled",
+    "Historical reports and user data volumes",
+    "5000/SearXNG/relay services"
+  ],
+  "scope": "Connection/default model restoration and smoke only, not research quality validation."
+}

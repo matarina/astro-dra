@@ -1,0 +1,11 @@
+# Account roles extend the current runtime; retrieval/model code is inherited.
+ARG LDR_ACCOUNTS_BASE_IMAGE=astro-dra:sidebar-5002-20261030
+FROM ${LDR_ACCOUNTS_BASE_IMAGE}
+USER root
+COPY local_deep_research/overlay/ui/ /tmp/astro-accounts/overlays/overlay/ui/
+COPY local_deep_research/astro_accounts/ /tmp/astro-accounts/overlays/astro_accounts/
+COPY deployment/install_overlays.py deployment/ui-overlay-manifest.json deployment/install_accounts.py /tmp/astro-accounts/
+RUN /install/.venv/bin/python /tmp/astro-accounts/install_overlays.py \
+      --source /tmp/astro-accounts/overlays --manifest /tmp/astro-accounts/ui-overlay-manifest.json --ui-only \
+    && /install/.venv/bin/python /tmp/astro-accounts/install_accounts.py --source /tmp/astro-accounts/overlays \
+    && rm -rf /tmp/astro-accounts

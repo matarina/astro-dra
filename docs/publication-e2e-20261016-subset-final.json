@@ -1,0 +1,17 @@
+{
+  "checks_passed": false,
+  "exit_code": 1,
+  "failure": {
+    "reason": "AssertionError",
+    "frames": [
+      {
+        "file": "publication_e2e_worker.py",
+        "line": 214
+      },
+      {
+        "file": "publication_e2e_worker.py",
+        "line": 151
+      }
+    ]
+  }
+}

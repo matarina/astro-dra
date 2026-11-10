@@ -1,0 +1,86 @@
+{
+  "relay_user": "1006:1007",
+  "relay_image_unchanged": true,
+  "relay_health": "healthy",
+  "app_searxng_5000_unchanged": true,
+  "compose_only_relay_changed": true,
+  "old_relay_id": "41ef5cc8f21f718d545f79b011c8f48c44e323aeb41c48c0ba08bf1b17ac904d",
+  "new_relay_id": "71cdb55120d7e84f25653e0dd76ae78498af43ad48af4b789d54add453fd4091",
+  "at": "2026-10-28T06:12:19.408260+00:00",
+  "failed_research_id": "e9f17c77-2685-4e3e-ba23-7fefa2136122",
+  "failed_collector_sources": 0,
+  "failed_tool_rounds": 10,
+  "uid_probes": [
+    {
+      "uid": 1000,
+      "gid": 1007,
+      "connect_ex": 111
+    },
+    {
+      "uid": 1006,
+      "gid": 1000,
+      "connect_ex": 0
+    }
+  ],
+  "before": [
+    {
+      "engine": "pubmed",
+      "ok": false,
+      "error_type": "ConnectionError"
+    },
+    {
+      "engine": "europepmc",
+      "ok": false,
+      "error_type": "ConnectionError"
+    },
+    {
+      "engine": "searxng",
+      "ok": false,
+      "returned": 0,
+      "unresponsive_engines": [
+        [
+          "bing",
+          "HTTP protocol error"
+        ]
+      ]
+    }
+  ],
+  "after": [
+    {
+      "engine": "pubmed",
+      "ok": true,
+      "http_status": 200,
+      "returned": 3,
+      "seconds": 0.73
+    },
+    {
+      "engine": "europepmc",
+      "ok": true,
+      "http_status": 200,
+      "returned": 3,
+      "seconds": 2.69
+    },
+    {
+      "engine": "searxng",
+      "ok": true,
+      "http_status": 200,
+      "unresponsive_engines": [],
+      "returned": 7,
+      "seconds": 1.39
+    }
+  ],
+  "native_abstract_previews": {
+    "pubmed": 2,
+    "europepmc": 2
+  },
+  "remaining": [
+    "Bing still intermittently returns HTTP 200 with zero results and no unresponsive_engine signal; native spatial transcriptomics preview was also zero in several post-repair probes. No query-specific workaround added.",
+    "Exact host firewall/policy rule and when it changed are unconfirmed; sudo iptables read requires a password.",
+    "No new complete research report was generated for validation; previously failed report is preserved."
+  ],
+  "native_searxng_examples": {
+    "Visium": 2,
+    "spatial transcriptomics": 0,
+    "cancer": 0
+  }
+}

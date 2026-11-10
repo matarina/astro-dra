@@ -1,0 +1,15 @@
+{
+  "artifact": "publication-e2e-20261016-v2-final.json",
+  "reviewer": "agent internal source comparison; not independent expert adjudication",
+  "accepted": false,
+  "automated_checks_passed": true,
+  "reviewed_final_claims": 6,
+  "underspecified_supported": 1,
+  "findings": [
+    {
+      "claim_sha256": "b696dd815f1b721cddc2ac72e7321627abdc7592e6810a09ab9804f0f88e20a4",
+      "reason": "Outcome responder count rewritten without endpoint, risking confusion with enrollment/group size."
+    }
+  ],
+  "followup": "Bind participant counts to outcome role; freeze generated report claims for regression."
+}

@@ -1,0 +1,19 @@
+{
+  "artifact": "publication-e2e-20261016-accepted.json",
+  "reviewer": "agent internal source comparison; not independent domain-expert adjudication",
+  "accepted": false,
+  "reviewed_final_claims": 11,
+  "false_supported": 2,
+  "findings": [
+    {
+      "claim_sha256": "359e113d06658b95a0c2bb334603213070519fc3a98889fc597111920e7cf37e",
+      "reason": "unsupported_mechanistic_inference_from_population"
+    },
+    {
+      "claim_sha256": "f2dc794392b8074c301e9f516900794598816b89a54d42c17fc1633f4cb0c25a",
+      "reason": "unnamed_source_estimand_relabelled_with_extra_analysis_inference"
+    }
+  ],
+  "automation_gap": "Numeric mutation control was skipped after abstract fetching removed an internal PMID field; fixed by canonical DOI fallback.",
+  "followup": "Require explicit analytical labels, mechanistic support and decomposition of explanatory clauses; rerun known real-paper counterexamples."
+}

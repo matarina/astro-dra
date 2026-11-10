@@ -1,0 +1,136 @@
+{
+  "observed_on": "2026-10-26",
+  "scope": "Actual installed code and allowlisted runtime configuration, not authenticated-account A/B quality benchmark. No application changes.",
+  "runtime": {
+    "5000": {
+      "image": "localdeepresearch/local-deep-research:astro-dra-d7d874b",
+      "image_id": "sha256:e94a4b527a6f61778da2aa7b2994722562fbfadac0dda9c6b499f64a16a5b1b2",
+      "started": "2026-10-15T08:59:54.908821447Z",
+      "health": "healthy",
+      "environment": {
+        "LDR_LLM_MODEL": "deepseek-v4-flash",
+        "LDR_LLM_PROVIDER": "openai_endpoint",
+        "LDR_SEARCH_TOOL": "searxng",
+        "LDR_SEARCH_SNIPPETS_ONLY": null,
+        "LDR_SEARCH_SKIP_RELEVANCE_FILTER": "false",
+        "LDR_SEARCH_MAX_RESULTS": "12",
+        "LDR_SEARCH_MAX_FILTERED_RESULTS": "6",
+        "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": "80",
+        "LDR_GENERAL_ENABLE_FACT_CHECKING": "true",
+        "LDR_VERIFY_ENABLE_CITATION_QC": "true",
+        "LDR_SEARCH_ENGINE_WEB_PUBMED_DEFAULT_PARAMS_OPTIMIZE_QUERIES": null,
+        "LDR_SEARCH_ENGINE_WEB_PUBMED_DEFAULT_PARAMS_ENABLE_LLM_RELEVANCE_FILTER": null,
+        "LDR_SEARCH_ENGINE_WEB_SEARXNG_DEFAULT_PARAMS_ENABLE_LLM_RELEVANCE_FILTER": null,
+        "LDR_SEARCH_ENGINE_WEB_EUROPEPMC_DEFAULT_PARAMS_ENABLE_LLM_RELEVANCE_FILTER": null
+      },
+      "defaults": {
+        "search.search_strategy": "langgraph-agent",
+        "search.fetch.mode": "summary_focus_query",
+        "search.snippets_only": true,
+        "search.max_results": 50,
+        "search.max_filtered_results": 20,
+        "search.skip_relevance_filter": true,
+        "general.enable_fact_checking": false,
+        "search.engine.web.pubmed.default_params.get_full_text": false,
+        "search.engine.web.pubmed.default_params.optimize_queries": true,
+        "search.engine.web.pubmed.default_params.enable_llm_relevance_filter": null,
+        "search.engine.web.searxng.default_params.enable_llm_relevance_filter": null,
+        "search.engine.web.europepmc.agent_enabled": null
+      }
+    },
+    "5002": {
+      "image": "astro-dra:abstract-context-20261021",
+      "image_id": "sha256:401b63e33e5794b60917cc745a4d46c903a73e102901cc8e8c6d8c5691297370",
+      "started": "2026-10-21T07:41:53.304074093Z",
+      "health": "healthy",
+      "environment": {
+        "LDR_LLM_MODEL": "deepseek-v4-flash",
+        "LDR_LLM_PROVIDER": "openai_endpoint",
+        "LDR_SEARCH_TOOL": "searxng",
+        "LDR_SEARCH_SNIPPETS_ONLY": "false",
+        "LDR_SEARCH_SKIP_RELEVANCE_FILTER": "false",
+        "LDR_SEARCH_MAX_RESULTS": "12",
+        "LDR_SEARCH_MAX_FILTERED_RESULTS": "6",
+        "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": "500",
+        "LDR_GENERAL_ENABLE_FACT_CHECKING": "true",
+        "LDR_VERIFY_ENABLE_CITATION_QC": "false",
+        "LDR_SEARCH_ENGINE_WEB_PUBMED_DEFAULT_PARAMS_OPTIMIZE_QUERIES": "false",
+        "LDR_SEARCH_ENGINE_WEB_PUBMED_DEFAULT_PARAMS_ENABLE_LLM_RELEVANCE_FILTER": "true",
+        "LDR_SEARCH_ENGINE_WEB_SEARXNG_DEFAULT_PARAMS_ENABLE_LLM_RELEVANCE_FILTER": "true",
+        "LDR_SEARCH_ENGINE_WEB_EUROPEPMC_DEFAULT_PARAMS_ENABLE_LLM_RELEVANCE_FILTER": "true"
+      },
+      "defaults": {
+        "search.search_strategy": "langgraph-agent",
+        "search.fetch.mode": "summary_focus_query",
+        "search.snippets_only": true,
+        "search.max_results": 12,
+        "search.max_filtered_results": 6,
+        "search.skip_relevance_filter": false,
+        "general.enable_fact_checking": false,
+        "search.engine.web.pubmed.default_params.get_full_text": false,
+        "search.engine.web.pubmed.default_params.optimize_queries": false,
+        "search.engine.web.pubmed.default_params.enable_llm_relevance_filter": true,
+        "search.engine.web.searxng.default_params.enable_llm_relevance_filter": true,
+        "search.engine.web.europepmc.agent_enabled": true
+      }
+    }
+  },
+  "modules": {
+    "ldr/web/services/research_service.py": "changed",
+    "ldr/advanced_search_system/strategies/langgraph_agent_strategy.py": "changed",
+    "ldr/web_search_engines/rate_limiting/tracker.py": "same",
+    "ldr/web_search_engines/engines/search_engine_serper.py": "same",
+    "ldr/web_search_engines/engines/search_engine_pubmed.py": "changed",
+    "ldr/storage/database.py": "changed",
+    "ldr/storage/file.py": "changed",
+    "ldr/web/services/report_assembly_service.py": "changed",
+    "ldr/scheduler/background.py": "changed",
+    "ldr/report_generator.py": "changed",
+    "ldr/exporters/quarto_exporter.py": "changed",
+    "ldr/web_search_engines/engines/search_engine_wayback.py": "changed",
+    "ldr/web_search_engines/search_engines_config.py": "changed",
+    "ldr/web/static/js/components/research.js": "changed",
+    "ldr/web/static/js/components/settings_sync.js": "changed",
+    "ldr/citation_handlers/base_citation_handler.py": "changed",
+    "ldr/citation_handlers/standard_citation_handler.py": "changed",
+    "ldr/advanced_search_system/tools/fetch/__init__.py": "changed",
+    "ldr/web_search_engines/engine_registry.py": "changed",
+    "ldr/security/module_whitelist.py": "changed",
+    "ldr/web_search_engines/engines/search_engine_europepmc.py": "added",
+    "ldr/web_search_engines/relevance_filter.py": "changed",
+    "ldr/research_library/downloaders/pubmed.py": "changed",
+    "ldr/content_fetcher/url_classifier.py": "changed",
+    "ldr/web_search_engines/search_engine_base.py": "same",
+    "ldr/advanced_search_system/tools/fetch/prompts.py": "same",
+    "verify/publication.py": "added",
+    "verify/revision.py": "added",
+    "verify/citation_qc.py": "changed",
+    "verify/evidence.py": "added",
+    "verify/generation.py": "added",
+    "verify/source_collection.py": "added",
+    "verify/retrieval.py": "added",
+    "verify/pmc_identity.py": "added",
+    "verify/citation_display.py": "added",
+    "verify/config.py": "changed"
+  },
+  "unchanged_search_core": {
+    "5000": {
+      "web_search_engines/search_engine_factory.py": "a850d274bf1ed2495f131e92912c83f053058e6f93005d6a97e079239cbccef0",
+      "web_search_engines/engines/search_engine_searxng.py": "b00a7ce140fe45365b5c527f52575bc24ad5773bce647960936436b5096e2ecb"
+    },
+    "5002": {
+      "web_search_engines/search_engine_factory.py": "a850d274bf1ed2495f131e92912c83f053058e6f93005d6a97e079239cbccef0",
+      "web_search_engines/engines/search_engine_searxng.py": "b00a7ce140fe45365b5c527f52575bc24ad5773bce647960936436b5096e2ecb"
+    }
+  },
+  "native_fact_check_prompt_identical": true,
+  "automatic_pubmed_fulltext_remains_disabled_by_default_in_both": true,
+  "known_unfinished": [
+    "Cross-field/URL identity aliases and confirmed publication-version policy",
+    "Research purpose/analysis task/section attribution alignment",
+    "Long relevance model calls and partial timed-out batches",
+    "Reliable JIF verification and original-study inclusion",
+    "SearXNG/Bing recall quality"
+  ],
+  "private_snapshots": "/data/ningh/nh/ldr-experiments/compare-5000-5002-20261026"
+}

@@ -1,0 +1,269 @@
+{
+  "research_id": "7162eae1-73a7-42e5-9e91-ec2be52ab14a",
+  "scope": "Read-only review of preserved trace and current primary records; no live model calls, application edits, report edits or restart",
+  "trace_audit": {
+    "task_id": "7162eae1-73a7-42e5-9e91-ec2be52ab14a",
+    "verified_artifact_count": 45,
+    "candidate_count": 214,
+    "writer_source_count": 103,
+    "published_sources": 76,
+    "agent_drafts_identical": true,
+    "writer_equals_publication_input": true,
+    "panel_case": {
+      "fetched_chars": 83580,
+      "writer_block_chars": 4364,
+      "raw_has_35_proteins": true,
+      "writer_has_35": false,
+      "writer_has_30": true,
+      "source_in_agent_draft": false,
+      "source_in_review": false,
+      "source_in_writer": true
+    },
+    "correction_notice_any_collector": true,
+    "correction_notice_in_writer_material": false,
+    "kidney_methods_six_mice_in_writer_material": false,
+    "recorded_agent_roles": {
+      "ai": 17
+    }
+  },
+  "source_mapping": {
+    "16": {
+      "index": 16,
+      "original_indices": [
+        149
+      ],
+      "paper_id": "doi:10.1186/s13059-026-03937-y",
+      "artifact_id": "text-v1:4f82cecd1abd08892f1f32b8aa22382c7996c8b11d4ef31c8b09eae3c38f2499",
+      "title": "A technical comparison of spatial transcriptomics platforms across six cancer types.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/41526977/"
+    },
+    "21": {
+      "index": 21,
+      "original_indices": [
+        137
+      ],
+      "paper_id": "doi:10.1038/s41586-026-10377-y",
+      "artifact_id": "text-v1:acc9a4821de9eb0c24ca8f9acb94cc2c8dcaca5761f7b950fba0fefcba0a913d",
+      "title": "A spatial atlas of the healthy human liver from live donors.",
+      "url": "https://europepmc.org/article/MED/41986723"
+    },
+    "34": {
+      "index": 34,
+      "original_indices": [
+        143
+      ],
+      "paper_id": "doi:10.1186/s13046-025-03479-4",
+      "artifact_id": "text-v1:3e6a4a8d048a8c7fc3555513b6964f306c2dd6e2e183a2e0c3da26e5853307ce",
+      "title": "Comparing Xenium 5K and Visium HD data from identical tissue slide at a pathological perspective.",
+      "url": "https://europepmc.org/article/MED/40713820"
+    },
+    "45": {
+      "index": 45,
+      "original_indices": [
+        126
+      ],
+      "paper_id": "doi:10.1038/s41467-024-54715-y",
+      "artifact_id": "text-v1:7dd96a5abb7322e3652bbfd83254b4633372cbb83f6c36a7be48b48d0d3fbf3a",
+      "title": "Stereo-seq of the prefrontal cortex in aging and Alzheimer's disease.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39779708/"
+    },
+    "46": {
+      "index": 46,
+      "original_indices": [
+        167
+      ],
+      "paper_id": "url:f60d7f3a3f2db7750918fba281aa082a9dc0dbb8e0cca0a0cafeb2eac9d76f34",
+      "artifact_id": "text-v1:2b1178c0ab114dcf7d5cf4b097988599e51651e6e403819d1738049ef6e45610",
+      "title": "Stereo-seq of the prefrontal cortex in aging and Alzheimer’s disease | Nature Communications",
+      "url": "https://www.nature.com/articles/s41467-024-54715-y"
+    },
+    "49": {
+      "index": 49,
+      "original_indices": [
+        168
+      ],
+      "paper_id": "url:0a1dcba63777d61b7a0467b16cdb3d6a3ab5a6b4985317baaf7b6dd4dc8eb8a8",
+      "artifact_id": "text-v1:757870e71f6db4b46b3e9b0eccc8c66f6656bebe0d66130422854f35ccd41a29",
+      "title": "Spatially resolved gene regulatory and disease-related vulnerability map of the adult Macaque cortex | Nature Communications",
+      "url": "https://www.nature.com/articles/s41467-022-34413-3"
+    },
+    "50": {
+      "index": 50,
+      "original_indices": [
+        127
+      ],
+      "paper_id": "doi:10.1038/s41467-022-34413-3",
+      "artifact_id": "text-v1:a19f31e3cbedf4a592188bf64ba9f61cf8f35eeb04108492286c0ebcb5efd578",
+      "title": "Spatially resolved gene regulatory and disease-related vulnerability map of the adult Macaque cortex.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/36347848/"
+    },
+    "63": {
+      "index": 63,
+      "original_indices": [
+        134
+      ],
+      "paper_id": "doi:10.1038/s41467-025-62599-9",
+      "artifact_id": "text-v1:e70d2d717afba82b511f4bc8656c5ca0220d6e59294524a4f9a672d83d611180",
+      "title": "Multimodal spatial transcriptomic characterization of mouse kidney injury and repair.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/40813851/"
+    }
+  },
+  "cases": [
+    {
+      "references": [
+        21
+      ],
+      "original_indices": [
+        137
+      ],
+      "cause_stage": "Europe PMC HTML cleanup -> Agent draft -> native feedback -> final writer",
+      "classification": "confirmed_error",
+      "cause": "An article reference superscript 3 is concatenated to HD by html_text. Agent writes HD 3-prime; native review repeats the corrupted HD3 and asks to verify the nomenclature; final writer asserts HD3.",
+      "deterministic_replay": true
+    },
+    {
+      "references": [
+        16
+      ],
+      "original_indices": [
+        149
+      ],
+      "cause_stage": "Acquired-text excerpt selection; final writer adds a previously absent claim",
+      "classification": "unreported_within_source_count_discrepancy",
+      "cause": "Stored 83580-character acquired text contains 35 proteins; the exact 4364-character model-facing source block contains 30 and not 35. Source149 is absent from the Agent draft/review feedback, then added by the final writer. No conclusion is drawn about which protein count is authoritative.",
+      "deterministic_replay": true
+    },
+    {
+      "references": [
+        45,
+        46
+      ],
+      "original_indices": [
+        126,
+        167
+      ],
+      "cause_stage": "Collector identity -> material selection -> writer -> publication identity",
+      "classification": "confirmed_duplicate_bibliography",
+      "canonical_doi": "10.1038/s41467-024-54715-y",
+      "cause": "PubMed source has an explicit DOI, publisher fetch has a URL and no DOI/PMID; keys and paper_identity do not resolve these aliases. Both remain selected and final numbering keeps two identities."
+    },
+    {
+      "references": [
+        49,
+        50
+      ],
+      "original_indices": [
+        168,
+        127
+      ],
+      "cause_stage": "Collector identity -> material selection -> writer -> publication identity",
+      "classification": "confirmed_duplicate_bibliography",
+      "canonical_doi": "10.1038/s41467-022-34413-3",
+      "cause": "The publisher fetch is identified by URL hash; PubMed counterpart by DOI. Both enter final writing as distinct source IDs."
+    },
+    {
+      "references": [
+        63
+      ],
+      "original_indices": [
+        134
+      ],
+      "cause_stage": "Abstract-only evidence -> ambiguous Agent draft -> unflagged review -> ambiguous writer wording",
+      "classification": "counted_entity_ambiguity",
+      "cause": "The actual supplied source reports 12 male mouse kidneys and six stages, not six independent animals. Draft says 12 kidneys using the Chinese measure word zhi; writer adds male mouse and leaves ambiguity. Methods establishing six mice are not in the actual model-facing material.",
+      "recommended_scope": "Write 12 kidney samples; add six mice only after supplying the Methods evidence."
+    },
+    {
+      "references": [
+        34
+      ],
+      "original_indices": [
+        143
+      ],
+      "cause_stage": "Correction association omitted; independently recalled notice dropped during writing-source selection",
+      "classification": "missing_correction_status_and_scope",
+      "correction_source_index": 32,
+      "original_pmid": "40713820",
+      "correction_pmid": "42458580",
+      "correction_doi": "10.1186/s13046-026-03775-7",
+      "cause": "The correction was already a metadata-only candidate32. The engine does not preserve the explicit Erratum in/for relationship. Batch2 selects 12 of 25 candidates and excludes32; both native review and writer receive the original source143 without the notice.",
+      "correction_scope": "Introduction changes lung-and-colon to lung; Figure2 CRC dataset is Xenium In Situ rather than Xenium5K. The notice states overall conclusions remain valid."
+    }
+  ],
+  "offline_replay": {
+    "html_superscript_present": true,
+    "cleaner_produces_hd3": true,
+    "cleaned_abstract_matches_trace": true,
+    "api_has_correction": true,
+    "adapter_has_correction": false,
+    "adapter_full_result_has_correction": false,
+    "duplicate_input_count": 4,
+    "collector_retained_count": 4,
+    "publication_retained_count": 4,
+    "actual_paper_count": 2,
+    "model_calls": 0
+  },
+  "formatter_replay": {
+    "formatted_block_matches_recorded": true,
+    "model_view_has_35": false,
+    "original_text_has_35": true,
+    "rerender_matches_publication": true,
+    "model_calls": 0
+  },
+  "correction_selection": {
+    "candidate_batches": [
+      {
+        "batch": 2,
+        "allowed_ids": [
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49
+        ],
+        "requested_count": 12
+      }
+    ],
+    "reverse_relation": {
+      "commentCorrection": [
+        {
+          "source": "MED",
+          "id": "40713820",
+          "reference": "J Exp Clin Cancer Res. 2025 Jul 26;44(1):219. doi: 10.1186/s13046-025-03479-4.",
+          "type": "Erratum for",
+          "orderIn": 1
+        }
+      ]
+    },
+    "agent_cites_notice": false,
+    "selected": false
+  },
+  "trace_gap": "Recorded agent_messages has 17 AI messages and no ToolMessages. Existing stream collection appends only AIMessage, so the prior claim of complete tool-return recording is inaccurate. Source inventory/model-facing materials/review/writer/publication are present and integrity-checked.",
+  "primary_urls": [
+    "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13216088/fullTextXML",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC12888464/",
+    "https://www.nature.com/articles/s41467-025-62599-9",
+    "https://link.springer.com/article/10.1186/s13046-026-03775-7"
+  ],
+  "private_artifacts": "/data/ningh/nh/ldr-experiments/trace-review-7162eae1-20261026"
+}

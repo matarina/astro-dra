@@ -1,0 +1,80 @@
+{
+  "research_id": "7759b63e-2114-43cb-8fc6-3635672f4f66",
+  "monitoring": "read-only, ended after successful save; no background watcher",
+  "runtime": {
+    "image_tag": "astro-dra:runtime-fixes-20261021",
+    "image_id": "sha256:2f69a6dafd35e0d9d91b84b6da756415428bc1337a4145fe3a6b6b73a2f5f726",
+    "started": "2026-10-21T06:10:27.195559831Z",
+    "health": "healthy",
+    "restart_count": 0,
+    "oom_killed": false
+  },
+  "beijing_start": "2026-10-21 14:32:10",
+  "beijing_completed": "2026-10-21 14:48:08.065",
+  "elapsed_seconds_approx": 958,
+  "synthesis_source_count": 203,
+  "clean_markdown_length": 10672,
+  "saved_citation_source_count": 40,
+  "writer_to_saved_seconds_approx": 0.29,
+  "counts": {
+    "pubmed_searches": 161,
+    "searxng_searches": 5,
+    "filter_model_returns": 419,
+    "all_filter_batches_failed_fallback": 0,
+    "empty_selection_warnings": 0,
+    "format_retry_lines": 4,
+    "invalid_selection_excerpt_lines": 4,
+    "valid_empty_selections": 160,
+    "native_fact_enabled_lines": 1,
+    "fetch_starts": 16,
+    "fetch_failed_tool_messages": 4,
+    "http403_log_lines": 8,
+    "pdf_wrong_content_type": 4,
+    "filter_timeout_lines": 1,
+    "pubmed_no_results_lines": 142,
+    "all_empty_filter_decisions": 23,
+    "out_of_range_selection_lines": 0,
+    "http429_message_lines": 0
+  },
+  "unrecovered_filter_batch_lines": 0,
+  "visible_main_collection_feedback": {
+    "messages": 38,
+    "newly_registered_hit_occurrences": 35,
+    "reused_hit_occurrences": 47,
+    "unregistered_hit_occurrences": 46
+  },
+  "details": {
+    "fetch_text_lengths": [
+      10029,
+      10029,
+      10029,
+      10029,
+      10029,
+      10029,
+      10029,
+      10029,
+      10029
+    ],
+    "native_and_writer_model_start_lines": [
+      "2026-10-21 14:47:12.045 | DEBUG    | local_deep_research.metrics.token_counter:on_llm_start:124 - Estimated prompt tokens: 34165 (from 136660 chars)",
+      "2026-10-21 14:47:32.505 | DEBUG    | local_deep_research.metrics.token_counter:on_llm_start:124 - Estimated prompt tokens: 37099 (from 148396 chars)"
+    ],
+    "allowlist_settings": {
+      "LDR_VERIFY_ENABLE_CITATION_QC": "false",
+      "LDR_GENERAL_ENABLE_FACT_CHECKING": "true",
+      "LDR_LANGGRAPH_AGENT_MAX_UNIQUE_SOURCES": "200",
+      "LDR_LLM_MODEL": "deepseek-v4-flash"
+    },
+    "workspace_generation_sha256": "78d038b4ab8d4dd7bba842f3a8190ee659abfbd533a468ab1ad43771fa3bcad2",
+    "installed_generation_sha256": "78d038b4ab8d4dd7bba842f3a8190ee659abfbd533a468ab1ad43771fa3bcad2",
+    "generation_hash_matches": true,
+    "source_excerpt_allocation_chars": 394
+  },
+  "limitations": [
+    "No authenticated final report or encrypted user database read; no semantic accuracy conclusion.",
+    "Visible collection feedback counts occurrences, not unique papers or all subtopic registrations.",
+    "Europe PMC lacks a symmetric complete raw-query counter.",
+    "Timeout root cause not identified; 300-second filter wall timeout and dropped pending batch are confirmed.",
+    "394 characters is nominal selected source-text budget before boundaries, headers, draft and instructions; actual full model request is much larger."
+  ]
+}

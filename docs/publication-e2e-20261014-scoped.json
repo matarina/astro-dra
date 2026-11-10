@@ -1,0 +1,532 @@
+{
+  "run_at_utc": "2026-10-14T09:26:33.741651+00:00",
+  "model": "deepseek-v4-flash",
+  "temperature": 0,
+  "synthetic": false,
+  "strategy": "source-based",
+  "search_engine": "PubMedSearchEngine",
+  "search_iterations": 1,
+  "paper_scope": "33567185",
+  "scope": "Actual strategy and detailed generator; disposable SQLite/file/export. No production HTTP login/task or independent expert adjudication.",
+  "source_count": 3,
+  "source_artifacts": [
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:4faff5a6bfb23f463a47990c54aa6d095ca09c7a9426f6c7c3106fca45e6a604",
+      "basis": "snippet",
+      "content_sha256": "4cddd5818d291909393c1cff69072c7d7828abce27d9094676c14d43e4631a71"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:4faff5a6bfb23f463a47990c54aa6d095ca09c7a9426f6c7c3106fca45e6a604",
+      "basis": "snippet",
+      "content_sha256": "4cddd5818d291909393c1cff69072c7d7828abce27d9094676c14d43e4631a71"
+    },
+    {
+      "paper_id": "doi:10.1056/nejmoa2032183",
+      "artifact_id": "text-v1:4faff5a6bfb23f463a47990c54aa6d095ca09c7a9426f6c7c3106fca45e6a604",
+      "basis": "snippet",
+      "content_sha256": "4cddd5818d291909393c1cff69072c7d7828abce27d9094676c14d43e4631a71"
+    }
+  ],
+  "quick": {
+    "status": "withheld",
+    "verified_claims": 0,
+    "action_reasons": [
+      {
+        "action": "pending",
+        "reason": "[1] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[1] original_text_unconfirmed",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[1] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[1] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[1] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[1] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      }
+    ],
+    "actions": {
+      "retained": 0,
+      "revised": 0,
+      "removed": 0,
+      "pending": 7
+    },
+    "sources": [],
+    "content_sha256": "1e5793b945a48005435cfc2fb0ca046e4ac074a33ef5dd183a363663695a92d7",
+    "reason_code": "revision_complete",
+    "checks": []
+  },
+  "detailed": {
+    "status": "withheld",
+    "verified_claims": 0,
+    "action_reasons": [
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[2] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[2] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[2] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[3] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[3] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[3] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[3] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[3] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "[3] judge_unverifiable",
+        "repair_reason": "unverifiable"
+      },
+      {
+        "action": "pending",
+        "reason": "missing_citation",
+        "repair_reason": "unverifiable"
+      }
+    ],
+    "actions": {
+      "retained": 0,
+      "revised": 0,
+      "removed": 0,
+      "pending": 17
+    },
+    "sources": [],
+    "content_sha256": "1924cc0fbe4e56305d9c819e83e5e4bc4f89be34747fcbbc80f7cc60c20006fc",
+    "reason_code": "revision_complete",
+    "checks": []
+  },
+  "storage_and_exports": [
+    {
+      "mode": "quick",
+      "database_equal": true,
+      "audit_roundtrip": true,
+      "chat_body_equal": true,
+      "file_equal": true,
+      "display_prefix_equal": true,
+      "exports": {
+        "quarto": {
+          "bytes": 1223,
+          "sha256": "ee0c487367fef698e47d9f40abed4da2cb8dd346465466d5f1beedc7dee6d93c",
+          "mimetype": "application/zip"
+        },
+        "latex": {
+          "bytes": 1494,
+          "sha256": "d3d69a001468fe2b96f1677458343b8dbb890dc99d2b77c26ba347ba82232168",
+          "mimetype": "text/plain"
+        },
+        "odt": {
+          "bytes": 7726,
+          "sha256": "afdc84abc8d475d9088e9a28fc31a4b9b1897d81298cc7af9166dd4ad9397a54",
+          "mimetype": "application/vnd.oasis.opendocument.text"
+        },
+        "pdf": {
+          "bytes": 235346,
+          "sha256": "cc7045629bcb225bcddfc59079212e41412bc81cb84e5eaab343c2ae654f7c2a",
+          "mimetype": "application/pdf"
+        },
+        "ris": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mimetype": "text/plain"
+        }
+      }
+    },
+    {
+      "mode": "detailed",
+      "database_equal": true,
+      "audit_roundtrip": true,
+      "chat_body_equal": true,
+      "file_equal": true,
+      "display_prefix_equal": true,
+      "exports": {
+        "quarto": {
+          "bytes": 1936,
+          "sha256": "784c9ce4a3035b2179278f89ecccff0093ac1fed243fc0f5819bf07a1d6fe49a",
+          "mimetype": "application/zip"
+        },
+        "latex": {
+          "bytes": 3295,
+          "sha256": "606cb075e3d20195669b0fdae101b0677d6aec12dac43dcffb5467224ca45823",
+          "mimetype": "text/plain"
+        },
+        "odt": {
+          "bytes": 8463,
+          "sha256": "5758e7e30d78b223c2128892af5c0be90e6a56ef209b0f3ebfadd96613a9f364",
+          "mimetype": "application/vnd.oasis.opendocument.text"
+        },
+        "pdf": {
+          "bytes": 292420,
+          "sha256": "37024f4f0f1cef33fc70630322725f6e2e4b543db452e8d22f9f061879e9f484",
+          "mimetype": "application/pdf"
+        },
+        "ris": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "mimetype": "text/plain"
+        }
+      }
+    }
+  ],
+  "faults": {
+    "verification_disabled": {
+      "status": "withheld",
+      "reason_code": "verification_disabled"
+    },
+    "model_offline": {
+      "status": "withheld",
+      "reason_code": "revision_complete"
+    },
+    "sources_unavailable": {
+      "status": "withheld",
+      "reason_code": "revision_complete"
+    },
+    "numeric_mutation": {
+      "status": "withheld",
+      "reason_code": "revision_complete"
+    }
+  },
+  "located_final_quotes": 0,
+  "elapsed_s": 115.177,
+  "model_calls": [
+    {
+      "elapsed_s": 0.526,
+      "usage": {
+        "input_tokens": 145,
+        "output_tokens": 57,
+        "total_tokens": 202,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 1.752,
+      "usage": {
+        "input_tokens": 349,
+        "output_tokens": 240,
+        "total_tokens": 589,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 3.35,
+      "usage": {
+        "input_tokens": 654,
+        "output_tokens": 477,
+        "total_tokens": 1131,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 3.648,
+      "usage": {
+        "input_tokens": 643,
+        "output_tokens": 521,
+        "total_tokens": 1164,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 2.263,
+      "usage": {
+        "input_tokens": 611,
+        "output_tokens": 316,
+        "total_tokens": 927,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 3.649,
+      "usage": {
+        "input_tokens": 652,
+        "output_tokens": 519,
+        "total_tokens": 1171,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 3.118,
+      "usage": {
+        "input_tokens": 628,
+        "output_tokens": 444,
+        "total_tokens": 1072,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.554,
+      "usage": {
+        "input_tokens": 620,
+        "output_tokens": 655,
+        "total_tokens": 1275,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 0.654,
+      "usage": {
+        "input_tokens": 483,
+        "output_tokens": 80,
+        "total_tokens": 563,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 0.902,
+      "usage": {
+        "input_tokens": 549,
+        "output_tokens": 111,
+        "total_tokens": 660,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 1.232,
+      "usage": {
+        "input_tokens": 665,
+        "output_tokens": 151,
+        "total_tokens": 816,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 1.409,
+      "usage": {
+        "input_tokens": 770,
+        "output_tokens": 182,
+        "total_tokens": 952,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 2.865,
+      "usage": {
+        "input_tokens": 887,
+        "output_tokens": 390,
+        "total_tokens": 1277,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 2.534,
+      "usage": {
+        "input_tokens": 519,
+        "output_tokens": 358,
+        "total_tokens": 877,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.397,
+      "usage": {
+        "input_tokens": 652,
+        "output_tokens": 630,
+        "total_tokens": 1282,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.391,
+      "usage": {
+        "input_tokens": 652,
+        "output_tokens": 629,
+        "total_tokens": 1281,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.116,
+      "usage": {
+        "input_tokens": 691,
+        "output_tokens": 588,
+        "total_tokens": 1279,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 3.771,
+      "usage": {
+        "input_tokens": 656,
+        "output_tokens": 539,
+        "total_tokens": 1195,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 3.495,
+      "usage": {
+        "input_tokens": 634,
+        "output_tokens": 499,
+        "total_tokens": 1133,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.658,
+      "usage": {
+        "input_tokens": 653,
+        "output_tokens": 669,
+        "total_tokens": 1322,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.328,
+      "usage": {
+        "input_tokens": 651,
+        "output_tokens": 621,
+        "total_tokens": 1272,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 4.049,
+      "usage": {
+        "input_tokens": 651,
+        "output_tokens": 580,
+        "total_tokens": 1231,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    },
+    {
+      "elapsed_s": 2.851,
+      "usage": {
+        "input_tokens": 635,
+        "output_tokens": 403,
+        "total_tokens": 1038,
+        "input_token_details": {},
+        "output_token_details": {}
+      }
+    }
+  ],
+  "checks_passed": false,
+  "image_id": "sha256:6e2adbc982eea0aa84504986954581825312cb3f4d1b9846d9f670d94faffa48",
+  "code_commit": "04a83cc6a3307f8bf212531d7130b39357950d1a",
+  "working_tree_dirty": true,
+  "code_sha256": {
+    "local_deep_research/research_verify/__init__.py": "11538d04e2443ee3571d687989ffac6af46c4abdff816fb7e189f927853af4f3",
+    "local_deep_research/research_verify/__main__.py": "e8aba19bda5166eca8ffc06bd4647381c51bd8abd6dec15514d05f25292b9dcf",
+    "local_deep_research/research_verify/citation_qc.py": "72ff70a7972d74516ca2ba0e03a8ad12566c41c4874d4e061d9ffab1a10ecacc",
+    "local_deep_research/research_verify/claims.py": "ef1eea19d3972d2b3ed80f72395fed104ebc79721872d3cba703a59e06ede08d",
+    "local_deep_research/research_verify/cli_check.py": "85cf079a8717d6387e73220ae986fdfbe8ec3fa0548984c40bff82ca37334d2a",
+    "local_deep_research/research_verify/config.py": "3260e211d780e356e1a2992ed9fb4a325a2197ca2e5705b77d5d2ceac2d7f458",
+    "local_deep_research/research_verify/constraint_matcher.py": "fde82942bf3a0ebe67603be94ce8960272bc7643c16a345fc641da6b2671317e",
+    "local_deep_research/research_verify/contracts.py": "30a461f449b2446b693c45775fb613791743adffd0b22c1008c7c1a1dc274b2a",
+    "local_deep_research/research_verify/doi_validator.py": "9656f05d4c506ed56c2faae16fa0132f1fc5effb0b0423ef6c78263172ab1606",
+    "local_deep_research/research_verify/evidence.py": "b986eda63f70544c608e9082fafa8605785aba18b8c3419c405b24326a6ba5fd",
+    "local_deep_research/research_verify/http_client.py": "d3dfcf448315b093ffbb243bf9b6a0bf82c257cda48dc0de301c52e01a8a1198",
+    "local_deep_research/research_verify/keyword_cov.py": "560579e7217fe734337455e3494693a2d550b8f04544d76b2f38439ff61771da",
+    "local_deep_research/research_verify/models.py": "eaa2690ce2a5d456bb5060f38ec1317c4c93f7786c3d6710136e0205df64922f",
+    "local_deep_research/research_verify/passages.py": "0cb026fc22bbc185b962caeaba3f72c135f6479c53a3d7c5ffd2ec7536aa5b16",
+    "local_deep_research/research_verify/publication.py": "dc3e4c690a983d5d8beaa9e6c6c5c59c9cbe39fec02493afba25ee76f9a816b8",
+    "local_deep_research/research_verify/revision.py": "e3fd65f6a26e7b65b80f672affe7f4b13cabbba15d1a16c3b1662acec768c71e",
+    "local_deep_research/research_verify/semantics.py": "5884aafb85e64c8577ab26975e98928100ac16e2aa5c7463dcaf094489c50434",
+    "local_deep_research/research_verify/textutil.py": "702db5973b2b6cd192a5f7276590e1ce7357011c03584a487695966331a48a3a"
+  }
+}

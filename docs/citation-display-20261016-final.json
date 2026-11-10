@@ -1,0 +1,41 @@
+{
+  "synthetic": true,
+  "modes": [
+    {
+      "mode": "quick",
+      "display_indices": [
+        1,
+        2
+      ],
+      "body_preserved": true,
+      "storage_roundtrip": true,
+      "exports": {
+        "quarto": 856,
+        "latex": 685,
+        "odt": 7067,
+        "pdf": 125628,
+        "ris": 287
+      }
+    },
+    {
+      "mode": "detailed",
+      "display_indices": [
+        1,
+        2
+      ],
+      "body_preserved": true,
+      "storage_roundtrip": true,
+      "exports": {
+        "quarto": 856,
+        "latex": 685,
+        "odt": 7067,
+        "pdf": 125628,
+        "ris": 287
+      }
+    }
+  ],
+  "scope": "Citation presentation, not semantic accuracy",
+  "old_report_view_fixed_without_write": true,
+  "checks_passed": true,
+  "image_id": "sha256:9c44b43188b328b43bf9d9a19f44e4ae44bdfc2859149417c06aadbbb1621e07"
+}

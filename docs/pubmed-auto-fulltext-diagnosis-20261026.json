@@ -1,0 +1,10 @@
+{
+  "configured_full_text_limit": 3,
+  "all_fail_attempts_for_6_candidates": 6,
+  "all_fail_sources_retained": 6,
+  "all_fail_abstracts_retained": true,
+  "success_attempts": 3,
+  "success_fulltext_records": 3,
+  "fulltext_in_source_records": true,
+  "fulltext_in_research_agent_tool_message": false
+}

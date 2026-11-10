@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}账号与审批 · Astro DRA{% endblock %}
+{% block content %}
+<section class="astro-account-card">
+    <header class="astro-account-heading"><div><div class="astro-eyebrow">账号管理</div><h1>账号与审批</h1><p>审批管理员申请，管理已有管理员权限。</p></div><span class="astro-role-badge">仅 root 可管理</span></header>
+    {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<p class="astro-account-notice" role="status">{{ message }}</p>{% endfor %}{% endwith %}
+    <div class="ldr-card astro-account-table-wrap"><table class="astro-account-table">
+        <thead><tr><th scope="col">账号</th><th scope="col">当前角色</th><th scope="col">申请状态</th><th scope="col">操作</th></tr></thead>
+        <tbody>{% for account in accounts %}<tr data-account="{{ account.username }}">
+            <td>{{ account.username }}</td>
+            <td>{{ 'Root' if account.is_root else '管理员' if account.is_admin else '普通用户' }}</td>
+            <td>{{ {'none':'—', 'pending':'待审批', 'approved':'已批准', 'rejected':'未批准'}[account.review_state] }}</td>
+            <td class="astro-account-actions">
+                {% if account.review_state == 'pending' and not account.is_root %}
+                    {% for action, label in [('approve','批准'), ('reject','拒绝')] %}
+                    <form method="post" action="{{ url_for('astro_accounts.review', user_id=account.id, action=action) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn {{ 'btn-primary' if action == 'approve' else 'btn-secondary' }}">{{ label }}</button>
+                    </form>
+                    {% endfor %}
+                {% elif account.role == 'admin' %}
+                    <form method="post" action="{{ url_for('astro_accounts.review', user_id=account.id, action='revoke') }}" onsubmit="return confirm('确认将此管理员调整为普通用户？');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button type="submit" class="btn btn-secondary">设为普通用户</button>
+                    </form>
+                {% else %}<span>—</span>{% endif %}
+            </td>
+        </tr>{% endfor %}</tbody>
+    </table></div>
+</section>
+{% endblock %}

@@ -1,0 +1,250 @@
+{
+  "before": [
+    {
+      "name": "/astro-dra-test-5002-local-deep-research-1",
+      "id": "0139142d67a6d1e84c705bba242ede73b227ff44ae622c8c78e6084b20e6b842",
+      "image": "astro-dra:abstract-context-20261021",
+      "started": "2026-10-26T03:06:13.378375527Z",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "astro-dra-test-5002_ldr_data",
+          "destination": "/data"
+        },
+        {
+          "type": "volume",
+          "name": "astro-dra-test-5002_ldr_config",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "/local_deep_research-local-deep-research-1",
+      "id": "3cd64119d61e68c91b31b0011eb43db47beda07ca23b6cf17188b92aa73945ab",
+      "image": "localdeepresearch/local-deep-research:astro-dra-d7d874b",
+      "started": "2026-10-15T08:59:54.908821447Z",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "local_deep_research_ldr_data",
+          "destination": "/data"
+        },
+        {
+          "type": "volume",
+          "name": "local_deep_research_ldr_scripts",
+          "destination": "/scripts"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/var/ldr-userlog"
+        },
+        {
+          "type": "volume",
+          "name": "168b5447226d9598063bd5cbc837e908d45de059111b5714a2cb7a9880ff6f38",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "/astro-dra-test-5002-searxng-1",
+      "id": "9655738081a5fad292ecc54fa731aa706d9f53e14de1d61db61f36060efcd735",
+      "image": "searxng/searxng@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "started": "2026-10-16T07:57:47.700526115Z",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "46cf2139f8f079045ed675f0d10c22f7ea384ffccd3ee7ab540f6c00d7d473e4",
+          "destination": "/etc/searxng"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/etc/searxng/settings.yml"
+        },
+        {
+          "type": "volume",
+          "name": "a834ad90ba84d39442a1e9482753ad1b7c37a2514bc2c23ecc2969e379786203",
+          "destination": "/var/cache/searxng"
+        }
+      ]
+    },
+    {
+      "name": "/astro-dra-test-5002-proxy-relay-1",
+      "id": "41ef5cc8f21f718d545f79b011c8f48c44e323aeb41c48c0ba08bf1b17ac904d",
+      "image": "astro-dra:search-stability-20261016-v2",
+      "started": "2026-10-16T07:26:42.115715988Z",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "f6297686575020e6c8c31e3d64834d9358d768905dff7ff3a0c253d41df2e54e",
+          "destination": "/data"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/relay/proxy_relay.py"
+        },
+        {
+          "type": "volume",
+          "name": "fbaf6e4a59d09fff464cfa7078d0ae848427a134c2606784c7380d8abb41a1dc",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    }
+  ],
+  "after": [
+    {
+      "name": "/astro-dra-test-5002-local-deep-research-1",
+      "id": "6b05cc85f9e9458f8e11d279ff257ce8481ddc5d7eb31d8bae25d714d2511347",
+      "image": "astro-dra:synthesis-trace-20261026",
+      "started": "2026-10-26T07:11:24.227511813Z",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "astro-dra-test-5002_ldr_data",
+          "destination": "/data"
+        },
+        {
+          "type": "volume",
+          "name": "astro-dra-test-5002_ldr_config",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "/local_deep_research-local-deep-research-1",
+      "id": "3cd64119d61e68c91b31b0011eb43db47beda07ca23b6cf17188b92aa73945ab",
+      "image": "localdeepresearch/local-deep-research:astro-dra-d7d874b",
+      "started": "2026-10-15T08:59:54.908821447Z",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "local_deep_research_ldr_data",
+          "destination": "/data"
+        },
+        {
+          "type": "volume",
+          "name": "local_deep_research_ldr_scripts",
+          "destination": "/scripts"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/var/ldr-userlog"
+        },
+        {
+          "type": "volume",
+          "name": "168b5447226d9598063bd5cbc837e908d45de059111b5714a2cb7a9880ff6f38",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    },
+    {
+      "name": "/astro-dra-test-5002-searxng-1",
+      "id": "9655738081a5fad292ecc54fa731aa706d9f53e14de1d61db61f36060efcd735",
+      "image": "searxng/searxng@sha256:6dd0dffc05a75d92bbacd858953b4e93b8f709403c3fb1fb8a33ca8fd02e40a4",
+      "started": "2026-10-16T07:57:47.700526115Z",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "46cf2139f8f079045ed675f0d10c22f7ea384ffccd3ee7ab540f6c00d7d473e4",
+          "destination": "/etc/searxng"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/etc/searxng/settings.yml"
+        },
+        {
+          "type": "volume",
+          "name": "a834ad90ba84d39442a1e9482753ad1b7c37a2514bc2c23ecc2969e379786203",
+          "destination": "/var/cache/searxng"
+        }
+      ]
+    },
+    {
+      "name": "/astro-dra-test-5002-proxy-relay-1",
+      "id": "41ef5cc8f21f718d545f79b011c8f48c44e323aeb41c48c0ba08bf1b17ac904d",
+      "image": "astro-dra:search-stability-20261016-v2",
+      "started": "2026-10-16T07:26:42.115715988Z",
+      "mounts": [
+        {
+          "type": "volume",
+          "name": "f6297686575020e6c8c31e3d64834d9358d768905dff7ff3a0c253d41df2e54e",
+          "destination": "/data"
+        },
+        {
+          "type": "bind",
+          "name": null,
+          "destination": "/relay/proxy_relay.py"
+        },
+        {
+          "type": "volume",
+          "name": "fbaf6e4a59d09fff464cfa7078d0ae848427a134c2606784c7380d8abb41a1dc",
+          "destination": "/app/.config/local_deep_research"
+        }
+      ]
+    }
+  ],
+  "health": "healthy",
+  "login_http_status": 200,
+  "model": "deepseek-flash",
+  "provider": "deepseek",
+  "trace_enabled": true,
+  "trace_directory": "/data/research_traces",
+  "native_fact_check": "true",
+  "citation_qc": "false",
+  "source_capacity": "500",
+  "modules_verified": 6,
+  "other_services_unchanged": true,
+  "volumes_preserved": true,
+  "backup": "/data/ningh/nh/ldr-test-5002-backups/synthesis-trace-20261026-150107",
+  "trace": "/data/ningh/nh/ldr-experiments/synthesis-trace-20261026",
+  "startup_error_lines": 0,
+  "tests_passed": 323,
+  "candidate_focused_check": {
+    "checks_passed": true,
+    "model": "deepseek-flash",
+    "provider": "deepseek",
+    "model_calls": 2,
+    "research_id": "trace-check-20261026",
+    "trace_stage_counts": {
+      "start": 3,
+      "agent_draft": 2,
+      "agent_messages": 1,
+      "collector_sources": 1,
+      "finish": 3,
+      "input_sources": 1,
+      "writer_sources": 1,
+      "native_check_request": 1,
+      "native_check_response": 1,
+      "writer_request": 1,
+      "writer_response": 1,
+      "publication_input": 1,
+      "publication_output": 1
+    },
+    "review_chars": 1181,
+    "report_chars": 1101,
+    "elapsed_s": 79.372,
+    "scope": "Actual Agent finalization/review/writer/publication with supplied draft; no full search or account changes."
+  },
+  "deployed_trace_check": {
+    "checks_passed": true,
+    "scope": "Deployed installed workflow with stub model; no external model call or user DB access",
+    "research_id": "diagnostic-c4fd93e8592e4cf8a12a54e69b220814",
+    "trace_dir": "/data/research_traces/diagnostic-c4fd93e8592e4cf8a12a54e69b220814",
+    "stage_count": 13,
+    "fixture_model_calls": 2,
+    "default_model": "deepseek-flash",
+    "default_provider": "deepseek"
+  },
+  "review_position": "before_final_writer; unchanged",
+  "additional_model_calls": 0,
+  "limitations": [
+    "No full web research accuracy evaluation or old/new prompt A/B.",
+    "Later writer errors are still outside the pre-writing review.",
+    "Per-record-unit byte limits and compression; historical trace cleanup is manual.",
+    "Raw content means as received by citation handler, after SDK/wrapper; HTTP headers and settings snapshots are not recorded."
+  ]
+}

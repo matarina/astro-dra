@@ -1,0 +1,1613 @@
+{
+  "date": "2026-11-04",
+  "scope": "Documentation only; project docs in UI worktree plus main/workspace navigation. No app, secrets, data, or services changed.",
+  "catalog_counts": {
+    "markdown": 67,
+    "json": 106,
+    "png": 9
+  },
+  "catalog_total": 182,
+  "catalog_covers_all_docs_files": true,
+  "catalog": [
+    {
+      "path": "README.md",
+      "format": "markdown",
+      "group": "当前入口与维护说明",
+      "purpose": "文档总入口、按问题找资料、功能对应及维护规则",
+      "status": "当前入口"
+    },
+    {
+      "path": "current-status.md",
+      "format": "markdown",
+      "group": "当前入口与维护说明",
+      "purpose": "两实例、已实现能力、开关及验证边界",
+      "status": "当前事实汇总"
+    },
+    {
+      "path": "roadmap.md",
+      "format": "markdown",
+      "group": "当前入口与维护说明",
+      "purpose": "有效待办、已有进展、完成标准及候选方向",
+      "status": "当前待办；未自动开始实施"
+    },
+    {
+      "path": "development-progress.md",
+      "format": "markdown",
+      "group": "当前入口与维护说明",
+      "purpose": "最近会话变化、接续步骤与历史入口",
+      "status": "短接续；不再承载全部旧流水"
+    },
+    {
+      "path": "current-research-flow-20261016.md",
+      "format": "markdown",
+      "group": "当前入口与维护说明",
+      "purpose": "当前提问→检索→成文→核对→保存导出",
+      "status": "当前说明；旧文件名保留"
+    },
+    {
+      "path": "source-layout.md",
+      "format": "markdown",
+      "group": "当前入口与维护说明",
+      "purpose": "部署补丁、上游快照、53覆盖目标和账号钩子",
+      "status": "当前开发边界"
+    },
+    {
+      "path": "deployment.md",
+      "format": "markdown",
+      "group": "当前入口与维护说明",
+      "purpose": "本机5002构建与更新、main/5000发布及回退",
+      "status": "当前操作说明"
+    },
+    {
+      "path": "test-instance-5002.md",
+      "format": "markdown",
+      "group": "当前入口与维护说明",
+      "purpose": "5002项目、容器、环境文件、卷与只读入口",
+      "status": "当前实例说明"
+    },
+    {
+      "path": "document-catalog.md",
+      "format": "markdown",
+      "group": "当前入口与维护说明",
+      "purpose": "本集合全部MD、JSON、截图逐文件归属",
+      "status": "本文件；完整目录"
+    },
+    {
+      "path": "documentation-audit-20261104.md",
+      "format": "markdown",
+      "group": "当前入口与维护说明",
+      "purpose": "整理范围、快照、校验及旧链接限制",
+      "status": "本轮文档整理记录"
+    },
+    {
+      "path": "project-overview-20261104.md",
+      "format": "markdown",
+      "group": "接续基线与原始长文快照",
+      "purpose": "初次熟悉项目的目录、架构及当日基线",
+      "status": "2026-11-04快照；后续看current-status"
+    },
+    {
+      "path": "development-progress-history-20261104.md",
+      "format": "markdown",
+      "group": "接续基线与原始长文快照",
+      "purpose": "整理前原文快照：development-progress.md（astro-dra-ui-5002）",
+      "status": "逐字节保留；当时版本，不能照搬旧下一步/镜像"
+    },
+    {
+      "path": "research-flow-history-20261104.md",
+      "format": "markdown",
+      "group": "接续基线与原始长文快照",
+      "purpose": "整理前原文快照：current-research-flow-20261016.md（astro-dra-ui-5002）",
+      "status": "逐字节保留；当时版本，不能照搬旧下一步/镜像"
+    },
+    {
+      "path": "deployment-history-20261104.md",
+      "format": "markdown",
+      "group": "接续基线与原始长文快照",
+      "purpose": "整理前原文快照：deployment.md（astro-dra-ui-5002）",
+      "status": "逐字节保留；当时版本，不能照搬旧下一步/镜像"
+    },
+    {
+      "path": "test-instance-5002-history-20261104.md",
+      "format": "markdown",
+      "group": "接续基线与原始长文快照",
+      "purpose": "整理前原文快照：test-instance-5002.md（astro-dra-ui-5002）",
+      "status": "逐字节保留；当时版本，不能照搬旧下一步/镜像"
+    },
+    {
+      "path": "source-layout-history-20261104.md",
+      "format": "markdown",
+      "group": "接续基线与原始长文快照",
+      "purpose": "整理前原文快照：source-layout.md（astro-dra-ui-5002）",
+      "status": "逐字节保留；当时版本，不能照搬旧下一步/镜像"
+    },
+    {
+      "path": "development-progress-main-history-20261104.md",
+      "format": "markdown",
+      "group": "接续基线与原始长文快照",
+      "purpose": "整理前原文快照：development-progress.md（astro-dra）",
+      "status": "逐字节保留；当时版本，不能照搬旧下一步/镜像"
+    },
+    {
+      "path": "research-flow-main-history-20261104.md",
+      "format": "markdown",
+      "group": "接续基线与原始长文快照",
+      "purpose": "整理前原文快照：current-research-flow-20261016.md（astro-dra）",
+      "status": "逐字节保留；当时版本，不能照搬旧下一步/镜像"
+    },
+    {
+      "path": "search-stability-20261016.md",
+      "format": "markdown",
+      "group": "检索、来源与证据流程",
+      "purpose": "代理稳定性与当时限流来源暂停",
+      "status": "阶段部署记录；来源池后续已收敛三源"
+    },
+    {
+      "path": "search-engine-audit-20261019.md",
+      "format": "markdown",
+      "group": "检索、来源与证据流程",
+      "purpose": "29类安装引擎及SearXNG后端探测、失败分类",
+      "status": "当时审计；不是当前所有引擎健康证明"
+    },
+    {
+      "path": "search-recovery-20261020.md",
+      "format": "markdown",
+      "group": "检索、来源与证据流程",
+      "purpose": "三源恢复、查询/相关性、摘要和共享节流",
+      "status": "演进记录；后续进入main/5000"
+    },
+    {
+      "path": "runtime-fixes-20261021.md",
+      "format": "markdown",
+      "group": "检索、来源与证据流程",
+      "purpose": "QC关/原生检查开、PMC自身身份及相关性解析",
+      "status": "演进记录；当时200来源，现为500"
+    },
+    {
+      "path": "abstract-context-20261021.md",
+      "format": "markdown",
+      "group": "检索、来源与证据流程",
+      "purpose": "500来源、完整摘要、分批选材和Europe PMC正文路由",
+      "status": "已实现并进入main；全文/选文质量有限制"
+    },
+    {
+      "path": "citation-grounding-20261019.md",
+      "format": "markdown",
+      "group": "检索、来源与证据流程",
+      "purpose": "抓取材料保全、来源信息和写作证据提示",
+      "status": "实现记录；文中未部署为当时时点，后续已集成"
+    },
+    {
+      "path": "generic-source-repairs-20261026.md",
+      "format": "markdown",
+      "group": "检索、来源与证据流程",
+      "purpose": "XML语义、稳定身份、关系保留及工具返回trace",
+      "status": "已集成main；文中写前检查随后被替换"
+    },
+    {
+      "path": "synthesis-trace-20261026.md",
+      "format": "markdown",
+      "group": "检索、来源与证据流程",
+      "purpose": "私有过程快照与当时检查输入优化",
+      "status": "阶段记录；工具返回缺口在后续来源修复补齐"
+    },
+    {
+      "path": "evidence-flow-20261027.md",
+      "format": "markdown",
+      "group": "检索、来源与证据流程",
+      "purpose": "必要证据预留、版本补取、写后核对及有限修订",
+      "status": "工程已集成main；不代表语义全部通过"
+    },
+    {
+      "path": "review-repairs-model-comparison-20261027.md",
+      "format": "markdown",
+      "group": "检索、来源与证据流程",
+      "purpose": "核对编排、PMC身份桥及双模型冻结/聚焦比较",
+      "status": "最近后端实现与限制；不同试验版本不得混用"
+    },
+    {
+      "path": "ui-workspace-20261028.md",
+      "format": "markdown",
+      "group": "5002界面与账号",
+      "purpose": "工作台、报告目录、专注阅读、登录与移动端",
+      "status": "已部署5002；未合入main"
+    },
+    {
+      "path": "ui-chinese-20261030.md",
+      "format": "markdown",
+      "group": "5002界面与账号",
+      "purpose": "中文词典、显示层翻译及用户内容保护",
+      "status": "已部署5002；未合入main"
+    },
+    {
+      "path": "sidebar-5002-20261030.md",
+      "format": "markdown",
+      "group": "5002界面与账号",
+      "purpose": "侧栏收起、用户偏好、手机抽屉与底部简化",
+      "status": "已部署5002；未合入main"
+    },
+    {
+      "path": "account-roles-5002-20261102.md",
+      "format": "markdown",
+      "group": "5002界面与账号",
+      "purpose": "普通用户/管理员/root、审批和服务端配置控制",
+      "status": "已部署5002；未合入main；登录问题未修"
+    },
+    {
+      "path": "deploy-main-5000-20261028.md",
+      "format": "markdown",
+      "group": "生产部署与模型变更",
+      "purpose": "main同步5000、原卷/账号保留、备份与回退",
+      "status": "已执行的生产事件；从main工作区补入"
+    },
+    {
+      "path": "azure-gpt56-deploy-5002-20261026.md",
+      "format": "markdown",
+      "group": "生产部署与模型变更",
+      "purpose": "临时Azure模型接入、兼容验证与切换",
+      "status": "历史切换；不是当前默认"
+    },
+    {
+      "path": "deepseek-flash-stage-5002-20261026.md",
+      "format": "markdown",
+      "group": "生产部署与模型变更",
+      "purpose": "官方DeepSeek连接准备与隔离验证",
+      "status": "当时仅准备；不表示当前默认或可用性"
+    },
+    {
+      "path": "deepseek-key-rotate-5002-20261026.md",
+      "format": "markdown",
+      "group": "生产部署与模型变更",
+      "purpose": "私有密钥轮换和加载验证",
+      "status": "历史操作摘要；凭据不在文档集合"
+    },
+    {
+      "path": "deepseek-default-5002-20261026.md",
+      "format": "markdown",
+      "group": "生产部署与模型变更",
+      "purpose": "当时默认切到官方Flash",
+      "status": "已被10月27日恢复原V4替代"
+    },
+    {
+      "path": "restore-deepseek-v4-20261027.md",
+      "format": "markdown",
+      "group": "生产部署与模型变更",
+      "purpose": "恢复原OpenAI兼容deepseek-v4-flash",
+      "status": "恢复事件；当前模型以current-status为准"
+    },
+    {
+      "path": "auth-session-diagnosis-20261030.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "remember、内存SID、凭据期限及随机失效诊断",
+      "status": "仅诊断；登录持久性未修复"
+    },
+    {
+      "path": "search-connectivity-20261028.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "三源断连、relay UID差异及连接修复",
+      "status": "主要断连已修；零命中/失败提示待做"
+    },
+    {
+      "path": "citation-case-diagnosis-20261026.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "IMC/4i、肾脏数量及分析输入错配溯源",
+      "status": "当时错例；不等于后续全部修复"
+    },
+    {
+      "path": "citation-consistency-plan-20261021.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "同文重复、版本与分析归属的原始诊断方案",
+      "status": "部分后续已实现；写前检查描述已过期"
+    },
+    {
+      "path": "kidney-count-review-20261027.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "肾样本与动物数误写、证据及模型责任定位",
+      "status": "诊断；未以单题规则修复"
+    },
+    {
+      "path": "report-e398fd15-review-20261027.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "五类生成/版本/材料问题逐项定位",
+      "status": "具体报告诊断；后续工程另有记录"
+    },
+    {
+      "path": "test001-review-20261027.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "报告与319快照对账、纳入条件与新核对缺陷",
+      "status": "具体报告诊断；部分编排/身份问题随后修复"
+    },
+    {
+      "path": "trace-review-7162eae1-20261026.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "六组引用/单位/勘误问题沿实际材料链追踪",
+      "status": "诊断；后续来源修复与写后核对处理部分缺口"
+    },
+    {
+      "path": "live-stall-5002-20261026.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "网页任务长等待阶段与外部调用观察",
+      "status": "观察记录；不是长等待已修声明"
+    },
+    {
+      "path": "log-triage-20261016.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "日志故障分级、限流/解析/依赖排查",
+      "status": "历史诊断；严格门槛及旧来源建议已失效"
+    },
+    {
+      "path": "web-run-log-review-20261021.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "网页任务06641267观察、PMC错映射与解析/截断",
+      "status": "当时缺陷；后续runtime/abstract修复部分问题"
+    },
+    {
+      "path": "web-run-log-review-20261021-7759b63e.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "网页任务7759b63e观察、来源容量/取文/长等待",
+      "status": "当时阶段；不等于当前5002参数"
+    },
+    {
+      "path": "spatial-research-diagnostic-20261019.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "默认安装版第一轮完整研究及失败诊断",
+      "status": "历史真实实跑；研究目标失败"
+    },
+    {
+      "path": "spatial-research-repeat-20261020.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "同镜像同题第二轮、召回与限流原因确认",
+      "status": "历史真实实跑；目标未完整达成"
+    },
+    {
+      "path": "spatial-research-search-patched-20261020.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "只替换检索补丁的第三轮完整流程",
+      "status": "历史实跑；不能代表最终全部补丁"
+    },
+    {
+      "path": "spatial-research-collection-patched-20261020.md",
+      "format": "markdown",
+      "group": "诊断、观察与真实流程试跑",
+      "purpose": "定向collector补丁的第四轮及writer字段缺口",
+      "status": "历史实跑；不是当前完整版本质量验收"
+    },
+    {
+      "path": "5000-vs-5002-20261026.md",
+      "format": "markdown",
+      "group": "历史差异比较",
+      "purpose": "10月26日两实例安装版差异",
+      "status": "过往比较；此后后端合并/5000更新已发生"
+    },
+    {
+      "path": "5002-vs-main-20261028.md",
+      "format": "markdown",
+      "group": "历史差异比较",
+      "purpose": "10月28日合并前累计后端变化",
+      "status": "合并前比较；不等于现在5002与main差异"
+    },
+    {
+      "path": "verification-20261012.md",
+      "format": "markdown",
+      "group": "历史严格核验阶段",
+      "purpose": "早期部署整理与55项测试、固定镜像检查",
+      "status": "历史工程基线；不是当前测试数量"
+    },
+    {
+      "path": "verification-foundation-20261012.md",
+      "format": "markdown",
+      "group": "历史严格核验阶段",
+      "purpose": "M0契约、样本、出口审计和基础验证",
+      "status": "历史基础，非当前功能已全部验收"
+    },
+    {
+      "path": "ldr-verification-engineering-plan.md",
+      "format": "markdown",
+      "group": "历史严格核验阶段",
+      "purpose": "旧M0/M1/M2/M3/M4严格准入路线",
+      "status": "历史方案；10月16日方向撤回，不作为待办"
+    },
+    {
+      "path": "claim-evidence-step1-20261012.md",
+      "format": "markdown",
+      "group": "历史严格核验阶段",
+      "purpose": "旧M3-A逐引用映射及原文短引定位",
+      "status": "历史实现阶段；后续流程/契约已调整"
+    },
+    {
+      "path": "claim-evidence-step2-20261012.md",
+      "format": "markdown",
+      "group": "历史严格核验阶段",
+      "purpose": "旧M3-A相关片段及无引用候选检测",
+      "status": "历史实现阶段；不表示当前自动开启审计"
+    },
+    {
+      "path": "claim-evidence-step3-20261014.md",
+      "format": "markdown",
+      "group": "历史严格核验阶段",
+      "purpose": "旧六维语义核查及真实小样本比较",
+      "status": "历史试验；六维强制结构不再作为门槛"
+    },
+    {
+      "path": "claim-evidence-step4-20261014.md",
+      "format": "markdown",
+      "group": "历史严格核验阶段",
+      "purpose": "旧结论修订/删除/隔离循环",
+      "status": "旧规则循环已撤回；区别于当前写后有限修订"
+    },
+    {
+      "path": "claim-evidence-step5-20261016.md",
+      "format": "markdown",
+      "group": "历史严格核验阶段",
+      "purpose": "旧统一发布控制与核验状态契约",
+      "status": "旧强制发布控制已撤回，现统一映射保留"
+    },
+    {
+      "path": "claim-evidence-step6-20261016.md",
+      "format": "markdown",
+      "group": "历史严格核验阶段",
+      "purpose": "旧严格报告与全部出口验收过程",
+      "status": "未全面通过；不能续用旧待办或accepted标签"
+    },
+    {
+      "path": "semantic-pilot-20261014.md",
+      "format": "markdown",
+      "group": "历史严格核验阶段",
+      "purpose": "早期语义小样本、正反例与迭代结果",
+      "status": "历史小样本；非独立准确率验收"
+    },
+    {
+      "path": "count-scope-prompt-trial-20261027.md",
+      "format": "markdown",
+      "group": "未采用的提示试验",
+      "purpose": "两版数量对象通用提示对照及撤回原因",
+      "status": "试验未达目标、已撤回、未部署"
+    },
+    {
+      "path": "5000-vs-5002-20261026.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "5000-vs-5002-20261026.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "5002-vs-main-20261028.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "5002-vs-main-20261028.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "abstract-context-20261021.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "abstract-context-20261021.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "account-roles-5002-20261102.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "account-roles-5002-20261102.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "advisory-deploy-5002-20261016.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "research-flow-history-20261104.md",
+      "purpose": "10月16日取消强制发布门槛后部署记录",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "azure-gpt56-deploy-5002-20261026.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "azure-gpt56-deploy-5002-20261026.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "biomedical-sources-20261016.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "research-flow-history-20261104.md",
+      "purpose": "当时两源收敛结果；后续已增Europe PMC为三源",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "citation-case-diagnosis-20261026.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "citation-case-diagnosis-20261026.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "citation-consistency-plan-20261021.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "citation-consistency-plan-20261021.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "citation-display-20261016-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "research-flow-history-20261104.md",
+      "purpose": "引用方括号、顺序和书目修复/部署的阶段结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "citation-display-20261016.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "research-flow-history-20261104.md",
+      "purpose": "引用方括号、顺序和书目修复/部署的阶段结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "citation-display-deploy-20261016.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "research-flow-history-20261104.md",
+      "purpose": "引用方括号、顺序和书目修复/部署的阶段结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "citation-grounding-comparison-20261019-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "citation-grounding-20261019.md",
+      "purpose": "材料与生成受控/真实流程/模型评审，保留失败轮次",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "citation-grounding-comparison-20261019-review2.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "citation-grounding-20261019.md",
+      "purpose": "材料与生成受控/真实流程/模型评审，保留失败轮次",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "citation-grounding-comparison-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "citation-grounding-20261019.md",
+      "purpose": "材料与生成受控/真实流程/模型评审，保留失败轮次",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "citation-grounding-e2e-20261019-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "citation-grounding-20261019.md",
+      "purpose": "材料与生成受控/真实流程/模型评审，保留失败轮次",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "citation-grounding-e2e-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "citation-grounding-20261019.md",
+      "purpose": "材料与生成受控/真实流程/模型评审，保留失败轮次",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "claim-revision-pilot-20261014-audit-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step4-20261014.md",
+      "purpose": "旧修订循环试跑，后续严格规则路径撤回",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "claim-revision-pilot-20261014-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step4-20261014.md",
+      "purpose": "旧修订循环试跑，后续严格规则路径撤回",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "claim-revision-pilot-20261014-scope-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step4-20261014.md",
+      "purpose": "旧修订循环试跑，后续严格规则路径撤回",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "claim-revision-pilot-20261014.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step4-20261014.md",
+      "purpose": "旧修订循环试跑，后续严格规则路径撤回",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "count-scope-prompt-trial-20261027.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "count-scope-prompt-trial-20261027.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "deepseek-default-5002-20261026.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "deepseek-default-5002-20261026.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "deepseek-flash-stage-5002-20261026.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "deepseek-flash-stage-5002-20261026.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "deepseek-key-rotate-5002-20261026.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "deepseek-key-rotate-5002-20261026.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "deploy-main-5000-20261028.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "deploy-main-5000-20261028.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "documentation-audit-20261104.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "documentation-audit-20261104.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "evidence-flow-20261027.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "evidence-flow-20261027.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "generic-source-repairs-20261026.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "generic-source-repairs-20261026.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "kidney-count-review-20261027.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "kidney-count-review-20261027.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "live-stall-5002-20261026.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "live-stall-5002-20261026.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "log-observation-20261016.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "log-triage-20261016.md",
+      "purpose": "两分钟日志观察原始分类，含后续需澄清的误判",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "proxy-check-20261016.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-stability-20261016.md",
+      "purpose": "当时9876代理路径检查",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261014-attempt2.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261014-attempt3.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261014-attempt4.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261014-diagnostic.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261014-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261014-scoped-diagnostic.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261014-scoped.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261016-accepted.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261016-frozen-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261016-live-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261016-reviewed-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261016-scoped.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261016-subset-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-20261016-v2-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧严格发布/存储出口试验；final/accepted不表示当前质量通过",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-review-20261016-first.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧publication结果逐项复核；保留自动检查与复核差异",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-review-20261016-live-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧publication结果逐项复核；保留自动检查与复核差异",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-review-20261016-second.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧publication结果逐项复核；保留自动检查与复核差异",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "publication-e2e-review-20261016-third.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "claim-evidence-step6-20261016.md",
+      "purpose": "旧publication结果逐项复核；保留自动检查与复核差异",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "pubmed-auto-fulltext-diagnosis-20261026.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "project-overview-20261104.md",
+      "purpose": "PubMed自动全文开关/失败保留摘要诊断；不代表开启自动全文",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "qwen-flash-deploy-5002-20261016.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "test-instance-5002-history-20261104.md",
+      "purpose": "当时Qwen接入、模型发现/流式/工具烟测及部署",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "qwen-flash-smoke-20261016.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "test-instance-5002-history-20261104.md",
+      "purpose": "当时Qwen接入、模型发现/流式/工具烟测及部署",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "report-e398fd15-review-20261027.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "report-e398fd15-review-20261027.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "report-preservation-e2e-20261016-fourth.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "research-flow-history-20261104.md",
+      "purpose": "撤除强制门槛后的保留输出试验；早期失败与第四轮分别保留",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "report-preservation-e2e-20261016-second.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "research-flow-history-20261104.md",
+      "purpose": "撤除强制门槛后的保留输出试验；早期失败与第四轮分别保留",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "report-preservation-e2e-20261016-third.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "research-flow-history-20261104.md",
+      "purpose": "撤除强制门槛后的保留输出试验；早期失败与第四轮分别保留",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "report-preservation-e2e-20261016.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "research-flow-history-20261104.md",
+      "purpose": "撤除强制门槛后的保留输出试验；早期失败与第四轮分别保留",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "restore-deepseek-v4-20261027.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "restore-deepseek-v4-20261027.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "review-repairs-model-comparison-20261027.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "review-repairs-model-comparison-20261027.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "runtime-fixes-20261021.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "runtime-fixes-20261021.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-5000-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-5000-content-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-5000-content-proxy9876-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-5000-proxy9876-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-5000-recheck-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-5001-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-5001-backends-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-5002-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-5002-content-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-5002-direct-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-5002-expanded-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-5002-pipeline-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-biomedical-services-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-github-anonymous-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-github-anonymous9876-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-local-rag-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-pubmed-knownpaper-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-runtime-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-searxng-backends-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-audit-summary-20261019.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-engine-audit-20261019.md",
+      "purpose": "当时引擎/内容/代理/后端/运行审计分项结果",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-connectivity-20261028.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-connectivity-20261028.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-recovery-20261020.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-recovery-20261020.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-stability-final-20261016.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-stability-20261016.md",
+      "purpose": "当时检索/relay/运行稳定性检查",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-stability-relay-final-20261016.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-stability-20261016.md",
+      "purpose": "当时检索/relay/运行稳定性检查",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "search-stability-runtime-20261016.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "search-stability-20261016.md",
+      "purpose": "当时检索/relay/运行稳定性检查",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "semantic-pilot-20261014-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "semantic-pilot-20261014.md",
+      "purpose": "旧语义试跑/正例/真实摘录/阶段结果；非独立全面验收",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "semantic-pilot-20261014-optimized-v2.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "semantic-pilot-20261014.md",
+      "purpose": "旧语义试跑/正例/真实摘录/阶段结果；非独立全面验收",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "semantic-pilot-20261014-optimized.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "semantic-pilot-20261014.md",
+      "purpose": "旧语义试跑/正例/真实摘录/阶段结果；非独立全面验收",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "semantic-pilot-20261014.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "semantic-pilot-20261014.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "semantic-real-excerpts-20261014-final.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "semantic-pilot-20261014.md",
+      "purpose": "旧语义试跑/正例/真实摘录/阶段结果；非独立全面验收",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "semantic-real-excerpts-20261014.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "semantic-pilot-20261014.md",
+      "purpose": "旧语义试跑/正例/真实摘录/阶段结果；非独立全面验收",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "semantic-scope-positives-20261014.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "semantic-pilot-20261014.md",
+      "purpose": "旧语义试跑/正例/真实摘录/阶段结果；非独立全面验收",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "semantic-stage-final-20261014.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "semantic-pilot-20261014.md",
+      "purpose": "旧语义试跑/正例/真实摘录/阶段结果；非独立全面验收",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "sidebar-5002-20261030.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "sidebar-5002-20261030.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "spatial-research-collection-patched-20261020.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "spatial-research-collection-patched-20261020.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "spatial-research-search-patched-20261020.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "spatial-research-search-patched-20261020.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "synthesis-trace-20261026.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "synthesis-trace-20261026.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "test001-review-20261027.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "test001-review-20261027.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "themes-5002-20261030.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "current-status.md",
+      "purpose": "三主题部署/环境与卷保持结果；没有独立同名MD",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "trace-review-7162eae1-20261026.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "trace-review-7162eae1-20261026.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "ui-chinese-20261030.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "ui-chinese-20261030.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "ui-workspace-20261028.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "ui-workspace-20261028.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "web-run-log-review-20261021-7759b63e.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "web-run-log-review-20261021-7759b63e.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "web-run-log-review-20261021.json",
+      "format": "json",
+      "group": "结构化结果",
+      "owner": "web-run-log-review-20261021.md",
+      "purpose": "同名说明的结构化结果；按记录日期和验证范围解读",
+      "status": "原始日期结果；未据文件名推定通过"
+    },
+    {
+      "path": "sidebar-5002-20261030/collapsed.png",
+      "format": "png",
+      "group": "页面预览",
+      "owner": "sidebar-5002-20261030.md",
+      "purpose": "当时界面截图；模拟报告/截获请求不等于真实研究验证",
+      "status": "原始截图，未修改"
+    },
+    {
+      "path": "sidebar-5002-20261030/expanded.png",
+      "format": "png",
+      "group": "页面预览",
+      "owner": "sidebar-5002-20261030.md",
+      "purpose": "当时界面截图；模拟报告/截获请求不等于真实研究验证",
+      "status": "原始截图，未修改"
+    },
+    {
+      "path": "ui-chinese-20261030/home.png",
+      "format": "png",
+      "group": "页面预览",
+      "owner": "ui-chinese-20261030.md",
+      "purpose": "当时界面截图；模拟报告/截获请求不等于真实研究验证",
+      "status": "原始截图，未修改"
+    },
+    {
+      "path": "ui-chinese-20261030/settings.png",
+      "format": "png",
+      "group": "页面预览",
+      "owner": "ui-chinese-20261030.md",
+      "purpose": "当时界面截图；模拟报告/截获请求不等于真实研究验证",
+      "status": "原始截图，未修改"
+    },
+    {
+      "path": "ui-workspace-20261028/ui-home-dark.png",
+      "format": "png",
+      "group": "页面预览",
+      "owner": "ui-workspace-20261028.md",
+      "purpose": "当时界面截图；模拟报告/截获请求不等于真实研究验证",
+      "status": "原始截图，未修改"
+    },
+    {
+      "path": "ui-workspace-20261028/ui-home-desktop.png",
+      "format": "png",
+      "group": "页面预览",
+      "owner": "ui-workspace-20261028.md",
+      "purpose": "当时界面截图；模拟报告/截获请求不等于真实研究验证",
+      "status": "原始截图，未修改"
+    },
+    {
+      "path": "ui-workspace-20261028/ui-home-mobile.png",
+      "format": "png",
+      "group": "页面预览",
+      "owner": "ui-workspace-20261028.md",
+      "purpose": "当时界面截图；模拟报告/截获请求不等于真实研究验证",
+      "status": "原始截图，未修改"
+    },
+    {
+      "path": "ui-workspace-20261028/ui-login-desktop.png",
+      "format": "png",
+      "group": "页面预览",
+      "owner": "ui-workspace-20261028.md",
+      "purpose": "当时界面截图；模拟报告/截获请求不等于真实研究验证",
+      "status": "原始截图，未修改"
+    },
+    {
+      "path": "ui-workspace-20261028/ui-report-desktop.png",
+      "format": "png",
+      "group": "页面预览",
+      "owner": "ui-workspace-20261028.md",
+      "purpose": "当时界面截图；模拟报告/截获请求不等于真实研究验证",
+      "status": "原始截图，未修改"
+    }
+  ],
+  "original_snapshots": {
+    "development-progress-history-20261104.md": {
+      "source": "development-progress.md",
+      "source_workspace": "astro-dra-ui-5002",
+      "sha256": "800e15ed8bf0f6cd791074c280bfa4a2af128f84e8ef82bfa580ad706fa1af30"
+    },
+    "research-flow-history-20261104.md": {
+      "source": "current-research-flow-20261016.md",
+      "source_workspace": "astro-dra-ui-5002",
+      "sha256": "af556f99a65f7cf7cc3228d1bb4aa3361bc60efa1445fdc90891ed52b4007cc9"
+    },
+    "deployment-history-20261104.md": {
+      "source": "deployment.md",
+      "source_workspace": "astro-dra-ui-5002",
+      "sha256": "9533f807091f914b33c3118d60e7c4b3df50951cd97ee650762b2727ff51b470"
+    },
+    "test-instance-5002-history-20261104.md": {
+      "source": "test-instance-5002.md",
+      "source_workspace": "astro-dra-ui-5002",
+      "sha256": "8be0c479ae14658919a3634b37afe3baa824dbf7d252522ef9c078bbacee6785"
+    },
+    "source-layout-history-20261104.md": {
+      "source": "source-layout.md",
+      "source_workspace": "astro-dra-ui-5002",
+      "sha256": "6baee5b558f59b014a82a9d47dd56a0088c1c83e4b8caf9cf54421bf14c71654"
+    },
+    "development-progress-main-history-20261104.md": {
+      "source": "development-progress.md",
+      "source_workspace": "astro-dra",
+      "sha256": "ef2db6be25f597ce43fc0f10f55b6fc362148a7be056baf061b6fdbad3718444"
+    },
+    "research-flow-main-history-20261104.md": {
+      "source": "current-research-flow-20261016.md",
+      "source_workspace": "astro-dra",
+      "sha256": "8c00167e9c9be401bc27bdc4bb5b8a4d8e3d08cf4ef11cc750247d1958e7d09a"
+    }
+  },
+  "snapshot_hashes_match": {
+    "development-progress-history-20261104.md": true,
+    "research-flow-history-20261104.md": true,
+    "deployment-history-20261104.md": true,
+    "test-instance-5002-history-20261104.md": true,
+    "source-layout-history-20261104.md": true,
+    "development-progress-main-history-20261104.md": true,
+    "research-flow-main-history-20261104.md": true
+  },
+  "dated_record_bodies_unchanged": {
+    "search-stability-20261016.md": true,
+    "search-engine-audit-20261019.md": true,
+    "search-recovery-20261020.md": true,
+    "runtime-fixes-20261021.md": true,
+    "abstract-context-20261021.md": true,
+    "citation-grounding-20261019.md": true,
+    "generic-source-repairs-20261026.md": true,
+    "synthesis-trace-20261026.md": true,
+    "evidence-flow-20261027.md": true,
+    "review-repairs-model-comparison-20261027.md": true,
+    "ui-workspace-20261028.md": true,
+    "ui-chinese-20261030.md": true,
+    "sidebar-5002-20261030.md": true,
+    "account-roles-5002-20261102.md": true,
+    "deploy-main-5000-20261028.md": true,
+    "azure-gpt56-deploy-5002-20261026.md": true,
+    "deepseek-flash-stage-5002-20261026.md": true,
+    "deepseek-key-rotate-5002-20261026.md": true,
+    "deepseek-default-5002-20261026.md": true,
+    "restore-deepseek-v4-20261027.md": true,
+    "auth-session-diagnosis-20261030.md": true,
+    "search-connectivity-20261028.md": true,
+    "citation-case-diagnosis-20261026.md": true,
+    "citation-consistency-plan-20261021.md": true,
+    "kidney-count-review-20261027.md": true,
+    "report-e398fd15-review-20261027.md": true,
+    "test001-review-20261027.md": true,
+    "trace-review-7162eae1-20261026.md": true,
+    "live-stall-5002-20261026.md": true,
+    "log-triage-20261016.md": true,
+    "web-run-log-review-20261021.md": true,
+    "web-run-log-review-20261021-7759b63e.md": true,
+    "spatial-research-diagnostic-20261019.md": true,
+    "spatial-research-repeat-20261020.md": true,
+    "spatial-research-search-patched-20261020.md": true,
+    "spatial-research-collection-patched-20261020.md": true,
+    "5000-vs-5002-20261026.md": true,
+    "5002-vs-main-20261028.md": true,
+    "verification-20261012.md": true,
+    "verification-foundation-20261012.md": true,
+    "ldr-verification-engineering-plan.md": true,
+    "claim-evidence-step1-20261012.md": true,
+    "claim-evidence-step2-20261012.md": true,
+    "claim-evidence-step3-20261014.md": true,
+    "claim-evidence-step4-20261014.md": true,
+    "claim-evidence-step5-20261016.md": true,
+    "claim-evidence-step6-20261016.md": true,
+    "semantic-pilot-20261014.md": true,
+    "count-scope-prompt-trial-20261027.md": true
+  },
+  "existing_json_and_png_checked": 221,
+  "existing_json_and_png_unchanged": true,
+  "imported_production_json_matches_main": true,
+  "json_parse_failures": [],
+  "current_document_missing_links": [],
+  "historical_missing_link_occurrences": 6,
+  "historical_missing_links": [
+    {
+      "document": "docs/development-progress-history-20261104.md",
+      "target": "../reports/model-comparison-20261027.md"
+    },
+    {
+      "document": "docs/development-progress-main-history-20261104.md",
+      "target": "../reports/model-comparison-20261027.md"
+    },
+    {
+      "document": "docs/research-flow-history-20261104.md",
+      "target": "../reports/model-comparison-20261027.md"
+    },
+    {
+      "document": "docs/research-flow-main-history-20261104.md",
+      "target": "../reports/model-comparison-20261027.md"
+    },
+    {
+      "document": "docs/review-repairs-model-comparison-20261027.md",
+      "target": "../reports/model-comparison-20261027.md"
+    },
+    {
+      "document": "docs/test-instance-5002-history-20261104.md",
+      "target": "../reports/model-comparison-20261027.md"
+    }
+  ],
+  "changed_existing_files": [
+    "/data/ningh/nh/astro-dra/docs/source-layout.md",
+    "/data/ningh/nh/astro-dra/docs/deployment.md",
+    "/data/ningh/nh/astro-dra/docs/development-progress.md",
+    "/data/ningh/nh/astro-dra/docs/test-instance-5002.md",
+    "/data/ningh/nh/astro-dra/docs/current-research-flow-20261016.md",
+    "/data/ningh/nh/astro-dra-ui-5002/README.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/5000-vs-5002-20261026.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/5002-vs-main-20261028.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/abstract-context-20261021.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/azure-gpt56-deploy-5002-20261026.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/citation-case-diagnosis-20261026.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/citation-consistency-plan-20261021.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/citation-grounding-20261019.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/claim-evidence-step1-20261012.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/claim-evidence-step2-20261012.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/claim-evidence-step3-20261014.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/claim-evidence-step4-20261014.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/claim-evidence-step5-20261016.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/claim-evidence-step6-20261016.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/count-scope-prompt-trial-20261027.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/current-research-flow-20261016.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/deepseek-default-5002-20261026.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/deepseek-flash-stage-5002-20261026.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/deepseek-key-rotate-5002-20261026.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/deployment.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/development-progress.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/evidence-flow-20261027.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/generic-source-repairs-20261026.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/kidney-count-review-20261027.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/ldr-verification-engineering-plan.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/live-stall-5002-20261026.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/log-triage-20261016.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/report-e398fd15-review-20261027.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/restore-deepseek-v4-20261027.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/review-repairs-model-comparison-20261027.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/runtime-fixes-20261021.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/search-engine-audit-20261019.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/search-recovery-20261020.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/search-stability-20261016.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/semantic-pilot-20261014.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/source-layout.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/spatial-research-collection-patched-20261020.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/spatial-research-diagnostic-20261019.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/spatial-research-repeat-20261020.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/spatial-research-search-patched-20261020.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/synthesis-trace-20261026.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/test-instance-5002.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/test001-review-20261027.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/trace-review-7162eae1-20261026.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/verification-20261012.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/verification-foundation-20261012.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/web-run-log-review-20261021-7759b63e.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/web-run-log-review-20261021.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/ui-workspace-20261028.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/search-connectivity-20261028.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/ui-chinese-20261030.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/sidebar-5002-20261030.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/auth-session-diagnosis-20261030.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/account-roles-5002-20261102.md",
+    "/data/ningh/nh/astro-dra-ui-5002/docs/project-overview-20261104.md",
+    "/data/ningh/nh/astro-dra-ui-5002/ldr-monitor/ENGINE_ARCHITECTURE.md",
+    "/data/ningh/nh/astro-dra-ui-5002/ldr-monitor/ENGINE_STATUS.md",
+    "/data/ningh/nh/astro-dra-ui-5002/local_deep_research/LLM-MODELS.md",
+    "/data/ningh/nh/astro-dra-ui-5002/local_deep_research/research_verify/README.md"
+  ],
+  "changed_application_or_config_files": [],
+  "original_files_missing": [],
+  "protected_container_ids_and_images_unchanged": {
+    "local_deep_research-local-deep-research-1": true,
+    "astro-dra-test-5002-local-deep-research-1": true,
+    "astro-dra-test-5002-searxng-1": true,
+    "astro-dra-test-5002-proxy-relay-1": true
+  },
+  "application_tests_rerun": false,
+  "new_research_or_model_calls": false,
+  "prior_session_baseline": {
+    "offline_tests_passed": 403,
+    "runtime_files_matched": 87,
+    "basis": "Earlier read-only intake in the same session; not rerun for docs"
+  },
+  "git_commit_push_merge": false
+}

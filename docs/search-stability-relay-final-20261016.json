@@ -1,0 +1,36 @@
+{
+  "verified_at_utc": "2026-10-16T06:57:54.602955+00:00",
+  "scope": "Only mounted relay logging changed after the general-search acceptance. App image, source-selection policy and SearXNG settings unchanged.",
+  "prior_acceptance": "search-stability-final-20261016.json",
+  "prior_acceptance_passed": true,
+  "tests": {
+    "passed": 330,
+    "elapsed_s": 1.69
+  },
+  "relay_script_sha256": "3fc885a48ab3ec386ca5a14b179ab9e1c2bb93601f7ef413bb4d7306f8a6f008",
+  "relay_mounted_hash_matches": true,
+  "relay_started_at": "2026-10-16T06:56:39.619804509Z",
+  "successful_recent_healthchecks": 5,
+  "legacy_reset_lines": 0,
+  "relay_events": [],
+  "crossref_http": 200,
+  "web_http": 200,
+  "states": [
+    {
+      "name": "/astro-dra-test-5002-local-deep-research-1",
+      "health": "healthy",
+      "oom_killed": false
+    },
+    {
+      "name": "/astro-dra-test-5002-searxng-1",
+      "health": "healthy",
+      "oom_killed": false
+    },
+    {
+      "name": "/astro-dra-test-5002-proxy-relay-1",
+      "health": "healthy",
+      "oom_killed": false
+    }
+  ],
+  "checks_passed": true
+}

@@ -1,0 +1,330 @@
+{
+  "date": "2026-11-06",
+  "scope": "Read-only comparison of running 5000/main and 5002; no user database, research, model call or restart. Includes application .py/.js/.css/.html/.json/.svg in local_deep_research, research_verify and astro_accounts; excludes other packages, bytecode and data.",
+  "git": {
+    "local_main_head": "e9be10309214dcad54e036663c04534cf52c9337",
+    "ui_branch": "work/ui-5002-20261028",
+    "ui_head": "e9be10309214dcad54e036663c04534cf52c9337",
+    "remote_main_same": true,
+    "remote_check": "GitHub compare connector, identical; Git CLI fetch failed HTTPS authentication",
+    "ui_changes_uncommitted": true
+  },
+  "runtime": {
+    "instance5000": {
+      "container": "local_deep_research-local-deep-research-1",
+      "image": "astro-dra:main-20261028",
+      "image_id": "sha256:84ea05a427a6efde4522d2d6dbaddb776e5cb259d538ca93dd566aac0f17c2b2",
+      "health": "healthy"
+    },
+    "instance5002": {
+      "container": "astro-dra-test-5002-local-deep-research-1",
+      "image": "astro-dra:subtask-scope-v3-5002-20261105",
+      "image_id": "sha256:9258c8da0f344856cad0fd4df7708c62fa8d7281921d1bc6caa33c1130b02b13",
+      "health": "healthy"
+    }
+  },
+  "counts": {
+    "selected_files_5000": 841,
+    "selected_files_5002": 857,
+    "changed": 31,
+    "added": 16,
+    "removed": 0,
+    "unchanged": 810,
+    "different_files": 47
+  },
+  "files": {
+    "changed": [
+      {
+        "path": "local_deep_research/database/auth_db.py",
+        "sha256_5000": "8c6c5b358502bf190173492385e827f837ea5f7337dc607894a52473702f799c",
+        "sha256_5002": "e0b6d62c645b1bcdaf03b64ac0060037beff0439fb8fd976b5effd9d02a7ffc9"
+      },
+      {
+        "path": "local_deep_research/database/encrypted_db.py",
+        "sha256_5000": "c3269eb987d405ad962b681187706bf2fcd2e72e1b1a1de9f8413c4905e56916",
+        "sha256_5002": "0f9295e4c21355afe2e12248e8f6ed80f3d5627e9bd088a9b8a1271e49ccb9b7"
+      },
+      {
+        "path": "local_deep_research/scheduler/background.py",
+        "sha256_5000": "b9da086db695f67418c76dee1e9645d14131e37a20dd6301afc00ad81aec289f",
+        "sha256_5002": "a0323a7dea6ec1c55099936bb10b6502542e4b5febc2bb90df56443ebb7ce238"
+      },
+      {
+        "path": "local_deep_research/settings/manager.py",
+        "sha256_5000": "539763b61149721c56f5599c5e96a758bfc4c652565b6b90e4acd0bd9fa14b65",
+        "sha256_5002": "a029861d27930051e99c4965b5f8bbe2a2b9c8beaeb71a29cddc297d73a7c84c"
+      },
+      {
+        "path": "local_deep_research/web/app_factory.py",
+        "sha256_5000": "665d89b3c64bb41b54fb5a298783ab6f709d971e46c5f6c973e436d9227b049e",
+        "sha256_5002": "39d9f1ba2f7a54595962915b48774e582549be08de1bcdf89a9c99f28de246cf"
+      },
+      {
+        "path": "local_deep_research/web/auth/routes.py",
+        "sha256_5000": "b8bbdebfdb1a65ee02b3f7971038dc4d7b09a76fa46c44b49f07ae298fda0a19",
+        "sha256_5002": "28ac9a5551c9c1ffbc5174656ab83647e7a498672a11fcc3601b4d8f3589eeaf"
+      },
+      {
+        "path": "local_deep_research/web/routes/research_routes.py",
+        "sha256_5000": "8f1c8d77b8bc9d8559e6613791b4e243b7bd1f594e6cfd1648b4cefd4b59d086",
+        "sha256_5002": "3547a26a392512f44c437ac47e3b2e0d6c2a48ee8bc428b667ad742b4071fd99"
+      },
+      {
+        "path": "local_deep_research/web/templates/base.html",
+        "sha256_5000": "cdf789cde1adcf4dd4841746deb5a48167c420fcff0db1118e17b1aff0c2d924",
+        "sha256_5002": "bf5461d39f002c60ea418d5a03f14bec676c210f308985a6f83558abac3966b4"
+      },
+      {
+        "path": "local_deep_research/web/templates/settings_dashboard.html",
+        "sha256_5000": "d98df948e767efc47959a2ba6daf1986026868d99f8836ef8c95b4d517062478",
+        "sha256_5002": "7564b763dfc076d8d9ff8e13a1c23026ce72355c9fb433fe1a5c313b7aa40ed1"
+      },
+      {
+        "path": "local_deep_research/web/templates/auth/change_password.html",
+        "sha256_5000": "0f5c58a7ab87fb3e1eacf6fc355f8b98e17989207b7d8f78785fb7bb7a369df5",
+        "sha256_5002": "a9b716119a26451916f2d95cc13ee3d92241e7018c382b8aa3fa34524fb8333b"
+      },
+      {
+        "path": "local_deep_research/web/templates/auth/login.html",
+        "sha256_5000": "a9a082007d942c689517b8d5f4c7281e41f311298de1acb72222a9d9844d7b6d",
+        "sha256_5002": "1de77a73372e0c4de512c6dfe1aa094bbda241546f1b26855ff4672544a79e97"
+      },
+      {
+        "path": "local_deep_research/web/templates/auth/register.html",
+        "sha256_5000": "32aef52754a08416d0eaac770dab0b255e7f00ed2d590cbdd7ea40f11481ffb1",
+        "sha256_5002": "38bf187312f09f79c83f28da15fe6cb4c5924cb8af9876f39233929e2c38be48"
+      },
+      {
+        "path": "local_deep_research/web/templates/components/sidebar.html",
+        "sha256_5000": "268267db420127a95c6bce345d124fb9fbc64aec01f03c3963e864d2da2baecd",
+        "sha256_5002": "15053290d250a2a608b982c64605083fe58e49960a783a4a0fb0db8ef9461566"
+      },
+      {
+        "path": "local_deep_research/web/templates/pages/chat.html",
+        "sha256_5000": "3ce233a48a7cda124e09fc3911f1988644b51f0685dcdcd33e5e0cd5ecd6a8ea",
+        "sha256_5002": "13964f0b5243e9541ea2ea7273e560797971003a0b0ec4f7adc3ba3f246c757f"
+      },
+      {
+        "path": "local_deep_research/web/templates/pages/history.html",
+        "sha256_5000": "974e4c3b5cf0e456358cb4eb2a1392d5a48e42d2895bc368e78d212a739d6c79",
+        "sha256_5002": "e9d1158821c99e6149cf912096260672f9d04dc61d071acf61247ca798934334"
+      },
+      {
+        "path": "local_deep_research/web/templates/pages/news-subscription-form.html",
+        "sha256_5000": "54e884aaa6eccdffff27e1ef09cba5aa913b2ec2142f671944943eeb0745a859",
+        "sha256_5002": "64ffacfa056a48872e2fa98f05e9cbbc3445164542c04ff2979134b9e602b054"
+      },
+      {
+        "path": "local_deep_research/web/templates/pages/news.html",
+        "sha256_5000": "a219215486e6a155cbcdb24fadacb1d32394fe83dd98da3a3f2a1e4cdd78c80f",
+        "sha256_5002": "a58a9485cff489944b0d96cf121aae7af0016ef964eaca7fa99d6edfc004f48d"
+      },
+      {
+        "path": "local_deep_research/web/templates/pages/progress.html",
+        "sha256_5000": "6631700a25f1b28b98a2447510f83aacc6e6b5a8ea25b0c4c6ea1c48f89c5ed4",
+        "sha256_5002": "e564ae5556f4033c3d7b2620f85ae270785ed8a05beee874b0ae89c482af05c2"
+      },
+      {
+        "path": "local_deep_research/web/templates/pages/research.html",
+        "sha256_5000": "79e132102b9032ea366cdec39af13733d17acdf9950ff8aa4d881effa29bb0df",
+        "sha256_5002": "67074fd897017069b43e0426e68d8ef4477880a31201409f43777d2563c19203"
+      },
+      {
+        "path": "local_deep_research/web/templates/pages/results.html",
+        "sha256_5000": "56c9e4d23c39e1ff2dc3b9d6a625b241dab46bb1370511fb256d8aa4ac90b1fb",
+        "sha256_5002": "a7e1fee3ef8fb2179278453557b96fa25d2625e4c1eb032c0e8ea997a9190347"
+      },
+      {
+        "path": "local_deep_research/web/static/js/mobile-navigation.js",
+        "sha256_5000": "28e95b000826dc89156cd3db68b297ed037512296c482a5a177fb1e93b475f26",
+        "sha256_5002": "def8156bf2bf4c555759c4d4380c4093673e17b275a0a09cf309bfc6db669147"
+      },
+      {
+        "path": "local_deep_research/web/static/js/components/chat.js",
+        "sha256_5000": "351ac90a180e0bc0adacc69f739fdfec726e88022f4b7708dcd9a5dbe89aa0aa",
+        "sha256_5002": "f9005b27f61d7d5722d709d24b2358550efbefa2b6a341c073ecafdd301de360"
+      },
+      {
+        "path": "local_deep_research/web/static/js/components/logpanel.js",
+        "sha256_5000": "4240e3ef7a4ca3b113b5fc605d65b4b0dd85ceedfc768e1dafed84d1cf4d4760",
+        "sha256_5002": "9fd0c81d72700812b0dcdf22b8c3f43d6757c5e3ed58b5f4a2bb6f7beab68b5c"
+      },
+      {
+        "path": "local_deep_research/web/static/js/components/progress.js",
+        "sha256_5000": "b7d63049f0c09cc1b4caa5853ac51267c59fb2920ea62c3d3ed45450382541f3",
+        "sha256_5002": "2de9f6c849824f0b2bf91a16df233471bfa3657e7e87e30c5ec585d76f7d0a53"
+      },
+      {
+        "path": "local_deep_research/web/static/js/components/settings.js",
+        "sha256_5000": "aa123cbc0f9ef170054cef7dafaacfb43ee3bc6c873372338db42beddbf42263",
+        "sha256_5002": "29afe79953eaa3c11f3e2259ffbe743db7b1e17a11ce7ebf65b7d5af9983a641"
+      },
+      {
+        "path": "local_deep_research/web/static/js/pages/news.js",
+        "sha256_5000": "150a899ad0e0c7a26e7a8b0e517400fa8282eb552d883655d876667bc2d89403",
+        "sha256_5002": "dc2063ce485b8c0e14d2ea523fa9356699b5d335247d5beb233d0fb83584700f"
+      },
+      {
+        "path": "local_deep_research/web/static/js/services/socket.js",
+        "sha256_5000": "df71d7d9f16a26f01dde8f20759cf8677ed3e9fbac97c29f3ab2522ccf357f55",
+        "sha256_5002": "48a59c2e79493a798d55c86d6cd01fae8314c5d264d13f6e9b6d9c7e73f5deef"
+      },
+      {
+        "path": "local_deep_research/web/static/js/services/theme.js",
+        "sha256_5000": "dd2dcd4fe6ed4b29d2da544f5dd7f673810b885733579e1e003f67c582513f54",
+        "sha256_5002": "3e8efb92c20fb9a42ef5ad3b09c7e9ad8624e26df9664bd6e5658bbd7ac25367"
+      },
+      {
+        "path": "local_deep_research/advanced_search_system/strategies/langgraph_agent_strategy.py",
+        "sha256_5000": "b2a9ab4f47cf73a51a0ea8694455838a930b2a3294be81275cdd87b28eefd639",
+        "sha256_5002": "a0a5a6ef586fd1719693c75d30d4c97055460fd03599ef0b5280c8e4912f4997"
+      },
+      {
+        "path": "research_verify/evidence_flow.py",
+        "sha256_5000": "9c49fe1b877877bbd13c7313d098eb19b5524d9ef25098551e1b0a74960d899d",
+        "sha256_5002": "430944fcacf26782daa463c28c2384bd9d36675522d96e28453350149169628c"
+      },
+      {
+        "path": "research_verify/generation.py",
+        "sha256_5000": "90697d3fc59d9622e4e577400bca79d56ae3f4c6c5b06c3fb64fa50c0ff7c1bd",
+        "sha256_5002": "6a55c3ccaf022b1b5e550d6870804ae119bcba13ff03763bf5d920900f8fee5a"
+      }
+    ],
+    "added": [
+      {
+        "path": "local_deep_research/web/templates/auth/accounts.html",
+        "sha256_5002": "04524af40ac18730d0086490fff2508555e96877c80574040c43934b41f22425"
+      },
+      {
+        "path": "local_deep_research/web/templates/auth/forbidden.html",
+        "sha256_5002": "f18fb8a548bf1689aaf4c4659dc6093f799b0c6db71213a8629fc312253a7448"
+      },
+      {
+        "path": "local_deep_research/web/static/css/astro-workspace.css",
+        "sha256_5002": "538d3557f7f4999ed6dbebefd2c6fbd66200b55e20cb439285fbb90f51a1750d"
+      },
+      {
+        "path": "local_deep_research/web/static/js/astro-research-simple.js",
+        "sha256_5002": "15fdbb1eeba30c49d54b3f57788925c28b59fe6377dbf6b408fb17507817cc55"
+      },
+      {
+        "path": "local_deep_research/web/static/js/astro-subscription-simple.js",
+        "sha256_5002": "8dcaaa8adc457049cc4f5276bc67d29389fbe50dc09f536201aa7aafc492673a"
+      },
+      {
+        "path": "local_deep_research/web/static/js/astro-workspace.js",
+        "sha256_5002": "714c245afce681e7acb104b475cbd5dc8765e94d3cc84404c5fa479156bea208"
+      },
+      {
+        "path": "local_deep_research/web/static/js/astro-i18n.js",
+        "sha256_5002": "d92a37b8e579e777944e165f0e4faa52ff1e052ea41118766182d02dd1bdc4db"
+      },
+      {
+        "path": "local_deep_research/web/static/js/astro-locale-zh.js",
+        "sha256_5002": "744ca90a135087a50505de52234cf22e16b28bcd634ea1fffe15c11738218306"
+      },
+      {
+        "path": "research_verify/source_reading.py",
+        "sha256_5002": "127660e51867ee27895b0ad0a8516f09c503633d7646f313535ff64ff3be2b85"
+      },
+      {
+        "path": "research_verify/subtask_handoff.py",
+        "sha256_5002": "6f8ebac2e3a4c78e16c1f74ded2c8ee413b3e2ae96d8e8c174216b04c9bb7049"
+      },
+      {
+        "path": "research_verify/subtask_research.py",
+        "sha256_5002": "78f787ce97cd34b73dbfb2763811a656ab7d67415cc2a712d16e2d2da1dcde45"
+      },
+      {
+        "path": "astro_accounts/__init__.py",
+        "sha256_5002": "f05e144b9f6ff4965209232c6c1aff40928f7ea51c5f61fe9e0621abb3b29512"
+      },
+      {
+        "path": "astro_accounts/cli.py",
+        "sha256_5002": "2e5184f16e098c9c3356008e05f7226f81a4d27193f2f033f95cbe55305df62c"
+      },
+      {
+        "path": "astro_accounts/policy.py",
+        "sha256_5002": "ddc55738d891bbdb6fe2ebdf291dc83f2ce0a664ccd196d7cf3a1775a1d93fd6"
+      },
+      {
+        "path": "astro_accounts/store.py",
+        "sha256_5002": "4da465b1eb2d316a17a2665af6aea2bf692839160c08981cee36393d0d2b7609"
+      },
+      {
+        "path": "astro_accounts/web.py",
+        "sha256_5002": "d9b6f07d0a72c35d73f29841bcab81895b9631a4d2c15381cd144dd2e1b64241"
+      }
+    ],
+    "removed": []
+  },
+  "shared_defaults": {
+    "provider": "openai_endpoint",
+    "model": "deepseek-v4-flash",
+    "strategy": "langgraph-agent",
+    "primary_search": "searxng",
+    "source_pool": [
+      "PubMed",
+      "SearXNG",
+      "Europe PMC"
+    ],
+    "max_results": 12,
+    "max_filtered_results": 6,
+    "max_unique_sources": 500,
+    "native_fact_checking": true,
+    "save_citation_qc": false,
+    "research_trace": true
+  },
+  "subtask_budget": {
+    "instance5000": {
+      "environment_override": 4
+    },
+    "instance5002": {
+      "default": 8,
+      "search_decisions": 7,
+      "reserved_delivery": 1
+    },
+    "note": "Runtime/default configuration, not guarantees for every account/task; original constructor default8 exists in both."
+  },
+  "ast": {
+    "evidence_flow": {
+      "changed_definitions": [
+        "synthesize"
+      ],
+      "review_function_definitions_unchanged": true
+    },
+    "generation": {
+      "changed_definitions": [
+        "_source_blocks",
+        "format_source_documents"
+      ],
+      "added_definitions": [
+        "prepare_draft_for_writing",
+        "format_reading_scope"
+      ]
+    }
+  },
+  "engineering": {
+    "backend_overlay_targets": 24,
+    "ui_overlay_targets": 29,
+    "total_overlay_targets": 53,
+    "account_install_hooks": 7,
+    "additional_packages": {
+      "astro_accounts": 5,
+      "research_verify_new": 3
+    },
+    "added_test_files": 5,
+    "historical_regression": {
+      "main_before_ui": 394,
+      "latest_ui": 465,
+      "rerun_this_session": false
+    }
+  },
+  "limitations": [
+    "Function deployment is not evidence of complete semantic accuracy.",
+    "Latest fresh research had empty child searches, PubMed search pages as sources and a review group not executed; see 20261105 deploy record.",
+    "Login persistence, formal literature identity, retrieval reliability and cross-topic report quality remain unresolved.",
+    "Root roles alter auth schema; account records and test data were not read for this comparison.",
+    "Another verification-audit image on port5018 was observed but is outside this 5002 comparison."
+  ]
+}

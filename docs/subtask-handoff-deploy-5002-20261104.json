@@ -1,0 +1,32 @@
+{
+  "deployed": true,
+  "checked_at": "2026-11-04T07:00:22.254828+00:00",
+  "image_tag": "astro-dra:subtask-handoff-5002-20261104",
+  "image_id": "sha256:84c1b5fd8d58693a9aef363e74a42284302dd477d018d232508a3a0d8eead671",
+  "container_id": "c4783450008d4d34f32bb251260606536d9a0c984351ab31718c9953ec138da5",
+  "started_at": "2026-11-04T06:59:45.338814844Z",
+  "health": "healthy",
+  "http": {
+    "/auth/login": 200,
+    "/": 200
+  },
+  "runtime_environment_unchanged": true,
+  "original_mounts_and_ports_preserved": true,
+  "other_services_unchanged": true,
+  "modules": {
+    "agent_sha256": "18b16ce95f317fd5c66b3311286dee6a533ce9c60564bfbcb9fd53e663cd97d3",
+    "handoff_sha256": "bfd9de85333fea53a495a2478071274994f5cae1e1cbe6399164c5e92caa76ea",
+    "installed_delivery_import_and_material": true
+  },
+  "startup_error_lines": 0,
+  "restart_scope": "Only 5002 application; no source/data migration or automatic research",
+  "backup_directory": "/data/ningh/nh/ldr-experiments/subtask-handoff-deploy-20261104",
+  "package_changes": {
+    "base_files": 939,
+    "candidate_files": 940,
+    "changed": [
+      "local_deep_research/advanced_search_system/strategies/langgraph_agent_strategy.py",
+      "research_verify/subtask_handoff.py"
+    ]
+  }
+}

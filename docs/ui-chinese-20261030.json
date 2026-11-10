@@ -1,0 +1,61 @@
+{
+  "image": "astro-dra:zh-ui-5002-20261030",
+  "image_id": "sha256:5cd8a0ff48c4f2bc95591797da401091564893405505734770ef3f1e86ec0203",
+  "container_id": "cf76d981e6515f50069161a03b52eab96c7e4018beef9fe83971211315d02010",
+  "health": "healthy",
+  "login_http": 200,
+  "locale_assets_sha_match": true,
+  "env_unchanged": true,
+  "volumes_unchanged": true,
+  "protected_containers_unchanged": true,
+  "backend_unchanged": true,
+  "compared_files": 931,
+  "runtime_changes": [
+    "ldr/web/static/css/astro-workspace.css",
+    "ldr/web/static/js/astro-i18n.js",
+    "ldr/web/static/js/astro-locale-zh.js",
+    "ldr/web/static/js/astro-workspace.js",
+    "ldr/web/static/js/components/chat.js",
+    "ldr/web/static/js/components/logpanel.js",
+    "ldr/web/static/js/components/progress.js",
+    "ldr/web/static/js/components/settings.js",
+    "ldr/web/static/js/services/socket.js",
+    "ldr/web/templates/auth/change_password.html",
+    "ldr/web/templates/auth/login.html",
+    "ldr/web/templates/auth/register.html",
+    "ldr/web/templates/base.html",
+    "ldr/web/templates/pages/chat.html",
+    "ldr/web/templates/pages/progress.html",
+    "ldr/web/templates/settings_dashboard.html"
+  ],
+  "private_backup": "/data/ningh/nh/ldr-experiments/i18n-5002-20261030",
+  "branch": "work/ui-5002-20261028",
+  "locale_entries": 4199,
+  "page_audit": {
+    "pages": 17,
+    "page_errors": []
+  },
+  "interaction_checks": {
+    "pages": 13,
+    "protected_content": true,
+    "input_values_and_select_values": true,
+    "actions_and_confirmations": true,
+    "chinese_settings_search": true,
+    "progress_status_and_log_filters": true,
+    "chart_labels_and_numbers": true,
+    "mobile": true
+  },
+  "theme_checks": {
+    "options": 3,
+    "system_color_changes": true,
+    "persistence": true,
+    "legacy_preferences": true
+  },
+  "final_copy_checks": {
+    "pagination_numeric": true,
+    "database_page_size": true,
+    "unknown_identifiers_preserved": true,
+    "home_and_settings_layout": true
+  },
+  "full_research_rerun": false
+}

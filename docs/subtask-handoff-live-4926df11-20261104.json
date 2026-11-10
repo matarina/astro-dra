@@ -1,0 +1,29 @@
+{
+  "research_id": "4926df11-52ba-4654-9497-25fcaac316d2",
+  "task_status": "completed",
+  "problem_resolved": false,
+  "source_pool": 109,
+  "writer_sources": 85,
+  "references": 62,
+  "snapshot_events": 96,
+  "verified_artifacts": 96,
+  "omitted_artifacts": 0,
+  "subtasks": 3,
+  "subtask_failed": 3,
+  "subtask_failure_type": "GraphRecursionError",
+  "handoffs": 0,
+  "review_groups": 6,
+  "review_calls": 7,
+  "lrrc4_original_index": 109,
+  "lrrc4_display_index": 23,
+  "lrrc4_review_status": "supported",
+  "applied_repairs": 0,
+  "unresolved_repairs": 0,
+  "writer_equals_final_before_numbering": true,
+  "findings": [
+    "All three subtasks hit their iteration limit before the handoff builder; no subtask summary/material delivery was produced.",
+    "The collected original LRRC4 abstract is correct and identical to the previous run; the full abstract is visible to the writer.",
+    "Lead draft and writer both attribute LRRC4 protective mechanism to deficiency; review marked it supported; published report retains it."
+  ],
+  "scope": "Read-only production observation and trace export; no application/config/report changes, model requests, research reruns or restarts; no user database decrypted."
+}

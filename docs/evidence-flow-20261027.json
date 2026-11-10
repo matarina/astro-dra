@@ -1,0 +1,173 @@
+{
+  "date": "2026-10-27",
+  "status": "deployed_5002_with_semantic_limitations",
+  "deployment": {
+    "id": "72de350ffdba97562bfcda726abcefebfd36394463cbcc2165a3573dc5addd58",
+    "started": "2026-10-27T06:43:06.358782625Z",
+    "image": "astro-dra:evidence-flow-20261027",
+    "image_id": "sha256:703d5c20bca85ca3c3d55e7ba3329994e108e3c9ed00a8878cedb313a26dc507",
+    "health": "healthy",
+    "login_http": 200,
+    "model": "deepseek-v4-flash",
+    "provider": "openai_endpoint",
+    "mounts": [
+      {
+        "name": "astro-dra-test-5002_ldr_data",
+        "destination": "/data"
+      },
+      {
+        "name": "astro-dra-test-5002_ldr_config",
+        "destination": "/app/.config/local_deep_research"
+      }
+    ],
+    "other_services_unchanged": [
+      "/local_deep_research-local-deep-research-1",
+      "/astro-dra-test-5002-searxng-1",
+      "/astro-dra-test-5002-proxy-relay-1"
+    ]
+  },
+  "scope": "General source continuity, explicit version comparison, post-writer claim review and bounded evidence supplementation",
+  "unit_tests": {
+    "passed": 378,
+    "seconds": 2.39
+  },
+  "installed_module_hashes_matched": 10,
+  "post_deploy_default_generation": {
+    "passed": true,
+    "real_model_calls": 1,
+    "provider": "openai_endpoint",
+    "model": "deepseek-v4-flash"
+  },
+  "post_deploy_simulated_agent_pipeline": {
+    "passed": true,
+    "real_model_calls": 0,
+    "simulated_calls": 2,
+    "private_tool_trace": true
+  },
+  "full_material_replays_before_final_quote_and_version_candidate_adjustments": {
+    "results": [
+      {
+        "mode": "saved_writer",
+        "research_id": "diagnostic-flow-saved-writer-7d3580f02a6f4ed4ab4c8d3bdd6b4f99",
+        "model": "deepseek-v4-flash",
+        "real_model_calls": 30,
+        "elapsed_s": 348.293,
+        "required_sources": 65,
+        "shown_sources": 85,
+        "parts": 1,
+        "review_status": "review_incomplete",
+        "applied_repairs": 0,
+        "unresolved_issues": 12,
+        "version_records": 1,
+        "linked_publications": [
+          {
+            "index": "219",
+            "pmid": "41361894",
+            "doi": "10.1186/s13059-025-03870-6"
+          }
+        ],
+        "invalid_reviews": 0,
+        "material_contract_passed": true
+      },
+      {
+        "mode": "normal",
+        "research_id": "diagnostic-flow-normal-26f28b1478b14bb58cdb1da99a21da0b",
+        "model": "deepseek-v4-flash",
+        "real_model_calls": 29,
+        "elapsed_s": 407.166,
+        "required_sources": 65,
+        "shown_sources": 86,
+        "parts": 1,
+        "review_status": "review_incomplete",
+        "applied_repairs": 0,
+        "unresolved_issues": 20,
+        "version_records": 1,
+        "linked_publications": [
+          {
+            "index": "219",
+            "pmid": "41361894",
+            "doi": "10.1186/s13059-025-03870-6"
+          }
+        ],
+        "invalid_reviews": 0,
+        "material_contract_passed": true
+      }
+    ]
+  },
+  "final_image_frozen_review_replays": {
+    "saved_writer": {
+      "mode": "saved_writer",
+      "real_confirmation_calls": 2,
+      "applied": 2,
+      "unresolved": 18,
+      "input_sha256": "31729d04b5a8d211aca36e2ffc5fd39e77ef8017bf30c8afef843d9c3df50a1b",
+      "output_sha256": "4dc3bd97572b441762017da1437c334ae5ed7dcd4eed08e46aa28ba74719f3b1",
+      "scope": "Frozen review responses; real independent confirmations only"
+    },
+    "normal": {
+      "mode": "normal",
+      "real_confirmation_calls": 1,
+      "applied": 0,
+      "unresolved": 28,
+      "input_sha256": "858d6100a4867d5da5fa3a63e3975fc98b69aae4338380bb731e97bed1499aa8",
+      "output_sha256": "858d6100a4867d5da5fa3a63e3975fc98b69aae4338380bb731e97bed1499aa8",
+      "scope": "Frozen review responses; real independent confirmations only"
+    }
+  },
+  "final_image_focused_live_synthesis": {
+    "results": [
+      {
+        "mode": "saved_writer",
+        "research_id": "diagnostic-flow-saved-writer-30c87505f98a42a6a0f0c2e8f4fceede",
+        "model": "deepseek-v4-flash",
+        "real_model_calls": 2,
+        "elapsed_s": 5.861,
+        "required_sources": 3,
+        "shown_sources": 3,
+        "parts": 1,
+        "review_status": "review_incomplete",
+        "applied_repairs": 1,
+        "unresolved_issues": 1,
+        "version_records": 1,
+        "linked_publications": [
+          {
+            "index": "219",
+            "pmid": "41361894",
+            "doi": "10.1186/s13059-025-03870-6"
+          }
+        ],
+        "invalid_reviews": 0,
+        "material_contract_passed": true
+      }
+    ]
+  },
+  "citation_alignment_fully_solved": false,
+  "semantic_findings": [
+    "All 65 required sources were shown to the writer; the normal replay had no draft-only-source warnings.",
+    "Explicit publication PMID41361894 retrieved separately as source219 without overwriting preprint source217.",
+    "Final-image frozen review replay with two live confirmations corrected RCC attribution and the ctSVG version.",
+    "Final-image focused live synthesis updated ctSVG but missed RCC at independent confirmation; reliability is incomplete.",
+    "Normal frozen-review replay retained the original body; the proposed version change was not confirmed.",
+    "Official document HTTP429, missing web results and intermittent EPMC SSL errors remain visible failures.",
+    "No fresh full web research, cross-topic accuracy benchmark, or user-report rewrite was performed."
+  ],
+  "preserved": {
+    "model": "deepseek-v4-flash",
+    "provider": "openai_endpoint",
+    "engines": [
+      "pubmed",
+      "searxng",
+      "europepmc"
+    ],
+    "regular_source_budget": 500,
+    "native_fact_check": true,
+    "saved_report_citation_qc": false,
+    "pubmed_auto_full_text_default": false,
+    "research_trace": true,
+    "user_volumes_and_other_services": true,
+    "env_change": "ASTRO_DRA_IMAGE only"
+  },
+  "private_artifacts": "/data/ningh/nh/ldr-experiments/evidence-flow-20261027",
+  "backup": "/data/ningh/nh/ldr-test-5002-backups/evidence-flow-20261027-131536",
+  "git_commit_push_merge": false
+}

@@ -1,0 +1,639 @@
+{
+  "started_utc": "2026-10-19T01:28:46Z",
+  "container": "astro-dra-test-5002-local-deep-research-1",
+  "mode": "pipeline",
+  "budget_per_engine_seconds": 65,
+  "scope": "Installed defaults + container environment; no encrypted account settings; no LLM generation; real adapter preview calls; two requested results.",
+  "results": [
+    {
+      "engine": "searxng",
+      "query": "cancer immunotherapy clinical trial",
+      "http": [
+        {
+          "host": "searxng",
+          "path": "/",
+          "method": "GET",
+          "status": 200,
+          "content_type": "text/html",
+          "seconds": 0.004
+        },
+        {
+          "host": "searxng",
+          "path": "/",
+          "method": "GET",
+          "status": 200,
+          "content_type": "text/html",
+          "seconds": 0.005
+        },
+        {
+          "host": "searxng",
+          "path": "/search",
+          "method": "GET",
+          "status": 200,
+          "content_type": "application/json",
+          "result_count": 7,
+          "unresponsive_engines": [],
+          "seconds": 0.843
+        }
+      ],
+      "warnings": [],
+      "stage": "preview",
+      "count": 2,
+      "samples": [
+        {
+          "title": "Cancer - Wikipedia",
+          "url": "https://en.wikipedia.org/wiki/Cancer",
+          "snippet_chars": 138
+        },
+        {
+          "title": "What Is Cancer? - NCI",
+          "url": "https://www.cancer.gov/about-cancer/understanding/what-is-cancer",
+          "snippet_chars": 132
+        }
+      ],
+      "status": "search_ok",
+      "elapsed_seconds": 2.856,
+      "container": "astro-dra-test-5002-local-deep-research-1"
+    },
+    {
+      "engine": "pubmed",
+      "query": "cancer immunotherapy",
+      "http": [
+        {
+          "host": "searxng",
+          "path": "/",
+          "method": "GET",
+          "status": 200,
+          "content_type": "text/html",
+          "seconds": 0.005
+        },
+        {
+          "host": "eutils.ncbi.nlm.nih.gov",
+          "path": "/entrez/eutils/esearch.fcgi",
+          "method": "GET",
+          "status": 200,
+          "content_type": "application/json",
+          "seconds": 0.879
+        },
+        {
+          "host": "eutils.ncbi.nlm.nih.gov",
+          "path": "/entrez/eutils/esearch.fcgi",
+          "method": "GET",
+          "status": 200,
+          "content_type": "application/json",
+          "seconds": 1.429
+        },
+        {
+          "host": "eutils.ncbi.nlm.nih.gov",
+          "path": "/entrez/eutils/esummary.fcgi",
+          "method": "GET",
+          "status": 200,
+          "content_type": "application/json",
+          "seconds": 1.126
+        },
+        {
+          "host": "eutils.ncbi.nlm.nih.gov",
+          "path": "/entrez/eutils/efetch.fcgi",
+          "method": "GET",
+          "status": 200,
+          "content_type": "text/xml",
+          "seconds": 3.521
+        },
+        {
+          "host": "api.openalex.org",
+          "path": "/works",
+          "method": "GET",
+          "status": 200,
+          "content_type": "application/json",
+          "seconds": 0.789
+        },
+        {
+          "host": "eutils.ncbi.nlm.nih.gov",
+          "path": "/entrez/eutils/efetch.fcgi",
+          "method": "GET",
+          "status": 200,
+          "content_type": "text/xml",
+          "seconds": 1.902
+        },
+        {
+          "host": "eutils.ncbi.nlm.nih.gov",
+          "path": "/entrez/eutils/efetch.fcgi",
+          "method": "GET",
+          "status": 200,
+          "content_type": "text/xml",
+          "seconds": 1.57
+        }
+      ],
+      "warnings": [
+        "Engine 'pubmed' is configured with requires_llm=True but no LLM provided. Creating engine without LLM — some features (query optimization, relevance filtering) may be unavailable.",
+        "LLM relevance filtering requested for pubmed but no LLM is available — filtering skipped",
+        "No abstract found for PMID 42893424",
+        "No abstract found for PMID 42891529",
+        "No abstract found for PMID 42893424",
+        "No abstract found for PMID 42891529"
+      ],
+      "stage": "preview",
+      "count": 25,
+      "samples": [
+        {
+          "title": "Multifunctional Magneto‑Thermal Probe Enhances the Efficacy of Tumor Therapy as a Tumor Nanovaccine.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42893588/",
+          "snippet_chars": 1448
+        },
+        {
+          "title": "Dual Metabolic Inhibition Via Vanadium-NO Synergistic Nanoplatform Potentiates Cancer Immunotherapy.",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42893571/",
+          "snippet_chars": 1432
+        }
+      ],
+      "status": "search_ok",
+      "elapsed_seconds": 16.741,
+      "container": "astro-dra-test-5002-local-deep-research-1"
+    }
+  ],
+  "inventory": {
+    "engines": [
+      {
+        "engine": "arxiv",
+        "class": "ArXivSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {
+          "default_params.max_results": 20,
+          "default_params.sort_by": "relevance",
+          "default_params.sort_order": "descending"
+        },
+        "description": "Search papers uploaded to ArXiv."
+      },
+      {
+        "engine": "brave",
+        "class": "BraveSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.region": "US",
+          "default_params.safe_search": true,
+          "default_params.search_language": "English",
+          "default_params.time_period": "y"
+        },
+        "description": "Search the web using the Brave search engine."
+      },
+      {
+        "engine": "exa",
+        "class": "ExaSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.search_type": "auto",
+          "default_params.include_full_content": true
+        },
+        "description": "Neural search engine built for AI with semantic understanding and high-quality results optimized for LLM consumption."
+      },
+      {
+        "engine": "github",
+        "class": "GitHubSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.include_issues": false,
+          "default_params.include_readme": true,
+          "default_params.max_results": 15,
+          "default_params.search_type": "repositories"
+        },
+        "description": "Search projects on Github."
+      },
+      {
+        "engine": "google_pse",
+        "class": "GooglePSESearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.region": "us",
+          "default_params.safe_search": true,
+          "default_params.search_language": "English"
+        },
+        "description": "Search the web using Google's Programmable Search Engine API."
+      },
+      {
+        "engine": "mojeek",
+        "class": "MojeekSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.language": "en",
+          "default_params.region": "",
+          "default_params.safe_search": false
+        },
+        "description": "Privacy-focused search engine with its own independent web index."
+      },
+      {
+        "engine": "pubmed",
+        "class": "PubMedSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "true",
+        "auto_enabled": "true",
+        "requires_key": false,
+        "key_present": true,
+        "params": {
+          "default_params.days_limit": 0,
+          "default_params.full_text_limit": 3,
+          "default_params.get_abstracts": true,
+          "default_params.get_full_text": false,
+          "default_params.max_results": 20,
+          "default_params.optimize_queries": true,
+          "default_params.max_mesh_terms": 3,
+          "default_params.max_keywords": 3,
+          "default_params.include_publication_type_in_context": true,
+          "default_params.include_journal_in_context": true,
+          "default_params.include_year_in_context": true,
+          "default_params.include_authors_in_context": false,
+          "default_params.include_full_date_in_context": false,
+          "default_params.include_mesh_terms_in_context": true,
+          "default_params.include_keywords_in_context": true,
+          "default_params.include_doi_in_context": false,
+          "default_params.include_pmid_in_context": false,
+          "default_params.include_pmc_availability_in_context": false,
+          "default_params.include_citation_in_context": false,
+          "default_params.include_language_in_context": false
+        },
+        "description": "Search papers indexed by PubMed."
+      },
+      {
+        "engine": "searxng",
+        "class": "SearXNGSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "true",
+        "auto_enabled": "true",
+        "requires_key": false,
+        "key_present": false,
+        "params": {
+          "default_params.instance_url": "http://searxng:8080",
+          "default_params.categories": [
+            "general"
+          ],
+          "default_params.delay_between_requests": 0,
+          "default_params.engines": [],
+          "default_params.include_full_content": true,
+          "default_params.language": "en",
+          "default_params.max_results": 15,
+          "default_params.result_format": "json",
+          "default_params.safe_search": "OFF"
+        },
+        "description": "A locally-hosted meta-search engine."
+      },
+      {
+        "engine": "serpapi",
+        "class": "SerpAPISearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.region": "us",
+          "default_params.safe_search": true,
+          "default_params.search_language": "English",
+          "default_params.time_period": "y"
+        },
+        "description": "Search the web with Google's search API."
+      },
+      {
+        "engine": "tavily",
+        "class": "TavilySearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.search_depth": "basic",
+          "default_params.include_full_content": true,
+          "default_params.time_period": "all"
+        },
+        "description": "AI-powered search engine optimized for research with built-in answer extraction."
+      },
+      {
+        "engine": "tinyfish",
+        "class": "TinyFishSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.location": "US",
+          "default_params.language": "en",
+          "default_params.include_full_content": true,
+          "default_params.fetch_format": "markdown"
+        },
+        "description": "Fast hosted web search with optional browser-rendered content extraction."
+      },
+      {
+        "engine": "wayback",
+        "class": "WaybackSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {
+          "default_params.closest_only": false,
+          "default_params.language": "English",
+          "default_params.max_results": 15,
+          "default_params.max_snapshots_per_url": 3
+        },
+        "description": "Search the Internet Archive's Wayback Machine."
+      },
+      {
+        "engine": "wikinews",
+        "class": "WikinewsSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {},
+        "description": "Search news articles written by volunteers with verified sources"
+      },
+      {
+        "engine": "wikipedia",
+        "class": "WikipediaSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {
+          "default_params.include_content": true,
+          "default_params.max_results": 20
+        },
+        "description": "Search Wikipedia articles"
+      },
+      {
+        "engine": "elasticsearch",
+        "class": "ElasticsearchSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {
+          "default_params.hosts": [
+            "http://localhost:9200"
+          ],
+          "default_params.index_name": "documents",
+          "default_params.username": "",
+          "default_params.password": "<empty>",
+          "default_params.api_key": "<empty>",
+          "default_params.cloud_id": "",
+          "default_params.max_results": 10,
+          "default_params.search_fields": [
+            "content",
+            "title",
+            "description",
+            "text"
+          ],
+          "default_params.highlight_fields": [
+            "content",
+            "title"
+          ]
+        },
+        "description": "Search engine for Elasticsearch databases. Efficient for searching document collections and structured data."
+      },
+      {
+        "engine": "paperless",
+        "class": "PaperlessSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.api_url": "http://localhost:8000",
+          "default_params.max_results": 10,
+          "default_params.timeout": 30,
+          "default_params.verify_ssl": true,
+          "default_params.include_content": true
+        },
+        "description": "Search your personal Paperless-ngx document archive."
+      },
+      {
+        "engine": "scaleserp",
+        "class": "ScaleSerpSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.location": "United States",
+          "default_params.language": "en",
+          "default_params.device": "desktop",
+          "default_params.safe_search": true,
+          "default_params.enable_cache": true,
+          "default_params.include_full_content": false
+        },
+        "description": "Cost-effective Google Search API with 1-hour free caching that can reduce costs by 40-70% for repeated searches."
+      },
+      {
+        "engine": "serper",
+        "class": "SerperSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.region": "us",
+          "default_params.search_language": "en",
+          "default_params.safe_search": true,
+          "default_params.time_period": null,
+          "default_params.include_full_content": false
+        },
+        "description": "Fast and affordable Google Search API with real-time results."
+      },
+      {
+        "engine": "sofya",
+        "class": "SofyaSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.topic": "general",
+          "default_params.freshness": null,
+          "default_params.include_full_content": true
+        },
+        "description": "Hosted web-search API for AI agents. Returns ranked results with SERP snippets and extracted page content (markdown) in a single call."
+      },
+      {
+        "engine": "nasa_ads",
+        "class": "NasaAdsSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": true,
+        "key_present": false,
+        "params": {
+          "default_params.max_results": 25,
+          "default_params.sort_by": "relevance",
+          "default_params.include_arxiv": true,
+          "default_params.min_citations": 0,
+          "default_params.from_publication_date": ""
+        },
+        "description": "NASA Astrophysics Data System - comprehensive database of astronomy, astrophysics, physics, and geophysics papers. Includes both ArXiv preprints and published papers."
+      },
+      {
+        "engine": "openalex",
+        "class": "OpenAlexSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {
+          "default_params.max_results": 25,
+          "default_params.sort_by": "relevance",
+          "default_params.filter_open_access": false,
+          "default_params.min_citations": 0,
+          "default_params.from_publication_date": ""
+        },
+        "description": "Search 250+ million academic papers with natural language queries. Comprehensive scholarly database covering all disciplines."
+      },
+      {
+        "engine": "semantic_scholar",
+        "class": "SemanticScholarSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {
+          "default_params.max_results": 20,
+          "default_params.get_tldr": true,
+          "default_params.get_abstracts": true,
+          "default_params.get_citations": false,
+          "default_params.get_references": false,
+          "default_params.citation_limit": 10,
+          "default_params.reference_limit": 10,
+          "default_params.optimize_queries": true
+        },
+        "description": "AI-powered search for scientific literature. Features include TLDR summaries, citation graphs, and semantic search across millions of papers."
+      },
+      {
+        "engine": "gutenberg",
+        "class": "GutenbergSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {
+          "default_params.max_results": 20
+        },
+        "description": "Search 70,000+ free public domain books with full text via Gutendex."
+      },
+      {
+        "engine": "openlibrary",
+        "class": "OpenLibrarySearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {
+          "default_params.max_results": 20
+        },
+        "description": "Search 2M+ books with metadata, covers, and full text from Internet Archive."
+      },
+      {
+        "engine": "pubchem",
+        "class": "PubChemSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {
+          "default_params.max_results": 10,
+          "default_params.include_synonyms": true
+        },
+        "description": "Search millions of chemical compounds with structures, properties, and bioactivity data."
+      },
+      {
+        "engine": "stackexchange",
+        "class": "StackExchangeSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {
+          "default_params.max_results": 20,
+          "default_params.site": "stackoverflow"
+        },
+        "description": "Search Stack Overflow and other Q&A sites for programming answers."
+      },
+      {
+        "engine": "zenodo",
+        "class": "ZenodoSearchEngine",
+        "configured_in_defaults": true,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {
+          "default_params.max_results": 20
+        },
+        "description": "Search millions of research datasets, software, and publications with DOIs."
+      },
+      {
+        "engine": "ddg",
+        "class": "DuckDuckGoSearchEngine",
+        "configured_in_defaults": false,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {},
+        "description": ""
+      },
+      {
+        "engine": "guardian",
+        "class": "GuardianSearchEngine",
+        "configured_in_defaults": false,
+        "agent_enabled": "false",
+        "auto_enabled": "false",
+        "requires_key": false,
+        "key_present": false,
+        "params": {},
+        "description": ""
+      }
+    ],
+    "root": "/install/.venv/lib/python3.14/site-packages/local_deep_research",
+    "snapshot_source": "installed defaults plus environment; no per-user database",
+    "proxy_configured": true,
+    "elapsed_seconds": 0.099,
+    "container": "astro-dra-test-5002-local-deep-research-1"
+  },
+  "completed_utc": "2026-10-19T01:29:05Z"
+}

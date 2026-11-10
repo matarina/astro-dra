@@ -1,0 +1,6 @@
+# Ignore local environment / ephemeral files that creep into the config dir
+.env
+.env.*
+!.env.example
+*.log
+.git/

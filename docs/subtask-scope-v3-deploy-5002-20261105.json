@@ -1,0 +1,234 @@
+{
+  "date": "2026-11-05",
+  "status": "deployed_5002",
+  "image_tag": "astro-dra:subtask-scope-v3-5002-20261105",
+  "image_id": "sha256:9258c8da0f344856cad0fd4df7708c62fa8d7281921d1bc6caa33c1130b02b13",
+  "container_id": "e6291b1b60234820bbfcbb8d2718ea10f511bb6c15d30241112dfff124b53fb1",
+  "started_at_utc": "2026-11-05T05:48:57.349993717Z",
+  "started_at_beijing": "2026-11-05 13:48:57",
+  "health": "healthy",
+  "checks": {
+    "other_services_unchanged": true,
+    "env_key_values_identical": true,
+    "mounts_identical": true,
+    "ports_identical": true,
+    "healthy": true,
+    "installed_matches_source": true,
+    "http200": true
+  },
+  "http": {
+    "/": 200,
+    "/auth/login": 200
+  },
+  "installed_sha256": {
+    "subtask_handoff.py": "6f8ebac2e3a4c78e16c1f74ded2c8ee413b3e2ae96d8e8c174216b04c9bb7049",
+    "subtask_research.py": "78f787ce97cd34b73dbfb2763811a656ab7d67415cc2a712d16e2d2da1dcde45",
+    "generation.py": "6a55c3ccaf022b1b5e550d6870804ae119bcba13ff03763bf5d920900f8fee5a",
+    "evidence_flow.py": "430944fcacf26782daa463c28c2384bd9d36675522d96e28453350149169628c",
+    "source_reading.py": "127660e51867ee27895b0ad0a8516f09c503633d7646f313535ff64ff3be2b85"
+  },
+  "prior_regression_passed": 465,
+  "same_tested_image": true,
+  "previous_image": "sha256:90cc95ab9a4354786514766d6a44d4d2768f44ec1567d60b77075f2c2b654bef",
+  "previous_image_tag": "astro-dra:subtask-handoff-v2-5002-20261105",
+  "only_env_line_updated": "ASTRO_DRA_IMAGE",
+  "predeploy_visible_research": {
+    "started": 2,
+    "finished": 2,
+    "active": 0
+  },
+  "startup_error_lines": 0,
+  "installed_smoke": {
+    "installed_actual_handler": "passed",
+    "uid": 1000,
+    "cases": [
+      {
+        "reader_failure": false,
+        "stages": [
+          "reader",
+          "writer",
+          "native_review"
+        ],
+        "report_preserved": true
+      },
+      {
+        "reader_failure": true,
+        "stages": [
+          "reader",
+          "writer",
+          "native_review"
+        ],
+        "report_preserved": true
+      }
+    ],
+    "verified_trace_events": 42,
+    "trace_permissions": "0700/0600",
+    "api_calls": 0,
+    "user_database_access": false
+  },
+  "fresh_research": {
+    "completed": true,
+    "elapsed_s": 368.404,
+    "sources": 27,
+    "references": 24,
+    "error": null,
+    "effective_settings": {
+      "native_fact_checking": true,
+      "source_reading": true,
+      "max_unique_sources": 500,
+      "max_sub_iterations": 8
+    },
+    "trace_events": 260,
+    "trace_hashes_valid": true,
+    "stages": {
+      "start": 66,
+      "agent_draft": 2,
+      "agent_messages": 1,
+      "collector_sources": 1,
+      "finish": 66,
+      "publication_input": 1,
+      "publication_output": 1,
+      "subtask_request": 2,
+      "subtask_budget": 2,
+      "subtask_messages_step": 30,
+      "subtask_messages": 2,
+      "subtask_sources": 2,
+      "subtask_search_end": 2,
+      "subtask_handoff": 2,
+      "input_sources": 1,
+      "evidence_plan": 1,
+      "writer_interpretation_notes": 1,
+      "source_material_views": 1,
+      "writer_sources": 1,
+      "writer_reading_scope": 1,
+      "source_reading_request": 1,
+      "source_reading_response": 1,
+      "source_reading_notes": 1,
+      "writer_request": 1,
+      "writer_response": 1,
+      "review_snapshot": 1,
+      "review_target_plan": 1,
+      "review_material_unavailable": 1,
+      "native_check_request": 1,
+      "native_check_response": 1,
+      "review_issue_state": 1,
+      "grounded_repairs": 1,
+      "final_response": 1,
+      "tool_messages": 61
+    },
+    "writer_sources": 27,
+    "source_reading": {
+      "status": "partial",
+      "observations": 31,
+      "reported_author_statements": 3,
+      "rejections": 10,
+      "original_selections_verified": 34,
+      "semantic_verification": "not_performed"
+    },
+    "subtasks": [
+      {
+        "search_end": "search_budget",
+        "delivery_status": "partial",
+        "rounds": 7,
+        "source_count": 0,
+        "material_cards": 0
+      },
+      {
+        "search_end": "search_budget",
+        "delivery_status": "partial",
+        "rounds": 7,
+        "source_count": 0,
+        "material_cards": 0
+      }
+    ],
+    "native_review": {
+      "requests": 1,
+      "issues": 9,
+      "statuses": {
+        "supported": 8,
+        "report_context": 1
+      },
+      "material_unavailable": 1,
+      "applied_repairs": 0
+    },
+    "search_result_pages_in_writer": 14,
+    "lrrc4": {
+      "retrieved": true,
+      "source_id": 18,
+      "deficiency_consequence_in_final_correct": true,
+      "original_fission_fusion_YAP_chain_written": false,
+      "semantic_regression_coverage": "partial_only; original detailed reversal sentence not generated"
+    },
+    "limits": [
+      "Both subtopics returned no search results and partial empty deliveries; semantic quality of newly searched child summaries was not exercised.",
+      "Search result pages are still treated as sources in the report; literature identity/coverage is not accepted.",
+      "Native review group 1 not run due evidence_budget; group 2 ran; not a full review pass.",
+      "Scope statements and omitted mechanisms require further evaluation; no claim of complete hallucination resolution.",
+      "Isolated programmatic research using deployed image/network/env, no user DB or web-account publication; request timeout90s/retries0 only in test."
+    ]
+  },
+  "search_comparison": {
+    "same_settings_and_network": true,
+    "results": {
+      "v2": [
+        {
+          "engine": "pubmed",
+          "result_type": "list",
+          "count": 0,
+          "elapsed_s": 8.442
+        },
+        {
+          "engine": "europepmc",
+          "result_type": "list",
+          "count": 0,
+          "elapsed_s": 8.578
+        },
+        {
+          "engine": "searxng",
+          "result_type": "list",
+          "count": 0,
+          "elapsed_s": 3.025
+        }
+      ],
+      "v3": [
+        {
+          "engine": "pubmed",
+          "result_type": "list",
+          "count": 0,
+          "elapsed_s": 17.727
+        },
+        {
+          "engine": "europepmc",
+          "result_type": "list",
+          "count": 0,
+          "elapsed_s": 7.489
+        },
+        {
+          "engine": "searxng",
+          "result_type": "list",
+          "count": 0,
+          "elapsed_s": 0.025
+        }
+      ]
+    },
+    "v2_diagnostics": [
+      "PubMed HTTP500",
+      "Europe PMC HTTP503",
+      "SearXNG bing timeout"
+    ],
+    "v3_diagnostics": [
+      "PubMed missing idlist",
+      "Europe PMC HTTP503",
+      "SearXNG bing suspended timeout"
+    ],
+    "conclusion": "Both versions reproduced empty search at this observation time; no new-code-only regression established. Cause beyond visible API/backend failures not established."
+  },
+  "checker_changed": false,
+  "database_schema_changed": false,
+  "user_database_read_or_decrypted": false,
+  "historical_reports_changed": false,
+  "git_merged_or_pushed": false,
+  "git_fetch": "failed_https_authentication",
+  "private_artifacts_dir": "/data/ningh/nh/ldr-experiments/subtask-scope-v3-deploy-5002-20261105",
+  "rollback": "Restore .env.pre-deploy to /data/ningh/nh/astro-dra/.env.test-5002, then up -d --no-build --no-deps local-deep-research with same project and compose file; keep current volumes."
+}

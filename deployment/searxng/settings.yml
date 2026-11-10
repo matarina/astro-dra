@@ -1,0 +1,22 @@
+use_default_settings:
+  engines:
+    # Restrict general web discovery to the verified backend.
+    keep_only:
+      - bing
+server:
+  bind_address: "0.0.0.0"
+  port: 8080
+  limiter: false
+search:
+  formats:
+    - html
+    - json
+outgoing:
+  proxies:
+    all://:
+      - http://host.docker.internal:9876
+
+# Verified fallback while rate-limited providers are paused.
+engines:
+  - name: bing
+    disabled: false
