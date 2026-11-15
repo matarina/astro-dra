@@ -1,7 +1,6 @@
 """Quarto export service.
 
-This module provides the QuartoExporter class that wraps the existing
-QuartoExporter implementation from text_optimization.citation_formatter.
+This module exports structural numeric citations and explicit source fields.
 """
 
 import io
@@ -17,7 +16,7 @@ from .registry import ExporterRegistry
 
 @ExporterRegistry.register
 class QuartoExporter(BaseExporter):
-    """Quarto exporter using the existing QuartoExporter implementation.
+    """Quarto exporter preserving report text and provided bibliography fields.
 
     This exporter converts markdown content to Quarto (.qmd) format,
     which can be rendered to HTML, PDF, or other formats using the
@@ -27,15 +26,6 @@ class QuartoExporter(BaseExporter):
     - The .qmd document
     - A references.bib bibliography file
     """
-
-    def __init__(self):
-        """Initialize Quarto exporter."""
-        # Import here to avoid circular imports
-        from ..text_optimization.citation_formatter import (
-            QuartoExporter as LegacyQuartoExporter,
-        )
-
-        self._legacy = LegacyQuartoExporter()
 
     @property
     def format_name(self) -> str:
@@ -82,20 +72,9 @@ class QuartoExporter(BaseExporter):
                     title_match.group(1) if title_match else "Research Report"
                 )
 
-            # Citation hyperlinks are display markup, not part of the reference key.
-            # Keep other hyperlinks intact; the bibliography retains the actual URLs.
-            markdown_content = re.sub(
-                r"\[?(\[\d+(?:\s*,\s*\d+)*\])\]?\([^\n)]*\)",
-                r"\1", markdown_content,
-            )
-
-            # Generate Quarto document
-            exported_content = self._legacy.export_to_quarto(
-                markdown_content, title
-            )
-
-            # Generate bibliography
-            bib_content = self._legacy._generate_bibliography(markdown_content)
+            from research_verify.quarto_sources import bibliography, document
+            bib_content = bibliography(markdown_content)
+            exported_content = document(markdown_content, title, bib_content)
 
             # Use base class method for safe filename generation, then extract base name
             base_filename = self._generate_safe_filename(options.title)

@@ -10,6 +10,7 @@ import threading
 import time
 import xml.etree.ElementTree as ET
 import copy
+import re
 
 
 def html_text(value):
@@ -237,3 +238,25 @@ def service_get(url, *, service, interval, get=None, sleep=time.sleep, **kwargs)
         response.close()
         sleep(delay)
     raise AssertionError("unreachable")
+
+
+def has_structured_query_syntax(query: str) -> bool:
+    """Return whether a query contains syntax that lexical broadening cannot preserve.
+
+    This is a syntax check, not a scientific intent classifier.  It deliberately
+    errs on the side of no fallback for operators, fields, quoted phrases,
+    parentheses, or date scopes.  Plain multilingual prose remains eligible for
+    the bounded lexical fallback above.
+    """
+    value = str(query or "")
+    if value.count('"') % 2:
+        return True
+    if re.search(r'"[^"\n]+"', value):
+        return True
+    if re.search(r'\[[^\]\n]+\]', value):
+        return True
+    if re.search(r'\b(?:AND|OR|NOT)\b', value, flags=re.I):
+        return True
+    if any(char in value for char in '()'):
+        return True
+    return bool(re.search(r'\b(?:last\s+\d+\s+(?:days?|months?|years?)|\d{4}(?:/\d{1,2}){0,2})\b', value, flags=re.I))

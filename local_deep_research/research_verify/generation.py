@@ -75,12 +75,10 @@ GROUNDING_INSTRUCTIONS += "\n" + READING_SCOPE_INSTRUCTIONS
 
 
 def prepare_draft_for_writing(draft):
-    """Separate explicitly tagged draft interpretations from empirical prose.
+    """Preserve the draft and record explicit annotations without judging them.
 
-    This prepares writing input, never edits a report. No scientific assertion
-    is classified by keywords: only the draft author's explicit Interpretation/
-    解读 annotation is used. Ordinary prose, tables, source reservations and the
-    original draft remain intact; the caller records these planning notes.
+    A label does not establish whether a paragraph is factual, speculative or
+    useful. The writer receives its original wording as unverified knowledge.
     """
     from .citation_display import cited_indices
     marker = re.compile(r"^\s*(?:\*\*|__)?(?:Interpretation|解读)"
@@ -92,15 +90,9 @@ def prepare_draft_for_writing(draft):
         if not marker.match(parts[i]):
             continue
         ids = list(cited_indices(parts[i]))
-        notes.append({"original": parts[i], "source_ids": ids, "kind": "draft_interpretation"})
-        refs = ", ".join(f"[{index}]" for index in ids)
-        parts[i] = ("Draft interpretation follow-up questions (unverified): "
-                    "What do the supplied source texts explicitly establish about study settings, "
-                    "outcomes and limitations? Which implications remain questions at the available "
-                    "reading scope? Keep unresolved items as questions for further reading; "
-                    "do not replace them with assertions that the original studies omitted something."
-                    + (" Sources to consult: " + refs if refs else ""))
-    return "".join(parts), notes
+        notes.append({"original": parts[i], "source_ids": ids, "kind": "draft_annotation",
+                      "scientific_status": "unknown"})
+    return draft, notes
 
 
 def source_material(source: dict) -> tuple[str, str]:

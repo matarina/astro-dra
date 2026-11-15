@@ -3,6 +3,8 @@ from hashlib import sha256
 import json
 from types import SimpleNamespace
 
+import pytest
+
 from research_verify.subtask_handoff import build_handoff, render_handoff
 from research_verify.generation import format_source_documents
 from test_generation_grounding import handler, Capture
@@ -123,12 +125,12 @@ def test_real_writer_receives_reading_scope_separately_from_the_unverified_draft
     assert "EVIDENCE READING LIMITS" in prompt
     assert "abstract_only" in prompt and "[17]" in prompt
     assert "not establish what full studies did or did not report" in prompt
-    assert "Most studies did not report durability outcomes" not in prompt
-    assert "Draft interpretation follow-up questions (unverified)" in prompt
+    assert "**Interpretation:** Most studies did not report durability outcomes [17]." in prompt
+    assert "Previous Knowledge only" in prompt
     assert len(model.prompts) == 1  # No added audit, correction call or report gate.
 
 
-def test_tagged_interpretation_is_separated_but_factual_prose_tables_and_sources_survive():
+def test_tagged_annotation_and_all_other_draft_content_reach_writer_unchanged():
     from research_verify.generation import prepare_draft_for_writing
     factual = "A measured result was reported [7]."
     note = "**解读（Interpretation）：** Most studies omitted durability measurements [9]."
@@ -136,9 +138,9 @@ def test_tagged_interpretation_is_separated_but_factual_prose_tables_and_sources
     draft = "## Mechanisms\n\n" + factual + "\n\n" + note + "\n\n" + table
     prepared, notes = prepare_draft_for_writing(draft)
     assert "## Mechanisms" in prepared and factual in prepared and table in prepared
-    assert "Most studies omitted" not in prepared and "[9]" in prepared
-    assert notes == [{"original": note, "source_ids": [9], "kind": "draft_interpretation"}]
-    assert note in draft  # Original is not rewritten or deleted.
+    assert prepared == draft
+    assert notes == [{"original": note, "source_ids": [9], "kind": "draft_annotation",
+                      "scientific_status": "unknown"}]
 
 
 def test_ordinary_prose_is_not_filtered_by_factual_or_absence_keywords():
@@ -157,5 +159,24 @@ def test_authors_explicit_negative_statement_is_preserved_in_original_source_tex
                             "abstract": original, "content_type": "abstract"}], draft, 0)
     prompt = model.prompts[0]
     assert original in prompt  # Source text is not processed as a draft annotation.
-    assert "No study in the literature reported outcome X" not in prompt
+    assert draft in prompt  # Draft remains unverified; the label cannot decide its scientific meaning.
     assert "[17]" in prompt and len(model.prompts) == 1
+
+
+@pytest.mark.parametrize("annotation", [
+    "Interpretation: A measured decrease was reported [17].",
+    "**Interpretation:** Could a follow-up experiment distinguish the explanations [17]?",
+    "解读：原文记录了关联，但不能推出因果关系 [17]。",
+    "**解读（Interpretation）：** 这一观察是否可用于设计下一步实验 [17]？",
+])
+def test_native_writer_keeps_scientific_and_proposal_content_under_draft_labels(annotation):
+    model = Capture()
+    writer = handler(model)
+    writer.settings_snapshot = {"general.enable_fact_checking": False}
+    draft = "## Working notes\n\n" + annotation + "\n\nOrdinary paragraph [17]."
+    writer.analyze_followup("What is supported?", [{"index": 17, "title": "Study",
+        "abstract": "An association was observed; causality could not be determined.",
+        "content_type": "abstract"}], draft, 0)
+    assert draft in model.prompts[0]
+    assert "An association was observed; causality could not be determined." in model.prompts[0]
+    assert len(model.prompts) == 1

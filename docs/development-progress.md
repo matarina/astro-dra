@@ -158,3 +158,42 @@ main与UI分支HEAD均e9be103，远程main已通过连接器只读核对相同�
 - [M0基础记录](verification-foundation-20261012.md)、[旧严格计划](ldr-verification-engineering-plan.md)：历史依据，不是当前开发路线。
 
 以后每次会话记录修改内容、验证范围、限制、提交/部署（如有）和下一步；不写入密钥、原始用户研究材料或私有全文缓存。详细过程使用单独日期记录，避免本文件再次增长成混合历史。
+
+### 2026-11-15 — selected integrity fixes prepared for main; broader goal paused
+
+User authorized pushing the recommended bounded fixes to remote main. The patch
+was assembled in an isolated worktree from origin/main 5a1e2a04; the original dirty
+workspace and immutable evaluation/independent-review artifacts were preserved.
+No evaluation attempt, model call, deployment, service restart or monitoring was
+started. The hallucination-reduction goal remains paused and unmet.
+
+Selected changes:
+- PubMed primary abstracts are reconstructed once, preserving nested text/tails,
+  section order and labels, without merging OtherAbstract translations.
+- Explicit Interpretation/解读 annotations retain their original draft paragraphs;
+  trace metadata identifies annotations with scientific status unknown.
+- Quarto/RIS export supplied bibliography fields and literal notes without
+  inventing publication year, language, publisher or access date. The structural
+  Markdown parser is an export dependency only; report claim extraction,
+  publication schema and runtime review remain unchanged. The overlay manifest
+  gains only the RIS exporter installation entry.
+- PubMed preserves structured Boolean/field/quoted/date syntax through optimizer
+  and simplification paths; topic volume no longer adds an implicit date window.
+  Operator days_limit remains in the transport. No lexical fallback, provider
+  ranking change, search proxy, source classifier or production setting is added.
+
+Validation: 25 focused tests passed in an offline disposable container using the
+existing astro-dra:main-20261106 image, with the isolated manifest overlays and
+research_verify package installed. This includes actual Quarto/RIS exporter tests
+and frozen-transport AST execution of the actual PubMed adapter methods. No model
+or external source endpoint was called. The updated legacy subtask-scope suite
+could not collect on the original main baseline because publication.py imports
+paper_identity missing from evidence.py; that existing issue remains unresolved.
+Full-suite success, scientific citation correctness, full Quarto rendering and
+report-level hallucination reduction are not claimed. Experimental automatic
+repair, source classification/schema changes, runtime configuration, the known
+PMC URL extraction defect, evaluation bundles and temporary scripts are excluded.
+
+Next work, upon explicit authorization: address the existing baseline import
+inconsistency separately and obtain independent whole-report outcome evidence
+before selecting any experimental repair chain for adoption.

@@ -1,0 +1,59 @@
+[
+  {
+    "id": "metadata",
+    "body": "A [7].\n\n## Sources\n\n[7] Title\n   Status: unverified\n   Identity: candidate\n   URL: https://example.org/a",
+    "expected": {
+      "7": "https://example.org/a"
+    }
+  },
+  {
+    "id": "grouped",
+    "body": "A [7, 17].\n\n## References\n\n[7, 17] Shared title\n   Other: retained\n   URL: https://example.org/shared",
+    "expected": {
+      "7": "https://example.org/shared",
+      "17": "https://example.org/shared"
+    }
+  },
+  {
+    "id": "protected",
+    "body": "A [7]. `literal [7]` [ordinary](https://example.org/[7]) \\[7]\n\n````\n[7]\n```\n````\n\n## Sources\n\n[7] Title\n   URL: https://example.org/a",
+    "expected": {
+      "7": "https://example.org/a"
+    }
+  },
+  {
+    "id": "following_section",
+    "body": "A [7].\n\n## Sources\n\n[7] Title\n   URL: https://example.org/a\n\n## Next research\n\n[17] A prose finding.",
+    "expected": {
+      "7": "https://example.org/a"
+    }
+  },
+  {
+    "id": "missing_url",
+    "body": "A [7].\n\n## Sources\n\n[7] Title\n   Status: unverified",
+    "expected": {
+      "7": ""
+    }
+  },
+  {
+    "id": "conflicting_urls",
+    "body": "A [7].\n\n## Sources\n\n[7] Title\n   URL: https://example.org/a\n   URL: https://example.org/b",
+    "expected": {
+      "7": ""
+    }
+  },
+  {
+    "id": "unsafe_url",
+    "body": "A [7].\n\n## Sources\n\n[7] Title\n   URL: javascript:alert(1)",
+    "expected": {
+      "7": ""
+    }
+  },
+  {
+    "id": "unknown_citation",
+    "body": "A [7] and unresolved [99].\n\n## Sources\n\n[7] Title\n   URL: https://example.org/a",
+    "expected": {
+      "7": "https://example.org/a"
+    }
+  }
+]

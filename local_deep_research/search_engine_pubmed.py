@@ -10,6 +10,7 @@ from ...security.safe_requests import safe_get
 from ...security.secure_logging import logger
 from ..rate_limiting import RateLimitError
 from ..search_engine_base import BaseSearchEngine, Exposure, Sensitivity
+from research_verify.retrieval import xml_text, has_structured_query_syntax
 
 
 class PubMedSearchEngine(BaseSearchEngine):
@@ -222,6 +223,10 @@ class PubMedSearchEngine(BaseSearchEngine):
         Returns:
             Simplified query with core terms
         """
+        # Preserve explicit query syntax, including a valid zero-result outcome.
+        if has_structured_query_syntax(query):
+            return query
+
         # Remove field specifications and operators
         simplified = re.sub(r"\[\w+\]", "", query)  # Remove [Field] tags
         simplified = re.sub(
@@ -285,7 +290,7 @@ class PubMedSearchEngine(BaseSearchEngine):
         Returns:
             Optimized query string for PubMed
         """
-        if not self.llm or not self.optimize_queries:
+        if not self.llm or not self.optimize_queries or has_structured_query_syntax(query):
             # Return original query if no LLM available or optimization disabled
             return query
 
@@ -465,6 +470,10 @@ Return ONLY the search query without any explanations.
         logger.info(f"Simplifying query: {query}")
         logger.debug(f"Query simplification started for: '{query[:100]}...'")
 
+        # Preserve explicit query syntax, including a valid zero-result outcome.
+        if has_structured_query_syntax(query):
+            return query
+
         # Simple approach: remove field restrictions to broaden the search
         import re
 
@@ -581,82 +590,11 @@ The default assumption should be that medical and scientific queries want RECENT
             return any(term in query.lower() for term in historical_terms)
 
     def _adaptive_search(self, query: str) -> Tuple[List[str], str]:
+        """Search within caller scope; an operator's days_limit still applies.
+
+        Topic volume does not authorize an implicit recency constraint.
         """
-        Perform an adaptive search that adjusts based on topic volume and whether
-        the query focuses on historical information.
-
-        Args:
-            query: The search query (already optimized)
-
-        Returns:
-            Tuple of (list of PMIDs, search strategy used)
-        """
-        # Estimate topic volume
-        estimated_volume = self._get_result_count(query)
-
-        # Determine if the query is focused on historical information
-        is_historical_focused = self._is_historical_focused(query)
-
-        if is_historical_focused:
-            # User wants historical information - no date filtering
-            time_filter = None
-            strategy = "historical_focus"
-        elif estimated_volume > 5000:
-            # Very common topic - use tighter recency filter
-            time_filter = '"last 1 year"[pdat]'
-            strategy = "high_volume"
-        elif estimated_volume > 1000:
-            # Common topic
-            time_filter = '"last 3 years"[pdat]'
-            strategy = "common_topic"
-        elif estimated_volume > 100:
-            # Moderate volume
-            time_filter = '"last 5 years"[pdat]'
-            strategy = "moderate_volume"
-        else:
-            # Rare topic - still use recency but with wider range
-            time_filter = '"last 10 years"[pdat]'
-            strategy = "rare_topic"
-
-        # Run search based on strategy
-        if time_filter:
-            # Try with adaptive time filter
-            query_with_time = f"({query}) AND {time_filter}"
-            logger.info(
-                f"Using adaptive search strategy: {strategy} with filter: {time_filter}"
-            )
-            results = self._search_pubmed(query_with_time)
-
-            # If too few results, gradually expand time window
-            if len(results) < 5 and '"last 10 years"[pdat]' not in time_filter:
-                logger.info(
-                    f"Insufficient results ({len(results)}), expanding time window"
-                )
-                expanded_time = self._expand_time_window(time_filter)
-                query_with_expanded_time = f"({query}) AND {expanded_time}"
-                expanded_results = self._search_pubmed(query_with_expanded_time)
-
-                if len(expanded_results) > len(results):
-                    logger.info(
-                        f"Expanded time window yielded {len(expanded_results)} results"
-                    )
-                    return expanded_results, f"{strategy}_expanded"
-
-            # If still no results, try without time filter
-            if not results:
-                logger.info(
-                    "No results with time filter, trying without time restrictions"
-                )
-                results = self._search_pubmed(query)
-                strategy = "no_time_filter"
-        else:
-            # Historical query - run without time filter
-            logger.info(
-                "Using historical search strategy without date filtering"
-            )
-            results = self._search_pubmed(query)
-
-        return results, strategy
+        return self._search_pubmed(query), "requested_scope"
 
     def _search_pubmed(self, query: str) -> List[str]:
         """
@@ -926,15 +864,14 @@ The default assumption should be that medical and scientific queries want RECENT
                 if pmid is None:
                     continue
 
-                # Find abstract text
-                abstract_text = ""
-                abstract_elem = article.find(".//AbstractText")
-
-                if abstract_elem is not None:
-                    abstract_text = abstract_elem.text or ""
-
-                # Some abstracts are split into multiple sections
-                abstract_sections = article.findall(".//AbstractText")
+                # Read the primary abstract once, preserving inline text and
+                # tails. Element.text alone stops at the first nested tag;
+                # pre-seeding it also duplicated the first section below.
+                # OtherAbstract translations remain distinct from this text.
+                abstract_parts = []
+                abstract_sections = article.findall(
+                    "./MedlineCitation/Article/Abstract/AbstractText"
+                )
                 if len(abstract_sections) > 1:
                     logger.debug(
                         f"Article {pmid} has {len(abstract_sections)} abstract sections"
@@ -943,18 +880,12 @@ The default assumption should be that medical and scientific queries want RECENT
                 for section in abstract_sections:
                     # Get section label if it exists
                     label = section.get("Label")
-                    section_text = section.text or ""
-
-                    if label and section_text:
-                        if abstract_text:
-                            abstract_text += f"\n\n{label}: {section_text}"
-                        else:
-                            abstract_text = f"{label}: {section_text}"
-                    elif section_text:
-                        if abstract_text:
-                            abstract_text += f"\n\n{section_text}"
-                        else:
-                            abstract_text = section_text
+                    section_text = xml_text(section).strip()
+                    if section_text:
+                        abstract_parts.append(
+                            f"{label}: {section_text}" if label else section_text
+                        )
+                abstract_text = "\n\n".join(abstract_parts)
 
                 # Store in dictionary
                 if pmid and abstract_text:

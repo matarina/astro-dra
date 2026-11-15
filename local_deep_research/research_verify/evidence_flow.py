@@ -626,7 +626,7 @@ def synthesize(handler, question, sources, draft, trace, nr_of_links=0):
         from .generation import format_source_documents, format_reading_scope, prepare_draft_for_writing
         writing_draft, interpretation_notes = prepare_draft_for_writing(working)
         trace.record('writer_interpretation_notes',{'notes':interpretation_notes,'batch':number,
-                     'draft_sha256':text_digest(working),'purpose':'planning_questions_not_study_findings'})
+                     'draft_sha256':text_digest(working),'purpose':'explicit_annotation_scientific_status_unknown'})
         reading_scope = []
         material = format_source_documents(documents,question,
             selector=lambda p:handler._invoke_text(p,trace=trace,stage='source_selection'),
