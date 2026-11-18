@@ -197,3 +197,22 @@ PMC URL extraction defect, evaluation bundles and temporary scripts are excluded
 Next work, upon explicit authorization: address the existing baseline import
 inconsistency separately and obtain independent whole-report outcome evidence
 before selecting any experimental repair chain for adoption.
+
+### 2026-11-18 — evidence-grounding and fail-closed held-out checkpoint
+
+Prepared an isolated collaboration branch from `origin/main` for the reusable
+evidence-grounding contract and held-out review integrity fixes. The code stays
+in the owned `local_deep_research/research_verify/` overlay used by the Docker
+install path. The checkpoint includes explicit scope metadata, source-indexed
+enrichment with conflict preservation, exact evidence locators, frozen manifest
+hash checks, and acceptance checks that reject empty, missing, duplicate,
+mismatched, or unbound review rows. Distinct assertions may share a case ID.
+Zero-assertion reports require complete per-arm case receipts and an explicit
+reason. No report text is edited and no production release gate is added.
+
+The private held-out dataset, gold labels, arm key, blinded packets, source
+bytes, provider traces, and run artifacts remain outside Git. Focused validation
+passed nine tests, import/compile checks, and `git diff --check`. The existing
+origin baseline publication import mismatch (`paper_identity` absent from
+`evidence.py`) remains outside this narrow port. Human blinded review and any
+hallucination-reduction claim remain pending.
