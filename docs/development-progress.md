@@ -216,3 +216,12 @@ passed nine tests, import/compile checks, and `git diff --check`. The existing
 origin baseline publication import mismatch (`paper_identity` absent from
 `evidence.py`) remains outside this narrow port. Human blinded review and any
 hallucination-reduction claim remain pending.
+
+### 2026-11-18 — opt-in observable model debug capture
+
+Added `research_verify.debug_capture.capture_chat_completion` on the evidence
+checkpoint branch. It can persist complete request payloads, raw response bytes,
+parsed response JSON, hashes, usage, finish reason, timing, visible output, and
+provider-returned reasoning fields for controlled runs. It does not and cannot
+recover hidden model chain-of-thought that the endpoint does not expose. Capture
+is opt-in, private-directory only, and unchanged for normal runs.

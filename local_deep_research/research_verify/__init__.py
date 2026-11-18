@@ -56,6 +56,7 @@ from .heldout import (
     validate_pair_integrity,
 )
 from .research_spec import ResearchSpec, format_research_spec, parse_research_spec
+from .debug_capture import capture_chat_completion
 
 __all__ = [
     "VerifyConfig",
@@ -98,6 +99,7 @@ __all__ = [
     "seal_manual_packet",
     "validate_manifest",
     "validate_pair_integrity",
+    "capture_chat_completion",
 ]
 
 __version__ = "0.1.0"
