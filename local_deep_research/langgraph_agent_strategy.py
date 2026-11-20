@@ -1360,7 +1360,6 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             )
         # research_verify: last parsed constraint (set by _attach_constraint_match)
         self._constraint_spec = None
-        self._keyword_spec = None
         self._citation_checks: list = []
         self._collection_tool_display_names: dict[str, str] = {}
         self._collection_tool_display_names_loaded = False
@@ -2487,10 +2486,6 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             synthesized_content, all_search_results
         )
         all_search_results = getattr(self, "_citation_evidence_sources", all_search_results)
-        # Evidence preparation in the QC gate may have fetched missing bodies.
-        # Compute coverage afterwards so its evidence basis matches the actual
-        # source fields used for the published claim checks.
-        self._attach_keyword_coverage(query, all_search_results)
         from research_verify.audit_io import publication_sources
         published_sources = publication_sources(all_search_results)
         if isinstance(getattr(self, "_citation_audit", None), dict):
@@ -2498,7 +2493,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                 json.dumps(published_sources, sort_keys=True, ensure_ascii=False).encode()
             ).hexdigest()
 
-        # Keep scope, keyword, identity, and optional fact-consistency results
+        # Keep scope, identity, and optional fact-consistency results
         # in trace/metadata only.  The current biomedical flow deliberately
         # does not append rule-driven verification tables to the report body.
         # The renderer methods remain available for explicit diagnostics and
@@ -2855,64 +2850,6 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         except Exception as exc:
             logger.debug("citation_qc json write failed: {}", type(exc).__name__)
             return None
-
-    def _attach_keyword_coverage(
-        self, query: str, sources: list[dict]
-    ) -> None:
-        """Requirement 3: compute keyword coverage and stash per source."""
-        try:
-            from research_verify import get_config
-            from research_verify.keyword_cov import KeywordCoverage
-        except Exception as exc:
-            logger.warning(f"research_verify import failed: {exc}")
-            return
-
-        cfg = get_config()
-        if not cfg.enable_verify or not cfg.module_enabled("keyword_coverage"):
-            return
-        if not sources:
-            return
-
-        try:
-            kc = KeywordCoverage(cfg, model=getattr(self, "model", None))
-            settings = {"keywords": self.get_setting("report.keywords", None)}
-            keywords = kc.extract_keywords(query, settings)
-            if not keywords:
-                return
-            for src in sources:
-                if not isinstance(src, dict):
-                    continue
-                cov = kc.compute(src, keywords)
-                src["_keyword_cov"] = cov.model_dump()
-                src["_keyword_badge"] = f"词面命中 {len(cov.hits)}/{cov.total}（非相关性判断）"
-            self._keyword_spec = keywords
-            logger.info(f"keyword_coverage: keywords={keywords}")
-        except Exception as exc:
-            logger.warning(f"keyword_coverage skipped: {exc}")
-
-    @staticmethod
-    def _render_keyword_section(sources: list[dict]) -> str:
-        rows = [s for s in sources if isinstance(s, dict) and s.get("_keyword_cov")]
-        if not rows:
-            return ""
-        lines = [
-            "### 关键词覆盖核验",
-            "",
-            "| # | 命中 | 缺失 | 覆盖 | 依据 | 结论 |",
-            "|---|------|------|------|------|------|",
-        ]
-        for s in rows:
-            cov = s.get("_keyword_cov") or {}
-            badge = s.get("_keyword_badge", "")
-            basis = cov.get("basis", "")
-            basis_label = "全文" if basis == "fulltext" else ("摘要" if basis == "abstract" else "无")
-            hits = ",".join(cov.get("hits") or [])[:80].replace("|", "/")
-            missed = ",".join(cov.get("missed") or [])[:80].replace("|", "/")
-            lines.append(
-                f"| {s.get('index', '?')} | {hits} | {missed} | "
-                f"{len(cov.get('hits') or [])}/{cov.get('total', 0)} | {basis_label} | {badge} |"
-            )
-        return "\n".join(lines)
 
     @staticmethod
     def _format_agent_error(exc: BaseException) -> str:

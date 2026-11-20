@@ -4,7 +4,7 @@
 
 ## 当前开发候选：显式意图与未知状态（2026-11-10）
 
-未部署候选停止从问题关键词推断出版语言/年份、论文数量、字段或报告模式；原问题仍交给Agent/Writer。`report.*`显式设置经校验后带provenance，缺失/冲突值保持unknown或pending，不创建科学条件通过或发布门槛。ConstraintMatcher不再自动调模型猜条件；关键词覆盖仅对显式terms报告词面命中，不能当相关性/语义通过。保存前QC仍关闭，LDR原生事实一致性保持开启。
+未部署候选停止从问题关键词推断出版语言/年份、论文数量、字段或报告模式；原问题仍交给Agent/Writer。`report.*`显式设置经校验后带provenance，缺失/冲突值保持unknown或pending，不创建科学条件通过或发布门槛。ConstraintMatcher不再自动调模型猜条件。保存前QC仍关闭，LDR原生事实一致性保持开启。
 
 见[候选与真实配对评测](../../docs/structured-intent-candidate-20261110.md)。32份纠正材料的生成完成，但12份辅助标注无效且存在judge与来源复读分歧；不宣称总体幻觉下降或跨域稳健性通过。下面旧需求/CLI术语仅作模块背景，不代表当前自动准入策略。
 
@@ -67,20 +67,17 @@ LangGraph 的 `findings.content`、`current_knowledge`、`final_report.content` 
 |------|------|------|
 | `config.py` | — | `VerifyConfig`（`LDR_VERIFY_*` 总开关 + 各模块开关 + 阈值） |
 | `http_client.py` | — | 共享异步 HTTP（信号量限流、重试、ok/not_found/transport_error 三态） |
-| `models.py` | — | 全部 pydantic 模型（`VerifyResult`/`ResearchConstraint`/`KeywordCov`/`ClaimCheck`…） |
+| `models.py` | — | 全部 pydantic 模型（`VerifyResult`/`ResearchConstraint`/`ClaimCheck`…） |
 | `textutil.py` | — | 纯函数工具（标题/年份/DOI/PMID 归一化） |
 | `doi_validator.py` | 需求1 | Crossref/PubMed 在线校验 DOI/PMID 真实性 |
 | `constraint_matcher.py` | 需求2 | 年份/IF/语种范围提示（IF 走 journal_quality，`0.0` 视为未知；不删除来源） |
-| `keyword_cov.py` | 需求3 | 全文/摘要关键词命中覆盖 |
 | `evidence.py` | 需求4 | 证据类型、全文窗口检索、逐篇引用查找和原文偏移校验 |
 | `citation_qc.py` | 需求4 | 摘要与正文支持判定、复判、有限修订、统一正文及审计 |
-| `cli_check.py` | 3/4 | 离线复核 CLI（拉 PubMed efetch 对账） |
 
 ## 状态语义（绝不静默）
 
 - 当前开发候选 `verified`：`True`仅表示provider返回请求的ID；`None`包括registry未收录、空/错误/不匹配响应和断网。旧`False`不能在缺scope/provenance时当全球无效；标题/年份一致性、同行评议与科学支撑另行表示。
 - 需求2 `hard_violations`：仅作为范围提示；来源仍保留，不阻止报告
-- 需求3 `threshold_ok`：`False` → 标注不达标（basis=abstract 时提示未验证全文）
 - 需求4 `verdict`：`supported`/`partial`/`unsupported`/`contradicted`/`unverifiable`。诊断结果写入旁路元数据，不替换生产正文。
 
 ## 开关（docker-compose env）
@@ -89,10 +86,7 @@ LangGraph 的 `findings.content`、`current_knowledge`、`final_report.content` 
 LDR_VERIFY_ENABLE_VERIFY=true            # 总开关，false 全链短路
 LDR_VERIFY_ENABLE_DOI_VALIDATION=true
 LDR_VERIFY_ENABLE_CONSTRAINT_MATCH=true
-LDR_VERIFY_ENABLE_KEYWORD_COVERAGE=true
 LDR_VERIFY_ENABLE_CITATION_QC=false
-LDR_VERIFY_MIN_KEYWORD_HITS=3
-LDR_VERIFY_KEYWORD_THRESHOLD_RATIO=0.75
 LDR_VERIFY_CROSSREF_MAILTO=<mailto>
 ```
 
@@ -107,16 +101,13 @@ docker exec <container> /install/.venv/bin/python -m research_verify.doi_validat
 docker exec <container> /install/.venv/bin/python -m research_verify.doi_validator --doi 10.9999/does-not-exist-xyz123
 docker exec <container> /install/.venv/bin/python -m research_verify.doi_validator --doi 10.1038/s41586-020-2649-2 --wrong-title "Wrong"
 
-# 离线复核（需求3/4）
-docker exec <container> /install/.venv/bin/python -m research_verify.cli_check --pmids 32561899 --keywords "m6A,METTL3" --threshold 2
-
 # 单测（容器未装 pytest；本地 venv 或临时装）
 pytest -q tests/
 ```
 
 ## 报告产出
 
-生产 `_finalize` 保留正文，并在书目中显示来源状态；范围、关键词、身份和可选事实一致性结果只写入 trace/metadata，不追加正文核验表。可选诊断才会生成 `citation_qc_*.json`；其中的判定不授权删除或扣留正文。
+生产 `_finalize` 保留正文，并在书目中显示来源状态；范围、身份和可选事实一致性结果只写入 trace/metadata，不追加正文核验表。可选诊断才会生成 `citation_qc_*.json`；其中的判定不授权删除或扣留正文。
 
 ## 回滚
 

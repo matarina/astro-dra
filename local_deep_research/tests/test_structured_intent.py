@@ -2,7 +2,6 @@
 import json
 from research_verify.research_spec import parse_research_spec, format_research_spec
 from research_verify.constraint_matcher import ConstraintMatcher
-from research_verify.keyword_cov import KeywordCoverage
 
 
 def test_unknown_intent_adds_no_scope_instructions():
@@ -59,10 +58,3 @@ def test_missing_source_metadata_is_not_condition_pass():
     scope = ConstraintMatcher().parse("", {"language":"en", "year_from":2020})
     match = ConstraintMatcher().match({"source_engine":"pubmed"}, scope)
     assert match.year_ok is None and match.lang_ok is None and match.detail["pending"]
-
-
-def test_lexical_hits_never_certify_relevance_or_fulltext():
-    coverage = KeywordCoverage().compute({"full_content":"term " * 100}, ["term"])
-    assert coverage.basis == "retrieved_text"
-    assert coverage.semantic_assessment == "not_performed"
-    assert KeywordCoverage().extract_keywords("term") == []

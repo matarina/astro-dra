@@ -29,13 +29,11 @@ def runner_for(body, model):
         model=model,collector=collector,all_links_of_system=[source],
         _attach_doi_verification=lambda sources:None,
         _attach_constraint_match=lambda query,sources:False,
-        _attach_keyword_coverage=lambda query,sources:None,
         _update_progress=lambda *args:None,
         get_setting=lambda key, default=None: default,
         citation_handler=SimpleNamespace(analyze_followup=lambda *args,**kwargs:{"content":body}),
         _format_citations=lambda answer,sources:answer+"\n\n## Sources\n1. fixture",
         _render_constraint_section=lambda sources:"",
-        _render_keyword_section=lambda sources:"",
         _render_verify_section=lambda sources:"",
         _write_citation_qc_json=lambda checks:None,
     )

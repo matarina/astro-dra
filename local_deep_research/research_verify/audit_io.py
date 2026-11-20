@@ -31,7 +31,7 @@ def _source_for_audit(source):
     result = {}
     # Keep metadata and provenance, while excluding transient private fields.
     for key, value in normalized.items():
-        if key.startswith("_") and key not in {"_verify", "_constraint", "_keyword_cov"}:
+        if key.startswith("_") and key not in {"_verify", "_constraint"}:
             continue
         if key in {"content", "full_content", "body", "fetched_content"}:
             if isinstance(value, str):

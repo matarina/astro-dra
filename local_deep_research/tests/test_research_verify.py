@@ -26,13 +26,13 @@ from research_verify.config import get_config
 # --------------------------------------------------------------------------- #
 # configuration
 # --------------------------------------------------------------------------- #
-def test_default_audit_is_enabled_without_automatic_selection_constraints():
+def test_default_verification_switches():
     cfg = VerifyConfig()
     assert cfg.enable_verify is True
     assert cfg.module_enabled("doi_validation") is True
-    assert cfg.module_enabled("constraint_match") is False
-    assert cfg.module_enabled("keyword_coverage") is False
-    assert cfg.module_enabled("citation_qc") is True
+    assert cfg.module_enabled("constraint_match") is True
+    assert cfg.module_enabled("citation_qc") is False
+    assert cfg.module_enabled("unregistered") is False
 
 
 def test_master_switch_disables_all(monkeypatch):
@@ -43,17 +43,15 @@ def test_master_switch_disables_all(monkeypatch):
 
 
 def test_module_switch_is_independent(monkeypatch):
-    monkeypatch.setenv("LDR_VERIFY_ENABLE_KEYWORD_COVERAGE", "false")
+    monkeypatch.setenv("LDR_VERIFY_ENABLE_CONSTRAINT_MATCH", "false")
     cfg = VerifyConfig()
-    assert cfg.module_enabled("keyword_coverage") is False
+    assert cfg.module_enabled("constraint_match") is False
     assert cfg.module_enabled("doi_validation") is True
 
 
-def test_env_overrides_thresholds(monkeypatch):
-    monkeypatch.setenv("LDR_VERIFY_MIN_KEYWORD_HITS", "4")
+def test_env_overrides_http_concurrency(monkeypatch):
     monkeypatch.setenv("LDR_VERIFY_HTTP_CONCURRENCY", "3")
     cfg = VerifyConfig()
-    assert cfg.min_keyword_hits == 4
     assert cfg.http_concurrency == 3
 
 

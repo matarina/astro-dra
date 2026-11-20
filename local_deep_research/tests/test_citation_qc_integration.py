@@ -104,13 +104,7 @@ def strategy():
         def _attach_constraint_match(self, query, sources):
             return False
 
-        def _attach_keyword_coverage(self, query, sources):
-            pass
-
         def _render_constraint_section(self, sources):
-            return ""
-
-        def _render_keyword_section(self, sources):
             return ""
 
         def _render_verify_section(self, sources):

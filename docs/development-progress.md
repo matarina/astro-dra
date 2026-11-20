@@ -233,3 +233,9 @@ Consolidated the GitHub branch histories with the current main integrity commit 
 The selected deployment defaults require an operator-supplied model and endpoint, use an optional search proxy and an effective 500-source limit, enable native fact checking, and keep save-time citation QC off. A local JCR catalog is still required for live metrics.
 
 Validation used the existing base runtime in disposable containers without network access. Overlay/account installation passed. The installed core suite passed 109 tests, the focused source suite passed 163 with one installed-runtime test deselected, and all four PubMed constructor checks passed. Compose defaults, optional SearXNG proxy rendering and Git whitespace checks passed. The broader installed suite returned 561 passes and 90 failures, including legacy citation/audit contracts, old subtask fixtures, and the inventory test's missing container CLI. Live research quality and production deployment were outside this run.
+
+### 2026-11-20 — custom report keyword coverage removed
+
+Deleted the report keyword checker, its configuration and result model, the recheck CLI, and their strategy, build, and metadata hooks. The archived report parsers still recognize saved coverage sections. Literature search queries and article-supplied keyword metadata are outside this feature.
+
+A clean overlay install confirmed both deleted modules are absent. The old config flag has no effect, legacy report parsing still separates the old appendix from claims, and regenerated metadata omits the obsolete private fields. The focused installed suite passed 148 tests. The broader installed suite had 554 passes and 88 existing failures, with zero new failures versus the previous main. Both Compose files and whitespace checks passed. No deployment or saved-data migration was performed.

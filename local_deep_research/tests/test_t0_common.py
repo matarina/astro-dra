@@ -8,7 +8,6 @@ from __future__ import annotations
 from research_verify import (
     ClaimCheck,
     ConstraintMatch,
-    KeywordCov,
     ResearchConstraint,
     VerifyResult,
 )
@@ -35,9 +34,7 @@ def test_constraint_match_excluded():
     assert ConstraintMatch(hard_violations=["year"]).excluded is True
 
 
-def test_keyword_cov_and_claim_defaults():
-    k = KeywordCov()
-    assert k.threshold_ok is True and k.basis == "unavailable"
+def test_claim_defaults_to_unverifiable():
     c = ClaimCheck(claim="x")
     assert c.verdict == "unverifiable"
 

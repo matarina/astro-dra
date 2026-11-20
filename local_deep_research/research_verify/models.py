@@ -1,6 +1,6 @@
 """Shared pydantic models for the ``research_verify`` chain.
 
-All four requirement modules read/write these models, so they live in one
+The verification modules read/write these models, so they live in one
 place to avoid circular imports.  The models are intentionally thin and
 JSON-serialisable: callers stash ``model_dump()`` results onto the source
 dicts and the report renderer reads the badge/status back off them.
@@ -11,7 +11,6 @@ Status vocabularies (never silently pass a bad item):
   (``None`` == unverified, e.g. offline).
 * requirement 2 ``ConstraintMatch.hard_violations`` -- non-empty means the
   source receives an advisory scope badge; it is never a deletion instruction.
-* requirement 3 ``KeywordCov.threshold_ok`` -- ``False`` means under-covered.
 * requirement 4 ``ClaimCheck.verdict`` -- one of
   ``supported``/``partial``/``unsupported``/``contradicted``/``unverifiable``.
 """
@@ -87,20 +86,6 @@ class SourceState(BaseModel):
     evidence_scope: str = "unknown"
     temporal_validity: str = "unknown"
     contradiction_status: str = "unknown"
-
-
-class KeywordCov(BaseModel):
-    """Keyword-coverage statistics for one source (requirement 3)."""
-
-    total: int = 0
-    hits: list[str] = Field(default_factory=list)
-    missed: list[str] = Field(default_factory=list)
-    coverage: float = 0.0
-    threshold_ok: bool | None = None
-    assessment_kind: str = "lexical_overlap"
-    semantic_assessment: str = "not_performed"
-    keyword_provenance: str = "unknown"
-    basis: str = "unavailable"  # fulltext | abstract | unavailable
 
 
 class EvidenceSpan(BaseModel):

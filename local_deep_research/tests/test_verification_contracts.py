@@ -37,7 +37,7 @@ def test_duplicate_outcomes_cannot_pass():
 def test_traceability_pass_does_not_imply_full_literature_pass():
     checks = (result("claim", "pass"),)
     assert evaluate_gate(("claim",), checks) == GateDecision.ADMITTED
-    assert evaluate_gate(("identity", "jif", "fulltext_keywords", "claim"), checks) == GateDecision.PENDING
+    assert evaluate_gate(("identity", "jif", "fulltext_evidence", "claim"), checks) == GateDecision.PENDING
     assert evaluate_gate(("claim",), checks + (result("jif", "fail"),)) == GateDecision.ADMITTED
 
 

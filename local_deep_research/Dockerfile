@@ -62,7 +62,7 @@ COPY overlay/standard_citation_handler.py /install/.venv/lib/python3.14/site-pac
 RUN /install/.venv/bin/python -c "import ast, hashlib, pathlib; root=pathlib.Path('/install/.venv/lib/python3.14/site-packages/local_deep_research/citation_handlers'); [ast.parse((root/n).read_text(encoding='utf-8'), filename=str(root/n)) for n in ('base_citation_handler.py','standard_citation_handler.py')]; print('citation handler overlays syntax OK', {n:hashlib.sha256((root/n).read_bytes()).hexdigest() for n in ('base_citation_handler.py','standard_citation_handler.py')})"
 
 # ============================================================================
-# research_verify/ — 新增的“科研验证链”包（四需求的地基，§0.1）。
+# research_verify/ — 新增的“科研验证链”包（§0.1）。
 # 顶层包名 research_verify，装入 venv site-packages 根目录，
 # 供 langgraph_agent_strategy._finalize 穿凿时 `from research_verify import ...`。
 # 仅 COPY 包本体（tests/ 不进生产镜像）。安装后逐个 .py 做 AST 语法校验。
@@ -70,8 +70,8 @@ RUN /install/.venv/bin/python -c "import ast, hashlib, pathlib; root=pathlib.Pat
 COPY research_verify /install/.venv/lib/python3.14/site-packages/research_verify
 RUN /install/.venv/bin/python -c "import ast, pathlib; root = pathlib.Path('/install/.venv/lib/python3.14/site-packages/research_verify'); files = sorted(root.rglob('*.py')); [ast.parse(f.read_text(encoding='utf-8'), filename=str(f)) for f in files]; print('research_verify syntax OK:', [f.name for f in files])"
 # 确认包可被应用解释器导入（不触发外网）。
-RUN /install/.venv/bin/python -c "import research_verify; from research_verify import VerifyConfig, HttpClient, HttpResult, VerifyResult, ResearchConstraint, ConstraintMatch, KeywordCov, ClaimCheck; print('research_verify import OK', research_verify.__version__)"
-RUN /install/.venv/bin/python -c "from research_verify.doi_validator import DoiValidator, badge_for; from research_verify.constraint_matcher import ConstraintMatcher; from research_verify.keyword_cov import KeywordCoverage; from research_verify.citation_qc import CitationQc; from research_verify.textutil import normalize_title; print('research_verify T0-T4 modules import OK')"
+RUN /install/.venv/bin/python -c "import research_verify; from research_verify import VerifyConfig, HttpClient, HttpResult, VerifyResult, ResearchConstraint, ConstraintMatch, ClaimCheck; print('research_verify import OK', research_verify.__version__)"
+RUN /install/.venv/bin/python -c "from research_verify.doi_validator import DoiValidator, badge_for; from research_verify.constraint_matcher import ConstraintMatcher; from research_verify.citation_qc import CitationQc; from research_verify.textutil import normalize_title; print('research_verify T0-T4 modules import OK')"
 RUN /install/.venv/bin/python -m research_verify.citation_qc --text 'x [1].' >/dev/null && echo 'research_verify citation_qc CLI OK'
 
 # No custom CMD/ENTRYPOINT override — inherit upstream defaults

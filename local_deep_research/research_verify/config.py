@@ -33,7 +33,6 @@ class VerifyConfig(BaseSettings):
     enable_verify: bool = True
     enable_doi_validation: bool = True
     enable_constraint_match: bool = True
-    enable_keyword_coverage: bool = True
     enable_citation_qc: bool = False
 
     # --- shared HTTP client ---
@@ -45,10 +44,6 @@ class VerifyConfig(BaseSettings):
     # --- requirement 2: constraint matching defaults ---
     min_if: float | None = None
     strict_year: bool = False
-
-    # --- requirement 3: keyword coverage ---
-    min_keyword_hits: int = Field(default=3, ge=1)
-    keyword_threshold_ratio: float = Field(default=0.75, ge=0, le=1)
 
     # --- requirement 4: citation QC ---
     qc_batch_size: int = Field(default=5, ge=1)
@@ -70,7 +65,7 @@ class VerifyConfig(BaseSettings):
         """
         if not self.enable_verify:
             return False
-        return bool(getattr(self, f"enable_{name}", True))
+        return bool(getattr(self, f"enable_{name}", False))
 
 
 @lru_cache(maxsize=1)

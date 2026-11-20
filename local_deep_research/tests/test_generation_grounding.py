@@ -201,7 +201,6 @@ def test_draft_citation_recovers_real_previous_source_for_final_writer():
         get_setting=lambda key, default=None: default,
         _attach_doi_verification=lambda sources: None,
         _attach_constraint_match=lambda query, sources: None,
-        _attach_keyword_coverage=lambda query, sources: None,
         _attach_citation_qc=lambda content, sources: (content, []),
     )
     result = LangGraphAgentStrategy._finalize(runner, "Task", "Draft cites earlier work [1].", 1, 1, [])

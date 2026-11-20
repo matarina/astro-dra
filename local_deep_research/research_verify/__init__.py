@@ -1,11 +1,10 @@
-"""``research_verify`` -- LDR research-verification chain (four requirements).
+"""``research_verify`` -- LDR research-verification chain.
 
 This package implements the "scientific verification chain" inserted between
 retrieval and report generation:
 
 * requirement 1 -- DOI/PMID authenticity        (``doi_validator``)
 * requirement 2 -- year / IF / language matching (``constraint_matcher``)
-* requirement 3 -- keyword coverage              (``keyword_cov``)
 * requirement 4 -- claim traceability            (``citation_qc``)
 
 Public baseline entry points available from this skeleton:
@@ -22,7 +21,6 @@ from .models import (
     SourceClaimCheck,
     ReportCheck,
     ConstraintMatch,
-    KeywordCov,
     ResearchConstraint,
     VerifyResult,
 )
@@ -69,7 +67,6 @@ __all__ = [
     "SourceClaimCheck",
     "ReportCheck",
     "ConstraintMatch",
-    "KeywordCov",
     "ResearchConstraint",
     "VerifyResult",
     "ResearchSpec",

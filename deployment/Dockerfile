@@ -12,6 +12,6 @@ COPY deployment/install_overlays.py deployment/overlay-manifest.json deployment/
 RUN /install/.venv/bin/python /tmp/astro-dra/install_overlays.py \
       --source /tmp/astro-dra/overlays --manifest /tmp/astro-dra/overlay-manifest.json \
     && /install/.venv/bin/python /tmp/astro-dra/install_accounts.py --source /tmp/astro-dra/overlays \
-    && /install/.venv/bin/python -c "import ddgs, research_verify; from research_verify.doi_validator import DoiValidator; from research_verify.constraint_matcher import ConstraintMatcher; from research_verify.keyword_cov import KeywordCoverage; from research_verify.citation_qc import CitationQc; from research_verify.publication import Publication" \
+    && /install/.venv/bin/python -c "import ddgs, research_verify; from research_verify.doi_validator import DoiValidator; from research_verify.constraint_matcher import ConstraintMatcher; from research_verify.citation_qc import CitationQc; from research_verify.publication import Publication" \
     && rm -rf /tmp/astro-dra
 # Inherit entrypoint, command, healthcheck and its switch to ldruser.
