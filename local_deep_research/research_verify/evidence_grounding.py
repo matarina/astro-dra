@@ -12,14 +12,12 @@ from copy import deepcopy
 from dataclasses import asdict, is_dataclass
 from hashlib import sha256
 import json
-import re
 from typing import Any, Literal
-from urllib.parse import parse_qsl, urlencode, unquote, urlsplit, urlunsplit
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from .claims import Claim, extract_report_claims
-from .source_identity import identity_fields
+from .source_identity import canonical_url, classify_source, identity_fields, identity_provenance
 
 
 VERDICTS = Literal[
@@ -38,81 +36,6 @@ def _digest(value: Any) -> str:
     return sha256(payload).hexdigest()
 
 
-_TRACKING_PARAMS = {"fbclid", "gclid", "mc_cid", "mc_eid", "ref", "source",
-                    "utm_campaign", "utm_content", "utm_medium", "utm_name",
-                    "utm_source", "utm_term"}
-
-
-def _canonical_url(url: Any) -> str:
-    """Normalize a supplied HTTP URL without asserting that it is authentic."""
-    try:
-        parts = urlsplit(str(url or ""))
-    except ValueError:
-        return ""
-    if parts.scheme.casefold() not in {"http", "https"} or not parts.hostname:
-        return ""
-    host = parts.hostname.casefold().rstrip(".")
-    if host.startswith("www."):
-        host = host[4:]
-    try:
-        port = parts.port
-    except ValueError:
-        return ""
-    netloc = host
-    if port and not ((parts.scheme.casefold() == "http" and port == 80) or
-                     (parts.scheme.casefold() == "https" and port == 443)):
-        netloc += f":{port}"
-    path = re.sub(r"/{2,}", "/", unquote(parts.path or "/"))
-    if path != "/":
-        path = path.rstrip("/")
-    query = urlencode(sorted((key, value) for key, value in parse_qsl(
-        parts.query, keep_blank_values=True) if key.casefold() not in _TRACKING_PARAMS))
-    return urlunsplit((parts.scheme.casefold(), netloc, path or "/", query, ""))
-
-
-def _classify_source(source: dict[str, Any]) -> dict[str, Any]:
-    """Produce local provenance labels using only the supplied record fields.
-
-    Network/API identity binding belongs to the caller.  This checkpoint keeps
-    that boundary explicit instead of importing the larger production identity
-    bridge from an unrelated snapshot.
-    """
-    result = dict(source)
-    ids = identity_fields(source)
-    result.update(ids)
-    canonical = _canonical_url(source.get("link") or source.get("url"))
-    content_type = str(source.get("content_type") or "").casefold().replace("-", "_")
-    host = ""
-    try:
-        host = (urlsplit(str(source.get("link") or source.get("url") or "")).hostname or "").casefold()
-    except ValueError:
-        pass
-    if content_type.startswith("search"):
-        source_kind = "search_result"
-    elif host in {"pubmed.ncbi.nlm.nih.gov", "europepmc.org", "www.europepmc.org"}:
-        source_kind = "academic_record"
-    elif source.get("publication_types") or source.get("journal") or source.get("pmid"):
-        source_kind = "publisher_article"
-    else:
-        source_kind = "unknown"
-    status = "candidate" if ids or canonical else "missing"
-    result.update({
-        "canonical_url": canonical,
-        "source_kind": source_kind,
-        "document_type": str(source.get("document_type") or "unknown"),
-        "publication_state": str(source.get("publication_state") or "unknown"),
-        "peer_review_status": str(source.get("peer_review_status") or "unknown"),
-        "identity_provenance": {"status": status, "scope": "supplied_metadata_only"},
-        "identity_status": status,
-        "publication_status": str(source.get("publication_status") or "unverified"),
-        "relevance_status": str(source.get("relevance_status") or "unknown"),
-        "evidence_scope": str(source.get("evidence_scope") or "unknown"),
-        "temporal_validity": str(source.get("temporal_validity") or "unknown"),
-        "contradiction_status": str(source.get("contradiction_status") or "unknown"),
-    })
-    return result
-
-
 def identity_hash(source: dict[str, Any]) -> str:
     """Return a stable hash for one source's bibliographic identity.
 
@@ -125,7 +48,7 @@ def identity_hash(source: dict[str, Any]) -> str:
         return _digest({"identity": {}})
     values = {
         "identifiers": identity_fields(source),
-        "url": _canonical_url(source.get("link") or source.get("url")) or
+        "url": canonical_url(source.get("link") or source.get("url")) or
                str(source.get("link") or source.get("url") or ""),
         "title": " ".join(str(source.get("title") or source.get("name") or "").split()),
         "journal": " ".join(str(source.get("journal") or source.get("journal_title") or "").split()),
@@ -329,16 +252,22 @@ def _source_set(name: str, ids: set[int], sources_by_id: dict[int, dict[str, Any
 
 def _locator_from_span(span: Any, source: dict[str, Any]) -> GroundingLocator | None:
     try:
-        citation = int(span.citation)
-        quote = str(span.quote)
-        start, end = int(span.start), int(span.end)
-        content_sha = str(span.content_sha256)
-        field, basis = str(span.field), str(span.basis)
+        citation_value = _get(span, "citation")
+        if not (type(citation_value) is int or
+                isinstance(citation_value, str) and citation_value.isdigit()):
+            return None
+        citation = int(citation_value)
+        quote = _get(span, "quote")
+        start, end = _get(span, "start"), _get(span, "end")
+        content_sha = _get(span, "content_sha256")
+        field, basis = _get(span, "field"), _get(span, "basis")
     except (AttributeError, TypeError, ValueError):
         return None
+    if (citation != int(source["index"]) or not isinstance(quote, str) or not quote
+            or type(start) is not int or type(end) is not int
+            or not isinstance(field, str) or not isinstance(basis, str) or not basis):
+        return None
     source_text = source.get(field)
-    if not isinstance(source_text, str):
-        source_text = source.get("body") if field in {"content", "full_content"} else source.get("abstract")
     if not isinstance(source_text, str) or not (0 <= start < end <= len(source_text)):
         return None
     if source_text[start:end] != quote or _digest(source_text) != content_sha:
@@ -374,7 +303,12 @@ def build_evidence_grounding(
     review: ReviewReceipt | dict[str, Any] | None = None,
 ) -> EvidenceGroundingV1:
     """Build the additive ledger for a report without changing ``report``."""
-    source_rows = [s for s in sources or [] if isinstance(s, dict)]
+    from .evidence import SourceLookup
+    # Reuse the review lookup's ambiguity policy. Never choose one of two
+    # different records carrying the same citation label, even with equal IDs.
+    lookup = SourceLookup(sources or [])
+    source_rows = lookup.records()
+    ambiguous_ids = lookup.ambiguous_indices
     by_id: dict[int, dict[str, Any]] = {}
     grounding_sources = []
     for source in source_rows:
@@ -385,7 +319,7 @@ def build_evidence_grounding(
         if index < 1 or index in by_id:
             continue
         by_id[index] = source
-        normalized = _classify_source(source)
+        normalized = classify_source(source)
         grounding_sources.append(GroundingSource(
             source_index=index, identity_hash=identity_hash(source),
             identity={key: value for key, value in identity_fields(source).items()},
@@ -406,6 +340,9 @@ def build_evidence_grounding(
     claims = []
     detectors = []
     pending = list(pending_findings or [])
+    for index in sorted(ambiguous_ids):
+        pending.append({"status": "unresolved", "reason_code": "ambiguous_source",
+                        "reason": f"Citation ID {index} has differing source records"})
     cited_ids: set[int] = set()
     for number, claim in enumerate(extract_report_claims(report), 1):
         citation_ids = list(claim.citations)
@@ -415,52 +352,64 @@ def build_evidence_grounding(
         reason_code = _get(check, "reason_code", "missing_review") if check else "missing_review"
         reason = _get(check, "reason", "") if check else ""
         review_status = "reviewed" if check else "unreviewed"
+        failures = [] if check else ["missing_review"]
         locators = []
         if check:
             for source_check in _get(check, "source_checks", []) or []:
                 citation = _get(source_check, "citation")
                 source = by_id.get(int(citation)) if str(citation).isdigit() else None
-                if source is None:
+                if source is None or int(citation) not in citation_ids:
                     continue
                 for span in _get(source_check, "evidence", []) or []:
                     locator = _locator_from_span(span, source)
                     if locator is not None:
                         locators.append(locator)
+        binding_failure = None
         if not citation_ids:
-            verdict, reason_code = "unverifiable", "missing_citation"
-            pending.append({"claim_id": f"claim-{number}", "status": "unresolved",
-                            "reason_code": "missing_citation", "reason": "No explicit citation IDs"})
+            binding_failure = ("missing_citation", "No explicit citation IDs")
+        elif any(index in ambiguous_ids for index in citation_ids):
+            binding_failure = ("ambiguous_source", "One or more citation IDs have differing source records")
         elif any(index not in by_id for index in citation_ids):
-            reason_code = "missing_source"
-            pending.append({"claim_id": f"claim-{number}", "status": "unresolved",
-                            "reason_code": "missing_source", "reason": "One or more citation IDs have no source record"})
+            binding_failure = ("missing_source", "One or more citation IDs have no source record")
         elif any(not any(isinstance(source.get(key), str) and source.get(key).strip()
                          for key in ("abstract", "body", "content", "full_content", "fetched_content"))
                  for index in citation_ids for source in [by_id[index]]):
-            pending.append({"claim_id": f"claim-{number}", "status": "unresolved",
-                            "reason_code": "source_text_unavailable", "reason": "Cited source text is unavailable"})
+            binding_failure = ("source_text_unavailable", "Cited source text is unavailable")
+        elif check and verdict in {"supported", "partial"} and not locators:
+            binding_failure = ("evidence_binding_unavailable", "No exact source-bound evidence locator")
         elif not check:
             pending.append({"claim_id": f"claim-{number}", "status": "unresolved",
                             "reason_code": "review_not_run", "reason": "No detector result"})
+        if binding_failure:
+            reason_code, reason = binding_failure
+            failures.append(reason_code)
+            pending.append({"claim_id": f"claim-{number}", "status": "unresolved",
+                            "reason_code": reason_code, "reason": reason})
+            # Keep the raw detector finding below, separately from whether
+            # this ledger can substantiate its positive verdict.
+            if verdict in {"supported", "partial"} or not citation_ids:
+                verdict = "unverifiable"
         row = GroundingClaim(claim_id=f"claim-{number}", text=claim.text,
                              report_start=int(claim.report_start or 0), report_end=int(claim.report_end or 0),
                              citations=citation_ids, verdict=verdict,
                              reason_code=str(reason_code or "unverifiable"), reason=str(reason or ""),
                              locators=locators, review_status=review_status,
-                             failure_reasons=[] if check else ["missing_review"])
+                             failure_reasons=failures)
         claims.append(row)
         if check:
             detectors.append(DetectorFinding(detector="citation_qc", claim_id=row.claim_id,
-                                              verdict=verdict, reason_code=str(reason_code or "unverifiable"),
-                                              reason=str(reason or ""),
+                                              verdict=_get(check, "verdict", "unverifiable"),
+                                              status="evidence_binding_unresolved" if binding_failure else "recorded",
+                                              reason_code=str(_get(check, "reason_code") or "unverifiable"),
+                                              reason=str(_get(check, "reason") or ""),
                                               evidence_locator_ids=[_digest(locator.model_dump()) for locator in locators]))
     detectors.extend(DetectorFinding.model_validate(item) for item in (detector_findings or []))
 
     selected_ids = {int(index) for row in writer_context or [] for index in (row.get("source_ids") or [])
                     if str(index).isdigit()}
     confirmed_ids = {index for index, source in by_id.items()
-                     if (_classify_source(source).get("identity_status") == "confirmed"
-                         or _classify_source(source).get("publication_status") == "formal")}
+                     if (classify_source(source).get("identity_status") == "confirmed"
+                         or classify_source(source).get("publication_status") == "formal")}
     if isinstance(review, ReviewReceipt):
         receipt = review
     else:
@@ -478,7 +427,7 @@ def build_evidence_grounding(
         sources=grounding_sources, claims=claims, detectors=detectors,
         review=receipt, writer_context=writer_rows,
         source_sets=GroundingSourceSets(
-            collected_candidates=_source_set("collected_candidates", set(by_id), by_id),
+            collected_candidates=_source_set("collected_candidates", set(by_id) | set(ambiguous_ids), by_id),
             selected_writer_context=_source_set(
                 "selected_writer_context", selected_ids, by_id,
                 status="recorded" if writer_context is not None else "unavailable"),
@@ -522,11 +471,15 @@ class SourceRegistry:
         for source in sources or []:
             if not isinstance(source, dict):
                 continue
+            if isinstance(source.get("index"), bool) or not str(source.get("index", "")).isdigit():
+                continue
             try:
                 index = int(source.get("index"))
             except (TypeError, ValueError):
                 continue
-            if index in self.sources and identity_hash(self.sources[index]) != identity_hash(source):
+            if index < 1:
+                continue
+            if index in self.sources and self.sources[index] != source:
                 self.ambiguous.add(index)
             else:
                 self.sources[index] = source
@@ -560,7 +513,8 @@ class SourceRegistry:
             if not isinstance(metadata, dict):
                 continue
             try:
-                source = self.sources.get(int(metadata.get("index")))
+                index = int(metadata.get("index"))
+                source = None if index in self.ambiguous else self.sources.get(index)
             except (TypeError, ValueError):
                 source = None
             if source:

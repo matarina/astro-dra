@@ -100,7 +100,8 @@ def test_reading_inventory_describes_the_actual_view_and_does_not_claim_full_pap
     assert a in material and "Endpoint Q improved" in material
     assert {v["index"] for v in scope} == {7, 8}
     assert scope[0]["view_kind"] == "abstract_only"
-    assert scope[1]["view_kind"] == "selected_excerpts"
+    assert scope[1]["view_kind"] == "complete_acquired_text"
+    assert docs[1].page_content in material
     assert all(v["exhaustive_assessment"] is False for v in scope)
 
 
@@ -147,6 +148,25 @@ def test_ordinary_prose_is_not_filtered_by_factual_or_absence_keywords():
     from research_verify.generation import prepare_draft_for_writing
     draft = "Most studies reported outcomes [17]. The authors explicitly did not measure X [17]."
     assert prepare_draft_for_writing(draft) == (draft, [])
+
+
+@pytest.mark.parametrize("annotation", [
+    "Interpretation: A measured decrease was reported [17].",
+    "**Interpretation:** Could a follow-up experiment distinguish the explanations [17]?",
+    "解读：原文记录了关联，但不能推出因果关系 [17]。",
+    "**解读（Interpretation）：** 这一观察是否可用于设计下一步实验 [17]？",
+])
+def test_native_writer_keeps_scientific_and_proposal_content_under_draft_labels(annotation):
+    model = Capture()
+    writer = handler(model)
+    writer.settings_snapshot = {"general.enable_fact_checking": False}
+    draft = "## Working notes\n\n" + annotation + "\n\nOrdinary paragraph [17]."
+    writer.analyze_followup("What is supported?", [{"index": 17, "title": "Study",
+        "abstract": "An association was observed; causality could not be determined.",
+        "content_type": "abstract"}], draft, 0)
+    assert draft in model.prompts[0]
+    assert "An association was observed; causality could not be determined." in model.prompts[0]
+    assert len(model.prompts) == 1
 
 
 def test_authors_explicit_negative_statement_is_preserved_in_original_source_text():

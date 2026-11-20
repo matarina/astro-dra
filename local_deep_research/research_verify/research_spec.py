@@ -1,4 +1,4 @@
-"""Topic-independent planning metadata for evidence-grounded research tasks."""
+"""Topic-independent query contract for evidence-grounded research tasks."""
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
@@ -40,10 +40,11 @@ _IF_ZH_RE = re.compile(
 
 
 def parse_if_constraint(text: str) -> tuple[float | None, str | None]:
-    """Parse only explicit IF/JIF comparison syntax."""
+    """Parse only explicit IF/JIF comparison syntax; never substring-match IF."""
     match = _IF_ASCII_RE.search(text or "") or _IF_ZH_RE.search(text or "")
     if not match:
         return None, None
+    # Chinese "影响因子10分以上" is an explicit lower-bound form.
     op = match.groupdict().get("op") or (">=" if "分以上" in match.group(0) else None)
     op = {"至少": ">=", "不低于": ">=", "大于": ">", "≥": ">="}.get(op, op)
     if op is None:
@@ -61,15 +62,22 @@ def _integer(value, minimum=1, maximum=9999):
 
 
 def normalize_language(value):
+    """Normalize an explicitly supplied label, never words from a question."""
     if not isinstance(value, str):
         return None
     value = value.strip().casefold()
-    value = {"english": "en", "eng": "en", "chinese": "zh", "chi": "zh", "zho": "zh"}.get(value, value)
+    aliases = {"english": "en", "eng": "en", "chinese": "zh", "chi": "zh", "zho": "zh"}
+    value = aliases.get(value, value)
     return value if re.fullmatch(r"[a-z]{2,3}", value) else None
 
 
 def parse_research_spec(query: str, settings=None) -> ResearchSpec:
-    """Validate explicit planning settings and retain unresolved scope."""
+    """Validate explicit planning settings; natural-language intent stays unknown.
+
+    The original question is passed intact to the agent/writer. Substring
+    matches cannot establish language, paper count, requested fields, dates,
+    or a scientific task type. Literal IF syntax is recorded but never applied.
+    """
     configured = settings if isinstance(settings, dict) else {}
     values = {}
     provenance = {}
@@ -98,10 +106,8 @@ def parse_research_spec(query: str, settings=None) -> ResearchSpec:
             if name == "count_relation" and value == "unknown":
                 unresolved.append("count_relation")
     if values.get("year_from", 0) > values.get("year_to", 9999):
-        values.pop("year_from", None)
-        values.pop("year_to", None)
-        provenance.pop("year_from", None)
-        provenance.pop("year_to", None)
+        for name in ("year_from", "year_to"):
+            values.pop(name, None); provenance.pop(name, None)
         unresolved.append("year_range")
     raw_fields = configured.get("requested_fields")
     if raw_fields is not None:
@@ -112,9 +118,12 @@ def parse_research_spec(query: str, settings=None) -> ResearchSpec:
         else:
             unresolved.append("requested_fields")
     if "requested_count" not in values:
-        values.pop("count_relation", None)
-        provenance.pop("count_relation", None)
+        values.pop("count_relation", None); provenance.pop("count_relation", None)
     elif "count_relation" not in values:
+        # A bare number does not say whether the user means an exact count,
+        # lower bound, upper bound, or ranking.  Keep the number while making
+        # the missing relation explicit so downstream writers cannot claim
+        # completion from a source-pool size.
         values["count_relation"] = "unknown"
         unresolved.append("count_relation")
     min_if, operator = parse_if_constraint(str(query or ""))
@@ -123,17 +132,46 @@ def parse_research_spec(query: str, settings=None) -> ResearchSpec:
                         provenance=provenance, unresolved=tuple(unresolved))
 
 
+def report_spec_settings(get_setting):
+    """One shared adapter for ordinary and detailed-report planning settings."""
+    names = ("language", "year_from", "year_to", "requested_count", "count_relation",
+             "requested_fields", "output_mode", "protocol_requested")
+    return {name: get_setting("report." + name, None) for name in names}
+
+
 def format_research_spec(spec: ResearchSpec) -> str:
-    """Render supplied planning metadata without inventing source evidence."""
+    """Render supplied data only; unknown intent adds no instruction block."""
     values = {name: getattr(spec, name) for name in spec.provenance}
     if spec.requested_count is not None:
         values.setdefault("requested_count", spec.requested_count)
         values.setdefault("count_relation", spec.count_relation or "unknown")
     if not values and not spec.unresolved:
         return ""
+    # Keep an explicit language setting machine-readable at the writer boundary.
+    # This is advisory scope metadata, not a source filter or publication gate:
+    # the writer still has to use each record's authoritative language field and
+    # preserve mismatches/unknowns as labelled evidence limits.
+    policy = {}
+    if spec.language:
+        policy["language"] = {
+            "requested": spec.language,
+            "match_field": "authoritative_source_language",
+            "matching_records": "may support requested-language findings",
+            "mismatch_records": "label as supplemental; do not present as satisfying the language scope",
+            "unknown_records": "state language unknown rather than infer from title, prompt, journal, or affiliation",
+            "no_matches": "state that no supplied record has a confirmed language match before any supplement",
+        }
+    count_policy = {}
+    if spec.requested_count is not None:
+        count_policy = {
+            "requested_count": spec.requested_count,
+            "count_relation": spec.count_relation or "unknown",
+            "completion_claim": (
+                "Do not claim the requested count was satisfied until the relation "
+                "is explicit and the matching records are confirmed."
+            ),
+        }
     return "Explicit report settings (planning data, not source evidence):\n" + json.dumps(
-        {"values": values, "provenance": spec.provenance, "unresolved": list(spec.unresolved)},
+        {"values": values, "provenance": spec.provenance, "unresolved": list(spec.unresolved),
+         "evidence_scope_policy": policy, "count_policy": count_policy},
         ensure_ascii=False)
-
-
-__all__ = ["ResearchSpec", "format_research_spec", "normalize_language", "parse_if_constraint", "parse_research_spec"]

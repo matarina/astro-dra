@@ -225,3 +225,11 @@ parsed response JSON, hashes, usage, finish reason, timing, visible output, and
 provider-returned reasoning fields for controlled runs. It does not and cannot
 recover hidden model chain-of-thought that the endpoint does not expose. Capture
 is opt-in, private-directory only, and unchanged for normal runs.
+
+### 2026-11-20 — branch consolidation and streamlined runtime
+
+Consolidated the GitHub branch histories with the current main integrity commit as an ancestor. Kept the opt-in model capture helper, its focused tests, the held-out review validators, and the deployed search, writer, source metadata, and export paths. Left 504 checkpoint additions in history, including 358 one-off scripts. Removed inactive writer variants for evidence-gap attachments, semantic reranking, source detail material, and retention retries. PubMed shares a successful XML batch across abstract and metadata readers and preserves structured queries.
+
+The selected deployment defaults require an operator-supplied model and endpoint, use an optional search proxy and an effective 500-source limit, enable native fact checking, and keep save-time citation QC off. A local JCR catalog is still required for live metrics.
+
+Validation used the existing base runtime in disposable containers without network access. Overlay/account installation passed. The installed core suite passed 109 tests, the focused source suite passed 163 with one installed-runtime test deselected, and all four PubMed constructor checks passed. Compose defaults, optional SearXNG proxy rendering and Git whitespace checks passed. The broader installed suite returned 561 passes and 90 failures, including legacy citation/audit contracts, old subtask fixtures, and the inventory test's missing container CLI. Live research quality and production deployment were outside this run.

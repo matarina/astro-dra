@@ -3,8 +3,8 @@
 Given a search-result ``source`` dict, resolve its DOI against **Crossref** and
 its PMID against **PubMed E-utilities**, then classify the outcome as one of::
 
-    verified is True   -> the identifier exists (and metadata is consistent)
-    verified is False  -> the identifier definitively does not exist
+    verified is True   -> the queried provider returned the same identifier
+    verified is False  -> legacy externally supplied result; not emitted here
     verified is None   -> could not be checked (offline / transport error)
 
 Contract (see the detailed plan, §0.2):
@@ -29,6 +29,7 @@ from loguru import logger
 from .config import VerifyConfig, get_config
 from .http_client import HttpClient
 from .models import VerifyResult
+from .record_identity import make_record_provenance
 from .textutil import (
     extract_doi,
     extract_pmid,
@@ -51,7 +52,7 @@ _RESOLVABLE_HOSTS = (
     "ncbi.nlm.nih.gov",
 )
 
-BADGE_VERIFIED = "✅已核验"
+BADGE_VERIFIED = "✅标识记录已查得"
 BADGE_INVALID = "❌无效DOI"
 BADGE_MISMATCH = "⚠️信息不一致"
 BADGE_UNVERIFIED = "❓未能核验"
@@ -60,9 +61,11 @@ BADGE_UNVERIFIED = "❓未能核验"
 def badge_for(result: VerifyResult) -> str:
     """Human-facing badge derived from a :class:`VerifyResult`."""
     if result.verified is True:
+        if not result.record_provenance:
+            return BADGE_UNVERIFIED
         return BADGE_MISMATCH if result.warnings else BADGE_VERIFIED
     if result.verified is False:
-        return BADGE_INVALID
+        return BADGE_UNVERIFIED
     return BADGE_UNVERIFIED
 
 
@@ -85,7 +88,6 @@ class DoiValidator:
         pmid = extract_pmid(
             source.get("pmid"),
             source.get("_pmid"),
-            source.get("pmcid"),
         )
         result = VerifyResult(doi=doi, pmid=pmid, verified_at=now_iso())
 
@@ -113,25 +115,37 @@ class DoiValidator:
         if res.transport_error:
             result.verified = None
             result.source = "unavailable"
+            result.lookup_status = "unavailable"
             return
         if res.not_found:
-            result.verified = False
+            # /works covers Crossref's registry. Other agencies' valid DOIs
+            # also return 404 here; do not declare the identifier nonexistent.
+            result.verified = None
             result.source = "crossref"
+            result.lookup_status = "not_found_in_registry"
+            result.warnings.append("crossref_record_not_found")
             return
         if not res.ok:
             result.verified = None
             result.source = "unavailable"
+            result.lookup_status = "unavailable"
             return
 
         result.source = "crossref"
-        message = (res.json or {}).get("message", {}) if isinstance(res.json, dict) else {}
-        remote_titles = message.get("title") or []
-        if not remote_titles:
+        message = res.json.get("message") if isinstance(res.json, dict) else None
+        receipt = make_record_provenance("crossref", message)
+        if not receipt:
             result.verified = None
-            result.warnings.append("crossref_no_title")
+            result.lookup_status = "malformed_response"
+            return
+        if receipt["identifiers"].get("doi") != doi.casefold():
+            result.verified = None
+            result.lookup_status = "response_identifier_mismatch"
             return
 
         result.verified = True
+        result.lookup_status = "record_found"
+        result.record_provenance = receipt
         self._compare_metadata(source, message, result)
 
     async def _verify_pubmed(
@@ -144,14 +158,29 @@ class DoiValidator:
         if res.transport_error or not res.ok:
             result.verified = None
             result.source = "unavailable"
+            result.lookup_status = "unavailable"
             return
         result.source = "pubmed"
-        payload = res.json or {}
-        entry = (payload.get("result") or {}).get(pmid) if isinstance(payload, dict) else None
-        if not entry or entry.get("error"):
-            result.verified = False
+        payload = res.json
+        entries = payload.get("result") if isinstance(payload, dict) else None
+        entry = entries.get(pmid) if isinstance(entries, dict) else None
+        if not isinstance(entry, dict) or entry.get("error"):
+            result.verified = None
+            result.lookup_status = "remote_error" if isinstance(entry, dict) and entry.get("error") else "malformed_response"
+            return
+        receipt = make_record_provenance("pubmed", entry)
+        if not receipt:
+            result.verified = None
+            result.lookup_status = "malformed_response"
+            return
+        if receipt["identifiers"].get("pmid") != pmid:
+            result.verified = None
+            result.lookup_status = "response_identifier_mismatch"
             return
         result.verified = True
+        result.lookup_status = "record_found"
+        result.record_provenance = receipt
+        self._compare_pubmed_metadata(source, entry, result)
 
     def _compare_metadata(
         self, source: dict, message: dict, result: VerifyResult
@@ -181,10 +210,77 @@ class DoiValidator:
         elif remote_year and local_year:
             result.year_ok = True
 
+        remote_journal = first_nonempty(message, ("container-title", "short-container-title"))
+        if isinstance(remote_journal, list):
+            remote_journal = remote_journal[0] if remote_journal else None
+        local_journal = first_nonempty(source, ("journal", "journal_ref", "container-title"))
+        if local_journal and remote_journal:
+            result.journal_ok = normalize_title(str(local_journal)) == normalize_title(str(remote_journal))
+            if result.journal_ok is False:
+                result.warnings.append(
+                    f"journal_mismatch: local={truncate(str(local_journal), 80)!r} "
+                    f"crossref={truncate(str(remote_journal), 80)!r}"
+                )
+        local_authors = source.get("authors") or source.get("author") or []
+        remote_authors = message.get("author") or []
+        local_first = self._author_key(local_authors[0] if isinstance(local_authors, list) and local_authors else local_authors)
+        remote_first = self._author_key(remote_authors[0] if remote_authors else None)
+        if local_first and remote_first:
+            result.authors_ok = local_first == remote_first
+            if result.authors_ok is False:
+                result.warnings.append(f"author_mismatch: local={local_first!r} crossref={remote_first!r}")
+
+    def _compare_pubmed_metadata(self, source: dict, entry: dict, result: VerifyResult) -> None:
+        """Compare the local record with PubMed's summary metadata."""
+        remote_title = entry.get("title") or ""
+        local_title = first_nonempty(source, ("title", "name"))
+        if local_title and remote_title:
+            result.title_ok = normalize_title(str(local_title)) == normalize_title(str(remote_title))
+            if result.title_ok is False:
+                result.warnings.append(
+                    f"title_mismatch: local={truncate(str(local_title), 80)!r} "
+                    f"pubmed={truncate(str(remote_title), 80)!r}"
+                )
+        remote_year = normalize_year(entry.get("pubdate") or entry.get("sortpubdate"))
+        local_year = normalize_year(first_nonempty(source, ("year", "published", "publication_date", "pubdate")))
+        if remote_year and local_year:
+            result.year_ok = remote_year == local_year
+            if result.year_ok is False:
+                result.warnings.append(f"year_mismatch: local={local_year} pubmed={remote_year}")
+        remote_journal = entry.get("fulljournalname") or entry.get("source") or ""
+        local_journal = first_nonempty(source, ("journal", "journal_ref", "container-title"))
+        if local_journal and remote_journal:
+            result.journal_ok = normalize_title(str(local_journal)) == normalize_title(str(remote_journal))
+            if result.journal_ok is False:
+                result.warnings.append(
+                    f"journal_mismatch: local={truncate(str(local_journal), 80)!r} "
+                    f"pubmed={truncate(str(remote_journal), 80)!r}"
+                )
+        local_authors = source.get("authors") or source.get("author") or []
+        remote_authors = entry.get("sortfirstauthor") or entry.get("authors") or []
+        local_first = self._author_key(local_authors[0] if isinstance(local_authors, list) and local_authors else local_authors)
+        remote_first = self._author_key(remote_authors[0] if isinstance(remote_authors, list) and remote_authors else remote_authors)
+        if local_first and remote_first:
+            result.authors_ok = local_first == remote_first
+            if result.authors_ok is False:
+                result.warnings.append(f"author_mismatch: local={local_first!r} pubmed={remote_first!r}")
+
+    @staticmethod
+    def _author_key(value) -> str:
+        if isinstance(value, dict):
+            value = value.get("family") or value.get("name") or value.get("fullName") or value.get("lastname")
+        text = normalize_title(str(value or ""))
+        return text.split()[0] if text else ""
+
     @staticmethod
     def _link_resolvable(source: dict) -> bool:
+        from urllib.parse import urlsplit
         link = str(first_nonempty(source, ("link", "url")) or "")
-        return any(host in link for host in _RESOLVABLE_HOSTS)
+        try:
+            parsed = urlsplit(link)
+            return parsed.scheme in {"http", "https"} and parsed.hostname in _RESOLVABLE_HOSTS
+        except ValueError:
+            return False
 
     # -- batch --------------------------------------------------------------
     async def verify_many(

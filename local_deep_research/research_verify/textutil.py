@@ -20,9 +20,13 @@ from typing import Any, Iterable
 _DOI_RE = re.compile(r"10\.\d+/[^\s\"'<>]+", re.IGNORECASE)
 # Trailing punctuation that is commonly glued to a DOI in prose/parentheses.
 _DOI_TRAILING = ".,;)]}>"
-# PubMed IDs are 7-9 digit numbers.
-_PMID_RE = re.compile(r"\b(\d{7,9})\b")
-_YEAR_RE = re.compile(r"(19|20)\d{2}")
+# A typed identifier field accepts numeric IDs or a complete PMID label, not
+# an arbitrary study number embedded in prose. Older PubMed IDs can be short.
+_PMID_RE = re.compile(r"(?:PMID\s*:?\s*)?([1-9][0-9]*)", re.I)
+_YEAR_RE = re.compile(
+    r"^(?:19|20)\d{2}(?:[-/]\d{1,2}(?:[-/]\d{1,2})?)?"
+    r"(?:[T ][0-9:.+\-Z]+)?$", re.I
+)
 
 
 def normalize_title(s: str | None) -> str:
@@ -40,8 +44,11 @@ def normalize_year(value: Any) -> int | None:
         return None
     if isinstance(value, int):
         return value if 1900 <= value <= 2100 else None
-    m = _YEAR_RE.search(str(value))
-    return int(m.group(0)) if m else None
+    text = str(value).strip()
+    # Only parse a typed year/date-shaped field.  Searching arbitrary titles,
+    # DOI suffixes, or prose can manufacture a publication year.
+    m = _YEAR_RE.fullmatch(text)
+    return int(text[:4]) if m else None
 
 
 def first_year(source: dict, keys: Iterable[str] = (
@@ -69,7 +76,7 @@ def normalize_doi(raw: str | None) -> str | None:
 def extract_doi(*candidates: Any) -> str | None:
     """Return the first normalised DOI found among *candidates* (str or dict-less)."""
     for cand in candidates:
-        if not cand:
+        if not isinstance(cand, str) or not cand:
             continue
         m = _DOI_RE.search(str(cand))
         if m:
@@ -80,16 +87,29 @@ def extract_doi(*candidates: Any) -> str | None:
 
 
 def extract_pmid(*candidates: Any) -> str | None:
-    """Return the first plausible PMID found among *candidates*."""
+    """Read constrained identifier syntax without mining arbitrary numbers."""
+    from urllib.parse import urlsplit
     for cand in candidates:
-        if cand is None or cand == "":
+        if isinstance(cand, bool) or not isinstance(cand, (str, int)):
             continue
         s = str(cand).strip()
-        if s.isdigit() and 7 <= len(s) <= 9:
-            return s
-        m = _PMID_RE.search(s)
+        m = _PMID_RE.fullmatch(s)
         if m:
             return m.group(1)
+        try:
+            parsed = urlsplit(s)
+            if parsed.scheme not in {"http", "https"} or parsed.username or parsed.password:
+                continue
+            if parsed.hostname == "pubmed.ncbi.nlm.nih.gov":
+                match = re.fullmatch(r"/([1-9][0-9]*)/?", parsed.path)
+            elif parsed.hostname in {"ncbi.nlm.nih.gov", "www.ncbi.nlm.nih.gov"}:
+                match = re.fullmatch(r"/pubmed/([1-9][0-9]*)/?", parsed.path)
+            else:
+                match = None
+            if match:
+                return match[1]
+        except ValueError:
+            continue
     return None
 
 

@@ -7,6 +7,7 @@ from semantic_test_helpers import complete_payload
 
 from research_verify.evidence import paper_identity, source_artifacts
 from research_verify.citation_qc import CitationQc, Claim
+from research_verify.record_identity import make_record_provenance
 
 
 class Collector:
@@ -29,6 +30,11 @@ class Judge:
 
 def paper(text="The trial observed a 12% reduction.", **extras):
     return {"index": "1", "doi": "10.1234/fixture", "abstract": text, **extras}
+
+
+def mismatched_record():
+    receipt = make_record_provenance("crossref", {"DOI": "10.1234/fixture", "title": ["Other registered title"]})
+    return paper(title="Local title", _verify={"verified": True, "record_provenance": receipt})
 
 
 def payload(quote="The trial observed a 12% reduction.", verdict="supported"):
@@ -110,8 +116,8 @@ def test_all_sources_must_have_located_quotes_for_supported():
 @pytest.mark.parametrize("source,reason", [
     (paper(index="2"), "citation_index_mismatch"),
     (paper(index="bad"), "citation_index_mismatch"),
-    (paper(_verify={"title_ok":False}), "identity_mismatch"),
-    (paper(_verify={"verified":False}), "identity_mismatch"),
+    (mismatched_record(), "identity_mismatch"),
+    (paper(link="https://doi.org/10.9999/other"), "identity_mismatch"),
     ({"index":"1","abstract":"Text"}, "identity_unavailable"),
     ({"index":"1","doi":"10.1234/fixture"}, "source_text_unavailable"),
 ])
@@ -120,6 +126,14 @@ def test_bad_mapping_or_missing_identity_does_not_invoke_judge(source, reason):
     result = CitationQc(judge).check([Claim("Conclusion [1].", [1])], Collector({1:source}))[0]
     assert result.citation_checks[0].reason_code == reason
     assert not judge.prompts
+
+
+def test_unscoped_negative_or_generic_warning_does_not_block_textual_assessment():
+    for check in ({"verified": False}, {"verified": None, "warnings": ["request_incomplete"]}):
+        judge = Judge([payload()])
+        result = CitationQc(judge).check([Claim("Conclusion [1].", [1])], Collector({1: paper(_verify=check)}))[0]
+        assert judge.prompts and result.source_checks[0].abstract_verdict == "supported"
+        assert result.verdict == "unverifiable"  # a missing body is still missing
 
 
 def test_full_content_abstract_marker_is_not_labeled_fulltext():

@@ -52,5 +52,6 @@
   "overlay/ui/templates/pages/news-subscription-form.html": "web/templates/pages/news-subscription-form.html",
   "overlay/ui/templates/pages/news.html": "web/templates/pages/news.html",
   "overlay/ui/native/pages/news.js": "web/static/js/pages/news.js",
-  "overlay/ui/astro-subscription-simple.js": "web/static/js/astro-subscription-simple.js"
+  "overlay/ui/astro-subscription-simple.js": "web/static/js/astro-subscription-simple.js",
+  "overlay/utilities/json_utils.py": "utilities/json_utils.py"
 }

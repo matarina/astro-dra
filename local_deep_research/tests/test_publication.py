@@ -158,19 +158,14 @@ def test_actual_detailed_generator_preserves_unverified_content():
 @pytest.mark.parametrize("citation", ["[7](https://example.com/paper)", "[[7]](https://example.com/paper)"])
 def test_quarto_wrapper_normalizes_numeric_hyperlinks_only(citation):
     import io,zipfile
-    from typing import Optional
-    tree=ast.parse((ROOT/"local_deep_research/overlay/quarto_exporter.py").read_text())
-    cls=next(n for n in tree.body if isinstance(n,ast.ClassDef) and n.name=="QuartoExporter")
-    node=next(n for n in cls.body if isinstance(n,ast.FunctionDef) and n.name=="export")
-    ns={"Optional":Optional,"ExportOptions":SimpleNamespace,"ExportResult":SimpleNamespace,
-        "io":io,"re":re,"zipfile":zipfile,"logger":logger}
-    exec(compile(ast.Module(body=[node],type_ignores=[]),"quarto-export","exec"),ns)
-    legacy=SimpleNamespace(export_to_quarto=lambda content,title:content,_generate_bibliography=lambda content:"fixture")
-    obj=SimpleNamespace(_legacy=legacy,_validate_content_size=lambda content:None,
-        _generate_safe_filename=lambda title:"fixture.zip",file_extension=".zip",mimetype="application/zip")
-    result=ns["export"](obj,f"Fact {citation}. See [website](https://example.com).",SimpleNamespace(title="Fixture"))
-    with zipfile.ZipFile(io.BytesIO(result.content)) as bundle: text=bundle.read("fixture.qmd").decode()
-    assert "Fact [7]." in text and "[website](https://example.com)" in text
+    from local_deep_research.exporters.quarto_exporter import QuartoExporter
+    body = f"Fact {citation}. See [website](https://example.com).\n\n## Sources\n\n[7] Paper\n   URL: https://example.com/paper"
+    result = QuartoExporter().export(body)
+    with zipfile.ZipFile(io.BytesIO(result.content)) as bundle:
+        text = bundle.read(next(n for n in bundle.namelist() if n.endswith(".qmd"))).decode()
+        bib = bundle.read("references.bib").decode()
+    assert "Fact [@ref7]." in text and "[website](https://example.com)" in text
+    assert "https://example.com/paper" in bib
 
 
 
@@ -180,7 +175,8 @@ def test_bibliography_uses_display_numbers_and_code_is_unchanged():
     p=publish_report(body,[source(),source(9)],None)
     assert "A [[1]](https://doi.org/10.1234/test)." in p.content
     assert "Example [7]." in p.content
-    assert "[1] Fixture source" in p.content and "[7, 9] Shared article" not in p.content
+    assert "[1] Shared article" in p.content and "[7, 9] Shared article" not in p.content
+    assert p.sources[0].title=="Fixture source" and p.sources[0].original_indices==[7,9]
     validate_publication(p.content,p.metadata())
 
 
@@ -215,7 +211,9 @@ def test_reference_order_does_not_determine_the_body_numbering():
     b=source(7) | {"doi":"10.1234/b", "link":"https://doi.org/10.1234/b", "title":"Article B"}
     body="First [9]. Second [7].\n\n## Sources\n\n[7] Article B\n[9] Article A\n\n## Discussion\nOther discussion."
     p=publish_report(body,[b,a],None)
-    assert p.content.index("[1] Fixture source") < p.content.index("[2] Article B")
+    assert "First [[1]]" in p.content and "Second [[2]]" in p.content
+    assert "[2] Article B" in p.content and "[1] Article A" in p.content
+    assert [s.original_indices for s in p.sources]==[[9],[7]]
     assert "## Discussion\nOther discussion." in p.content
     assert p.report_body==body
     validate_publication(p.content,p.metadata())
@@ -251,8 +249,10 @@ def test_reference_heading_variants_are_rebuilt_without_counting_unused_entries(
     body="A [9].\n\n"+heading+"\n\n[3] Unused entry\n[9] Fixture A\n\n### Discussion\nKeep this explanation."
     p=publish_report(body,[source(9),source(3)|{"doi":"10.1234/b"}],None)
     assert len(p.sources)==1 and p.sources[0].original_indices==[9]
-    assert "[1] Fixture source" in p.content and "Unused entry" not in p.content
+    assert "[1] Fixture A" in p.content and "[3] Unused entry" in p.content
+    assert p.sources[0].title=="Fixture source" and p.report_body==body
     assert "### Discussion\nKeep this explanation." in p.content
+    validate_publication(p.content,p.metadata())
 
 
 def test_reference_headings_inside_code_are_preserved():

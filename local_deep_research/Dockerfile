@@ -52,6 +52,15 @@ RUN /install/.venv/bin/python -c "import ast; ast.parse(open('/install/.venv/lib
 COPY search_engine_pubmed.py /install/.venv/lib/python3.14/site-packages/local_deep_research/web_search_engines/engines/search_engine_pubmed.py
 RUN /install/.venv/bin/python -c "import ast; ast.parse(open('/install/.venv/lib/python3.14/site-packages/local_deep_research/web_search_engines/engines/search_engine_pubmed.py', encoding='utf-8').read()); print('search_engine_pubmed.py syntax OK')"
 
+# The isolated hallucination evaluation imports the installed citation handler,
+# not the workspace overlay directory.  Keep the image aligned with the
+# overlay manifest so evidence_flow (and its opt-in selectors) is actually
+# reachable.  This is an evaluation-image repair; production images are not
+# rebuilt or restarted by this task.
+COPY overlay/base_citation_handler.py /install/.venv/lib/python3.14/site-packages/local_deep_research/citation_handlers/base_citation_handler.py
+COPY overlay/standard_citation_handler.py /install/.venv/lib/python3.14/site-packages/local_deep_research/citation_handlers/standard_citation_handler.py
+RUN /install/.venv/bin/python -c "import ast, hashlib, pathlib; root=pathlib.Path('/install/.venv/lib/python3.14/site-packages/local_deep_research/citation_handlers'); [ast.parse((root/n).read_text(encoding='utf-8'), filename=str(root/n)) for n in ('base_citation_handler.py','standard_citation_handler.py')]; print('citation handler overlays syntax OK', {n:hashlib.sha256((root/n).read_bytes()).hexdigest() for n in ('base_citation_handler.py','standard_citation_handler.py')})"
+
 # ============================================================================
 # research_verify/ — 新增的“科研验证链”包（四需求的地基，§0.1）。
 # 顶层包名 research_verify，装入 venv site-packages 根目录，

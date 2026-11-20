@@ -1,4 +1,4 @@
-"""Forward Docker gateway port 9876 to the host's loopback proxy.
+"""Forward Docker gateway port 2088 to the host's loopback proxy.
 
 No request contents or credentials are logged. Empty TCP probes do not open
 upstream connections; real transport failures retain direction and byte counts.
@@ -89,7 +89,7 @@ class Server(socketserver.ThreadingTCPServer):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--listen-host", default="host.docker.internal")
-    parser.add_argument("--port", type=int, default=9876)
+    parser.add_argument("--port", type=int, default=2088)
     args = parser.parse_args()
     address = socket.gethostbyname(args.listen_host)
     if address in {"0.0.0.0", "127.0.0.1"}:

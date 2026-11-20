@@ -22,7 +22,7 @@ def test_threshold_is_max_of_min_and_ratio():
 
 def test_fulltext_basis_and_pass():
     text = "This study of m6A and METTL3 in hepatocellular carcinoma improves prognosis."
-    cov = _kc().compute({"full_content": text * 5}, KWS)
+    cov = _kc().compute({"full_content": text * 5, "content_type":"full_text"}, KWS)
     assert cov.basis == "fulltext"
     assert cov.threshold_ok is True
     assert len(cov.hits) == 4
@@ -54,9 +54,10 @@ def test_extract_keywords_from_settings_string():
 
 def test_extract_keywords_regex_from_query():
     kws = _kc().extract_keywords("m6A hepatocellular carcinoma METTL3 prognosis")
-    assert "m6A" in kws and "METTL3" in kws
+    assert kws == []
 
 
-def test_empty_keywords_is_neutral_pass():
+def test_empty_keywords_is_unknown():
     cov = _kc().compute({"full_content": "x" * 300}, [])
-    assert cov.total == 0 and cov.threshold_ok is True
+    assert cov.total == 0 and cov.threshold_ok is None
+    assert cov.semantic_assessment == "not_performed"

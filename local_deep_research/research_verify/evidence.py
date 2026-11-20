@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-from collections import Counter
 from copy import deepcopy
 from dataclasses import dataclass
 import hashlib
-import math
 import re
 
 from .models import EvidenceSpan
+from .source_identity import canonical_url, identity_fields
 
 
 @dataclass(frozen=True)
@@ -19,10 +18,20 @@ class Artifact:
     text: str
     start: int = 0
     end: int | None = None
+    paper_id: str = ""
+    source_url: str = ""
 
     @property
     def sha256(self):
         return hashlib.sha256(self.text.encode()).hexdigest()
+
+    @property
+    def artifact_id(self):
+        return self.sha256
+
+    @property
+    def content_sha256(self):
+        return self.sha256
 
 
 @dataclass(frozen=True)
@@ -56,6 +65,11 @@ class SourceLookup:
     def find_by_index(self, index):
         return None if index in self._ambiguous else self._sources.get(index)
 
+    @property
+    def ambiguous_indices(self):
+        """Indices with differing supplied records; no identity is selected."""
+        return frozenset(self._ambiguous)
+
     def snapshot(self, indices):
         return SourceLookup([deepcopy(source) for index in indices
                              if (source := self.find_by_index(index)) is not None])
@@ -79,6 +93,8 @@ def source_artifacts(source: dict) -> tuple[Artifact | None, Artifact | None]:
     if is_search_page(source):
         return None, None
     normalize_source(source)
+    paper_id = paper_identity(source) or ""
+    source_url = _source_url(source)
     abstract = source.get("abstract")
     abstract_field = "abstract"
     kind = str(source.get("content_type") or "").lower()
@@ -86,7 +102,7 @@ def source_artifacts(source: dict) -> tuple[Artifact | None, Artifact | None]:
         abstract_field = "full_content" if source.get("full_content") else "content"
         abstract = source.get(abstract_field)
     abs_art = (
-        Artifact(abstract_field, "abstract", abstract)
+        Artifact(abstract_field, "abstract", abstract, paper_id=paper_id, source_url=source_url)
         if isinstance(abstract, str) and abstract.strip()
         else None
     )
@@ -104,6 +120,7 @@ def source_artifacts(source: dict) -> tuple[Artifact | None, Artifact | None]:
     if abs_art and re.sub(r"\s+", "", body) == re.sub(r"\s+", "", abs_art.text):
         return abs_art, None
     start, end = 0, len(body)
+    body_basis = "body"
     references = _REFERENCES.search(body)
     if references:
         end = references.start()
@@ -124,14 +141,51 @@ def source_artifacts(source: dict) -> tuple[Artifact | None, Artifact | None]:
         else:
             heading = _BODY_HEADING.search(body, abstract_heading.end(), end)
         if not heading:
-            return abs_art, None  # Cannot separate abstract from body reliably.
-        start = heading.start()
+            # Do not discard supplied body text merely because the publisher
+            # used an unconventional heading.  Preserve it with an explicit
+            # uncertain boundary; the model-facing scope records that this is
+            # not a verified abstract/body split.
+            start = abstract_heading.end()
+            body_basis = "body (abstract boundary uncertain)"
+        else:
+            start = heading.start()
     return (
         abs_art,
-        Artifact(body_field, "body", body, start, end)
+        Artifact(body_field, body_basis, body, start, end,
+                 paper_id=paper_id, source_url=source_url)
         if body[start:end].strip()
         else None,
     )
+
+
+def paper_identity(source: dict) -> str | None:
+    """Return a conservative work identity independent of display numbering."""
+    if not isinstance(source, dict):
+        return None
+    ids = identity_fields(source)
+    if ids.get("doi"):
+        return "doi:" + ids["doi"].casefold()
+    if ids.get("pmid"):
+        return "pmid:" + str(ids["pmid"])
+    if ids.get("pmcid"):
+        return "pmcid:" + str(ids["pmcid"]).upper()
+    value = canonical_url(source.get("link") or source.get("url"))
+    return "url:" + value if value else None
+
+
+def _source_url(source: dict) -> str:
+    """Resolve a stable display URL without inventing a publisher link."""
+    value = canonical_url(source.get("link") or source.get("url"))
+    if value:
+        return value
+    identity = identity_fields(source)
+    if identity.get("doi"):
+        return "https://doi.org/" + identity["doi"]
+    if identity.get("pmid"):
+        return "https://pubmed.ncbi.nlm.nih.gov/" + str(identity["pmid"]) + "/"
+    if identity.get("pmcid"):
+        return "https://pmc.ncbi.nlm.nih.gov/articles/" + str(identity["pmcid"]).upper() + "/"
+    return ""
 
 
 def _tokens(text: str) -> set[str]:
@@ -143,41 +197,21 @@ def _tokens(text: str) -> set[str]:
 
 
 def retrieve(
-    artifact: Artifact, claim: str, *, chunk_chars: int, top_k: int, context_chars: int
+    artifact: Artifact, claim: str, *, chunk_chars: int, top_k: int, context_chars: int,
+    semantic_ranker=None,
 ) -> list[Chunk]:
-    """Rank windows across the entire body, preserving original field offsets."""
-    size = min(chunk_chars, context_chars)
+    """Select shared structural windows while preserving artifact offsets."""
+    from .evidence_selection import select_context_windows
+    start = artifact.start
     end = artifact.end if artifact.end is not None else len(artifact.text)
-    step = max(1, size - min(200, size // 4))
-    chunks = [
-        Chunk(p, min(p + size, end), artifact.text[p : min(p + size, end)])
-        for p in range(artifact.start, end, step)
-    ]
-    if not chunks:
-        return []
-    query = _tokens(claim)
-    tokens = [_tokens(c.text) for c in chunks]
-    counts = Counter(t for terms in tokens for t in terms)
-    scores = [
-        sum(math.log(1 + len(chunks) / counts[t]) for t in query & terms)
-        for terms in tokens
-    ]
-    # With no lexical overlap (e.g. Chinese claim / English paper), sample the
-    # complete document rather than silently restricting evidence to its head.
-    if not any(scores):
-        n = min(top_k, len(chunks))
-        order = [round(i * (len(chunks) - 1) / max(1, n - 1)) for i in range(n)]
-    else:
-        order = sorted(range(len(chunks)), key=lambda i: (-scores[i], i))
-    selected, used = [], 0
-    for i in order:
-        chunk = chunks[i]
-        if len(selected) >= top_k:
-            break
-        if used + len(chunk.text) <= context_chars:
-            selected.append(chunk)
-            used += len(chunk.text)
-    return sorted(selected, key=lambda c: c.start)
+    size = min(chunk_chars, context_chars)
+    windows = select_context_windows(artifact.text[start:end], claim,
+                                     window_chars=size,
+                                     max_windows=top_k,
+                                     overlap_chars=min(size - 1, max(1, chunk_chars // 4)),
+                                     context_chars=context_chars,
+                                     semantic_ranker=semantic_ranker)
+    return [Chunk(start + item.start, start + item.end, item.text) for item in windows]
 
 
 def _normalized(text: str) -> tuple[str, list[int]]:

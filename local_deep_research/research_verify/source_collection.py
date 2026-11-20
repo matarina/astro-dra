@@ -3,6 +3,38 @@ from .retrieval import academic_snippet
 from .source_identity import with_identity
 
 
+def sources_for_draft(current, accumulated, draft):
+    """Keep current hits and recover only uniquely indexed sources cited in prose.
+
+    This resolves explicit syntax, not scientific relevance or entailment. Do
+    not widen to the whole archive or mutate the collector/previous records.
+    """
+    from copy import deepcopy
+    from .citation_display import cited_indices
+    from .evidence import SourceLookup
+
+    selected = list(current or [])
+    lookup = SourceLookup([*selected, *(accumulated or [])])
+    current_ids = {int(source["index"]) for source in SourceLookup(selected).records()}
+    requested = cited_indices(draft or "")
+    recovered, missing, ambiguous = [], [], []
+    for index in requested:
+        if index in lookup.ambiguous_indices:
+            ambiguous.append(index)
+        elif (source := lookup.find_by_index(index)) is None:
+            missing.append(index)
+        elif index not in current_ids:
+            selected.append(deepcopy(source))
+            recovered.append(index)
+    return selected, {
+        "scope": "citation_index_lookup_only",
+        "requested_ids": requested, "recovered_ids": recovered,
+        "missing_ids": missing, "ambiguous_ids": ambiguous,
+        "current_source_count": len(current or []), "selected_source_count": len(selected),
+        "status": "incomplete" if missing or ambiguous else "resolved" if requested else "no_citations",
+    }
+
+
 class CollectionOffset(int):
     """Keep the original integer API and attach feedback for this call only."""
 
@@ -34,6 +66,14 @@ class SourceCollectionMixin:
             if relation not in relations:
                 relations.append(relation)
         super()._merge_duplicate(existing, incoming)
+        # Fetch tools use find_or_add_result, which also calls this hook while
+        # holding the collector lock. A duplicate after reset is evidence for
+        # the current call too; reuse its ID and return the retained record.
+        if not any(item is existing for item in self._results):
+            self._results.append(existing)
+        link = existing.get("link") or existing.get("url")
+        if link and link not in self._sources:
+            self._sources.append(link)
         if relations:
             existing["related_articles"] = relations
         if existing.get("abstract") and any(existing.get(k) for k in ("doi", "pmid", "journal")):
@@ -45,16 +85,23 @@ class SourceCollectionMixin:
         with self._lock:
             offset = CollectionOffset(len(self._all_links))
             offset.added = offset.reused = offset.excluded = 0
+            offset.flagged = 0
+            offset.flagged_sources = []
             offset.unregistered = []
             returned = []
             returned_ids = set()
             for raw in results:
                 if not isinstance(raw, dict):
                     continue
-                if self._is_preprint_url(raw):
-                    offset.excluded += 1
-                    continue
                 record = with_identity(raw)
+                if record.get("publication_status") not in {None, "formal"}:
+                    offset.flagged += 1
+                    offset.flagged_sources.append({
+                        "index": record.get("index"),
+                        "status": record.get("publication_status"),
+                        "reason": record.get("publication_status_reason"),
+                        "url": record.get("link") or record.get("url"),
+                    })
                 existing = self._find_duplicate(record)
                 if existing is not None:
                     self._merge_duplicate(existing, record)
@@ -106,6 +153,9 @@ def format_collection_results(results, offset, original_formatter):
             lines.append(f"Unregistered: {record.get('title', '')} "
                          f"({record.get('link') or record.get('url') or ''})\n"
                          f"{str(record.get('snippet') or '')[:1200]}")
-    if offset.excluded:
-        lines.append(f"{offset.excluded} hits excluded by the existing source policy.")
+    if getattr(offset, "flagged", 0):
+        lines.append(
+            f"{offset.flagged} hits were retained with provenance warnings; "
+            "they are not formal citation records until identity is confirmed."
+        )
     return "\n\n".join(lines)

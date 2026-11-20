@@ -80,6 +80,19 @@ def test_page_view_searches_beyond_old_10k_limit_and_retains_original_text():
     assert raw.endswith('mixed-effects model.')
 
 
+def test_claim_directed_query_reaches_distant_methods_passage_without_scientific_rules():
+    abstract = 'The study analyzed a tumor cohort with transcriptomics.'
+    body = ('Introduction.\n\n' * 900
+            + 'Methods\n\nThe spatial assay used 10x Genomics Visium on seven samples.\n\n'
+            + 'Results\n\nThe study found an association.')
+    doc = SimpleNamespace(page_content=abstract + '\n\n' + body, metadata={
+        'index': 13, 'title': 'Study', 'source': 'https://example.org/13',
+        'abstract': abstract, 'evidence_type': 'retrieved text (completeness unconfirmed)'})
+    query = 'Which spatial platform and sample count did the draft claim? Visium seven samples'
+    rendered = format_source_documents([doc], query, max_chars=6000)
+    assert '10x Genomics Visium' in rendered and 'seven samples' in rendered
+
+
 @pytest.mark.parametrize('url, expected', [
     ('https://europepmc.org/article/MED/123', ('123', None)),
     ('https://www.europepmc.org/article/PMC/PMC456', (None, 'PMC456')),

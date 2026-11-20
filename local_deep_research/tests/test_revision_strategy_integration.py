@@ -1,5 +1,6 @@
 """Actual strategy finalize entry with isolated application dependencies."""
 import ast
+import hashlib
 import json
 from pathlib import Path
 import re
@@ -15,9 +16,9 @@ from research_verify.semantics import DIMENSIONS
 def runner_for(body, model):
     tree=ast.parse((Path(__file__).parents[1]/"langgraph_agent_strategy.py").read_text())
     cls=next(n for n in tree.body if isinstance(n,ast.ClassDef) and n.name=="LangGraphAgentStrategy")
-    methods=[n for n in cls.body if isinstance(n,ast.FunctionDef) and n.name in {"_finalize"}]
+    methods=[n for n in cls.body if isinstance(n,ast.FunctionDef) and n.name in {"_finalize", "_attach_citation_qc"}]
     collector_node=next(n for n in tree.body if isinstance(n,ast.ClassDef) and n.name=="SearchResultsCollector")
-    ns={"re":re,"threading":threading,"logger":logger,"DEFAULT_MAX_UNIQUE_SOURCES":80,
+    ns={"hashlib":hashlib,"json":json,"re":re,"threading":threading,"logger":logger,"DEFAULT_MAX_UNIQUE_SOURCES":80,
         "Dict":dict,"Any":Any,"NO_RESULTS_MESSAGE":"NO_RESULTS"}
     exec(compile(ast.Module(body=[collector_node,*methods],type_ignores=[]),"<actual-finalize>","exec"),ns)
     quote="In cultured cells, M regulates proliferation."
@@ -30,6 +31,7 @@ def runner_for(body, model):
         _attach_constraint_match=lambda query,sources:False,
         _attach_keyword_coverage=lambda query,sources:None,
         _update_progress=lambda *args:None,
+        get_setting=lambda key, default=None: default,
         citation_handler=SimpleNamespace(analyze_followup=lambda *args,**kwargs:{"content":body}),
         _format_citations=lambda answer,sources:answer+"\n\n## Sources\n1. fixture",
         _render_constraint_section=lambda sources:"",
@@ -37,6 +39,7 @@ def runner_for(body, model):
         _render_verify_section=lambda sources:"",
         _write_citation_qc_json=lambda checks:None,
     )
+    runner._attach_citation_qc = lambda *args: ns["_attach_citation_qc"](runner, *args)
     return ns["_finalize"],runner,quote
 
 

@@ -1,4 +1,5 @@
 import re
+import os
 from typing import Any, Dict, List, Optional, Tuple
 
 from defusedxml import ElementTree as ET
@@ -10,7 +11,14 @@ from ...security.safe_requests import safe_get
 from ...security.secure_logging import logger
 from ..rate_limiting import RateLimitError
 from ..search_engine_base import BaseSearchEngine, Exposure, Sensitivity
-from research_verify.retrieval import xml_text, has_structured_query_syntax
+from research_verify.retrieval import fallback_query_candidates, has_structured_query_syntax, xml_text
+
+
+def _search_proxy_kwargs() -> dict:
+    """Route PubMed traffic through the search proxy when configured."""
+    proxy = (os.environ.get("LDR_SEARCH_PROXY_URL") or
+             os.environ.get("LDR_SEARCH_HTTP_PROXY") or "").strip()
+    return {"proxies": {"http": proxy, "https": proxy}} if proxy else {}
 
 
 class PubMedSearchEngine(BaseSearchEngine):
@@ -54,6 +62,8 @@ class PubMedSearchEngine(BaseSearchEngine):
         include_citation_in_context: bool = False,
         include_language_in_context: bool = False,
         settings_snapshot: Optional[Dict[str, Any]] = None,
+        programmatic_mode: bool = False,
+        search_snippets_only: Optional[bool] = None,
     ):
         """
         Initialize the PubMed search engine.
@@ -86,9 +96,14 @@ class PubMedSearchEngine(BaseSearchEngine):
             max_results=max_results,
             preview_filters=preview_filters,  # type: ignore[arg-type]
             settings_snapshot=settings_snapshot,
+            programmatic_mode=programmatic_mode,
+            search_snippets_only=(
+                not (get_abstracts or get_full_text)
+                if search_snippets_only is None else search_snippets_only
+            ),
         )
-        self.max_results = max(self.max_results, 25)
         self.api_key = api_key
+        self._article_xml_cache = None
         self.days_limit = days_limit
         self.get_abstracts = get_abstracts
         self.get_full_text = get_full_text
@@ -194,7 +209,7 @@ class PubMedSearchEngine(BaseSearchEngine):
             )
 
             # Execute search request
-            response = safe_get(self.search_url, params=params)
+            response = safe_get(self.search_url, params=params, **_search_proxy_kwargs())
             response.raise_for_status()
 
             # Parse response
@@ -257,7 +272,8 @@ class PubMedSearchEngine(BaseSearchEngine):
         # Parse current time window
         import re
 
-        match = re.match(r'"last (\d+) (\w+)"[pdat]', time_filter)
+        match = re.fullmatch(r'\s*"last (\d+) (\w+)"\[pdat\]\s*', time_filter,
+                             flags=re.IGNORECASE)
         if not match:
             return '"last 10 years"[pdat]'
 
@@ -649,7 +665,7 @@ The default assumption should be that medical and scientific queries want RECENT
 
             # Execute search request
             logger.debug(f"Sending request to PubMed API: {self.search_url}")
-            response = safe_get(self.search_url, params=params)
+            response = safe_get(self.search_url, params=params, **_search_proxy_kwargs())
             response.raise_for_status()
             logger.debug(f"PubMed API response status: {response.status_code}")
 
@@ -684,6 +700,7 @@ The default assumption should be that medical and scientific queries want RECENT
         Returns:
             List of article summary dictionaries
         """
+        from research_verify.record_identity import make_record_provenance
         if not id_list:
             logger.debug("Empty ID list provided to _get_article_summaries")
             return []
@@ -712,7 +729,7 @@ The default assumption should be that medical and scientific queries want RECENT
 
             # Execute request
             logger.debug(f"Requesting summaries from: {self.summary_url}")
-            response = safe_get(self.summary_url, params=params)
+            response = safe_get(self.summary_url, params=params, **_search_proxy_kwargs())
             response.raise_for_status()
             logger.debug(f"Summary API response status: {response.status_code}")
 
@@ -768,6 +785,7 @@ The default assumption should be that medical and scientific queries want RECENT
                         "lang": article.get("lang", []),
                         "pmcrefcount": article.get("pmcrefcount", None),
                         "link": f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/",
+                        "record_provenance": make_record_provenance("pubmed", article),
                     }
 
                     summaries.append(summary)
@@ -804,6 +822,23 @@ The default assumption should be that medical and scientific queries want RECENT
 
             return []
 
+    def _fetch_article_xml(self, id_list: List[str]):
+        """Share the most recent successful XML batch across record readers."""
+        ids = tuple(id_list)
+        cached = getattr(self, "_article_xml_cache", None)
+        if cached is not None and cached[0] == ids:
+            return cached[1]
+
+        params = {"db": "pubmed", "id": ",".join(ids), "retmode": "xml"}
+        if self.api_key:
+            params["api_key"] = self.api_key
+        self._last_wait_time = self.rate_tracker.apply_rate_limit(self.engine_type)
+        response = safe_get(self.fetch_url, params=params, **_search_proxy_kwargs())
+        response.raise_for_status()
+        root = ET.fromstring(response.text)
+        self._article_xml_cache = (ids, root)
+        return root
+
     def _get_article_abstracts(self, id_list: List[str]) -> Dict[str, str]:
         """
         Get abstracts for a list of PubMed article IDs.
@@ -821,35 +856,7 @@ The default assumption should be that medical and scientific queries want RECENT
         logger.debug(f"Fetching abstracts for {len(id_list)} PubMed articles")
 
         try:
-            # Prepare parameters
-            params = {
-                "db": "pubmed",
-                "id": ",".join(id_list),
-                "retmode": "xml",
-                "rettype": "abstract",
-            }
-
-            # Add API key if available
-            if self.api_key:
-                params["api_key"] = self.api_key
-
-            self._last_wait_time = self.rate_tracker.apply_rate_limit(
-                self.engine_type
-            )
-            logger.debug(
-                f"Applied rate limit wait: {self._last_wait_time:.2f}s"
-            )
-
-            # Execute request
-            logger.debug(f"Requesting abstracts from: {self.fetch_url}")
-            response = safe_get(self.fetch_url, params=params)
-            response.raise_for_status()
-            logger.debug(
-                f"Abstract fetch response status: {response.status_code}, size: {len(response.text)} bytes"
-            )
-
-            # Parse XML response
-            root = ET.fromstring(response.text)
+            root = self._fetch_article_xml(id_list)
             logger.debug(
                 f"Parsing abstracts from XML for {len(id_list)} articles"
             )
@@ -925,28 +932,7 @@ The default assumption should be that medical and scientific queries want RECENT
             return {}
 
         try:
-            # Prepare parameters
-            params = {
-                "db": "pubmed",
-                "id": ",".join(id_list),
-                "retmode": "xml",
-                "rettype": "medline",
-            }
-
-            # Add API key if available
-            if self.api_key:
-                params["api_key"] = self.api_key
-
-            self._last_wait_time = self.rate_tracker.apply_rate_limit(
-                self.engine_type
-            )
-
-            # Execute request
-            response = safe_get(self.fetch_url, params=params)
-            response.raise_for_status()
-
-            # Parse XML response
-            root = ET.fromstring(response.text)
+            root = self._fetch_article_xml(id_list)
 
             metadata = {}
 
@@ -1179,7 +1165,7 @@ The default assumption should be that medical and scientific queries want RECENT
             )
 
             # Execute request
-            response = safe_get(self.link_url, params=params)
+            response = safe_get(self.link_url, params=params, **_search_proxy_kwargs())
             response.raise_for_status()
 
             # Parse response
@@ -1240,7 +1226,7 @@ The default assumption should be that medical and scientific queries want RECENT
             )
 
             # Execute request
-            response = safe_get(self.fetch_url, params=params)
+            response = safe_get(self.fetch_url, params=params, **_search_proxy_kwargs())
             response.raise_for_status()
 
             # Parse XML response
@@ -1309,22 +1295,14 @@ The default assumption should be that medical and scientific queries want RECENT
         # Perform adaptive search
         pmid_list, strategy = self._adaptive_search(optimized_query)
 
-        # If no results, try a simplified query
-        if not pmid_list:
-            logger.warning(
-                f"No PubMed results found using strategy: {strategy}"
-            )
-            simplified_query = self._simplify_query(optimized_query)
-            if simplified_query != optimized_query:
-                logger.info(f"Trying with simplified query: {simplified_query}")
-                pmid_list, strategy = self._adaptive_search(simplified_query)
+        if not pmid_list and not has_structured_query_syntax(query):
+            for fallback_query in fallback_query_candidates(query):
+                if fallback_query == optimized_query:
+                    continue
+                pmid_list, strategy = self._adaptive_search(fallback_query)
                 if pmid_list:
-                    logger.info(
-                        f"Simplified query found {len(pmid_list)} results"
-                    )
-
+                    break
         if not pmid_list:
-            logger.warning("No PubMed results found after query simplification")
             return []
 
         # Get article summaries
@@ -1399,7 +1377,7 @@ The default assumption should be that medical and scientific queries want RECENT
                         snippet_parts
                     )  # Journal and year use dash
             else:
-                snippet = "Research article"
+                snippet = "PubMed record"
 
             # Add publication type prefix
             snippet = pub_type_prefix + snippet
@@ -1469,6 +1447,9 @@ The default assumption should be that medical and scientific queries want RECENT
                 "source": "PubMed",
                 "_pmid": summary["id"],  # Store PMID for later use
                 "_search_strategy": strategy,  # Store search strategy for analytics
+                "publication_types": summary.get("pubtype") or [],
+                "language": summary.get("lang") or [],
+                "record_provenance": summary.get("record_provenance"),
             }
 
             previews.append(preview)

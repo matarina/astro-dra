@@ -57,6 +57,7 @@ from .heldout import (
 )
 from .research_spec import ResearchSpec, format_research_spec, parse_research_spec
 from .debug_capture import capture_chat_completion
+from .source_identity import canonical_url, classify_source
 
 __all__ = [
     "VerifyConfig",
@@ -100,6 +101,8 @@ __all__ = [
     "validate_manifest",
     "validate_pair_integrity",
     "capture_chat_completion",
+    "canonical_url",
+    "classify_source",
 ]
 
 __version__ = "0.1.0"

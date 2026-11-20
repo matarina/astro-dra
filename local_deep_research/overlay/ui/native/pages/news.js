@@ -982,15 +982,13 @@ function renderNewsItems(searchQuery = null) {
             } else if (typeof renderMarkdown !== 'undefined') {
                 findingsHtml = `<div class="ldr-news-findings">${renderMarkdown(findingsPreview)}</div>`;
             } else {
-                // Basic fallback rendering — escape first to prevent XSS
+                // Safe fallback: do not reinterpret Markdown with regexes.
+                // That path corrupted escaped asterisks, URLs, code spans and
+                // substantive italic prose.  The full renderer above handles
+                // formatting; when it is unavailable, preserve the exact
+                // escaped text as readable paragraphs.
                 const escaped = (window.escapeHtml || String)(findingsPreview);
-                const basicHtml = escaped
-                    .replace(/\n\n/g, '</p><p>')
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/^- (.+)$/gm, '<li>$1</li>')
-                    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
-                findingsHtml = `<div class="ldr-news-findings"><p>${basicHtml}</p></div>`;
+                findingsHtml = `<div class="ldr-news-findings"><p>${escaped.replace(/\n\n/g, '</p><p>')}</p></div>`;
             }
         } else if (item.summary) {
             // Fallback to summary if no findings

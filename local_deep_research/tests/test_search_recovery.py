@@ -1,6 +1,7 @@
 """Retrieval constraints, shared pacing, complete records and source identity."""
 import ast
 import json
+import os
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 import re
@@ -36,14 +37,17 @@ def engine_class(file, name, **overrides):
     tree = ast.parse((ROOT / file).read_text())
     cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == name)
     ns = {**vars(typing), "BaseSearchEngine": Base, "BaseLLM": object, "re": re,
-          "ET": ET, "logger": logger, "SNIPPET_LENGTH_LONG": 1200,
+          "ET": ET, "logger": logger, "SNIPPET_LENGTH_LONG": 1200, "os": os,
+          "has_structured_query_syntax": retrieval.has_structured_query_syntax,
+          "fallback_query_candidates": retrieval.fallback_query_candidates,
           "Sensitivity": SimpleNamespace(NON_SENSITIVE=1),
           "Exposure": SimpleNamespace(EXPOSING=1), "html_text": retrieval.html_text,
           "academic_snippet": retrieval.academic_snippet,
           "xml_text": retrieval.xml_text, "epmc_relations": epmc_relations,
           "pubmed_relations": pubmed_relations,
           **overrides}
-    exec(compile(ast.Module(body=[cls], type_ignores=[]), file, "exec"), ns)
+    helpers = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_search_proxy_kwargs"]
+    exec(compile(ast.Module(body=[*helpers, cls], type_ignores=[]), file, "exec"), ns)
     return ns[name]
 
 
@@ -57,7 +61,7 @@ def test_pubmed_abstract_and_metadata_reuse_one_real_record_request():
     calls = []
     def request(url, **kwargs):
         calls.append(kwargs)
-        return SimpleNamespace(text=XML)
+        return SimpleNamespace(text=XML, raise_for_status=lambda: None)
     cls = engine_class("search_engine_pubmed.py", "PubMedSearchEngine", safe_get=request,
                        service_get=lambda url, **kw: request(url, **kw))
     engine = cls(max_results=6)

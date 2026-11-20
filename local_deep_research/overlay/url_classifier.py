@@ -110,34 +110,18 @@ class URLClassifier:
         if cls._is_pdf_url(url_lower):
             return URLType.PDF
 
-        # Check specific academic sources
-        for pattern in cls.ARXIV_PATTERNS:
-            if re.search(pattern, url_lower):
-                return URLType.ARXIV
-
-        for pattern in cls.PMC_PATTERNS:
-            if re.search(pattern, url_lower):
-                return URLType.PMC
-
-        for pattern in cls.PUBMED_PATTERNS:
-            if re.search(pattern, url_lower):
-                return URLType.PUBMED
-
-        for pattern in cls.SEMANTIC_SCHOLAR_PATTERNS:
-            if re.search(pattern, url_lower):
-                return URLType.SEMANTIC_SCHOLAR
-
-        for pattern in cls.BIORXIV_PATTERNS:
-            if re.search(pattern, url_lower):
-                return URLType.BIORXIV
-
-        for pattern in cls.MEDRXIV_PATTERNS:
-            if re.search(pattern, url_lower):
-                return URLType.MEDRXIV
-
-        for pattern in cls.DOI_PATTERNS:
-            if re.search(pattern, url_lower):
-                return URLType.DOI
+        host = (parsed.hostname or "").lower().rstrip(".")
+        path = parsed.path or ""
+        if host in {"arxiv.org", "ar5iv.org"} and re.match(r"^/(?:abs|pdf|html)/", path):
+            return URLType.ARXIV
+        if host in {"biorxiv.org", "www.biorxiv.org"} and path.startswith("/content/"):
+            return URLType.BIORXIV
+        if host in {"medrxiv.org", "www.medrxiv.org"} and path.startswith("/content/"):
+            return URLType.MEDRXIV
+        if host in {"semanticscholar.org", "api.semanticscholar.org"} and path.startswith("/paper/"):
+            return URLType.SEMANTIC_SCHOLAR
+        if host in {"doi.org", "dx.doi.org"} and path.startswith("/10."):
+            return URLType.DOI
 
         # Default to HTML for web pages
         return URLType.HTML
@@ -152,15 +136,13 @@ class URLClassifier:
         url_lower = url.lower()
 
         # Academic sources with PDF URLs should use their specialized downloaders
-        academic_domains = [
-            "arxiv.org",
-            "biorxiv.org",
-            "medrxiv.org",
-            "ncbi.nlm.nih.gov",
-            "europepmc.org",
-            "semanticscholar.org",
-        ]
-        if any(domain in url_lower for domain in academic_domains):
+        academic_domains = {
+            "arxiv.org", "ar5iv.org", "biorxiv.org", "www.biorxiv.org",
+            "medrxiv.org", "www.medrxiv.org", "ncbi.nlm.nih.gov",
+            "www.ncbi.nlm.nih.gov", "europepmc.org", "semanticscholar.org",
+            "api.semanticscholar.org", "doi.org", "dx.doi.org",
+        }
+        if (urlparse(url_lower).hostname or "").lower().rstrip(".") in academic_domains:
             return False
 
         parsed = urlparse(url_lower)
@@ -201,23 +183,24 @@ class URLClassifier:
 
         if url_type == URLType.ARXIV:
             # Extract arXiv ID (e.g., 2301.12345 or cond-mat/0501234)
-            match = re.search(r"(\d{4}\.\d{4,5}(?:v\d+)?)", url)
+            match = re.fullmatch(r"/(?:abs|pdf|html)/(\d{4}\.\d{4,5}(?:v\d+)?)(?:\.pdf)?/?", urlparse(url).path,
+                                 flags=re.IGNORECASE)
             if match:
                 return match.group(1)
             # Old format
-            match = re.search(r"([a-z-]+/\d{7}(?:v\d+)?)", url)
+            match = re.fullmatch(r"/(?:abs|pdf|html)/([a-z-]+/\d{7}(?:v\d+)?)/?", urlparse(url).path,
+                                 flags=re.IGNORECASE)
             if match:
                 return match.group(1)
 
         elif url_type == URLType.PUBMED:
-            # Extract PMID
-            match = re.search(r"/(\d+)/?", url)
-            if match:
-                return match.group(1)
+            match = re.fullmatch(r"/(?:pubmed/)?(\d+)/?", urlparse(url).path,
+                                 flags=re.IGNORECASE)
+            if match:return match.group(1)
 
         elif url_type == URLType.PMC:
-            # Extract PMC ID
-            match = re.search(r"PMC(\d+)", url, re.IGNORECASE)
+            match = re.fullmatch(r"/(?:pmc/articles/|article/PMC/|articles/)?(PMC\d+)/?", urlparse(url).path,
+                                 flags=re.IGNORECASE)
             if match:
                 return f"PMC{match.group(1)}"
 
@@ -230,8 +213,7 @@ class URLClassifier:
                 return match.group(1)
 
         elif url_type == URLType.DOI:
-            # Extract DOI
-            match = re.search(r"(10\.\d{4,}/[^\s]+)", url)
+            match = re.fullmatch(r"/(10\.\d{4,}/[^\s?#]+?)/?", urlparse(url).path)
             if match:
                 return match.group(1)
 

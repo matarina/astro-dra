@@ -7,6 +7,11 @@ from .base_citation_handler import BaseCitationHandler
 class StandardCitationHandler(BaseCitationHandler):
     def _synthesize(self, question, search_results, previous_knowledge, nr_of_links, kind):
         from research_verify.evidence_flow import synthesize
+        # Give the writer its actual source records and query so it can decide
+        # whether a requested IF/JIF field needs a model-selected JCR call.
+        # The context is disabled automatically for questions without an
+        # explicit IF/JIF constraint.
+        self.set_writer_jcr_context(search_results, question)
         with start_trace(kind) as trace:
             trace.record("agent_draft", {"question": question, "text": previous_knowledge,
                          "text_sha256": text_digest(previous_knowledge)})

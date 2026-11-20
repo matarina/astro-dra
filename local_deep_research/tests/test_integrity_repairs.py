@@ -1,5 +1,6 @@
 """Offline adapter and draft contracts; no report-quality success claim."""
 import ast
+import os
 from pathlib import Path
 import re
 from types import SimpleNamespace
@@ -21,7 +22,8 @@ def adapter_methods(*names, response=None):
     tree = ast.parse((ROOT / "search_engine_pubmed.py").read_text())
     cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == "PubMedSearchEngine")
     nodes = [n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name in names]
-    ns = dict(List=List, Dict=Dict, Tuple=Tuple, ET=ET, re=re, xml_text=xml_text,
+    nodes.extend(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_search_proxy_kwargs")
+    ns = dict(os=os, List=List, Dict=Dict, Tuple=Tuple, ET=ET, re=re, xml_text=xml_text,
               has_structured_query_syntax=has_structured_query_syntax,
               logger=SimpleNamespace(**{k: lambda *a, **kw: None for k in ("debug", "info", "warning")}),
               safe_get=lambda *a, **kw: response)
@@ -51,10 +53,11 @@ def test_primary_abstract_preserves_sections_nested_text_and_translation_boundar
     <OtherAbstract><AbstractText>Only a translation.</AbstractText></OtherAbstract>
     </MedlineCitation></PubmedArticle></PubmedArticleSet>"""
     response = SimpleNamespace(text=xml, status_code=200, raise_for_status=lambda: None)
-    method = adapter_methods("_get_article_abstracts", response=response)["_get_article_abstracts"]
+    methods = adapter_methods("_get_article_abstracts", "_fetch_article_xml", response=response)
     obj = SimpleNamespace(api_key=None, rate_tracker=SimpleNamespace(apply_rate_limit=lambda *a: 0),
                           engine_type="pubmed", fetch_url="frozen-xml", _scrub_error=str)
-    result = method(obj, ["123", "456"])
+    obj._fetch_article_xml = lambda ids: methods["_fetch_article_xml"](obj, ids)
+    result = methods["_get_article_abstracts"](obj, ["123", "456"])
     assert result == {"123": "METHODS: CD [superscript:4] cells < 5.\n\nRESULTS: No improvement in either group."}
 
 

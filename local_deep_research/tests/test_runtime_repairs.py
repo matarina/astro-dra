@@ -18,6 +18,7 @@ from research_verify.pmc_identity import own_pmc_id, europepmc_record, article_t
 from research_verify.config import VerifyConfig
 from research_verify.publication import publish_report
 from test_generation_grounding import handler
+from research_verify.synthesis_trace import source_snapshot
 
 ROOT = Path(__file__).parents[1]
 
@@ -127,6 +128,83 @@ def test_native_consistency_reviews_actual_final_writer_output():
     assert 'DOI: 10.1000/paper' in calls[0] and 'Date: 2024 Nov' in calls[1]
     assert 'Journal: Example Journal' in calls[0]
     assert result['content'] == 'No improvement [7].'
+
+
+def test_empty_length_response_retries_with_larger_completion_budget():
+    class LengthThenText:
+        def __init__(self):
+            self.calls = 0
+            self.bound_tokens = None
+
+        def invoke(self, prompt):
+            self.calls += 1
+            if self.calls == 1:
+                return SimpleNamespace(
+                    content='',
+                    response_metadata={
+                        'finish_reason': 'length',
+                        'token_usage': {'completion_tokens': 6000},
+                    },
+                )
+            return SimpleNamespace(content='{"issues": []}', response_metadata={
+                'finish_reason': 'stop',
+            })
+
+        def bind(self, **kwargs):
+            self.bound_tokens = kwargs.get('max_tokens')
+            return self
+
+    model = LengthThenText()
+    writer = handler(model)
+    writer.settings_snapshot['citation.empty_response_retry_max_tokens'] = 12000
+    assert writer._invoke_text('structured review', stage='native_check') == '{"issues": []}'
+    assert model.calls == 2 and model.bound_tokens == 12000
+
+
+def test_nonempty_length_stopped_structured_response_retries_but_writer_does_not():
+    class LengthThenComplete:
+        def __init__(self):
+            self.calls = 0
+            self.bound_tokens = None
+
+        def invoke(self, prompt):
+            self.calls += 1
+            if self.calls == 1:
+                return SimpleNamespace(content='```json {"readings": [', response_metadata={
+                    'finish_reason': 'length', 'token_usage': {'completion_tokens': 6000}})
+            return SimpleNamespace(content='{"readings": []}', response_metadata={
+                'finish_reason': 'stop'})
+
+        def bind(self, **kwargs):
+            self.bound_tokens = kwargs.get('max_tokens')
+            return self
+
+    model = LengthThenComplete()
+    writer = handler(model)
+    writer.settings_snapshot['citation.empty_response_retry_max_tokens'] = 12000
+    assert writer._invoke_text('source reading', stage='source_reading') == '{"readings": []}'
+    assert model.calls == 2 and model.bound_tokens == 12000
+
+    prose = LengthThenComplete()
+    prose_writer = handler(prose)
+    assert prose_writer._invoke_text('writer prose', stage='writer') == '```json {"readings": ['
+    assert prose.calls == 1 and prose.bound_tokens is None
+
+
+def test_source_snapshot_preserves_scope_and_evidence_metadata():
+    result = source_snapshot([{
+        'index': 1, 'title': 'Study', 'language': ['zh'],
+        'platform': 'Visium', 'technology': 'spatial transcriptomics',
+        'population': 'human', 'sample_size': 12, 'groups': 'case/control',
+        'outcome': 'spatial pattern', 'impact_factor': 4.2,
+        'impact_factor_provenance': {'source': 'journal_quality'}, 'abstract': 'Evidence.',
+    }])
+    assert result[0]['language'] == ['zh']
+    assert result[0]['platform'] == 'Visium'
+    assert result[0]['technology'] == 'spatial transcriptomics'
+    assert result[0]['population'] == 'human'
+    assert result[0]['impact_factor'] == 4.2
+    assert result[0]['impact_factor_provenance']['source'] == 'journal_quality'
 
 
 def test_citation_qc_can_be_disabled_independently_of_publication(monkeypatch):

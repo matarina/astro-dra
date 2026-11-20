@@ -68,6 +68,8 @@ def test_explicit_identifiers_survive_without_bibliographic_inference():
 
 @pytest.mark.parametrize("heading", ["## Citations", "Citations:"])
 def test_legacy_citations_bibliography_label_is_preserved(heading):
+    from research_verify.citation_display import cited_indices
     text = "A [7].\n\n" + heading + "\n\n[17] Book\n   URL: https://example.org/book"
+    assert cited_indices(text) == [7]
     assert set(bibliography_entries(text)) == {17}
     assert "UR  - https://example.org/book" in RISExporter().export(text).content.decode()
