@@ -91,7 +91,9 @@ class PubMedDownloader(BaseDownloader):
         path = parsed.path or ""
 
         # Check for PMC article direct download
-        if hostname == "ncbi.nlm.nih.gov" and "/pmc/articles/PMC" in path:
+        if hostname in {"ncbi.nlm.nih.gov", "www.ncbi.nlm.nih.gov"} and re.fullmatch(
+            r"/pmc/articles/PMC\d+/?", path, flags=re.IGNORECASE
+        ):
             return self._download_pmc_direct(url)
         # Check for PubMed main site
         if hostname == "pubmed.ncbi.nlm.nih.gov":
@@ -104,12 +106,13 @@ class PubMedDownloader(BaseDownloader):
 
     def _download_pdf_with_result(self, url: str) -> DownloadResult:
         """Download PDF and return detailed result with skip reason."""
+        parsed_url = urlparse(url)
+        host = (parsed_url.hostname or "").lower().rstrip(".")
+        path = parsed_url.path or ""
         # Handle different URL types
-        if "/pmc/articles/PMC" in url:
-            pmc_match = re.search(r"(PMC\d+)", url)
-            if not pmc_match:
-                return DownloadResult(skip_reason="Invalid PMC URL format")
-
+        pmc_match = (re.fullmatch(r"/pmc/articles/(PMC\d+)/?", path, flags=re.IGNORECASE)
+                     if host == "www.ncbi.nlm.nih.gov" or host == "ncbi.nlm.nih.gov" else None)
+        if pmc_match:
             pmc_id = pmc_match.group(1)
             logger.info(f"Downloading PMC article: {pmc_id}")
 
@@ -127,9 +130,9 @@ class PubMedDownloader(BaseDownloader):
                 skip_reason=f"PMC article {pmc_id} not accessible - may be retracted or embargoed"
             )
 
-        if urlparse(url).hostname == "pubmed.ncbi.nlm.nih.gov":
+        if host == "pubmed.ncbi.nlm.nih.gov":
             # Extract PMID
-            pmid_match = re.search(r"/(\d+)/?", url)
+            pmid_match = re.fullmatch(r"/(\d+)/?", path)
             if not pmid_match:
                 return DownloadResult(skip_reason="Invalid PubMed URL format")
 
@@ -204,10 +207,12 @@ class PubMedDownloader(BaseDownloader):
                 skip_reason="No free full-text available - article may be paywalled"
             )
 
-        parsed = urlparse(url)
-        hostname = parsed.hostname or ""
+        parsed = parsed_url
+        hostname = host
         if hostname == "europepmc.org" or hostname.endswith(".europepmc.org"):
-            pmc_match = re.search(r"(PMC\d+)", url)
+            pmc_match = re.fullmatch(r"/article/PMC/(PMC\d+)/?", parsed.path, flags=re.IGNORECASE)
+            if pmc_match is None:
+                pmc_match = re.fullmatch(r"/articles/(PMC\d+)/?", parsed.path, flags=re.IGNORECASE)
             if pmc_match:
                 pmc_id = pmc_match.group(1)
                 pdf_content = self._download_via_europe_pmc(pmc_id)
@@ -275,9 +280,9 @@ class PubMedDownloader(BaseDownloader):
                         )
 
                         if text_response.status_code == 200:
-                            text = article_text(text_response.text, article, pmid=pmid)
+                            text = article_text(text_response.text, article, pmid=pmid, require_body=True)
                             if not text:
-                                logger.warning("PMC text identity does not match requested article; ignoring download")
+                                logger.warning("PMC response lacks matching article identity or body; ignoring full-text download")
 
                             if text:
                                 logger.info(
@@ -304,7 +309,10 @@ class PubMedDownloader(BaseDownloader):
 
     def _download_pmc_direct(self, url: str) -> Optional[bytes]:
         """Download directly from PMC URL."""
-        pmc_match = re.search(r"(PMC\d+)", url)
+        parsed = urlparse(url)
+        if (parsed.hostname or "").lower().rstrip(".") not in {"ncbi.nlm.nih.gov", "www.ncbi.nlm.nih.gov"}:
+            return None
+        pmc_match = re.fullmatch(r"/pmc/articles/(PMC\d+)/?", parsed.path, flags=re.IGNORECASE)
         if not pmc_match:
             return None
 
@@ -322,7 +330,10 @@ class PubMedDownloader(BaseDownloader):
     def _download_pubmed(self, url: str) -> Optional[bytes]:
         """Download from PubMed URL."""
         # Extract PMID
-        pmid_match = re.search(r"/(\d+)/?", url)
+        parsed = urlparse(url)
+        if (parsed.hostname or "").lower().rstrip(".") != "pubmed.ncbi.nlm.nih.gov":
+            return None
+        pmid_match = re.fullmatch(r"/(\d+)/?", parsed.path)
         if not pmid_match:
             return None
 

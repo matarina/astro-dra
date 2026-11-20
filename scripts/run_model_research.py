@@ -32,6 +32,7 @@ def main(config):
 
     defaults=Path(local_deep_research.__file__).parent/'defaults/default_settings.json'
     snapshot=apply_environment_overrides_to_snapshot({k:v.get('value') for k,v in json.loads(defaults.read_text()).items()})
+    snapshot.update(config.get('settings') or {})
     public_keys=['llm.model','llm.provider','llm.temperature','llm.max_tokens','search.tool',
         'search.search_strategy','search.iterations','search.questions_per_iteration',
         'langgraph_agent.max_unique_sources','search.engine.web.pubmed.default_params.get_full_text',
@@ -54,6 +55,8 @@ def main(config):
             system=AdvancedSearchSystem(llm=model,search=search,strategy_name=snapshot['search.search_strategy'],
                 max_iterations=snapshot['search.iterations'],questions_per_iteration=snapshot['search.questions_per_iteration'],
                 settings_snapshot=snapshot,programmatic_mode=True)
+            if 'include_sub_research' in config and hasattr(system.strategy, 'include_sub_research'):
+                system.strategy.include_sub_research = bool(config['include_sub_research'])
             system.set_progress_callback(progress)
             with trace_context(config['task_id']):
                 result=system.analyze_topic(config['question'])

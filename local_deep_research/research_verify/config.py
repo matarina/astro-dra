@@ -3,11 +3,12 @@
 Every knob is overridable through environment variables prefixed with
 ``LDR_VERIFY_`` (e.g. ``LDR_VERIFY_ENABLE_DOI_VALIDATION=false``).
 
-Design contract (see ``LDR-四需求-行动文档.md`` §0.1):
-    verification = annotate / drop / leave a trace.
-It must *never* silently pass a bad item, and must *never* fail the whole
-report.  When the network is unavailable the chain degrades to
-``unverified`` and records that fact, rather than blocking the research.
+Current contract:
+    provenance and fact-consistency helpers annotate / retain / leave a
+    trace.  Save-time per-citation QC is disabled by default and is never a
+    report publication gate.  When the network is unavailable the chain
+    degrades to ``unverified`` and records that fact, rather than blocking the
+    research.
 """
 
 from __future__ import annotations
@@ -33,7 +34,7 @@ class VerifyConfig(BaseSettings):
     enable_doi_validation: bool = True
     enable_constraint_match: bool = True
     enable_keyword_coverage: bool = True
-    enable_citation_qc: bool = True
+    enable_citation_qc: bool = False
 
     # --- shared HTTP client ---
     http_timeout: float = Field(default=10.0, gt=0, le=120)

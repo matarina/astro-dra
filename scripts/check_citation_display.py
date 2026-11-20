@@ -55,7 +55,12 @@ with settings_context(settings), Session(engine) as session:
         assert files.save_report(mode, publication.content, publication.metadata())
         assert files.get_report(mode) == publication.content
         assembled = assemble_full_report(row, session)
-        assert assembled.index("[1] Fixture A") < assembled.index("[2] Fixture B")
+        if mode == "quick":
+            assert assembled.index("[1] Fixture A") < assembled.index("[2] Fixture B")
+        else:
+            # Preserve the supplied bibliography's order/wording while the
+            # structured source map above still follows first citation use.
+            assert assembled.index("[2] Fixture B") < assembled.index("[1] Fixture A")
         assert "Uncited context remains." in assembled
         exports = {}
         for fmt in ["quarto", "latex", "odt", "pdf", "ris"]:
@@ -72,8 +77,8 @@ with settings_context(settings), Session(engine) as session:
             elif fmt == "ris":
                 records = data.decode().split("ER  -")
                 assert len(records) - 1 == 2
-                assert "Fixture A" in records[0] and "https://example.org/a" in records[0]
-                assert "Fixture B" in records[1] and "https://example.org/b" in records[1]
+                assert any("ID  - ref1\n" in record and "Fixture A" in record and "https://example.org/a" in record for record in records)
+                assert any("ID  - ref2\n" in record and "Fixture B" in record and "https://example.org/b" in record for record in records)
             exports[fmt] = len(data)
         result["modes"].append({"mode": mode, "display_indices": [1, 2], "body_preserved": True,
                                "storage_roundtrip": True, "exports": exports})

@@ -14,7 +14,9 @@ search:
 outgoing:
   proxies:
     all://:
-      - http://host.docker.internal:9876
+      # Replaced at container startup from the private LDR_SEARCH_PROXY_URL
+      # environment variable. Do not put proxy credentials in this file.
+      - "__LDR_SEARCH_PROXY_URL__"
 
 # Verified fallback while rate-limited providers are paused.
 engines:

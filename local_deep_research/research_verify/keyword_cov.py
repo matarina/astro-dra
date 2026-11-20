@@ -22,13 +22,6 @@ from .config import VerifyConfig, get_config
 from .models import KeywordCov
 from .textutil import first_nonempty
 
-_ZH_STOP = set("的了吗呢和在是有与及等为对以")
-_EN_STOP = {
-    "the", "a", "an", "of", "and", "or", "to", "in", "on", "for", "with",
-    "study", "research", "analysis", "review",
-}
-
-
 class KeywordCoverage:
     """Compute keyword coverage for sources."""
 
@@ -46,54 +39,22 @@ class KeywordCoverage:
 
     # -- keyword extraction -------------------------------------------------
     def extract_keywords(self, query: str, settings: dict | None = None) -> list[str]:
-        """Return keywords from explicit settings, else the query, else LLM."""
-        settings = settings or {}
-        raw = settings.get("keywords")
-        if raw:
-            if isinstance(raw, str):
-                return [k.strip() for k in re.split(r"[,，;；]", raw) if k.strip()]
-            return [str(k).strip() for k in raw if str(k).strip()]
+        """Only explicit terms have a lexical coverage interpretation.
 
-        kws = self._regex_keywords(query or "")
-        if len(kws) < 3 and self._model is not None:
-            kws = self._llm_keywords(query or "") or kws
-        return kws[:8]
-
-    @staticmethod
-    def _regex_keywords(text: str) -> list[str]:
-        # Split on CJK/whitespace/punctuation, drop stopwords and 1-char CJK.
-        tokens = re.split(r"[\s,，、;；:：/()（）\[\]【】\"']+", text or "")
-        out: list[str] = []
-        for t in tokens:
-            t = t.strip()
-            if not t:
-                continue
-            low = t.casefold()
-            if low in _EN_STOP or t in _ZH_STOP:
-                continue
-            if len(t) < 2 and re.match(r"[A-Za-z]", t):
-                continue
-            if t not in out:
-                out.append(t)
-        return out
-
-    def _llm_keywords(self, text: str) -> list[str]:
-        prompt = (
-            "List 3-6 core scientific keywords from the query, comma-separated, "
-            "no numbering, no explanation.\n\nQuery: " + text[:1000]
-        )
-        try:
-            resp = self._model.invoke(prompt)
-            raw = getattr(resp, "content", str(resp))
-            return [k.strip() for k in re.split(r"[,，\n]", raw) if k.strip()][:8]
-        except Exception as exc:
-            logger.debug(f"keyword LLM extract failed: {exc}")
-            return []
+        The question remains with the writer; no stop-word list or model
+        guesses which scientific terms determine relevance.
+        """
+        raw = (settings or {}).get("keywords")
+        if isinstance(raw, str):
+            return list(dict.fromkeys(k.strip() for k in re.split(r"[,，;；]", raw) if k.strip()))
+        if isinstance(raw, (list, tuple)):
+            return list(dict.fromkeys(k.strip() for k in raw if isinstance(k, str) and k.strip()))
+        return []
 
     # -- coverage -----------------------------------------------------------
     def compute(self, source: dict, keywords: list[str]) -> KeywordCov:
         """Compute keyword coverage; never raises."""
-        cov = KeywordCov(total=len(keywords))
+        cov = KeywordCov(total=len(keywords), assessment_kind="lexical_overlap", semantic_assessment="not_performed", keyword_provenance="explicit_settings" if keywords else "unknown")
         if not keywords:
             return cov
 
@@ -122,9 +83,13 @@ class KeywordCoverage:
 
     @staticmethod
     def _basis_text(source: dict) -> tuple[str, str]:
-        full = first_nonempty(source, ("full_content", "body", "content"))
-        if full and len(str(full)) > 200:
-            return str(full), "fulltext"
+        kind = str(source.get("content_type") or "").casefold().replace("-", "_")
+        body = first_nonempty(source, ("body",))
+        if body:
+            return str(body), "fulltext" if kind in {"full_text", "fulltext", "body"} else "body_excerpt"
+        full = first_nonempty(source, ("full_content", "content"))
+        if full:
+            return str(full), "fulltext" if kind in {"full_text", "fulltext"} else "retrieved_text"
         parts = [
             first_nonempty(source, ("abstract",)),
             first_nonempty(source, ("snippet",)),

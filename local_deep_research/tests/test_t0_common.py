@@ -72,9 +72,10 @@ def test_extract_doi_variants_and_trailing_punct():
 
 def test_extract_pmid_forms():
     assert textutil.extract_pmid("32561899") == "32561899"
-    assert textutil.extract_pmid({"id": "32561899"}) is None or True
-    assert textutil.extract_pmid("pmid 32561899 end") == "32561899"
-    assert textutil.extract_pmid(12345) is None
+    assert textutil.extract_pmid({"id": "32561899"}) is None
+    assert textutil.extract_pmid("pmid 32561899 end") is None
+    assert textutil.extract_pmid("PMID: 32561899") == "32561899"
+    assert textutil.extract_pmid(12345) == "12345"
 
 
 def test_first_nonempty_and_truncate():

@@ -1,0 +1,171 @@
+[
+  {
+    "case_id": "findings",
+    "draft": "## Findings\nAn observed effect [17].",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "detailed",
+    "draft": "## Detailed Findings\nAn observed effect [17].",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "plain_detailed",
+    "draft": "Detailed Findings:\nAn observed effect [17].",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "scope_table",
+    "draft": "## Research metrics\n| Input | Observation |\n|---|---|\n| X | Text [17] |",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "uncited_heading",
+    "draft": "## X enables resistance\n\nA proposed follow-up?\n\nWe recommend further research.",
+    "expected_prose_citation_ids": []
+  },
+  {
+    "case_id": "cited_heading",
+    "draft": "## X enables resistance [17]",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "conventional_refs",
+    "draft": "Finding [17].\n\n## References\n[99] Bibliographic entry.",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "nested_refs",
+    "draft": "Finding [17].\n\n## Sources\n### Notes\n[99] Entry.\n\n## Discussion\nOther finding [7].",
+    "expected_prose_citation_ids": [
+      17,
+      7
+    ]
+  },
+  {
+    "case_id": "setext_refs",
+    "draft": "Finding [17].\n\nReferences\n----------\n[99] Entry.\n\nDiscussion\n----------\nOther finding [7].",
+    "expected_prose_citation_ids": [
+      17,
+      7
+    ]
+  },
+  {
+    "case_id": "bold_refs",
+    "draft": "Finding [17].\n\n**References:**\n[99] Entry.",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "plain_refs",
+    "draft": "Finding [17].\n\nReferences:\n[99] Entry.",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "fence_length",
+    "draft": "````text\n```\nHidden [99].\n````\n\nVisible [17].",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "indented_code",
+    "draft": "    code [99]\n\nVisible [17].",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "inline_code",
+    "draft": "Use `[99]` literally and cite [17].",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "escaped",
+    "draft": "Literal \\[99] and actual [17].",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "linked",
+    "draft": "A [[17]](https://example.org/p(a)) and 【7】 and [17, 7].",
+    "expected_prose_citation_ids": [
+      17,
+      7
+    ]
+  },
+  {
+    "case_id": "destination",
+    "draft": "[Read more](https://example.org/[99]) and evidence [17].",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "bare_url",
+    "draft": "See https://example.org/x[99] and evidence [17].",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "url_boundary",
+    "draft": "See https://www.10xgenomics.com/tool [17].",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "image",
+    "draft": "![Example [99]](https://example.org/image) and evidence [17].",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "definition",
+    "draft": "Finding [17].\n\n[99]: https://example.org/target",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "html_comment",
+    "draft": "<!-- Hidden [99] -->\n\nFinding [17].",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "crlf",
+    "draft": "## Detailed Findings\r\nFinding [17].\r\n\r\n## References\r\n[99] Entry.\r\n",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  },
+  {
+    "case_id": "unicode",
+    "draft": "## αβ结果 [17]\n方法有效吗？\n\n建议进一步研究。",
+    "expected_prose_citation_ids": [
+      17
+    ]
+  }
+]

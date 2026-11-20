@@ -258,7 +258,13 @@ def _extract_synthesized_answer(results: dict) -> str:
 def _ground_report_content(
     content: str, sources: list[dict], model
 ) -> tuple[str, dict]:
-    """Final gate for detailed synthesis, after generation and before saving."""
+    """Optionally record legacy QC metadata without gating the report body.
+
+    The current flow closes save-time citation auditing.  An explicitly
+    enabled diagnostic run may still collect advisory checks, but it must
+    return the generated content unchanged and must never replace it with a
+    withheld/error message.
+    """
     try:
         from research_verify import get_config
         from research_verify.citation_qc import CitationQc
@@ -276,12 +282,6 @@ def _ground_report_content(
         ) if cfg.qc_require_body else {"status": "abstract_only_policy"}
         result = qc.verify_report(content, lookup)
         from research_verify.audit_io import publication_sources, write_audit
-        sections = [
-            result.content,
-            qc.render_paper_section(result.paper_checks),
-            qc.render_section(result.original_checks),
-        ]
-        checked = "\n\n".join(section for section in sections if section)
         audit = result.model_dump(exclude={"content"})
         audit["evidence_preparation"] = evidence_preparation
         frozen = qc.source_snapshot.records()
@@ -290,13 +290,14 @@ def _ground_report_content(
             audit["evidence_artifact_file"] = write_audit(audit, frozen)
         except OSError:
             audit["evidence_storage_status"] = "unavailable"
-        audit["rendered_content_sha256"] = hashlib.sha256(
-            checked.encode()
-        ).hexdigest()
-        return checked, audit
+        audit["rendered_content_sha256"] = hashlib.sha256(content.encode()).hexdigest()
+        # Keep the generated report as-is.  This preserves useful partial and
+        # unverified material while the optional audit remains inspectable in
+        # metadata/logs.
+        return content, audit
     except Exception as exc:
         logger.warning("Final report QC failed: {}", type(exc).__name__)
-        return "结论核验未完成，未发布未经核验的研究正文。", {
+        return content, {
             "status": "unverifiable", "reason_code": "qc_error"
         }
 

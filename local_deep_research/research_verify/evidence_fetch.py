@@ -40,6 +40,11 @@ class EvidenceFetcher:
             raise PermissionError('Evidence retrieval denied: '+decision.reason)
 
     def read(self, url, *, params=None, limit=2_000_000, service=None, internal=False):
+        return self.read_bytes(url,params=params,limit=limit,service=service,
+                               internal=internal).decode('utf-8',errors='replace')
+
+    def read_bytes(self, url, *, params=None, limit=2_000_000, service=None, internal=False):
+        """Preserve binary primary documents under the same policy and budgets."""
         if self.remaining <= 0 or self.seconds_left <= 0:
             raise TimeoutError("Evidence retrieval budget exhausted")
         started = time.monotonic()
@@ -58,6 +63,12 @@ class EvidenceFetcher:
                 get = self.get
             timeout = max(.1, min(5, self.deadline - time.monotonic()))
             options = {'allow_private_ips':True} if internal else {}
+            if not internal:
+                import os
+                proxy = (os.environ.get('LDR_SEARCH_PROXY_URL') or
+                         os.environ.get('LDR_SEARCH_HTTP_PROXY') or '').strip()
+                if proxy:
+                    options['proxies'] = {'http': proxy, 'https': proxy}
             response = get(url, params=params, timeout=(min(3, timeout), timeout), stream=True, **options)
             response.raise_for_status()
             chunks, size = [], 0
@@ -67,7 +78,7 @@ class EvidenceFetcher:
                     raise TimeoutError("Evidence response exceeds retrieval budget")
                 chunks.append(chunk)
             self.events.append({'host':urlsplit(url).hostname,'status':'retrieved','bytes':size})
-            return b''.join(chunks).decode('utf-8', errors='replace')
+            return b''.join(chunks)
         except Exception as exc:
             self.events.append({'host':urlsplit(url).hostname,'error_type':type(exc).__name__,
                 'http_status':getattr(getattr(exc,'response',None),'status_code',None)})
@@ -115,10 +126,31 @@ class EvidenceFetcher:
         return None
 
     def article(self, source):
-        key=tuple(sorted(identity_fields(source).items())) or (('url',source.get('link','')),)
+        identifiers = identity_fields(source)
+        document_enabled = self.settings.get('citation.original_reference_document_followup') is True
+        locator_enabled = document_enabled or self.settings.get('citation.original_reference_pdf_followup') is True
+        anchors = []
+        if not identifiers and locator_enabled:
+            from .original_reference import original_reference_urls
+            anchors = original_reference_urls(source)
+        # Unknown records must not share the old empty-URL cache entry. A
+        # literal original-reference digest is a locator key, never a paper ID.
+        key = tuple(sorted(identifiers.items())) or (
+            ('url', source.get('link', '')),
+            ('original_reference', source.get('original_bibliography_sha256', '')),
+            ('source_index', str(source.get('index', ''))),
+            ('locators', tuple(a['url']for a in anchors)),
+        )
         if key in self.article_cache:return self.article_cache[key]
         self.article_cache[key]=None
-        text=self._article(source)
+        if not identifiers and locator_enabled:
+            if len(anchors) != 1:
+                return None
+            from .original_reference import extract_locator_pdf, extract_locator_document
+            raw = self.read_bytes(anchors[0]['url'], limit=8_000_000)
+            text = (extract_locator_document if document_enabled else extract_locator_pdf)(raw, anchors[0])
+        else:
+            text=self._article(source)
         self.article_cache[key]=text
         return text
 
@@ -127,7 +159,8 @@ class EvidenceFetcher:
         if not record or not record.get('pmcid') or record.get('isOpenAccess') != 'Y':
             return None
         xml = self.read('https://www.ebi.ac.uk/europepmc/webservices/rest/' + record['pmcid'] + '/fullTextXML', service='europepmc')
-        text = article_text(xml, record, pmid=source.get('pmid'))
+        text = article_text(xml, record, pmid=source.get('pmid'), require_body=True,
+                            include_graphic_refs=self.settings.get('citation.preserve_article_graphic_links') is True)
         return text[:500_000] if text else None
 
     def web(self, query, domain='', url=''):
@@ -198,6 +231,7 @@ def from_epmc(record):
             'https://europepmc.org/article/'+str(record.get('source',''))+'/'+str(record.get('id',''))),
         'journal':((record.get('journalInfo') or {}).get('journal') or {}).get('title',''),
         'pubdate':record.get('firstPublicationDate') or record.get('pubYear',''),
+        'language':record.get('language') or record.get('languageOfFullText') or '',
         'abstract':abstract,'content':abstract,'full_content':abstract,
         'content_type':'abstract' if abstract else 'metadata',
         'publication_types':(record.get('pubTypeList') or {}).get('pubType',[]),

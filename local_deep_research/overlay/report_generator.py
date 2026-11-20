@@ -1,5 +1,7 @@
 import importlib
+import os
 import re
+import time
 from typing import Any, Dict, List, Optional
 from datetime import datetime, UTC
 
@@ -250,6 +252,7 @@ class IntegratedReportGenerator:
         """
         # If search_system is provided, use its LLM; otherwise use the provided LLM
         self._owns_llm = False
+        self.settings_snapshot = settings_snapshot
         if search_system:
             self.search_system = search_system
             self.model = llm or search_system.model
@@ -300,6 +303,13 @@ class IntegratedReportGenerator:
                 for reporting progress (0-100%) and checking cancellation.
         """
 
+        from research_verify.research_spec import format_research_spec, parse_research_spec, report_spec_settings
+        from .utilities.type_utils import unwrap_setting
+        self._research_spec = parse_research_spec(query, report_spec_settings(
+            lambda name, default=None: unwrap_setting(
+                (self.settings_snapshot or {}).get(name, default))))
+        self._scope_contract = format_research_spec(self._research_spec)
+
         # Step 1: Determine structure
         if progress_callback:
             progress_callback(
@@ -338,6 +348,7 @@ class IntegratedReportGenerator:
                 self.search_system, getattr(self.search_system, "all_links_of_system", [])
             ),
             self.model,
+            research_spec=getattr(self, "_research_spec", None),
         )
         report["content"] = publication.content
         report.setdefault("metadata", {}).update(publication.metadata())
@@ -348,8 +359,11 @@ class IntegratedReportGenerator:
     ) -> List[Dict]:
         """Analyze content and determine optimal report structure."""
         combined_content = findings["current_knowledge"]
+        scope_contract = getattr(self, "_scope_contract", "")
         prompt = f"""
         Analyze this research content about: {query}
+
+        {scope_contract}
 
         Content Summary:
         {combined_content[:1000]}... [truncated]
@@ -371,6 +385,7 @@ class IntegratedReportGenerator:
         Make the structure specific to the content, not generic.
         Each subsection must include its purpose after the | symbol.
         DO NOT include sections about sources, citations, references, or methodology.
+        {"For field extraction, prefer one compact table-oriented section and avoid background discussion or a broad review." if getattr(getattr(self, "_research_spec", None), "output_mode", "") == "field_extraction" else ""}
         """
 
         response = get_llm_response_text(self.model.invoke(prompt))
@@ -686,11 +701,14 @@ class IntegratedReportGenerator:
                             )
                             if w not in _stop_words
                         }
+                        # A shared purpose word is not proof that the italic
+                        # prose is generated boilerplate.  Preserve substantive
+                        # scientific prose unless it is an exact/near-exact
+                        # restatement or an explicitly marked boilerplate line.
                         if (
                             self._heading_restates_name(italic_text, purpose)
                             or norm_italic.startswith(norm_purpose)
                             or norm_purpose.startswith(norm_italic)
-                            or bool(purpose_words & italic_words)
                         ):
                             should_strip = True
 
@@ -1016,11 +1034,26 @@ class IntegratedReportGenerator:
         # Accumulate content from previous sections to avoid repetition
         accumulated_findings: List[str] = []
 
+        scope_contract = getattr(self, "_scope_contract", "")
+        focused_mode = getattr(getattr(self, "_research_spec", None), "output_mode", "") == "field_extraction"
+
         # Count total subsections for progress tracking
         total_subsections = sum(
             max(len(section.get("subsections", [])), 1) for section in structure
         )
         completed_subsections = 0
+        try:
+            total_report_timeout = float(
+                os.getenv("LDR_REPORT_TOTAL_TIMEOUT_SECONDS", "900")
+            )
+        except (TypeError, ValueError):
+            total_report_timeout = 900.0
+        report_deadline = (
+            time.monotonic() + total_report_timeout
+            if total_report_timeout > 0
+            else None
+        )
+        stop_report_research = False
 
         # Preserve questions from initial research to avoid repetition
         # This follows the same pattern as citation tracking (all_links_of_system)
@@ -1044,6 +1077,19 @@ class IntegratedReportGenerator:
                 )
 
         for i, section in enumerate(structure, 1):
+            if report_deadline is not None and time.monotonic() >= report_deadline:
+                logger.warning(
+                    "Report generation total time limit reached before section %s; "
+                    "finalizing partial report",
+                    section.get("name", i),
+                )
+                if progress_callback:
+                    progress_callback(
+                        "Report generation time limit reached; finalizing partial report",
+                        95,
+                        {"phase": "report_section_research_timeout"},
+                    )
+                break
             logger.info(f"Processing section: {section['name']}")
             section_content = []
 
@@ -1068,6 +1114,15 @@ class IntegratedReportGenerator:
 
             # Process each subsection by directly researching it
             for j, subsection in enumerate(section["subsections"], 1):
+                if report_deadline is not None and time.monotonic() >= report_deadline:
+                    logger.warning(
+                        "Report generation total time limit reached during %s > %s; "
+                        "finalizing partial report",
+                        section.get("name", i),
+                        subsection.get("name", j),
+                    )
+                    stop_report_research = True
+                    break
                 # Only add subsection header if there are multiple subsections
                 if len(section["subsections"]) > 1:
                     section_content.append(f"## {i}.{j} {subsection['name']}\n")
@@ -1107,13 +1162,14 @@ class IntegratedReportGenerator:
                 if is_section_level:
                     # Section-level prompt - more comprehensive
                     subsection_query = (
-                        f"Research task: Create comprehensive content for the '{subsection['name']}' section in a report about '{query}'. "
+                        f"Research task: Create {'focused field-by-field' if focused_mode else 'concise evidence-grounded'} content for the '{subsection['name']}' section in a report about '{query}'. "
                         f"Section purpose: {subsection['purpose']} "
+                        f"\n{scope_contract}\n"
                         f"\n"
                         f"Other sections in the report:\n{other_sections_text}\n"
                         f"{previous_context_section}"
-                        f"This is a standalone section requiring comprehensive coverage of its topic. "
-                        f"Provide a thorough exploration that may include synthesis of information from previous sections where relevant. "
+                        f"Keep the scope limited to the requested fields and supplied evidence. "
+                        f"Use synthesis only where the supplied sources support it. "
                         f"Use retrieved evidence for examples and numbers; add detail only "
                         f"when the supplied sources support it. Label your interpretation "
                         f"separately from reported study findings. "
@@ -1128,6 +1184,7 @@ class IntegratedReportGenerator:
                     subsection_query = (
                         f"Research task: Create content for subsection '{subsection['name']}' in a report about '{query}'. "
                         f"This subsection's purpose: {subsection['purpose']} "
+                        f"\n{scope_contract}\n"
                         f"Part of section: '{section['name']}' "
                         f"\n"
                         f"Other sections in the report:\n{other_sections_text}\n"
@@ -1177,7 +1234,18 @@ class IntegratedReportGenerator:
                 # Belt-and-suspenders: also override max_iterations for
                 # strategies that cache it at __init__ time
                 original_max_iter = getattr(strategy, "max_iterations", None)
+                original_short_run = getattr(strategy, "_allow_short_runs", False)
+                original_deadline = getattr(strategy, "_run_deadline", None)
                 strategy.max_iterations = 1
+                strategy._allow_short_runs = True
+                try:
+                    subsection_timeout = float(
+                        os.getenv("LDR_REPORT_SUBSECTION_TIMEOUT_SECONDS", "300")
+                    )
+                except (TypeError, ValueError):
+                    subsection_timeout = 300.0
+                if subsection_timeout > 0:
+                    strategy._run_deadline = time.monotonic() + subsection_timeout
 
                 try:
                     # Perform search for this subsection
@@ -1196,6 +1264,8 @@ class IntegratedReportGenerator:
                         )
                     if original_max_iter is not None:
                         strategy.max_iterations = original_max_iter
+                    strategy._allow_short_runs = original_short_run
+                    strategy._run_deadline = original_deadline
 
                 completed_subsections += 1
 
@@ -1255,6 +1325,9 @@ class IntegratedReportGenerator:
 
                 section_content.append("\n\n")
 
+            if stop_report_research:
+                break
+
             # Combine all content for this section
             sections[section["name"]] = "\n".join(section_content)
 
@@ -1293,14 +1366,15 @@ class IntegratedReportGenerator:
         # Combine TOC and sections
         report_parts = ["\n".join(toc), ""]
 
-        # Add a summary of the research
+        # Add a summary of the research.  Field-extraction requests need a
+        # compact scope marker; generic boilerplate makes them look like a
+        # broad review and competes with the requested evidence table.
         report_parts.append("# Research Summary")
-        report_parts.append(
-            "This report was researched using an advanced search system."
-        )
-        report_parts.append(
-            "Research included targeted searches for each section and subsection."
-        )
+        if getattr(getattr(self, "_research_spec", None), "output_mode", "") == "field_extraction":
+            report_parts.append("The table below reports only fields available in the supplied source material.")
+        else:
+            report_parts.append("This report was researched using an advanced search system.")
+            report_parts.append("Research included targeted searches for each section and subsection.")
         report_parts.append("\n---\n")
 
         # Add each section's content

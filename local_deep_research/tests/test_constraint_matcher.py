@@ -14,15 +14,14 @@ def test_valid_if_treats_zero_and_none_as_unknown():
     assert _valid_if(17.18) == 17.18
 
 
-def test_parse_year_min_if_language_from_query():
+def test_free_query_does_not_establish_scope():
     c = ConstraintMatcher().parse("找 2026年 关于 m6A 的文献，IF>10，只要英文")
-    assert c.year_from == 2026
-    assert c.min_if == 10
-    assert c.language == "en"
+    assert c.year_from is None and c.min_if is None and c.language is None
+    assert c.unresolved == ["query_intent_not_structured"]
 
 
 def test_parse_cjk_if_variant():
-    c = ConstraintMatcher().parse("影响因子≥15 的论文")
+    c = ConstraintMatcher().parse("影响因子≥15 的论文", {"min_if":15})
     assert c.min_if == 15
 
 
@@ -82,10 +81,10 @@ def test_match_language_mismatch():
     assert r.lang_ok is False and "language" in r.hard_violations
 
 
-def test_match_english_engine_infers_en():
+def test_match_index_does_not_establish_language():
     m = _matcher_with_if({})
     r = m.match({"index": "1", "source_engine": "pubmed"}, ResearchConstraint(language="en"))
-    assert r.lang_ok is True
+    assert r.lang_ok is None and r.detail["pending"]
 
 
 def test_match_empty_constraint_returns_neutral():

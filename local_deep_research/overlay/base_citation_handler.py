@@ -22,6 +22,108 @@ class BaseCitationHandler(ABC):
         self.settings_snapshot = settings_snapshot or {}
         self._fact_checking_logged = False
         self.stream_callback: Optional[Callable[[str], None]] = None
+        # Empty by default: ordinary reports must not initialize the JCR
+        # catalog or make an unsolicited journal lookup.
+        self._writer_jcr_tool_factory = None
+        self._writer_jcr_sources = []
+        self._writer_jcr_query = ""
+        self._writer_jcr_enabled = False
+
+    def set_writer_jcr_tool_factory(self, factory) -> None:
+        """Install the strategy-owned model-selected JCR tool factory."""
+        self._writer_jcr_tool_factory = factory
+
+    def set_writer_jcr_context(self, sources, question: str) -> None:
+        """Enable writer JCR routing only for an explicit IF/JIF request."""
+        self._writer_jcr_sources = sources if isinstance(sources, list) else []
+        self._writer_jcr_query = str(question or "")
+        try:
+            from research_verify.research_spec import parse_if_constraint
+            minimum, operator = parse_if_constraint(self._writer_jcr_query)
+            self._writer_jcr_enabled = (
+                minimum is not None and self._writer_jcr_tool_factory is not None
+            )
+            self._writer_jcr_minimum = minimum
+            self._writer_jcr_operator = operator
+        except Exception:
+            self._writer_jcr_enabled = False
+            self._writer_jcr_minimum = None
+            self._writer_jcr_operator = None
+
+    def _writer_jcr_system_prompt(self) -> str:
+        return (
+            "You are the final evidence-grounded report writer. The user query "
+            "may contain an explicit IF/JIF condition. You have a model-selected "
+            "search_journal tool when that condition is present. Decide yourself "
+            "whether the report needs IF values. For an explicit IF/JIF request, "
+            "inspect the supplied source blocks and call search_journal for each "
+            "relevant paper record that you retain, "
+            "using the exact [N] source_index and journal_name shown in metadata. "
+            "Use the returned jcr_mcp value, metric year, status and threshold "
+            "result in the report. Never invent or estimate an IF. If the tool "
+            "returns unknown or ambiguous, write that state and explain why. A "
+            "journal-only lookup without source_index is not a paper-level check. "
+            "Do not call the tool for reports with no explicit IF/JIF request."
+        )
+
+    def _invoke_plain_text(self, prompt: str, *, trace=None, stage="model") -> str:
+        """Plain invocation helper used by the tool-routing fallback."""
+        response = self.llm.invoke(prompt)
+        text = get_llm_response_text(response)
+        record_model_response(trace, stage, response, text)
+        return text
+
+    def _invoke_writer_agent(self, prompt: str, *, trace=None) -> str:
+        """Run the writer as a model-selected tool-calling agent."""
+        if not (self._writer_jcr_enabled and self._writer_jcr_tool_factory):
+            return self._invoke_plain_text(prompt, trace=trace, stage="writer")
+        try:
+            from langchain.agents import create_agent
+
+            agent = create_agent(
+                model=self.llm,
+                tools=[self._writer_jcr_tool_factory()],
+                system_prompt=self._writer_jcr_system_prompt(),
+            )
+            result = agent.invoke(
+                {"messages": [{"role": "user", "content": prompt}]},
+                {"recursion_limit": 25},
+            )
+            messages = result.get("messages", []) if isinstance(result, dict) else []
+            final = None
+            for message in reversed(messages):
+                content = getattr(message, "content", None)
+                if content and not getattr(message, "tool_calls", None):
+                    final = message
+                    break
+            if final is None and messages:
+                final = messages[-1]
+            text = get_llm_response_text(final if final is not None else result)
+            if trace:
+                trace.record("writer_jcr_agent", {
+                    "tool": "search_journal",
+                    "enabled": True,
+                    "minimum_if": self._writer_jcr_minimum,
+                    "operator": self._writer_jcr_operator,
+                    "message_count": len(messages),
+                    "tool_call_count": sum(
+                        len(getattr(message, "tool_calls", []) or [])
+                        for message in messages
+                    ),
+                })
+            record_model_response(trace, "writer", final or result, text,
+                                  tool_calling=True)
+            return text
+        except Exception as exc:
+            if trace:
+                trace.record("writer_jcr_agent_error", {
+                    "error_type": type(exc).__name__,
+                })
+            logger.warning(
+                "Writer JCR agent unavailable; using plain writer: %s",
+                type(exc).__name__,
+            )
+            return self._invoke_plain_text(prompt, trace=trace, stage="writer")
 
     def set_stream_callback(self, callback: Callable[[str], None]):
         """Set a callback that receives each streamed LLM token."""
@@ -37,6 +139,15 @@ class BaseCitationHandler(ABC):
         Returns:
             The complete response text.
         """
+        if stage == "writer" and self._writer_jcr_enabled:
+            text = self._invoke_writer_agent(prompt, trace=trace)
+            if self.stream_callback and text:
+                try:
+                    self.stream_callback(text)
+                except Exception:
+                    logger.debug("stream_callback failed")
+            return text
+
         if self.stream_callback and hasattr(self.llm, "stream"):
             chunks = []
             try:
@@ -98,14 +209,78 @@ class BaseCitationHandler(ABC):
         and strips ``<think>`` reasoning blocks via ``get_llm_response_text``.
         """
         try:
+            if stage == "writer" and self._writer_jcr_enabled:
+                return self._invoke_writer_agent(prompt, trace=trace)
             response = self.llm.invoke(prompt)
             text = get_llm_response_text(response)
             record_model_response(trace, stage, response, text)
+            # Reasoning models can exhaust the completion budget before emitting
+            # any answer text.  A structured consumer (source selection, native
+            # review, repair validation) can report a JSON error even though the
+            # transport succeeded. Retry only for an explicit provider length
+            # stop. This is a transport/runtime recovery seam: it adds no prompt
+            # rules, does not rewrite reports, and preserves the first response
+            # in the trace for diagnosis.
+            # Structured stages can emit a non-empty but truncated JSON object
+            # when reasoning consumes the completion budget.  Retry those
+            # provider-declared length stops once with the same model.  Writer
+            # prose is left alone: a complete-looking answer may legitimately
+            # end at its configured cap, and no parser should decide that it
+            # needs rewriting.
+            structured_length_stop = stage in {
+                "source_selection", "source_reading", "native_check"
+            }
+            if ((not str(text or "").strip() or structured_length_stop)
+                    and self._response_stopped_at_length(response)
+                    and hasattr(self.llm, "bind")):
+                retry_tokens = self.get_setting(
+                    "citation.empty_response_retry_max_tokens", 12000
+                )
+                try:
+                    retry_tokens = max(1, int(retry_tokens))
+                except (TypeError, ValueError):
+                    retry_tokens = 12000
+                if trace:
+                    trace.record("empty_response_retry", {
+                        "stage": stage, "max_tokens": retry_tokens,
+                        "reason": ("length_stop_without_text"
+                                   if not str(text or "").strip()
+                                   else "length_stop_structured_response"),
+                    })
+                try:
+                    retry_response = self.llm.bind(max_tokens=retry_tokens).invoke(prompt)
+                    retry_text = get_llm_response_text(retry_response)
+                    record_model_response(trace, stage + "_retry", retry_response, retry_text,
+                                          retry_of=("length_stop_without_text"
+                                                    if not str(text or "").strip()
+                                                    else "length_stop_structured_response"),
+                                          retry_max_tokens=retry_tokens)
+                    return retry_text
+                except Exception as retry_exc:
+                    if trace:
+                        trace.record("empty_response_retry_error", {
+                            "stage": stage, "error_type": type(retry_exc).__name__,
+                            "max_tokens": retry_tokens,
+                        })
+                    return text
             return text
         except Exception as exc:
             if trace:
                 trace.record(stage + "_error", {"error_type": type(exc).__name__})
             raise
+
+    @staticmethod
+    def _response_stopped_at_length(response) -> bool:
+        """Return true only for an explicit provider length termination."""
+        metadata = getattr(response, "response_metadata", {}) or {}
+        if str(metadata.get("finish_reason") or "").lower() in {
+            "length", "max_tokens", "max_output_tokens"
+        }:
+            return True
+        usage = metadata.get("token_usage") or {}
+        return str(usage.get("finish_reason") or "").lower() in {
+            "length", "max_tokens", "max_output_tokens"
+        }
 
     def get_setting(self, key: str, default=None):
         """Get a setting value from the snapshot."""
@@ -165,6 +340,7 @@ class BaseCitationHandler(ABC):
             return documents
 
         from research_verify.source_relations import associated_notices
+        from research_verify.evidence_cards import additional_source_metadata
         for i, result in enumerate(search_results):
             if isinstance(result, dict) and "index" not in result:
                 result["index"] = str(i + nr_of_links + 1)
@@ -178,6 +354,8 @@ class BaseCitationHandler(ABC):
                     result["index"] = str(i + nr_of_links + 1)
 
                 content, evidence_type = source_material(result)
+                from research_verify.source_identity import classify_source
+                provenance = classify_source(result)
                 # Use the index from the result if it exists, otherwise calculate it
                 doc_index = int(result.get("index", i + nr_of_links + 1))
                 documents.append(
@@ -192,13 +370,41 @@ class BaseCitationHandler(ABC):
                             "doi": result.get("doi"),
                             "pmid": result.get("pmid"),
                             "journal": result.get("journal") or result.get("journal_ref"),
+                            "authors": result.get("authors") or result.get("authorString") or result.get("author_string"),
                             "publication_date": result.get("pubdate") or result.get("publication_date") or result.get("year"),
+                            "language": result.get("language") or result.get("languages") or result.get("lang"),
+                            "platform": result.get("platform"),
+                            "technology": result.get("technology"),
+                            "population": result.get("population"),
+                            "sample_size": result.get("sample_size"),
+                            "groups": result.get("groups"),
+                            "outcome": result.get("outcome"),
+                            "impact_factor": result.get("impact_factor"),
+                            "metric_year": result.get("metric_year"),
+                            "passes_threshold": result.get("passes_threshold"),
+                            "_jcr_check": result.get("_jcr_check"),
+                            "jcr_provenance": result.get("jcr_provenance"),
+                            "additional_source_metadata": additional_source_metadata(result),
                             "related_notices": notices.get(str(doc_index), []),
                             "publication_types": result.get("publication_types", []),
                             "related_articles": result.get("related_articles", []),
                             "publication_versions": result.get("publication_versions", []),
                             "version_resolution": result.get("version_resolution", ""),
                             "authority_status": result.get("authority_status", ""),
+                            "source_kind": provenance.get("source_kind", "unknown"),
+                            "document_type": provenance.get("document_type", "unknown"),
+                            "publication_status": provenance.get("publication_status", "unverified"),
+                            "identity_status": provenance.get("identity_status", "candidate"),
+                            "identity_provenance": provenance.get("identity_provenance", {}),
+                            "publication_status_reason": provenance.get("publication_status_reason", ""),
+                            "publication_state": provenance.get("publication_state", "unknown"),
+                            "peer_review_status": provenance.get("peer_review_status", "unknown"),
+                            "peer_review_status_provenance": provenance.get("peer_review_status_provenance", {}),
+                            "relevance_status": provenance.get("relevance_status", "unknown"),
+                            "evidence_scope": provenance.get("evidence_scope", "unknown"),
+                            "temporal_validity": provenance.get("temporal_validity", "unknown"),
+                            "contradiction_status": provenance.get("contradiction_status", "unknown"),
+                            "identity_status": provenance.get("identity_status", "missing"),
                         },
                     )
                 )

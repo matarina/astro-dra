@@ -18,6 +18,70 @@ def payload():
          "quote": "Factor Q itself maintained balance."}], "reported_limits": []}]}
 
 
+def test_source_reading_preserves_only_controlled_evidence_roles():
+    from research_verify.source_reading import build_reading_notes, render_reading_notes
+    p = {"readings": [{"source_id": 17, "observations": [
+        {"subject_quote": "Loss of factor Q", "state_quote": "Loss",
+         "evidence_role": "outcome", "quote": "Loss of factor Q caused damage."},
+        {"subject_quote": "Factor Q", "state_quote": "",
+         "evidence_role": ["invented_role"], "quote": "Factor Q itself maintained balance."}],
+        "reported_limits": []}]}
+    notes = build_reading_notes(json.dumps(p), {17: TEXT})
+    assert [item.get("evidence_role") for item in notes["observations"]] == ["outcome", "other"]
+    rendered = render_reading_notes(notes)
+    assert "Evidence role: outcome" in rendered
+    assert "Evidence role: other" in rendered
+
+
+def test_source_reading_roles_can_be_disabled_for_a_paired_baseline():
+    from research_verify.source_reading import build_reading_notes, render_reading_notes
+    p = {"readings": [{"source_id": 17, "observations": [
+        {"subject_quote": "Loss of factor Q", "state_quote": "Loss",
+         "evidence_role": "outcome", "quote": "Loss of factor Q caused damage."}],
+        "reported_limits": []}]}
+    notes = build_reading_notes(json.dumps(p), {17: TEXT}, include_roles=False)
+    assert "evidence_role" not in notes["observations"][0]
+    assert "Evidence role:" not in render_reading_notes(notes)
+
+
+def test_candidate_claim_units_are_bound_to_exact_quotes_and_rendered_before_writing():
+    from research_verify.source_reading import build_reading_notes, render_reading_notes
+    p = {"readings": [], "claim_units": [{
+        "claim": "Factor Q has a reported effect, with a supplied limitation.",
+        "evidence": [{"source_id": 17, "quote": "Factor Q itself maintained balance."}],
+        "qualifiers": [{"source_id": 17, "quote": "Loss of factor Q caused damage."}],
+    }]}
+    notes = build_reading_notes(json.dumps(p), {17: TEXT}, include_roles=True)
+    assert notes["claim_unit_count"] == 1
+    rendered = render_reading_notes(notes)
+    assert "ATTRIBUTION PLAN" in rendered
+    assert "Claim unit 1 (unverified plan)" in rendered
+    assert "Evidence source [17] original quotation" in rendered
+    assert "Qualifying source [17] original quotation" in rendered
+
+
+def test_claim_units_with_unlocatable_quotes_are_rejected_and_never_reach_writer():
+    from research_verify.source_reading import build_reading_notes, render_reading_notes
+    p = {"readings": [], "claim_units": [{
+        "claim": "An invented claim.",
+        "evidence": [{"source_id": 17, "quote": "The supplied text proves an invented result."}],
+    }]}
+    notes = build_reading_notes(json.dumps(p), {17: TEXT}, include_roles=True)
+    assert notes["claim_units"] == []
+    assert any(x.get("reason") == "claim_unit_evidence_invalid" for x in notes["rejections"])
+    assert "An invented claim." not in render_reading_notes(notes)
+
+
+def test_claim_units_are_not_created_for_roles_off_baseline():
+    from research_verify.source_reading import build_reading_notes
+    p = {"readings": [], "claim_units": [{
+        "claim": "Factor Q has a reported effect.",
+        "evidence": [{"source_id": 17, "quote": "Factor Q itself maintained balance."}],
+    }]}
+    notes = build_reading_notes(json.dumps(p), {17: TEXT}, include_roles=False)
+    assert notes["claim_units"] == []
+
+
 def test_source_notes_keep_loss_and_the_factors_own_action_as_distinct_originals():
     from research_verify.source_reading import build_reading_notes, render_reading_notes
     notes = build_reading_notes(json.dumps(payload()), {17: TEXT})

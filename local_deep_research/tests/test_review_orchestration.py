@@ -73,6 +73,22 @@ def test_document_level_not_reported_is_an_evidence_gap_with_a_valid_request():
     assert issues[0]['request']['kind']=='article'
 
 
+def test_supporting_candidate_is_not_automatically_the_missing_clause_article():
+    raw = {'issues': [{'claim_id': 0, 'status': 'supported', 'evidence_source_id': 7,
+        'evidence_sources': [{'source_id': 7, 'quote': 'Population A used method M.'}],
+        'atom_checks': [{'attribute': 'method', 'claim_value': 'Population B used M',
+                         'source_value': 'not reported', 'evidence_quote': '', 'result': 'not_reported'}]}]}
+    claims = {0: {'text': 'Populations A and B used M.', 'source_ids': []}}
+    issue, = parse_review(json.dumps(raw), claims)
+    assert issue['status'] == 'insufficient_evidence'
+    assert issue['source_id'] == 7  # Preserve provenance of the supplied clause.
+    assert issue['request']['kind'] == 'web'
+    assert claims[0]['source_ids'] == []
+    cited = {0: {'text': 'Populations A and B used M [7].', 'source_ids': [7]}}
+    issue, = parse_review(json.dumps(raw), cited)
+    assert issue['request']['kind'] == 'article'
+
+
 def test_unasserted_attributes_do_not_create_evidence_gaps():
     raw={'issues':[{'claim_id':0,'status':'supported','evidence_source_id':7,
         'atom_checks':[{'attribute':'method','claim_value':'method M','result':'supported'},
@@ -81,6 +97,19 @@ def test_unasserted_attributes_do_not_create_evidence_gaps():
     assert parse_review(json.dumps(raw),claims)==[]
     raw['issues'][0]['atom_checks'][1]['claim_value']='population A'
     assert parse_review(json.dumps(raw),claims)[0]['status']=='insufficient_evidence'
+
+
+def test_supplied_material_scope_assertion_is_not_a_full_paper_evidence_gap():
+    raw = {'issues': [{'claim_id': 0, 'status': 'supported', 'evidence_source_id': 7,
+        'atom_checks': [{'attribute': 'platform',
+                         'attribute_role': 'platform',
+                         'claim_value': 'not reported in the supplied material',
+                         'source_value': 'not reported',
+                         'evidence_quote': 'Spatial transcriptomics was used; platform not specified.',
+                         'result': 'supported'}]}]}
+    claims = {0: {'text': 'The supplied material does not report the spatial platform [7].',
+                  'source_ids': [7]}}
+    assert parse_review(json.dumps(raw), claims) == []
 
 
 def test_table_repair_must_keep_the_original_column_structure():

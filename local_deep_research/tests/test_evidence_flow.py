@@ -3,7 +3,11 @@ from types import SimpleNamespace
 import pytest
 from research_verify.generation import format_source_documents
 from research_verify.retrieval import html_text
-from research_verify.evidence_flow import apply_review, writing_batches, parse_review, review_claim_groups, supplement
+from research_verify.evidence_flow import (
+    apply_review, bounded_retention_retry, missing_structural_markers, parse_review,
+    review_answer, review_claim_groups, structural_markers, supplement, visible_texts,
+    writing_batches,
+)
 from research_verify.evidence_fetch import resolve_versions, EvidenceFetcher, register_source
 from research_verify.synthesis_trace import DISABLED
 import json
@@ -13,6 +17,82 @@ from test_generation_grounding import handler
 
 def doc(i, text):
     return SimpleNamespace(page_content=text, metadata={'index':i,'title':f'Study {i}','source':f'https://example.org/{i}','abstract':text})
+
+
+def test_structure_retention_markers_are_generic_and_ordered():
+    draft = '# Methods\n\n**Limitations**:\n\n## Results\n'
+    answer = '# Methods\n\n## Results\n'
+    assert structural_markers(draft) == ['# Methods', '**Limitations**:', '## Results']
+    assert missing_structural_markers(draft, answer) == ['**Limitations**:']
+
+
+def test_structure_retention_markers_do_not_interpret_body_claims():
+    draft = '# Methods\n\nA claim about eosinophils.\n'
+    answer = '# Methods\n\nA different claim.\n'
+    assert missing_structural_markers(draft, answer) == []
+
+
+class _RetentionTrace:
+    def __init__(self):
+        self.events = []
+
+    def record(self, name, payload):
+        self.events.append((name, payload))
+
+
+class _RetentionHandler:
+    def __init__(self, responses):
+        self.responses = list(responses)
+        self.calls = 0
+
+    def _invoke_text(self, prompt, trace, stage):
+        self.calls += 1
+        value = self.responses.pop(0)
+        if isinstance(value, Exception):
+            raise value
+        return value
+
+
+def test_bounded_retention_retry_selects_one_structural_retry():
+    handler = _RetentionHandler(['# Methods\n\n## Results\nrestored'])
+    trace = _RetentionTrace()
+    answer, receipt = bounded_retention_retry(
+        handler, 'writer prompt', '# Methods\nbody',
+        '# Methods\n\n## Results\n', trace, 1, True)
+    assert answer.startswith('# Methods') and '## Results' in answer
+    assert receipt['attempted'] is True
+    assert receipt['attempt_count'] == 1
+    assert receipt['selected'] == 'retry'
+    assert handler.calls == 1
+    assert [name for name, _ in trace.events] == ['writer_retention_retry']
+
+
+def test_bounded_retention_retry_preserves_original_on_failure_and_is_bounded():
+    handler = _RetentionHandler([RuntimeError('transient')])
+    trace = _RetentionTrace()
+    original = '# Methods\nbody'
+    answer, receipt = bounded_retention_retry(
+        handler, 'writer prompt', original,
+        '# Methods\n\n## Results\n', trace, 1, True)
+    assert answer == original
+    assert receipt['attempt_count'] == 1
+    assert receipt['selected'] == 'original'
+    assert receipt['retry_error_type'] == 'RuntimeError'
+    assert handler.calls == 1
+
+
+def test_bounded_retention_retry_records_no_marker_candidate_batch_once():
+    handler = _RetentionHandler([])
+    trace = _RetentionTrace()
+    answer, receipt = bounded_retention_retry(
+        handler, 'writer prompt', '# Methods\nbody',
+        '# Methods\nbody', trace, 2, True)
+    assert answer == '# Methods\nbody'
+    assert receipt['attempted'] is False
+    assert receipt['attempt_count'] == 0
+    assert handler.calls == 0
+    assert len(trace.events) == 1
+    assert trace.events[0][1]['attempt_count'] == 0
 
 def test_existing_draft_citations_reserve_original_material_before_selection():
     docs=[doc(1,'Original supporting abstract. '*15),doc(2,'Other candidate. '*60)]
@@ -109,6 +189,50 @@ def test_claim_ids_preserve_original_markdown_and_reject_unknown_ids():
     assert issues==[{'claim_id':3,'evidence_source_id':7,'source_id':7,'statement':'**Observed tissue B** [7].'}]
 
 
+def test_metadata_aggregate_repair_accepts_explicit_source_quote_pairs():
+    first, second = doc(1, 'First record evidence.'), doc(2, 'Second record evidence.')
+    first.metadata['language'] = ['chi']
+    second.metadata['language'] = ['eng']
+    material = format_source_documents([first, second])
+    issue = {
+        'statement': 'The language count is wrong [1, 2].',
+        'source_id': 1,
+        'source_ids': [1, 2],
+        'status': 'contradiction',
+        'evidence_sources': [
+            {'source_id': 1, 'quote': "Language: ['chi']"},
+            {'source_id': 2, 'quote': "Language: ['eng']"},
+        ],
+        'replacement': 'The supplied records have different languages [1, 2].',
+    }
+    out, applied, unresolved = apply_review(issue['statement'], [issue], material)
+    assert out == issue['replacement']
+    assert len(applied) == 1 and not unresolved
+
+
+def test_atom_checks_keep_controlled_evidence_roles_without_dropping_unknowns():
+    claims = {0: {'text': 'The workflow used platform P [7].'}}
+    issues = parse_review(json.dumps({'issues': [{
+        'claim_id': 0,
+        'status': 'supported',
+        'atom_checks': [
+            {'attribute': 'platform', 'claim_value': 'P', 'result': 'supported'},
+            {'attribute': 'vendor_specific_label', 'claim_value': 'X', 'result': 'not_reported'},
+        ],
+    }]}), claims)
+    assert issues == []
+    checked = parse_review(json.dumps({'issues': [{
+        'claim_id': 0,
+        'status': 'contradiction',
+        'atom_checks': [
+            {'attribute': 'platform', 'claim_value': 'P', 'result': 'supported'},
+            {'attribute': 'vendor_specific_label', 'claim_value': 'X', 'result': 'contradiction'},
+        ],
+    }]}), claims)
+    assert checked[0]['atom_checks'][0]['attribute_role'] == 'platform'
+    assert checked[0]['atom_checks'][1]['attribute_role'] == 'other'
+
+
 def test_unreviewed_claims_are_not_silently_marked_supported():
     issues=parse_review('{"issues":[{"claim_id":0,"status":"supported"}]}',
         {0:{'text':'First [7].'},1:{'text':'Second [7].'}})
@@ -159,6 +283,76 @@ def test_review_groups_preserve_uncited_assertions_and_table_context():
     assert any(c['text']=='A categorical statement.' and not c['source_ids'] for c in claims)
     row=next(c for c in claims if c['source_ids'])
     assert row['table_context']=='| Measure | Finding |' and row['section_context']==['## Group A']
+
+
+@pytest.mark.parametrize('header, row, budget, expected', [
+    ('| Run [1] | Result [2] |', '| A | 14 |', 60000, [1, 2]),
+    ('| Run [1] | Result |', '| A | 14 [2] |', 60000, [2, 1]),
+    ('| Run | Result |', '| A | 14 [2] |', 60000, [2]),
+    ('| Run [2] | Result [9] |', '| A | 14 [2] |', 60000, [2]),
+    (r'| Run `[1]` | Result \[3] |', '| A | 14 [2] |', 60000, [2]),
+    ('| Run [1, 3] | Result |', '| A | 14 [2] |', 1200, [2, 3]),
+])
+def test_table_header_sources_use_only_space_left_after_direct_evidence(header, row, budget, expected):
+    answer = f'{header}\n| --- | --- |\n{row}\n{row.replace("A", "B")}\n'
+    documents = [doc(1, 'Run measured 14 units. ' * 100), doc(2, 'Direct evidence.'), doc(3, 'Additional context.')]
+    sources = [{'index': item.metadata['index']} for item in documents]
+    prompts = []
+
+    def invoke(prompt, **kwargs):
+        prompts.append(prompt)
+        return '{"issues": [{"claim_id": 0, "status": "supported"}, {"claim_id": 1, "status": "supported"}]}'
+
+    result = review_answer(SimpleNamespace(_invoke_text=invoke), 'Question', answer, documents, sources,
+                           DISABLED, None, 1, budget, {}, {'remaining': 1})
+    assert result[0] == answer and result[4] == set(expected) and len(prompts) == 1
+    units_json, material = prompts[0].split('\nFINAL ANSWER:\n')[1].split('\nSUPPLIED SOURCES:\n')
+    units = json.loads(units_json)
+    assert [unit['table_context'] for unit in units] == [header, header]
+    assert [unit['source_ids'] for unit in units] == [sorted(expected)] * 2
+    assert list(visible_texts(material)) == expected and len(material) <= budget
+    if '[2]' in row:
+        direct = format_source_documents([documents[1]], max_chars=budget, required_ids={2})
+        assert material == direct or material.startswith(direct + '\n\n')
+
+
+def test_followup_review_keeps_header_sources_with_new_evidence(monkeypatch):
+    answer = '| Run [1] | Result |\n| --- | --- |\n| A | 14 [2] |\n'
+    documents = [doc(1, 'Header evidence.'), doc(2, 'Row evidence.'), doc(3, 'Follow-up evidence.')]
+    sources = [{'index': item.metadata['index']} for item in documents]
+    prompts = []
+
+    def invoke(prompt, **kwargs):
+        prompts.append(prompt)
+        status = 'insufficient_evidence' if len(prompts) == 1 else 'supported'
+        return json.dumps({'issues': [{'claim_id': 0, 'status': status, 'source_id': 2}]})
+
+    monkeypatch.setattr('research_verify.evidence_flow.supplement', lambda *args, **kwargs: [3])
+    reviewer = SimpleNamespace(_invoke_text=invoke, _create_documents=lambda sources: documents)
+    result = review_answer(reviewer, 'Question', answer, documents, sources, DISABLED, None,
+                           1, 60000, {'fetcher': object()}, {'remaining': 2})
+    assert result[0] == answer and result[4] == {1, 2, 3} and len(prompts) == 2
+    units_json, material = prompts[1].split('\nFINAL ANSWER:\n')[1].split('\nSUPPLIED SOURCES:\n')
+    assert json.loads(units_json)[0]['source_ids'] == [1, 2]
+    assert list(visible_texts(material)) == [2, 3, 1]
+
+
+def test_table_header_sources_stay_scoped_to_their_own_rows():
+    first = '| Run [1] | Result |\n| --- | --- |\n| A | 14 |\n'
+    second = '| Run [2] | Result |\n| --- | --- |\n| B | 18 |\n'
+    answer = first + '\n' + second
+    documents = [doc(1, 'Run A measured 14 units.'), doc(2, 'Run B measured 18 units.')]
+    prompts = []
+
+    def invoke(prompt, **kwargs):
+        prompts.append(prompt)
+        return '{"issues": [{"claim_id": 0, "status": "supported"}, {"claim_id": 1, "status": "supported"}]}'
+
+    result = review_answer(SimpleNamespace(_invoke_text=invoke), 'Question', answer, documents,
+                           [{'index': 1}, {'index': 2}], DISABLED, None, 1, 60000, {}, {'remaining': 1})
+    units_json, _ = prompts[0].split('\nFINAL ANSWER:\n')[1].split('\nSUPPLIED SOURCES:\n')
+    assert [unit['source_ids'] for unit in json.loads(units_json)] == [[1], [2]]
+    assert result[0] == answer and result[4] == {1, 2}
 
 
 def test_owned_full_text_can_be_used_after_network_budget_is_exhausted():

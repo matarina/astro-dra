@@ -6,13 +6,14 @@ from urllib.parse import urlsplit
 from typing import Literal
 from pydantic import BaseModel, Field, ConfigDict
 from .citation_qc import CitationQc
-from .claims import CITE_RE, extract_report_claims
+from .claims import CITE_RE, extract_report_claims, extract_legacy_report_claims
 from .config import VerifyConfig, get_config
 from .models import ClaimCheck
 from .evidence import paper_identity, source_artifacts
 from .revision import RevisionResult
-from .citation_display import cited_indices, render_report, format_sources
+from .citation_display import cited_indices, legacy_cited_indices, render_report, render_report_current, format_sources
 from .synthesis_trace import start_trace, source_snapshot, text_digest
+from .evidence_grounding import EvidenceGroundingV1, build_evidence_grounding
 
 NOTICE = "当前没有可保留的已核验结论。"
 KEY = "claim_publication"
@@ -28,9 +29,21 @@ class PublishedSource(BaseModel):
     artifact_id: str
     title: str = ""
     url: str = ""
+    source_kind: str = "unknown"
+    document_type: str = "unknown"
+    status: str = "unverified"
+    status_reason: str = ""
+    identity_status: str = "missing"
+    identity_provenance: dict = Field(default_factory=dict)
+    publication_state: str = "unknown"
+    peer_review_status: str = "unknown"
+    relevance_status: str = "unknown"
+    evidence_scope: str = "unknown"
+    temporal_validity: str = "unknown"
+    contradiction_status: str = "unknown"
 
 class Publication(BaseModel):
-    schema_version: Literal["1.0", "2.0", "2.1"] = "2.1"
+    schema_version: Literal["1.0", "2.0", "2.1", "2.2"] = "2.2"
     status: Literal["unverified", "traceability_checked", "partial", "withheld"]
     content: str
     content_sha256: str
@@ -43,6 +56,8 @@ class Publication(BaseModel):
     audit_status: Literal["completed", "disabled", "unavailable", "no_cited_claims"] = "disabled"
     warnings: list[str] = Field(default_factory=list)
     reason_code: str = "publication_complete"
+    # Additive metadata.  Historical reports omit this field and remain valid.
+    evidence_grounding: EvidenceGroundingV1 | None = None
 
     def metadata(self) -> dict:
         return {KEY: self.model_dump(mode="json")}
@@ -63,8 +78,8 @@ class SourceCollector:
             copied = {**source, "index": index}
             existing = self.sources.get(index)
             if existing is not None:
-                a = {(x.paper_id,x.artifact_id) for x in source_artifacts(existing)}
-                b = {(x.paper_id,x.artifact_id) for x in source_artifacts(copied)}
+                a = {(x.paper_id, x.artifact_id) for x in source_artifacts(existing) if x}
+                b = {(x.paper_id, x.artifact_id) for x in source_artifacts(copied) if x}
                 if paper_identity(existing) != paper_identity(copied) or a != b:
                     self.ambiguous.add(index)
             else:
@@ -116,33 +131,43 @@ def _render_report_v2(body: str, sources: list[PublishedSource]) -> str:
         return ", ".join(f"[{n}]({urls[n]})" for n in numbers)
     # Only format citations in answer prose. Bibliography entry labels (including
     # grouped [1, 2] labels) must stay intact for RIS/BibTeX/Quarto parsers.
-    for claim in reversed(extract_report_claims(body)):
+    for claim in reversed(extract_legacy_report_claims(body)):
         if claim.citations:
             body = (body[:claim.report_start] + CITE_RE.sub(hyperlink, claim.text)
                     + body[claim.report_end:])
     return body
 
 
-def publish_report(draft: str, sources: list[dict], model=None, cfg: VerifyConfig | None=None) -> Publication:
+def publish_report(draft: str, sources: list[dict], model=None, cfg: VerifyConfig | None=None, *,
+                   research_spec=None, writer_context=None, pending_findings=None,
+                   proposed_changes=None) -> Publication:
     with start_trace("publication") as trace:
         if trace:
             trace.record("publication_input", {"text": draft, "text_sha256": text_digest(draft),
                          "sources": source_snapshot(sources)})
-        result = _publish_report(draft, sources, model, cfg)
+        result = _publish_report(draft, sources, model, cfg,
+                                 research_spec=research_spec,
+                                 writer_context=writer_context,
+                                 pending_findings=pending_findings,
+                                 proposed_changes=proposed_changes)
         trace.record("publication_output", {"text": result.content,
                      "input_text_sha256": text_digest(draft),
                      "text_sha256": result.content_sha256,
                      "sources": [source.model_dump() for source in result.sources],
                      "warnings": result.warnings, "audit_status": result.audit_status})
+        if result.evidence_grounding is not None:
+            trace.record("evidence_grounding", result.evidence_grounding.model_dump(mode="json"))
         return result
 
 
-def _publish_report(draft: str, sources: list[dict], model=None, cfg: VerifyConfig | None=None) -> Publication:
+def _publish_report(draft: str, sources: list[dict], model=None, cfg: VerifyConfig | None=None, *, _schema_version="2.2",
+                    research_spec=None, writer_context=None, pending_findings=None,
+                    proposed_changes=None) -> Publication:
     """Number/link citations and optionally audit; no semantic rewriting or QC gate."""
-    from .source_identity import reconcile_identities
+    from .source_identity import classify_source, reconcile_identities
     collector = SourceCollector(reconcile_identities(sources))
     selected, warnings, identities = [], [], {}
-    order = cited_indices(draft)
+    order = cited_indices(draft) if _schema_version == "2.2" else legacy_cited_indices(draft)
     missing = {index for index in order if collector.find_by_index(index) is None}
     next_index = 1
     for index in order:
@@ -158,12 +183,26 @@ def _publish_report(draft: str, sources: list[dict], model=None, cfg: VerifyConf
         while next_index in missing:
             next_index += 1
         artifacts = source_artifacts(source)
+        artifact = next((item for item in artifacts if item is not None), None)
+        provenance = classify_source(source)
         published = PublishedSource(
             index=next_index, original_indices=[index], paper_id=identity,
-            artifact_id=artifacts[0].artifact_id if artifacts else "",
+            artifact_id=artifact.artifact_id if artifact else "",
             title=str(source.get("title") or source.get("name") or ""),
             url=safe_url(source.get("link") or source.get("url") or
-                         (artifacts[0].source_url if artifacts else "")),
+                         (artifact.source_url if artifact else "")),
+            source_kind=str(provenance.get("source_kind") or "unknown"),
+            document_type=str(provenance.get("document_type") or "unknown"),
+            status=str(provenance.get("publication_status") or "unverified"),
+            status_reason=str(provenance.get("publication_status_reason") or ""),
+            identity_status=str(provenance.get("identity_status") or "missing"),
+            identity_provenance=provenance.get("identity_provenance") or {},
+            publication_state=str(provenance.get("publication_state") or "unknown"),
+            peer_review_status=str(provenance.get("peer_review_status") or "unknown"),
+            relevance_status=str(provenance.get("relevance_status") or "unknown"),
+            evidence_scope=str(provenance.get("evidence_scope") or "unknown"),
+            temporal_validity=str(provenance.get("temporal_validity") or "unknown"),
+            contradiction_status=str(provenance.get("contradiction_status") or "unknown"),
         )
         selected.append(published)
         identities[identity] = published
@@ -188,11 +227,22 @@ def _publish_report(draft: str, sources: list[dict], model=None, cfg: VerifyConf
     except Exception:
         audit_status = "unavailable"
         warnings.append("citation_audit_error")
-    content = render_report(draft, selected)
-    return Publication(status="unverified", content=content, content_sha256=digest(content),
+    content = (render_report_current if _schema_version == "2.2" else render_report)(draft, selected)
+    grounding = build_evidence_grounding(draft, list(collector.sources.values()), checks=checks,
+                                         research_spec=research_spec,
+                                         writer_context=writer_context,
+                                         pending_findings=pending_findings,
+                                         proposed_changes=proposed_changes,
+                                         review={
+                                             "status": "completed" if audit_status == "completed" else "not_run",
+                                             "failure_reasons": [] if audit_status == "completed" else [audit_status],
+                                             "reviewed_claim_ids": [], "skipped_claim_ids": [],
+                                         })
+    return Publication(schema_version=_schema_version, status="unverified", content=content, content_sha256=digest(content),
                        report_body=draft, sources=selected, citation_audit=checks,
                        audit_status=audit_status, warnings=warnings,
-                       reason_code="report_preserved")
+                       reason_code="report_preserved",
+                       evidence_grounding=grounding)
 
 
 def render_content(body: str, sources: list[PublishedSource], revision: RevisionResult) -> str:
@@ -226,15 +276,17 @@ def presentation_for_publication(publication: Publication) -> Publication:
                     doi=source.paper_id[4:] if source.paper_id.startswith("doi:") else None,
                     pmid=source.paper_id[5:] if source.paper_id.startswith("pmid:") else None)
                for source in publication.sources for old in source.original_indices]
-    return publish_report(publication.report_body, sources, cfg=VerifyConfig(enable_verify=False))
+    return _publish_report(publication.report_body, sources, cfg=VerifyConfig(enable_verify=False), _schema_version="2.1")
 
 
 def validate_publication(content: str, metadata: dict | None) -> Publication:
     """Validate serialization integrity; advisory verdicts never authorize report content."""
     publication=Publication.model_validate((metadata or {}).get(KEY))
+    if publication.evidence_grounding is not None:
+        EvidenceGroundingV1.model_validate(publication.evidence_grounding)
     if content!=publication.content or digest(content)!=publication.content_sha256:
         raise ValueError("publication_content_mismatch")
-    if publication.schema_version in {"2.0", "2.1"}:
+    if publication.schema_version in {"2.0", "2.1", "2.2"}:
         if publication.status != "unverified" or publication.revision is not None or publication.verified_body:
             raise ValueError("advisory_publication_state_mismatch")
         indices = [source.index for source in publication.sources]
@@ -242,8 +294,8 @@ def validate_publication(content: str, metadata: dict | None) -> Publication:
             raise ValueError("duplicate_source_index")
         cited = {int(n) for m in CITE_RE.finditer(publication.report_body)
                  for n in re.split(r"\s*,\s*", m.group(1))}
-        if publication.schema_version == "2.1":
-            cited = set(cited_indices(publication.report_body))
+        if publication.schema_version in {"2.1", "2.2"}:
+            cited = set((cited_indices if publication.schema_version == "2.2" else legacy_cited_indices)(publication.report_body))
             originals = [old for source in publication.sources for old in source.original_indices]
             if len(originals) != len(set(originals)) or not set(originals) <= cited:
                 raise ValueError("uncited_source_mapping")
@@ -251,7 +303,7 @@ def validate_publication(content: str, metadata: dict | None) -> Publication:
             raise ValueError("uncited_source_mapping")
         if any(source.url != safe_url(source.url) for source in publication.sources):
             raise ValueError("publication_url_invalid")
-        renderer = render_report if publication.schema_version == "2.1" else _render_report_v2
+        renderer = render_report_current if publication.schema_version == "2.2" else render_report if publication.schema_version == "2.1" else _render_report_v2
         if content != renderer(publication.report_body, publication.sources):
             raise ValueError("publication_render_mismatch")
         return publication

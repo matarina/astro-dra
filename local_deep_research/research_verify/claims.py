@@ -18,6 +18,7 @@ _FACT = re.compile(r"\d|\b(?:increases?|decreases?|reduces?|regulates?|causes?|a
 _PURE_ADVICE = re.compile(r"^(?:(?:we\s+)?(?:recommend|suggest)\s+(?:further|additional)\s+(?:research|studies)|(?:建议|推荐)(?:开展)?(?:进一步|更多)?(?:研究|验证|实验))[.!。！]?$", re.I)
 _SEPARATOR = re.compile(r"^\s*\|?\s*:?-{3,}:?\s*(?:\|\s*:?-{3,}:?\s*)+\|?\s*$")
 _ABBREVIATIONS = {"e.g", "i.e", "et al", "dr", "mr", "mrs", "fig", "vs", "al"}
+_URL = re.compile(r"https?://[^\s<>]+", re.I)
 
 
 @dataclass
@@ -31,9 +32,13 @@ class Claim:
 
 
 def _sentences(text: str):
+    protected_urls = [(match.start(), match.end()) for match in _URL.finditer(text)]
     begin, pos = 0, 0
     while pos < len(text):
         char = text[pos]
+        if any(start <= pos < end for start, end in protected_urls):
+            pos += 1
+            continue
         if char not in ".!?。！？":
             pos += 1
             continue
@@ -68,7 +73,8 @@ def _sentences(text: str):
         yield begin, len(text)
 
 
-def extract_report_claims(report: str) -> list[Claim]:
+def extract_legacy_report_claims(report: str) -> list[Claim]:
+    """Frozen pre-2.2 serialization behavior; not used for new report routing."""
     lines = report.splitlines(keepends=True)
     offsets, position = [], 0
     for line in lines:
@@ -160,3 +166,60 @@ def extract_report_claims(report: str) -> list[Claim]:
             add(block_start+a, block_start+b)
         index = end_index+1
     return claims
+
+
+def extract_report_claims(report: str) -> list[Claim]:
+    """Keep Markdown roles and exact raw spans; scientific meaning is unknown."""
+    from .report_syntax import layout, citations_in, inline_coordinates
+    blocks, _, env = layout(report, include_env=True)
+    result = []
+    for block in blocks:
+        text = report[block.start:block.end]
+        citations = citations_in(text, env)
+        if block.kind in {"heading_candidate", "table_candidate"}:
+            spans = [(0, len(text))]
+        else:
+            protected = inline_coordinates(text, env)["protected"]
+            spans = []
+            begin, pos = 0, 0
+            while pos < len(text):
+                char = text[pos]
+                if char not in ".!?。！？" or any(a <= pos < b for a,b in protected):
+                    pos += 1
+                    continue
+                if char == ".":
+                    if pos+1 < len(text) and text[pos+1].isdigit() and (not pos or text[pos-1].isdigit() or text[pos-1].isspace()):
+                        pos += 1
+                        continue
+                    if pos+1 < len(text) and text[pos+1].isalpha():
+                        pos += 1
+                        continue
+                    if any(re.search(r"(?:^|\s)"+re.escape(word)+r"$",text[begin:pos].casefold()) for word in _ABBREVIATIONS):
+                        pos += 1
+                        continue
+                end = pos+1
+                while end < len(text) and text[end] in ".!?。！？\"'”’":
+                    end += 1
+                while True:
+                    at = end
+                    while at < len(text) and text[at].isspace():at += 1
+                    following = next((c for c in citations if c.start == at), None)
+                    if following is None:break
+                    end = following.end
+                spans.append((begin,end))
+                begin, pos = end, end
+            if begin < len(text):spans.append((begin,len(text)))
+        for start,end in spans:
+            while start < end and text[start].isspace():start += 1
+            while end > start and text[end-1].isspace():end -= 1
+            value = text[start:end]
+            masked = list(value)
+            cited = []
+            for citation in citations:
+                if start <= citation.start and citation.end <= end:
+                    cited.extend(citation.indices)
+                    masked[citation.start-start:citation.end-start] = " "*(citation.end-citation.start)
+            if not any(c.isalnum() for c in masked):continue
+            result.append(Claim(value, sorted(set(cited)), block.start+start, block.start+end,
+                                block.kind, block.context))
+    return result

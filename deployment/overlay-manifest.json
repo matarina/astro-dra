@@ -10,6 +10,7 @@
   "overlay/scheduler_background.py": "scheduler/background.py",
   "overlay/report_generator.py": "report_generator.py",
   "overlay/quarto_exporter.py": "exporters/quarto_exporter.py",
+  "overlay/ris_exporter.py": "exporters/ris_exporter.py",
   "overlay/search_engine_wayback.py": "web_search_engines/engines/search_engine_wayback.py",
   "overlay/search_engines_config.py": "web_search_engines/search_engines_config.py",
   "overlay/research.js": "web/static/js/components/research.js",
@@ -51,5 +52,7 @@
   "overlay/ui/templates/pages/news-subscription-form.html": "web/templates/pages/news-subscription-form.html",
   "overlay/ui/templates/pages/news.html": "web/templates/pages/news.html",
   "overlay/ui/native/pages/news.js": "web/static/js/pages/news.js",
-  "overlay/ui/astro-subscription-simple.js": "web/static/js/astro-subscription-simple.js"
+  "overlay/ui/astro-subscription-simple.js": "web/static/js/astro-subscription-simple.js",
+  "overlay/utilities/json_utils.py": "utilities/json_utils.py",
+  "overlay/journal_reputation_filter.py": "advanced_search_system/filters/journal_reputation_filter.py"
 }

@@ -260,11 +260,6 @@ class SearchResultsCollector:
             for raw in results:
                 if not isinstance(raw, dict):
                     continue
-                if self._is_preprint_url(raw):
-                    # Keep preprints out of the evidence/citation pool.  The
-                    # source can still be found again through a deliberate
-                    # user request after this policy is made configurable.
-                    continue
                 r = dict(raw)  # shallow copy to avoid mutating engine output
                 duplicate = self._find_duplicate(r)
                 if duplicate is not None:
@@ -1231,6 +1226,57 @@ def _make_research_subtopic_tool(
     return research_subtopic
 
 
+def _make_jcr_tool(collector, settings_snapshot=None):
+    """Expose the vendored jcr_mcp journal search as a model-selected tool."""
+    @tool("search_journal")
+    def search_journal(
+        journal_name: str,
+        minimum_if: float,
+        source_index: int,
+        year: str = "latest",
+        operator: str = ">=",
+    ) -> str:
+        """Search jcr_mcp data and optionally evaluate a paper-bound IF threshold."""
+        try:
+            from research_verify.jcr_adapter import lookup_source
+            source = collector.find_by_index(int(source_index))
+            if source is None:
+                result = {"status": "metric_unavailable",
+                          "missing_reason": "source_index_not_found",
+                          "source_index": source_index,
+                          "minimum_if": minimum_if,
+                          "threshold_operator": operator}
+            else:
+                result = lookup_source(source, minimum=minimum_if,
+                                       operator=operator, year=year)
+                result["source_index"] = int(source_index)
+                source["_jcr_check"] = result
+                source["jcr_check_status"] = result.get("status")
+                source["jcr_provenance"] = {
+                    "source": "jcr_mcp",
+                    "metric_year": result.get("metric_year"),
+                    "metric_source": result.get("metric_source"),
+                    "source_url": result.get("source_url"),
+                    "status": result.get("status"),
+                    "missing_reason": result.get("missing_reason"),
+                    "requested_minimum_if": result.get("minimum_if"),
+                    "threshold_operator": result.get("threshold_operator"),
+                }
+                if result.get("status") == "found":
+                    source["impact_factor"] = result.get("impact_factor")
+                    source["metric_year"] = result.get("metric_year")
+                    source["passes_threshold"] = result.get("passes_threshold")
+            return json.dumps(result, ensure_ascii=False, sort_keys=True)
+        except Exception as exc:
+            logger.warning("jcr_mcp tool failed: %s", type(exc).__name__)
+            return json.dumps({"status": "metric_unavailable",
+                               "missing_reason": "jcr_mcp_tool_failed",
+                               "error_type": type(exc).__name__},
+                              ensure_ascii=False, sort_keys=True)
+
+    return search_journal
+
+
 # ---------------------------------------------------------------------------
 # Strategy class
 # ---------------------------------------------------------------------------
@@ -1278,6 +1324,12 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             else DEFAULT_MAX_ITERATIONS
         )
         self.max_sub_iterations = int(max_sub_iterations)
+        # Detailed-report subsection research deliberately uses a short
+        # bounded pass.  Keep this opt-in so normal user research retains the
+        # minimum iteration budget while report generation cannot silently
+        # expand a requested one-step pass back to the default 50 rounds.
+        self._allow_short_runs = False
+        self._run_deadline = None
         self.include_sub_research = include_sub_research
         self.citation_handler = citation_handler or CitationHandler(
             model,
@@ -1298,6 +1350,14 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         self.collector = SearchResultsCollector(
             self.all_links_of_system, max_results=self.max_unique_sources
         )
+        # The final citation writer may need to make its own model-selected
+        # source-bound JCR lookup.  Keep the factory on the writer handler so
+        # it uses the same collector/index space as the research agent.
+        writer_handler = getattr(self.citation_handler, "_handler", self.citation_handler)
+        if hasattr(writer_handler, "set_writer_jcr_tool_factory"):
+            writer_handler.set_writer_jcr_tool_factory(
+                lambda: _make_jcr_tool(self.collector, self.settings_snapshot)
+            )
         # research_verify: last parsed constraint (set by _attach_constraint_match)
         self._constraint_spec = None
         self._keyword_spec = None
@@ -1869,6 +1929,16 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             )
         )
 
+        # jcr_mcp is exposed only for an explicit IF/JIF request. Its required
+        # source_index and minimum_if fields make a paper-bound check explicit
+        # instead of allowing an unbound journal lookup into the writer.
+        try:
+            from research_verify.research_spec import parse_if_constraint
+            if parse_if_constraint(overall_query)[0] is not None:
+                tools.append(_make_jcr_tool(self.collector, self.settings_snapshot))
+        except Exception:
+            logger.debug("jcr_mcp tool unavailable", exc_info=True)
+
         # Subagent research tool — only when the toolbox already holds at
         # least one real research tool. Subagents are gated on the same
         # search/fetch/egress state as the lead, so with nothing else here
@@ -1989,6 +2059,31 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                 "agent will see the unmodified prompt"
             )
 
+        has_explicit_if_condition = False
+        if_minimum = None
+        if_operator = None
+        if "search_journal" in self._tool_names:
+            try:
+                from research_verify.research_spec import parse_if_constraint
+                if_minimum, if_operator = parse_if_constraint(query)
+                has_explicit_if_condition = if_minimum is not None
+            except Exception:
+                has_explicit_if_condition = False
+        if_routing_line = (
+            "IF/JIF ROUTING: The user request contains an explicit journal "
+            f"impact-factor condition (minimum_if={if_minimum}, operator={if_operator}). "
+            "After search returns a candidate source, call "
+            "search_journal with journal_name, year, minimum_if="
+            f"{if_minimum}, operator={if_operator}, and citation source_index [N]. "
+            "source_index and minimum_if are required for threshold claims: "
+            "a journal-only lookup is not a paper-level check. The tool writes "
+            "its jcr_mcp result into the source metadata used by the "
+            "writer. If no candidate source identity is available, report IF "
+            "as unverified; do not invent a journal name or claim the requested "
+            "count was satisfied.\n"
+            if has_explicit_if_condition else ""
+        )
+
         system_prompt = (
             f"You are a research assistant writing a research report. Today's date: {current_date}.\n"
             "This is NOT a chat conversation. Your only job is to research the "
@@ -2013,6 +2108,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             "factor or publication status unless a source explicitly states it. "
             "If the sources do not establish a claim, say that it could not be "
             "verified and omit the claim rather than guessing.\n"
+            f"{if_routing_line}"
             "6. When you have enough information, provide a comprehensive answer "
             "citing sources as [1], [2], etc. Keep each citation close to the "
             "claim it supports; one citation must not be used to imply support "
@@ -2048,7 +2144,8 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             )
 
         # Stream agent execution
-        effective_max = max(MIN_ITERATIONS, self.max_iterations)
+        minimum_iterations = 1 if getattr(self, "_allow_short_runs", False) else MIN_ITERATIONS
+        effective_max = max(minimum_iterations, self.max_iterations)
         config = {"recursion_limit": effective_max * 2 + 1}
         iteration = 0
         final_content = ""
@@ -2061,6 +2158,22 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                 stream_mode="updates",
             ):
                 self.check_termination(CHECK_CONTEXT_AGENT_STREAM)
+
+                run_deadline = getattr(self, "_run_deadline", None)
+                if run_deadline is not None and time.monotonic() >= run_deadline:
+                    logger.warning(
+                        "LangGraph agent subsection deadline reached; synthesizing partial results"
+                    )
+                    self._update_progress(
+                        "Subsection time limit reached; synthesizing partial results",
+                        min(85, 10 + int((iteration / effective_max) * 75)),
+                        {
+                            "phase": "agent_timeout",
+                            "iteration": iteration,
+                            "effective_max_iterations": effective_max,
+                        },
+                    )
+                    break
 
                 if "agent" in chunk or "model" in chunk:
                     node_key = "agent" if "agent" in chunk else "model"
@@ -2253,58 +2366,60 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         agent_messages: list,
     ) -> Dict[str, Any]:
         """Apply citation handling and build the return dict."""
-        all_search_results = self.collector.results
+        from research_verify.source_collection import sources_for_draft
+        all_search_results, source_recovery = sources_for_draft(
+            self.collector.results, self.all_links_of_system, final_answer
+        )
+        self._source_recovery = source_recovery
+        from research_verify.research_spec import format_research_spec, parse_research_spec, report_spec_settings
+        research_spec = parse_research_spec(query, report_spec_settings(self.get_setting))
+        self._research_spec = research_spec
+        field_evidence_preparation = {"status": "not_requested"}
+        if research_spec.output_mode == "field_extraction" and research_spec.requested_fields:
+            try:
+                from research_verify.source_evidence import prepare_selected_evidence
+                field_evidence_preparation = prepare_selected_evidence(
+                    all_search_results,
+                    limit=min(research_spec.requested_count or 6, 20),
+                    egress_context=(
+                        self._build_egress_context()
+                        if hasattr(self, "_build_egress_context") else None
+                    ),
+                )
+                from research_verify.evidence_cards import build_source_cards
+                field_evidence_preparation["cards"] = build_source_cards(
+                    all_search_results[:min(research_spec.requested_count or 6, 20)],
+                    requested_fields=research_spec.requested_fields,
+                )
+            except Exception as exc:
+                field_evidence_preparation = {
+                    "status": "unavailable",
+                    "error_type": type(exc).__name__,
+                }
+        self._field_evidence_preparation = field_evidence_preparation
 
         # --- research_verify: requirement 1 (DOI/PMID authenticity) --------
         # Runs on the deduplicated result set only; never blocks the report.
         self._attach_doi_verification(all_search_results)
 
         # --- research_verify: requirement 2 (year/IF/language constraints) --
-        constraint_all_excluded = self._attach_constraint_match(
-            query, all_search_results
-        )
+        # Constraint matching is an advisory scope annotation.  It must never
+        # turn a search miss into a publication gate or an instruction to
+        # suppress otherwise useful evidence.
+        self._attach_constraint_match(query, all_search_results)
 
-        # A subsection call in detailed-report mode can answer purely
-        # from previously-written sections without running new searches,
-        # leaving the per-call collector empty. The citation pass below
-        # is then skipped and the section is saved as raw agent prose
-        # even though ## Sources renders the full accumulated bibliography
-        # (#4969). Running the pass against all_links_of_system instead is
-        # NOT safe as-is: the widened prompt overflows default local-model
-        # context windows, the rewrite has no structure-preservation
-        # guarantees, and the empty-collector condition is also reachable
-        # from chat follow-ups. Until that is redesigned, make the skip
-        # loud and report whether the raw answer already contains markers.
-        if (
-            not all_search_results
-            and self.all_links_of_system
-            and final_answer != NO_RESULTS_MESSAGE
-        ):
-            existing_markers = re.findall(
-                r"\[\d+(?:\s*,\s*\d+)*\]", final_answer or ""
-            )
-            if existing_markers:
-                logger.warning(
-                    f"Citation pass skipped: no new sources collected in "
-                    f"this call although {len(self.all_links_of_system)} "
-                    f"are accumulated; the raw answer already contains "
-                    f"{len(existing_markers)} inline [N] marker(s) and "
-                    f"will be preserved as-is (#4969, query "
-                    f"'{query[:80]}')"
-                )
-            else:
-                logger.warning(
-                    f"Citation pass skipped: no new sources collected in "
-                    f"this call although {len(self.all_links_of_system)} "
-                    f"are accumulated, and the raw answer contains no "
-                    f"inline [N] markers (#4969, query '{query[:80]}')"
-                )
+        # Reuse only explicitly cited prior records. Missing/ambiguous labels
+        # stay unresolved; neither the whole archive nor a guessed source is
+        # substituted for them. Existing native source budgets still apply.
+        if source_recovery["missing_ids"] or source_recovery["ambiguous_ids"]:
+            logger.warning("Draft source lookup unresolved: missing={}, ambiguous={}",
+                           source_recovery["missing_ids"], source_recovery["ambiguous_ids"])
 
         # Emit synthesis milestone if it is not an agent failure
         if final_answer != NO_RESULTS_MESSAGE:
             if not all_search_results and self.all_links_of_system:
                 self._update_progress(
-                    f"Skipping citation synthesis (reusing {len(self.all_links_of_system)} accumulated sources)",
+                    "No supplied source resolves the draft citations; preserving the draft",
                     90,
                     {
                         "phase": "synthesis",
@@ -2339,8 +2454,10 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         # Citation handling — only if we have results
         if all_search_results:
             try:
+                scope_data = format_research_spec(research_spec)
+                writer_query = query + ("\n\n" + scope_data if scope_data else "")
                 citation_result = self.citation_handler.analyze_followup(
-                    query,
+                    writer_query,
                     all_search_results,
                     previous_knowledge=final_answer,
                     nr_of_links=nr_of_links,
@@ -2381,26 +2498,12 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                 json.dumps(published_sources, sort_keys=True, ensure_ascii=False).encode()
             ).hexdigest()
 
-        # --- research_verify: append verification evidence section ---------
-        verify_parts = []
-        if constraint_all_excluded:
-            verify_parts.append(
-                "### 条件匹配提示\n\n"
-                "> 当前未找到完全满足这些条件的文献，未放宽条件填充。"
-            )
-        constraint_section = self._render_constraint_section(all_search_results)
-        if constraint_section:
-            verify_parts.append(constraint_section)
-        keyword_section = self._render_keyword_section(all_search_results)
-        if keyword_section:
-            verify_parts.append(keyword_section)
-        verify_section = self._render_verify_section(all_search_results)
-        if verify_section:
-            verify_parts.append(verify_section)
-        verify_block = "\n\n".join(verify_parts)
+        # Keep scope, keyword, identity, and optional fact-consistency results
+        # in trace/metadata only.  The current biomedical flow deliberately
+        # does not append rule-driven verification tables to the report body.
+        # The renderer methods remain available for explicit diagnostics and
+        # backwards-compatible callers, but are not part of publication text.
         current_knowledge = checked_content
-        if verify_block:
-            current_knowledge = f"{current_knowledge}\n\n{verify_block}"
         if isinstance(getattr(self, "_citation_audit", None), dict):
             self._citation_audit["sealed_content_sha256"] = hashlib.sha256(current_knowledge.encode()).hexdigest()
         formatted_output = self._format_citations(
@@ -2449,8 +2552,15 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                     self, "_citation_audit", {"status": "unverifiable"}
                 ),
                 "sources_for_publication": published_sources,
+                "research_spec": research_spec.as_dict(),
+                "field_evidence_preparation": field_evidence_preparation,
+                "source_recovery": source_recovery,
             },
-            "sources": list(set(self.collector.sources)),
+            "sources": list(dict.fromkeys([
+                *self.collector.sources,
+                *(source.get("link") or source.get("url") for source in all_search_results
+                  if source.get("link") or source.get("url")),
+            ])),
             "search_results": all_search_results,
             "documents": documents,
             "reasoning_trace": reasoning_trace,
@@ -2552,8 +2662,8 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         """Requirement 2: parse user constraints and match each source.
 
         Writes ``_constraint`` / ``_constraint_badge`` onto each source and
-        returns ``True`` when every source was excluded by hard constraints
-        (so the report can state that no fully-matching paper was found).
+        The result is an advisory annotation only.  It never removes a source,
+        changes the report body, or creates a publication gate.
         """
         try:
             from research_verify import get_config
@@ -2570,13 +2680,13 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             return False
 
         try:
-            matcher = ConstraintMatcher(cfg, model=getattr(self, "model", None))
-            settings = {
-                "year_from": self.get_setting("report.year_from", None),
-                "year_to": self.get_setting("report.year_to", None),
-                "min_if": self.get_setting("report.min_if", None),
-                "language": self.get_setting("report.language", None),
-            }
+            from research_verify.research_spec import report_spec_settings
+            matcher = ConstraintMatcher(cfg)
+            settings = report_spec_settings(self.get_setting)
+            # Journal metrics are selected by the jcr_mcp tool. Finalization
+            # only records tool-produced annotations and does not infer a
+            # journal constraint from prompt text.
+            settings["min_if"] = None
             constraint = matcher.parse(query, settings)
             if constraint.is_empty:
                 return False
@@ -2585,26 +2695,42 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             logger.warning(f"constraint_match skipped: {exc}")
             return False
 
-        excluded = 0
+        flagged = 0
         for idx, m in matches.items():
             src = self.collector.find_by_index(idx)
             if src is None:
                 continue
             src["_constraint"] = m.model_dump()
+            if m.detail.get("jcr_check"):
+                src["_jcr_check"] = m.detail["jcr_check"]
+                result = m.detail["jcr_check"]
+                if result.get("status") == "found" and result.get("impact_factor") is not None:
+                    src["impact_factor"] = result.get("impact_factor")
+                    src["metric_year"] = result.get("metric_year")
+                    src["passes_threshold"] = result.get("passes_threshold")
+                    src["jcr_provenance"] = {
+                        "source": "jcr_mcp",
+                        "metric_year": result.get("metric_year"),
+                        "metric_source": result.get("metric_source"),
+                        "source_url": result.get("source_url"),
+                        "status": result.get("status"),
+                    }
             if m.excluded:
-                src["_constraint_badge"] = "❌不符合条件"
-                excluded += 1
+                src["_constraint_badge"] = "⚠️范围外/需复核"
+                flagged += 1
             elif m.if_unknown:
-                src["_constraint_badge"] = "⚠️IF未收录"
+                src["_constraint_badge"] = "⚠️JCR metric unavailable"
             elif m.detail.get("pending"):
                 src["_constraint_badge"] = "❓条件待核验"
             else:
                 src["_constraint_badge"] = "✅满足条件"
         self._constraint_spec = constraint
         logger.info(
-            f"constraint_match: {excluded}/{len(matches)} sources excluded"
+            f"constraint_match: {flagged}/{len(matches)} sources flagged for scope review"
         )
-        return bool(matches) and excluded == len(matches)
+        # Keep the historical return type for callers outside this class, but
+        # do not expose an all-excluded gate to finalization.
+        return False
 
     @staticmethod
     def _render_constraint_section(sources: list[dict]) -> str:
@@ -2612,7 +2738,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         if not rows:
             return ""
         lines = [
-            "### 条件匹配核验",
+            "### 条件范围提示（仅供写作参考）",
             "",
             "| # | 期刊 | 年份 | IF | 结论 | 说明 |",
             "|---|------|------|----|------|------|",
@@ -2626,7 +2752,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             if m.get("if_unknown"):
                 notes.append("期刊IF未收录")
             if m.get("hard_violations"):
-                notes.append("越界:" + ",".join(m["hard_violations"]))
+                notes.append("范围提示:" + ",".join(m["hard_violations"]))
             if detail.get("pending"):
                 notes.append("待核验:" + ",".join(detail["pending"]))
             journal = str(s.get("journal", ""))[:40].replace("|", "/")
@@ -2639,10 +2765,13 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
     def _attach_citation_qc(
         self, report_text: str, sources: list[dict]
     ) -> tuple[str, list]:
-        """Requirement 4: judge claim support and append the QC section.
+        """Run the legacy citation check only as optional metadata.
 
-        Returns ``(report_text, checks)``. Appends a '结论可溯源性核查'
-        section and writes a JSON audit file next to the app logs.
+        Returns ``(report_text, checks)``.  The current LDR flow keeps the
+        generated body intact and does not append a body checklist or replace
+        it with a withheld/error message.  Production disables this legacy
+        audit; if an operator explicitly enables it for diagnostics, its
+        result is stored outside the answer text.
         """
         self._citation_checks = []
         self._citation_evidence_sources = sources
@@ -2655,7 +2784,11 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             from research_verify.citation_qc import CitationQc
         except Exception as exc:
             logger.warning(f"research_verify import failed: {exc}")
-            return "结论核验模块不可用，未发布未经核验的研究正文。", []
+            self._citation_audit = {
+                "status": "unavailable",
+                "reason_code": "qc_import_error",
+            }
+            return report_text, []
 
         cfg = get_config()
         if not cfg.enable_verify or not cfg.module_enabled("citation_qc"):
@@ -2685,18 +2818,10 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             self._citation_evidence_sources = qc.source_snapshot.records()
             self._citation_publication_sources = publication_sources(self._citation_evidence_sources)
             checks = result.original_checks
-            sections = [
-                result.content,
-                qc.render_paper_section(result.paper_checks),
-                qc.render_section(checks),
-            ]
-            out = "\n\n".join(section for section in sections if section)
             self._citation_audit = result.model_dump(exclude={"content"})
-            self._citation_audit["verified_body_chars"] = len(result.content)
+            self._citation_audit["verified_body_chars"] = len(report_text)
             self._citation_audit["evidence_preparation"] = evidence_preparation
-            self._citation_audit["rendered_content_sha256"] = hashlib.sha256(
-                out.encode()
-            ).hexdigest()
+            self._citation_audit["rendered_content_sha256"] = hashlib.sha256(report_text.encode()).hexdigest()
             self._citation_audit["source_metadata_sha256"] = hashlib.sha256(
                 json.dumps(self._citation_publication_sources, sort_keys=True, ensure_ascii=False).encode()
             ).hexdigest()
@@ -2710,11 +2835,13 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                 f"citation_qc: judged {len(checks)} claims "
                 f"({sum(1 for c in checks if c.verdict == 'unsupported')} unsupported)"
             )
-            return out, checks
+            # The audit is advisory metadata. Never rewrite or withhold the
+            # generated answer at this boundary.
+            return report_text, checks
         except Exception as exc:
             logger.warning("citation_qc failed: {}", type(exc).__name__)
             self._citation_audit = {"status": "unverifiable", "reason_code": "qc_error"}
-            return "结论核验未完成，未发布未经核验的研究正文。", []
+            return report_text, []
 
     @staticmethod
     def _write_citation_qc_json(checks: list, audit: dict | None = None) -> str | None:
@@ -2757,14 +2884,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                     continue
                 cov = kc.compute(src, keywords)
                 src["_keyword_cov"] = cov.model_dump()
-                if cov.threshold_ok:
-                    src["_keyword_badge"] = "✅达标"
-                else:
-                    src["_keyword_badge"] = (
-                        "⚠️不达标(未验证全文)"
-                        if cov.basis != "fulltext"
-                        else "⚠️不达标"
-                    )
+                src["_keyword_badge"] = f"词面命中 {len(cov.hits)}/{cov.total}（非相关性判断）"
             self._keyword_spec = keywords
             logger.info(f"keyword_coverage: keywords={keywords}")
         except Exception as exc:

@@ -1,0 +1,50 @@
+# Markdown roles and citation preservation — 2026-11-11, undeployed
+
+The candidate removes scientific-word selection and nonbibliographic section suppression from the default claim/citation path. Ordinary findings headings no longer hide their prose citations. This repairs syntax/routing failures; it does not establish scientific support or better research reports.
+
+## Implementation
+
+`report_syntax.py` uses the application image's existing markdown-it-py 4.2.0 to identify CommonMark blocks and protected inline syntax. [The parser documentation](https://markdown-it-py.readthedocs.io/en/latest/using.html) and [CommonMark 0.31.2](https://spec.commonmark.org/0.31.2/) distinguish headings, code, links and references structurally. No dependency is installed or upgraded. Inline rule spans are captured before newline normalization, so CRLF/raw source coordinates remain valid. Balanced numeric `[N]`, `[[N]]`, `【N】`, grouped labels and complete numeric Markdown links are constrained syntax. Ordinary link destinations, images, escaped brackets, code and link-reference definitions cannot create citation IDs. URL punctuation does not split a prose unit inside the URL.
+
+Only exact conventional bibliography labels establish that serialized section role. “Detailed Findings,” audit/metrics headings and scientific/copula words do not decide meaning. Default `extract_report_claims` preserves headings, tables, prose questions and recommendations as structural candidates with unknown scientific meaning. It does not claim all are empirical. The native reviewer receives cited headings; other headings remain context. More candidates can increase reviewer work, false alarms and latency, which are not measured with a model in this round.
+
+Citation lookup/formatting uses explicit citation spans, independently of scientific candidate classification. The current-plus-uniquely-cited archive recovery still preserves all current sources, unresolved IDs and ambiguous records, without guessing URLs or expanding the whole archive. New rendering changes known citation/entry numbers and URLs while preserving supplied bibliography wording and unmatched entries. Existing duplicate or incorrect bibliography text is not independently validated; preserving it can leave duplication for a later structured-export treatment. No scientific text is deleted to improve an audit score.
+
+New reports use serialization **2.2**. Stored 2.0/2.1 rendering/order use frozen legacy extraction, and read-only 2.0 presentation retains its previous 2.1 compatibility path. No migration or historical database/report edit occurs. The old lexical code remains specifically for serialization compatibility; the optional legacy `CitationQc` path also retains old heuristics and remains disabled at save time. This does not claim all legacy behavior is correct. Rollback before deployment is a code reversal; a future deployment that writes 2.2 data must retain a reader capable of that version.
+
+## Preserved comparison
+
+Before editing, save the complete current 162-file application/deployment/test snapshot and 24 constrained syntax/routing cases. Cases are implementing-agent contracts, not independent scientific gold. Two previously inspected real biomedical abstracts are added as routing fixtures after the initial syntax freeze; no prospective source-quality claim is made. Candidate has 165 files including the new module, test and fixture. Install each frozen arm offline in the same image; execute actual citation parsing, native review-unit construction, source recovery, publication and validation. No model or network calls occur.
+
+| Component endpoint | Baseline | Candidate |
+|---|---:|---:|
+| Predeclared citation-ID contracts | 10/24 | 24/24 |
+| Exact original candidate coordinates and collector/archive preservation | 24/24 | 24/24 |
+| Native review units | 22 | 28 |
+| Report body retained; publication unverified/audit disabled | 24/24 | 24/24 |
+| Pre-round 2.1 publications validated without mutation by candidate | Reference 24 fixtures | 24/24 |
+| New serialization version | 2.1 | 2.2 |
+
+The cases include ordinary/detailed/plain headings, tables, nested/Setext/plain/bold reference sections, long fences, indented/inline code, escapes, numeric link destinations, images, reference definitions, comments, CRLF and Unicode text. Further checks cover malformed labels, reference links, source recovery with unresolved IDs, cited headings, recommendations and preservation of unmatched bibliography text. These are mechanical roles/coordinates, not citation entailment, scientific recall or hallucination accuracy. Known bibliography metadata remains separate from original supplied wording.
+
+Candidate selected tests: **229 passed, 37 failed**. Baseline: **198 passed, the same 37 named failures**. The candidate adds 31 checks. Expanded publication tests expose twelve shared failures beyond the previously recorded 25, mostly old enabled-audit expectations and an incomplete AST fixture. They remain red; no audit is enabled to satisfy them. Initial candidate had five additional failures because three existing test functions expected bibliography replacement/deletion. Those five parameterized cases now assert original-text preservation, canonical first-use source mapping and unchanged code instead. Their original logs and policy correction remain preserved. A grouped-alias label correction keeps all metadata while normalizing known numbers.
+
+The separate actual storage/export script fails in **both** arms at its Quarto bibliography URL assertion. Diagnostic output shows identical entries missing `url` fields. The assertion is retained, and later exports/modes are not declared verified. This is a concrete pre-existing export/provenance defect, not a green end-to-end result. All original failures remain available.
+
+## URL sentence-boundary follow-up
+
+The legacy citation renderer still used sentence punctuation inside ordinary URLs as a boundary. A provenance probe exposed this with a `www.10xgenomics.com` URL. The generic fix protects `http` and `https` URL spans while the legacy extractor segments sentences. It preserves the original URL, citation number and character coordinates. A direct 24-case Markdown contract replay plus the URL regression passes. This is a syntax repair only. It does not classify scientific meaning or establish citation support. The broader legacy suite remains at its previously recorded 37 failures.
+
+Subsequent [export follow-up](export-provenance-20261111.md) traces this to an earlier cumulative candidate's metadata-line ordering, not pre-goal HEAD. “Pre-existing” above means before this parser round. The follow-up fixes Quarto/RIS separately and reaches the later temporary storage/export checks without editing stored reports or enabling audits; it does not retroactively change this round's failed result.
+
+See [freeze](../evaluation/markdown-citations-freeze-20261111.json), [results](../evaluation/markdown-citations-results-20261111.json), [probe](../scripts/probe_markdown_citations.py) and [collector](../scripts/collect_markdown_citations.py). Full frozen trees/cases/logs are under `/data1/maxw/ldr-evaluation/markdown-citations-20261111/`. The targeted patch is forward/reverse apply-checked against those trees. The thirty-pair report study uses older code and does not validate this parser candidate. Scientific correctness, real model usefulness/latency and representative robustness remain unproven.
+
+## Fresh medical full-text preparation
+
+Before changing material selection, freeze author-distributed Evidence Inference 2.0 trial texts and independent ICO/result-direction annotations. The [official author repository](https://github.com/jayded/evidence-inference) links its corpus; the HTTPS archive returns 36,528,800 bytes, SHA256 `6abe0d4ec0d331834981c0171c3c79d47515761867f82f1dc6066e43863a1586`. The archive's official ev2 test split and seeded hash order select 18 distinct articles/prompts, six per author-majority direction; all selected votes have strict majorities. Six cases are development and twelve reserved from tuning. No selection is based on generated outputs, all original annotations/disagreements are kept, and generation inputs contain no labels/highlights. This is public old data, not secret or guaranteed model-unseen evaluation. Article population and complete published-paper coverage are not inferred from the benchmark name.
+
+All eighteen saved text files match original archive bytes. Text lengths range 1,642–37,904 characters, so distributed-text completeness still needs consideration. None of the selected prompt IDs is on the archive authors' incorrect/questionable/malformed lists. Thirty-six original annotation rows are preserved; HTML-entity decoding gives a unique literal source match for 35/36. Direct offsets are less reliable: 35 are in bounds, none matches the decoded annotation under the README's declared inclusive-end convention, and 26 match under half-open interpretation. The initial derived `original_offset_text` used half-open slicing; its limitation is explicitly flagged. Original offsets, labels and source bytes are not silently repaired. The remaining annotation stays unresolved, and exact localization would still not prove entailment.
+
+[Pool index and readiness status](../evaluation/medical-fulltext-pool-freeze-20261111.json), [preparer](../scripts/prepare_medical_fulltext_pool.py), private corpus `/data1/maxw/ldr-evaluation/medical-fulltext-pool-20261111/`. Assessment readiness remains pending span-contract reconciliation; no model calls or material-selection changes have occurred. A subsequent experiment must add fresh nonmedical controls before tuning, hold sources/model/budget fixed, compare useful answers and original result directions, retain failures/disagreements, and measure context/cost regressions. Full-text exposure alone cannot prove improved grounding.
+
+No deployment/restart of 5000/5002, production model/source/dependency change, historical report modification or GPU work occurs in this round. Work remains on main with no new branch or commit.

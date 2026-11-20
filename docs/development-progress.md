@@ -158,3 +158,11 @@ main与UI分支HEAD均e9be103，远程main已通过连接器只读核对相同�
 - [M0基础记录](verification-foundation-20261012.md)、[旧严格计划](ldr-verification-engineering-plan.md)：历史依据，不是当前开发路线。
 
 以后每次会话记录修改内容、验证范围、限制、提交/部署（如有）和下一步；不写入密钥、原始用户研究材料或私有全文缓存。详细过程使用单独日期记录，避免本文件再次增长成混合历史。
+
+## 2026-11-20 — current worktree checkpoint
+
+This branch captures the application overlays, deployment configuration, research modules, tests, and experiment tooling from the current worktree at local main base `5a1e2a0`. GitHub main was independently verified at `49501d0`. The branch includes experimental settings and has no associated deployment. The original checkout and its index were preserved.
+
+The checkpoint includes report time bounds, source-bound journal metric lookup, advisory evidence grounding, and isolated evaluation capture tooling. Native fact-consistency checking defaults to on and save-time citation QC defaults to off in this checkout. Client files, generated reports, raw evaluation captures, working logs, and the local JCR database are retained in the source workspace. Journal metric lookups need a separately supplied catalog at `local_deep_research/research_verify/jcr_mcp/jcr.db`.
+
+Validation in the checkpoint worktree covered the deployment manifest, Compose configuration, SearXNG entrypoint syntax, Python parsing, and 108 focused tests with one installed-runtime import test deselected. The original checkout's corresponding run with the local JCR catalog passed 111 tests, with the same deselection. Two catalog-dependent expectations fail in a fresh checkout without that catalog. Full-suite, live pipeline, and scientific report quality validation remain pending. Compare upstream's Nov 15 integrity changes before integrating this checkpoint into main.

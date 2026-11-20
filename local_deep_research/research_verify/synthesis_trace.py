@@ -20,6 +20,12 @@ _research_id = ContextVar("synthesis_trace_research_id", default=None)
 _SENSITIVE = re.compile(r"api[_-]?key|password|secret|authorization|credential|access[_-]?token", re.I)
 _SOURCE_FIELDS = ("index", "title", "link", "url", "doi", "pmid", "pmcid", "journal",
                   "journal_ref", "pubdate", "publication_date", "year", "authors",
+                  "language", "languages", "lang", "platform", "technology",
+                  "population", "sample_size", "groups", "outcome",
+                  "impact_factor", "impact_factor_value", "journal_impact_factor", "jif",
+                  "impact_factor_provenance", "jif_provenance",
+                  "_jcr_check", "jcr_provenance", "jcr_check_status",
+                  "metric_year", "passes_threshold",
                   "abstract", "snippet", "content", "body", "full_content",
                   "fetched_content", "content_type", "evidence_type", "engine", "source_engine",
                   "related_articles", "publication_types", "publication_versions",
@@ -39,6 +45,9 @@ def source_snapshot(sources):
 
 
 def source_ids(text):
+    registry = getattr(text, 'views', None)
+    if isinstance(registry, dict) and registry:
+        return sorted(int(index) for index in registry)
     return [int(n) for n in re.findall(r"^\[(\d+)\]\nTitle:", text, re.M)]
 
 

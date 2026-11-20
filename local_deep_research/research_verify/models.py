@@ -10,7 +10,7 @@ Status vocabularies (never silently pass a bad item):
 * requirement 1 ``VerifyResult.verified`` -- ``True`` / ``False`` / ``None``
   (``None`` == unverified, e.g. offline).
 * requirement 2 ``ConstraintMatch.hard_violations`` -- non-empty means the
-  source must be flagged/dropped for the report's condition.
+  source receives an advisory scope badge; it is never a deletion instruction.
 * requirement 3 ``KeywordCov.threshold_ok`` -- ``False`` means under-covered.
 * requirement 4 ``ClaimCheck.verdict`` -- one of
   ``supported``/``partial``/``unsupported``/``contradicted``/``unverifiable``.
@@ -18,6 +18,7 @@ Status vocabularies (never silently pass a bad item):
 
 from __future__ import annotations
 
+from typing import Literal
 from pydantic import BaseModel, Field
 
 
@@ -26,23 +27,30 @@ class VerifyResult(BaseModel):
 
     doi: str | None = None
     pmid: str | None = None
-    # True = exists & consistent / False = definitively absent / None = unverified
+    # True = same ID returned by provider; metadata comparisons are separate.
+    # False is retained for legacy inputs; current lookup uncertainty is None.
     verified: bool | None = None
     source: str = "unavailable"  # crossref | pubmed | link | unavailable
     title_ok: bool | None = None
     year_ok: bool | None = None
+    journal_ok: bool | None = None
+    authors_ok: bool | None = None
     retracted: bool | None = None
     warnings: list[str] = Field(default_factory=list)
     verified_at: str = ""
+    lookup_status: str = "unreported"
+    record_provenance: dict | None = None
 
 
 class ResearchConstraint(BaseModel):
-    """Parsed user hard-constraints (requirement 2)."""
+    """Parsed user scope constraints used for advisory annotations."""
 
     year_from: int | None = None
     year_to: int | None = None
     min_if: float | None = None
+    if_operator: Literal[">", ">=", "="] = ">="
     min_if_inclusive: bool = True
+    provenance: dict[str, str] = Field(default_factory=dict)
     language: str | None = None
     unresolved: list[str] = Field(default_factory=list)
     is_hard_default: bool = True
@@ -53,7 +61,7 @@ class ResearchConstraint(BaseModel):
 
 
 class ConstraintMatch(BaseModel):
-    """Per-source result of matching against a :class:`ResearchConstraint`."""
+    """Per-source scope annotation; it never authorizes source deletion."""
 
     year_ok: bool | None = None
     if_ok: bool | None = None
@@ -67,6 +75,20 @@ class ConstraintMatch(BaseModel):
         return bool(self.hard_violations)
 
 
+class SourceState(BaseModel):
+    """Orthogonal source states; unknown is preserved instead of inferred."""
+
+    identity_status: str = "missing"
+    source_kind: str = "unknown"
+    document_type: str = "unknown"
+    publication_state: str = "unknown"
+    peer_review_status: str = "unknown"
+    relevance_status: str = "unknown"
+    evidence_scope: str = "unknown"
+    temporal_validity: str = "unknown"
+    contradiction_status: str = "unknown"
+
+
 class KeywordCov(BaseModel):
     """Keyword-coverage statistics for one source (requirement 3)."""
 
@@ -74,7 +96,10 @@ class KeywordCov(BaseModel):
     hits: list[str] = Field(default_factory=list)
     missed: list[str] = Field(default_factory=list)
     coverage: float = 0.0
-    threshold_ok: bool = True
+    threshold_ok: bool | None = None
+    assessment_kind: str = "lexical_overlap"
+    semantic_assessment: str = "not_performed"
+    keyword_provenance: str = "unknown"
     basis: str = "unavailable"  # fulltext | abstract | unavailable
 
 

@@ -1,0 +1,241 @@
+{
+  "schema_version": "adjudicated_claim_regression.v1",
+  "source": "evaluation/archive-claim-review-20261112/human-adjudication-20261112.json",
+  "cases": [
+    {
+      "blind_id": "immune_fixed_source_roles-arm-1",
+      "claim_id": 78,
+      "claim_text": "**分选**：FACS分选 [81]",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_plus_excerpts_methods_unseen",
+      "evidence_links": [
+        "https://www.frontiersin.org/journals/immunology/articles/10.3389/fimmu.2023.1151754/full"
+      ]
+    },
+    {
+      "blind_id": "immune_fixed_source_roles-arm-1",
+      "claim_id": 9,
+      "claim_text": "- **组织来源（人脂肪组织）**：从仅2 g完整人脂肪组织中，通过FACS方案可纯化>10⁴个嗜酸性粒细胞，纯度≥99%，活力≥95%；分离的细胞可进行下游表观遗传分析（如DNA甲基化）[36]。",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_only",
+      "evidence_links": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC7413382/"
+      ]
+    },
+    {
+      "blind_id": "immune_fixed_source_roles-arm-2",
+      "claim_id": 11,
+      "claim_text": "分离的嗜酸性粒细胞可进行表观遗传学分析[36]。",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_only",
+      "evidence_links": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC7413382/"
+      ]
+    },
+    {
+      "blind_id": "immune_fixed_source_roles-arm-2",
+      "claim_id": 8,
+      "claim_text": "- **外周血嗜酸性粒细胞FACS分选**：有文献详细描述了基于FACS的完整方案，用于从外周血中分离完整的未染色人嗜酸性粒细胞，整个过程可在3小时内完成，仅需少量全血，即使在健康受试者循环嗜酸性粒细胞水平较低的情况下也可行。",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "missing_source_record",
+      "evidence_links": [
+        "https://pubmed.ncbi.nlm.nih.gov/30217720/",
+        "https://www.sciencedirect.com/science/article/abs/pii/S002217591830190X"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-1",
+      "claim_id": 68,
+      "claim_text": "- [33] ANXA7 in CRC — 仅单细胞转录组挖掘",
+      "scientific_verdict": "contradicted",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_only_title_scope_conflict",
+      "evidence_links": [
+        "https://link.springer.com/article/10.1186/s12951-026-04915-z"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-1",
+      "claim_id": 31,
+      "claim_text": "| 14 | [13] Humoral IgG1 in HCC immunotherapy | Nature Medicine | 2026-03 | 是 | 未明确 | unknown/not supplied |",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_plus_excerpts_methods_unseen",
+      "evidence_links": [
+        "https://www.nature.com/articles/s41591-025-04177-6",
+        "https://doi.org/10.1038/s41591-025-04177-6"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-2",
+      "claim_id": 85,
+      "claim_text": "- **验证队列**：7个额外队列，包括500例患者的单细胞和bulk测序数据、7例患者的空间转录组、1,582例患者的生存分析 [13]",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_plus_excerpts_methods_unseen",
+      "evidence_links": [
+        "https://www.nature.com/articles/s41591-025-04177-6",
+        "https://doi.org/10.1038/s41591-025-04177-6"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-2",
+      "claim_id": 157,
+      "claim_text": "**建议**：需要提供包含IF元数据的文献来源（如Web of Science或JCR数据），以及更完整的全文信息（特别是Methods部分）才能完成分组设计和样本数的提取。",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "report_material_limit_no_citation",
+      "evidence_links": []
+    },
+    {
+      "blind_id": "immune_fixed_source_roles-arm-1",
+      "claim_id": 29,
+      "claim_text": "该研究显示人肺肥大细胞主要表达经典肥大细胞标记物，未通过无偏聚类检测到亚群；CMA1（chymase）仅在少数细胞中可检测，而CPA3 mRNA在所有细胞中高表达 [81]。",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_plus_excerpts_claim_supported",
+      "evidence_links": [
+        "https://www.frontiersin.org/journals/immunology/articles/10.3389/fimmu.2023.1151754/full"
+      ]
+    },
+    {
+      "blind_id": "immune_fixed_source_roles-arm-1",
+      "claim_id": 41,
+      "claim_text": "| **单细胞3' RNA-seq** | 标准高通量单细胞转录组 | 鸡外周血白细胞研究使用单细胞3' RNA-seq [55] |",
+      "scientific_verdict": "partially supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_only_generalization_unshown",
+      "evidence_links": [
+        "https://link.springer.com/article/10.1186/s12864-024-10044-4"
+      ]
+    },
+    {
+      "blind_id": "immune_fixed_source_roles-arm-2",
+      "claim_id": 34,
+      "claim_text": "| 肥大细胞 | SmartSeq2（分选后人肺肥大细胞） | [81] |",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_plus_excerpts_methods_unseen",
+      "evidence_links": [
+        "https://www.frontiersin.org/journals/immunology/articles/10.3389/fimmu.2023.1151754/full"
+      ]
+    },
+    {
+      "blind_id": "immune_fixed_source_roles-arm-2",
+      "claim_id": 58,
+      "claim_text": "**肥大细胞**：从组织中分选（如肺组织），使用FACS分选后可直接进行SmartSeq2测序[81]。",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_plus_excerpts_methods_unseen",
+      "evidence_links": [
+        "https://www.frontiersin.org/journals/immunology/articles/10.3389/fimmu.2023.1151754/full"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-1",
+      "claim_id": 28,
+      "claim_text": "| 11 | [9] Lactate metabolism in PDAC | Frontiers in Immunology | 2026 | 是 | 未明确 | unknown/not supplied |",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_plus_excerpts_methods_visible",
+      "evidence_links": [
+        "https://www.frontiersin.org/journals/immunology/articles/10.3389/fimmu.2026.1743187/full",
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC12946077/"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-1",
+      "claim_id": 32,
+      "claim_text": "| 15 | [16] C16orf74 in HNSCC | Cancer Science | 2026-11-10 | 是 | 未明确 | unknown/not supplied |",
+      "scientific_verdict": "partially supported",
+      "confidence": "medium",
+      "writer_evidence_scope": "abstract_only_spatial_unseen",
+      "evidence_links": [
+        "https://doi.org/10.1111/cas.70548"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-1",
+      "claim_id": 63,
+      "claim_text": "- [21] KRT17 in endometrial cancer — 仅单细胞RNA-seq",
+      "scientific_verdict": "supported",
+      "confidence": "medium",
+      "writer_evidence_scope": "abstract_only_claim_supported",
+      "evidence_links": [
+        "https://link.springer.com/article/10.1007/s00432-026-06561-2"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-1",
+      "claim_id": 82,
+      "claim_text": "- [81]-[84] 不完整记录，无法确认",
+      "scientific_verdict": "partially supported",
+      "confidence": "medium",
+      "writer_evidence_scope": "selected_excerpts_partial_record",
+      "evidence_links": [
+        "https://pubmed.ncbi.nlm.nih.gov/42129561/"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-2",
+      "claim_id": 139,
+      "claim_text": "### [25] KCNQ3泛癌（Gene, 2026）",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_only_claim_supported",
+      "evidence_links": [
+        "https://doi.org/10.1016/j.gene.2026.150491",
+        "https://www.lifescience.net/publications/2295605/kcnq3-as-a-pan-cancer-prognostic-biomarker-and-the/"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-2",
+      "claim_id": 88,
+      "claim_text": "- **IMbrave150验证队列**：atezolizumab+bevacizumab vs sorafenib，2:1随机 [13]",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_plus_excerpts_methods_unseen",
+      "evidence_links": [
+        "https://www.nature.com/articles/s41591-025-04177-6"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-2",
+      "claim_id": 17,
+      "claim_text": "- [60] PD-1通路双向调控综述（Autoimmunity reviews）",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_only_claim_supported",
+      "evidence_links": [
+        "https://pubmed.ncbi.nlm.nih.gov/42906786/"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-2",
+      "claim_id": 111,
+      "claim_text": "### [9] 胰腺癌乳酸代谢（Frontiers in Immunology, 2026）",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_plus_excerpts_claim_supported",
+      "evidence_links": [
+        "https://www.frontiersin.org/journals/immunology/articles/10.3389/fimmu.2026.1743187/full",
+        "https://pubmed.ncbi.nlm.nih.gov/41766855/"
+      ]
+    },
+    {
+      "blind_id": "if_fixed_source_roles-arm-2",
+      "claim_id": 23,
+      "claim_text": "- [65] 表皮干细胞性别二态性（Nature）——非肿瘤研究",
+      "scientific_verdict": "supported",
+      "confidence": "high",
+      "writer_evidence_scope": "abstract_only_claim_supported",
+      "evidence_links": [
+        "https://www.nature.com/articles/s41586-026-11159-2"
+      ]
+    }
+  ]
+}
