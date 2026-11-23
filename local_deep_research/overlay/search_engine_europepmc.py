@@ -1,11 +1,9 @@
 """Europe PMC search: one core response for identity and abstract text."""
 from typing import Any, Dict, List
 import os
-from loguru import logger
 
 from research_verify.retrieval import (
     academic_snippet,
-    fallback_query_candidates,
     html_text,
     service_get,
 )
@@ -42,26 +40,9 @@ class EuropePMCSearchEngine(BaseSearchEngine):
         endpoint = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"
         params = {"query": query, "format": "json", "resultType": "core",
                   "pageSize": max(1, min(1000, int(self.max_results)))}
-        data = None
-        try:
-            fallback = fallback_query_candidates(query)
-        except NameError:  # lightweight AST test harnesses omit module helpers
-            fallback = []
-        attempted = [query] + [item for item in fallback
-                               if item.casefold() != str(query).casefold()]
-        for candidate in attempted:
-            response = service_get(endpoint, service="europepmc", interval=0.35,
-                                   params={**params, "query": candidate},
-                                   **_search_proxy_kwargs())
-            candidate_data = response.json()
-            records = (candidate_data.get("resultList") or {}).get("result")
-            if isinstance(records, list) and records:
-                data = candidate_data
-                if candidate != query:
-                    logger.info("Europe PMC lexical fallback found results for %s", candidate)
-                break
-            data = candidate_data
-        data = data or {}
+        response = service_get(endpoint, service="europepmc", interval=0.35,
+                               params=params, **_search_proxy_kwargs())
+        data = response.json()
         records = data.get("resultList", {}).get("result")
         if records is None and data.get("hitCount") == 0:
             return []

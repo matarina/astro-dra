@@ -11,6 +11,13 @@ def test_unknown_intent_adds_no_scope_instructions():
     assert format_research_spec(spec) == ""
 
 
+def test_impact_factor_wording_is_left_to_the_model():
+    expected = parse_research_spec("")
+    for question in ("IF > 10", "影响因子10分以上", "影响因\n  子10分以上",
+                     "Rank papers by their journals' impact metric"):
+        assert parse_research_spec(question) == expected
+
+
 def test_settings_are_not_overwritten_by_question_words():
     spec = parse_research_spec("Chinese cohort 2020 at least 20 patients", {
         "language":"en", "year_from":2010, "year_to":2015, "requested_count":3})

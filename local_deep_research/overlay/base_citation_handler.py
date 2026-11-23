@@ -22,48 +22,25 @@ class BaseCitationHandler(ABC):
         self.settings_snapshot = settings_snapshot or {}
         self._fact_checking_logged = False
         self.stream_callback: Optional[Callable[[str], None]] = None
-        # Empty by default: ordinary reports must not initialize the JCR
-        # catalog or make an unsolicited journal lookup.
         self._writer_jcr_tool_factory = None
-        self._writer_jcr_sources = []
-        self._writer_jcr_query = ""
-        self._writer_jcr_enabled = False
 
     def set_writer_jcr_tool_factory(self, factory) -> None:
         """Install the strategy-owned model-selected JCR tool factory."""
         self._writer_jcr_tool_factory = factory
 
-    def set_writer_jcr_context(self, sources, question: str) -> None:
-        """Enable writer JCR routing only for an explicit IF/JIF request."""
-        self._writer_jcr_sources = sources if isinstance(sources, list) else []
-        self._writer_jcr_query = str(question or "")
-        try:
-            from research_verify.research_spec import parse_if_constraint
-            minimum, operator = parse_if_constraint(self._writer_jcr_query)
-            self._writer_jcr_enabled = (
-                minimum is not None and self._writer_jcr_tool_factory is not None
-            )
-            self._writer_jcr_minimum = minimum
-            self._writer_jcr_operator = operator
-        except Exception:
-            self._writer_jcr_enabled = False
-            self._writer_jcr_minimum = None
-            self._writer_jcr_operator = None
-
     def _writer_jcr_system_prompt(self) -> str:
         return (
             "You are the final evidence-grounded report writer. The user query "
-            "may contain an explicit IF/JIF condition. You have a model-selected "
-            "search_journal tool when that condition is present. Decide yourself "
-            "whether the report needs IF values. For an explicit IF/JIF request, "
-            "inspect the supplied source blocks and call search_journal for each "
-            "relevant paper record that you retain, "
-            "using the exact [N] source_index and journal_name shown in metadata. "
-            "Use the returned jcr_mcp value, metric year, status and threshold "
-            "result in the report. Never invent or estimate an IF. If the tool "
+            "determines whether impact factors are needed. For requests about "
+            "journal impact factors, including ranking, use the verified JCR "
+            "metadata already supplied. Call search_journal for relevant papers "
+            "that still need a lookup, using the exact [N] source_index and "
+            "journal_name from the source blocks. Pass a threshold and operator "
+            "only if the user asked for one. Use the tool's metric year, value, "
+            "status and any threshold result. Never invent or estimate an IF. If the tool "
             "returns unknown or ambiguous, write that state and explain why. A "
             "journal-only lookup without source_index is not a paper-level check. "
-            "Do not call the tool for reports with no explicit IF/JIF request."
+            "Use the tool only when the requested report requires journal impact factors."
         )
 
     def _invoke_plain_text(self, prompt: str, *, trace=None, stage="model") -> str:
@@ -75,8 +52,6 @@ class BaseCitationHandler(ABC):
 
     def _invoke_writer_agent(self, prompt: str, *, trace=None) -> str:
         """Run the writer as a model-selected tool-calling agent."""
-        if not (self._writer_jcr_enabled and self._writer_jcr_tool_factory):
-            return self._invoke_plain_text(prompt, trace=trace, stage="writer")
         try:
             from langchain.agents import create_agent
 
@@ -103,8 +78,6 @@ class BaseCitationHandler(ABC):
                 trace.record("writer_jcr_agent", {
                     "tool": "search_journal",
                     "enabled": True,
-                    "minimum_if": self._writer_jcr_minimum,
-                    "operator": self._writer_jcr_operator,
                     "message_count": len(messages),
                     "tool_call_count": sum(
                         len(getattr(message, "tool_calls", []) or [])
@@ -139,7 +112,7 @@ class BaseCitationHandler(ABC):
         Returns:
             The complete response text.
         """
-        if stage == "writer" and self._writer_jcr_enabled:
+        if stage == "writer" and self._writer_jcr_tool_factory is not None:
             text = self._invoke_writer_agent(prompt, trace=trace)
             if self.stream_callback and text:
                 try:
@@ -209,7 +182,7 @@ class BaseCitationHandler(ABC):
         and strips ``<think>`` reasoning blocks via ``get_llm_response_text``.
         """
         try:
-            if stage == "writer" and self._writer_jcr_enabled:
+            if stage == "writer" and self._writer_jcr_tool_factory is not None:
                 return self._invoke_writer_agent(prompt, trace=trace)
             response = self.llm.invoke(prompt)
             text = get_llm_response_text(response)

@@ -29,29 +29,6 @@ class ResearchSpec:
         return data
 
 
-_IF_ASCII_RE = re.compile(
-    r"(?<![A-Za-z0-9])(?P<label>IF|JIF)(?![A-Za-z0-9])\s*"
-    r"(?P<op>>=|≥|>|=)\s*(?P<value>\d+(?:\.\d+)?)", re.I
-)
-_IF_ZH_RE = re.compile(
-    r"影响因子\s*(?:(?P<op>>=|≥|>|=|至少|不低于|大于)\s*)?"
-    r"(?P<value>\d+(?:\.\d+)?)\s*(?:分以上|分及以上)?"
-)
-
-
-def parse_if_constraint(text: str) -> tuple[float | None, str | None]:
-    """Parse only explicit IF/JIF comparison syntax; never substring-match IF."""
-    match = _IF_ASCII_RE.search(text or "") or _IF_ZH_RE.search(text or "")
-    if not match:
-        return None, None
-    # Chinese "影响因子10分以上" is an explicit lower-bound form.
-    op = match.groupdict().get("op") or (">=" if "分以上" in match.group(0) else None)
-    op = {"至少": ">=", "不低于": ">=", "大于": ">", "≥": ">="}.get(op, op)
-    if op is None:
-        return None, None
-    return float(match.group("value")), op
-
-
 def _integer(value, minimum=1, maximum=9999):
     if isinstance(value, bool) or value is None:
         return None
@@ -76,7 +53,7 @@ def parse_research_spec(query: str, settings=None) -> ResearchSpec:
 
     The original question is passed intact to the agent/writer. Substring
     matches cannot establish language, paper count, requested fields, dates,
-    or a scientific task type. Literal IF syntax is recorded but never applied.
+    impact-factor thresholds, or a scientific task type.
     """
     configured = settings if isinstance(settings, dict) else {}
     values = {}
@@ -126,8 +103,7 @@ def parse_research_spec(query: str, settings=None) -> ResearchSpec:
         # completion from a source-pool size.
         values["count_relation"] = "unknown"
         unresolved.append("count_relation")
-    min_if, operator = parse_if_constraint(str(query or ""))
-    return ResearchSpec(**values, min_if_mentioned=min_if, if_operator=operator,
+    return ResearchSpec(**values,
                         intent_status="explicit_partial" if provenance else "unknown",
                         provenance=provenance, unresolved=tuple(unresolved))
 

@@ -1226,17 +1226,23 @@ def _make_research_subtopic_tool(
     return research_subtopic
 
 
-def _make_jcr_tool(collector, settings_snapshot=None):
+def _make_jcr_tool(collector):
     """Expose the vendored jcr_mcp journal search as a model-selected tool."""
     @tool("search_journal")
     def search_journal(
         journal_name: str,
-        minimum_if: float,
         source_index: int,
+        minimum_if: float | None = None,
         year: str = "latest",
         operator: str = ">=",
     ) -> str:
-        """Search jcr_mcp data and optionally evaluate a paper-bound IF threshold."""
+        """Look up a collected paper's journal impact factor using its exact source_index.
+
+        Use when the user requests journal impact factors or ranking by them.
+        Pass minimum_if and operator only for a requested threshold. Use latest
+        unless the user specifies a JCR metric year. The lookup uses the
+        journal recorded for that source.
+        """
         try:
             from research_verify.jcr_adapter import lookup_source
             source = collector.find_by_index(int(source_index))
@@ -1356,7 +1362,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         writer_handler = getattr(self.citation_handler, "_handler", self.citation_handler)
         if hasattr(writer_handler, "set_writer_jcr_tool_factory"):
             writer_handler.set_writer_jcr_tool_factory(
-                lambda: _make_jcr_tool(self.collector, self.settings_snapshot)
+                lambda: _make_jcr_tool(self.collector)
             )
         # research_verify: last parsed constraint (set by _attach_constraint_match)
         self._constraint_spec = None
@@ -1928,16 +1934,6 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             )
         )
 
-        # jcr_mcp is exposed only for an explicit IF/JIF request. Its required
-        # source_index and minimum_if fields make a paper-bound check explicit
-        # instead of allowing an unbound journal lookup into the writer.
-        try:
-            from research_verify.research_spec import parse_if_constraint
-            if parse_if_constraint(overall_query)[0] is not None:
-                tools.append(_make_jcr_tool(self.collector, self.settings_snapshot))
-        except Exception:
-            logger.debug("jcr_mcp tool unavailable", exc_info=True)
-
         # Subagent research tool — only when the toolbox already holds at
         # least one real research tool. Subagents are gated on the same
         # search/fetch/egress state as the lead, so with nothing else here
@@ -1963,6 +1959,9 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                     web_search_description=primary_search_description,
                 )
             )
+
+        if tools:
+            tools.append(_make_jcr_tool(self.collector))
 
         return tools
 
@@ -2058,31 +2057,6 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                 "agent will see the unmodified prompt"
             )
 
-        has_explicit_if_condition = False
-        if_minimum = None
-        if_operator = None
-        if "search_journal" in self._tool_names:
-            try:
-                from research_verify.research_spec import parse_if_constraint
-                if_minimum, if_operator = parse_if_constraint(query)
-                has_explicit_if_condition = if_minimum is not None
-            except Exception:
-                has_explicit_if_condition = False
-        if_routing_line = (
-            "IF/JIF ROUTING: The user request contains an explicit journal "
-            f"impact-factor condition (minimum_if={if_minimum}, operator={if_operator}). "
-            "After search returns a candidate source, call "
-            "search_journal with journal_name, year, minimum_if="
-            f"{if_minimum}, operator={if_operator}, and citation source_index [N]. "
-            "source_index and minimum_if are required for threshold claims: "
-            "a journal-only lookup is not a paper-level check. The tool writes "
-            "its jcr_mcp result into the source metadata used by the "
-            "writer. If no candidate source identity is available, report IF "
-            "as unverified; do not invent a journal name or claim the requested "
-            "count was satisfied.\n"
-            if has_explicit_if_condition else ""
-        )
-
         system_prompt = (
             f"You are a research assistant writing a research report. Today's date: {current_date}.\n"
             "This is NOT a chat conversation. Your only job is to research the "
@@ -2107,7 +2081,9 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             "factor or publication status unless a source explicitly states it. "
             "If the sources do not establish a claim, say that it could not be "
             "verified and omit the claim rather than guessing.\n"
-            f"{if_routing_line}"
+            "If the user's request requires journal impact factors, use search_journal "
+            "for relevant papers by source index. Use its reported metric and year, "
+            "and mark unavailable or ambiguous results as unverified.\n"
             "6. When you have enough information, provide a comprehensive answer "
             "citing sources as [1], [2], etc. Keep each citation close to the "
             "claim it supports; one citation must not be used to imply support "

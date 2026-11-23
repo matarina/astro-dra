@@ -1,19 +1,12 @@
-"""Regression coverage for syntax-preserving fallbacks and evidence windows."""
+"""Regression coverage for evidence windows and format parsing."""
 
 import ast
 from pathlib import Path
-from types import SimpleNamespace
 
 from research_verify.evidence import Artifact, retrieve, source_artifacts
 from research_verify.passages import retrieve_passages
-from research_verify.retrieval import fallback_query_candidates, has_structured_query_syntax
 from research_verify.textutil import normalize_year
 from overlay.url_classifier import URLClassifier, URLType
-
-
-def test_boolean_exclusion_is_never_rewritten_as_positive_fallback():
-    assert fallback_query_candidates("cancer NOT pediatric") == []
-    assert fallback_query_candidates('"lung cancer"[Title/Abstract] AND adult') == []
 
 
 def test_no_overlap_samples_distant_sections_instead_of_opening_only():
@@ -44,25 +37,6 @@ def test_unusual_body_heading_is_preserved_as_uncertain_scope():
     assert body_artifact is not None
     assert "Experimental details" in body_artifact.text[body_artifact.start:body_artifact.end]
     assert "uncertain" in body_artifact.basis
-
-
-def test_pubmed_simplifier_keeps_structured_query_semantics():
-    query = '(cancer[Title/Abstract] NOT pediatric[Title/Abstract]) AND "last 5 years"[pdat]'
-    tree = ast.parse((Path(__file__).parents[1] / "search_engine_pubmed.py").read_text())
-    methods = {node.name: node for node in next(node for node in tree.body
-              if isinstance(node, ast.ClassDef) and node.name == "PubMedSearchEngine").body
-               if isinstance(node, ast.FunctionDef) and node.name in {"_simplify_query", "_extract_core_terms"}}
-    namespace = {"re": __import__("re"), "has_structured_query_syntax": has_structured_query_syntax,
-                 "logger": SimpleNamespace(info=lambda *a, **k: None, debug=lambda *a, **k: None)}
-    for method in methods.values():
-        exec(compile(ast.Module(body=[method], type_ignores=[]), "search_engine_pubmed.py", "exec"), namespace)
-    engine = SimpleNamespace(_simplify_query=namespace["_simplify_query"].__get__(None, object),
-                             _extract_core_terms=namespace["_extract_core_terms"].__get__(None, object))
-    # Bind the extracted functions to a minimal instance.
-    engine._simplify_query = lambda value: namespace["_simplify_query"](engine, value)
-    engine._extract_core_terms = lambda value: namespace["_extract_core_terms"](engine, value)
-    assert engine._simplify_query(query) == query
-    assert engine._extract_core_terms(query) == query
 
 
 def test_year_parser_does_not_mine_doi_or_prose():

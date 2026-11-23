@@ -11,7 +11,7 @@ from ...security.safe_requests import safe_get
 from ...security.secure_logging import logger
 from ..rate_limiting import RateLimitError
 from ..search_engine_base import BaseSearchEngine, Exposure, Sensitivity
-from research_verify.retrieval import fallback_query_candidates, has_structured_query_syntax, xml_text
+from research_verify.retrieval import has_structured_query_syntax, xml_text
 
 
 def _search_proxy_kwargs() -> dict:
@@ -228,73 +228,6 @@ class PubMedSearchEngine(BaseSearchEngine):
             )
             return 0
 
-    def _extract_core_terms(self, query: str) -> str:
-        """
-        Extract core terms from a complex query for volume estimation.
-
-        Args:
-            query: PubMed query string
-
-        Returns:
-            Simplified query with core terms
-        """
-        # Preserve explicit query syntax, including a valid zero-result outcome.
-        if has_structured_query_syntax(query):
-            return query
-
-        # Remove field specifications and operators
-        simplified = re.sub(r"\[\w+\]", "", query)  # Remove [Field] tags
-        simplified = re.sub(
-            r"\b(AND|OR|NOT)\b", "", simplified
-        )  # Remove operators
-
-        # Remove quotes and parentheses
-        simplified = (
-            simplified.replace('"', "").replace("(", "").replace(")", "")
-        )
-
-        # Split by whitespace and join terms with 4+ chars (likely meaningful)
-        terms = [term for term in simplified.split() if len(term) >= 4]
-
-        # Join with AND to create a basic search
-        return " ".join(terms[:5])  # Limit to top 5 terms
-
-    def _expand_time_window(self, time_filter: str) -> str:
-        """
-        Expand a time window to get more results.
-
-        Args:
-            time_filter: Current time filter
-
-        Returns:
-            Expanded time filter
-        """
-        # Parse current time window
-        import re
-
-        match = re.fullmatch(r'\s*"last (\d+) (\w+)"\[pdat\]\s*', time_filter,
-                             flags=re.IGNORECASE)
-        if not match:
-            return '"last 10 years"[pdat]'
-
-        amount, unit = int(match.group(1)), match.group(2)
-
-        # Expand based on current unit
-        if unit == "months" or unit == "month":
-            if amount < 6:
-                return '"last 6 months"[pdat]'
-            if amount < 12:
-                return '"last 1 year"[pdat]'
-            return '"last 2 years"[pdat]'
-        if unit == "years" or unit == "year":
-            if amount < 2:
-                return '"last 2 years"[pdat]'
-            if amount < 5:
-                return '"last 5 years"[pdat]'
-            return '"last 10 years"[pdat]'
-
-        return '"last 10 years"[pdat]'
-
     def _optimize_query_for_pubmed(self, query: str) -> str:
         """
         Optimize a natural language query for PubMed search.
@@ -319,7 +252,7 @@ Original query: "{query}"
 CRITICAL RULES:
 1. ONLY RETURN THE EXACT SEARCH QUERY - NO EXPLANATIONS, NO COMMENTS
 2. DO NOT wrap the entire query in quotes
-3. DO NOT include ANY date restrictions or year filters
+3. Preserve any requested publication dates and other explicit limits. Do not add limits the user did not request.
 4. Use parentheses around OR statements: (term1[Field] OR term2[Field])
 5. Use only BASIC MeSH terms - stick to broad categories like "Vaccines"[Mesh]
 6. KEEP IT SIMPLE - use 2-3 main concepts maximum
@@ -403,31 +336,9 @@ Return ONLY the search query without any explanations.
                 )
                 optimized_query = query
 
-            # Final safety check - if query looks too much like an explanation, use original
-            if len(optimized_query.split()) > 30:
-                logger.warning(
-                    "Query too verbose, falling back to simpler form"
-                )
-                # Create a simple query from the original
-                words = [
-                    w
-                    for w in query.split()
-                    if len(w) > 3
-                    and w.lower()
-                    not in (
-                        "what",
-                        "are",
-                        "the",
-                        "and",
-                        "for",
-                        "with",
-                        "from",
-                        "have",
-                        "been",
-                        "recent",
-                    )
-                ]
-                optimized_query = " AND ".join(words[:3])
+            if not optimized_query.strip() or len(optimized_query.split()) > 30:
+                logger.warning("Invalid optimizer output, using the original PubMed query")
+                return query
 
             # Basic cleanup: standardize field tag case for consistency
             import re
@@ -452,9 +363,6 @@ Return ONLY the search query without any explanations.
             # Pattern: "term[Field] -> "term"[Field]
             optimized_query = re.sub(r'"([^"]+)\[', r'"\1"[', optimized_query)
 
-            # Simplify the query if still no results are found
-            self._simplify_query_cache = optimized_query
-
             # Log original and optimized queries
             logger.info("Original query: '{}'", query)
             logger.info(f"Optimized for PubMed: '{optimized_query}'")
@@ -471,139 +379,6 @@ Return ONLY the search query without any explanations.
             )
             logger.debug(f"Falling back to original query: '{query}'")
             return query  # Fall back to original query on error
-
-    def _simplify_query(self, query: str) -> str:
-        """
-        Simplify a PubMed query that returned no results.
-        Progressively removes elements to get a more basic query.
-
-        Args:
-            query: The original query that returned no results
-
-        Returns:
-            Simplified query
-        """
-        logger.info(f"Simplifying query: {query}")
-        logger.debug(f"Query simplification started for: '{query[:100]}...'")
-
-        # Preserve explicit query syntax, including a valid zero-result outcome.
-        if has_structured_query_syntax(query):
-            return query
-
-        # Simple approach: remove field restrictions to broaden the search
-        import re
-
-        # Remove field tags to make search broader
-        simplified = query
-
-        # Remove [Mesh] tags - search in all fields instead
-        simplified = re.sub(r"\[Mesh\]", "", simplified, flags=re.IGNORECASE)
-
-        # Remove [Publication Type] tags
-        simplified = re.sub(
-            r"\[Publication Type\]", "", simplified, flags=re.IGNORECASE
-        )
-
-        # Keep [Title/Abstract] as it's usually helpful
-        # Clean up any double spaces
-        simplified = re.sub(r"\s+", " ", simplified).strip()
-
-        # If no simplification was possible, return the original query
-        if simplified == query:
-            logger.debug("No simplification possible, returning original query")
-
-        logger.info(f"Simplified query: {simplified}")
-        logger.debug(
-            f"Query simplified from {len(query)} to {len(simplified)} chars"
-        )
-        return simplified
-
-    def _is_historical_focused(self, query: str) -> bool:
-        """
-        Determine if a query is specifically focused on historical/older information using LLM.
-        Default assumption is that queries should prioritize recent information unless
-        explicitly asking for historical content.
-
-        Args:
-            query: The search query
-
-        Returns:
-            Boolean indicating if the query is focused on historical information
-        """
-        if not self.llm:
-            # Fall back to basic keyword check if no LLM available
-            historical_terms = [
-                "history",
-                "historical",
-                "early",
-                "initial",
-                "first",
-                "original",
-                "before",
-                "prior to",
-                "origins",
-                "evolution",
-                "development",
-            ]
-            historical_years = [str(year) for year in range(1900, 2020)]
-
-            query_lower = query.lower()
-            has_historical_term = any(
-                term in query_lower for term in historical_terms
-            )
-            has_past_year = any(year in query for year in historical_years)
-
-            return has_historical_term or has_past_year
-
-        try:
-            # Use LLM to determine if the query is focused on historical information
-            prompt = f"""Determine if this query is specifically asking for HISTORICAL or OLDER information.
-
-Query: "{query}"
-
-Answer ONLY "yes" if the query is clearly asking for historical, early, original, or past information from more than 5 years ago.
-Answer ONLY "no" if the query is asking about recent, current, or new information, or if it's a general query without a specific time focus.
-
-The default assumption should be that medical and scientific queries want RECENT information unless clearly specified otherwise.
-"""
-
-            response = self.llm.invoke(prompt)
-            answer = (
-                (
-                    str(response.content)
-                    if hasattr(response, "content")
-                    else str(response)
-                )
-                .strip()
-                .lower()
-            )
-
-            # Log the determination
-            logger.info(f"Historical focus determination for query: '{query}'")
-            logger.info(f"LLM determined historical focus: {answer}")
-
-            return "yes" in answer
-
-        except Exception as e:
-            safe_msg = self._scrub_error(e)
-            logger.exception(
-                f"Error determining historical focus ({type(e).__name__}): {safe_msg}"
-            )
-            # Fall back to basic keyword check
-            historical_terms = [
-                "history",
-                "historical",
-                "early",
-                "initial",
-                "first",
-                "original",
-                "before",
-                "prior to",
-                "origins",
-                "evolution",
-                "development",
-            ]
-            return any(term in query.lower() for term in historical_terms)
 
     def _adaptive_search(self, query: str) -> Tuple[List[str], str]:
         """Search within caller scope; an operator's days_limit still applies.
@@ -1295,13 +1070,6 @@ The default assumption should be that medical and scientific queries want RECENT
         # Perform adaptive search
         pmid_list, strategy = self._adaptive_search(optimized_query)
 
-        if not pmid_list and not has_structured_query_syntax(query):
-            for fallback_query in fallback_query_candidates(query):
-                if fallback_query == optimized_query:
-                    continue
-                pmid_list, strategy = self._adaptive_search(fallback_query)
-                if pmid_list:
-                    break
         if not pmid_list:
             return []
 

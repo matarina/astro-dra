@@ -65,17 +65,17 @@ def test_primary_abstract_preserves_sections_nested_text_and_translation_boundar
     'cells NOT cancer', 'cells OR cancer', 'cells[Title]', '"exact phrase"',
     '(cells OR cancer) AND human', 'cells AND "last 365 days"[pdat]',
     'cells AND ("2025/01/01"[dp] : "2026/11/11"[dp])',
+    'specific tumor assay without prior treatment',
 ])
-def test_structured_queries_are_not_optimized_simplified_or_date_broadened(query):
-    names = ("_optimize_query_for_pubmed", "_simplify_query", "_extract_core_terms", "_adaptive_search", "_get_previews")
+def test_pubmed_queries_are_not_broadened_on_zero_hits(query):
+    names = ("_optimize_query_for_pubmed", "_adaptive_search", "_get_previews")
     methods = adapter_methods(*names)
-    obj = SimpleNamespace(llm=SimpleNamespace(invoke=lambda *a: pytest.fail("unexpected model call")), optimize_queries=True)
+    obj = SimpleNamespace(llm=SimpleNamespace(invoke=lambda *a: pytest.fail("unexpected model call")),
+                          optimize_queries=has_structured_query_syntax(query))
     calls = []
     obj._search_pubmed = lambda q: calls.append(q) or []
     for name in names:
         setattr(obj, name, lambda *a, _name=name: methods[_name](obj, *a))
-    assert obj._simplify_query(query) == query
-    assert obj._extract_core_terms(query) == query
     assert obj._get_previews(query) == []
     assert calls == [query]
 

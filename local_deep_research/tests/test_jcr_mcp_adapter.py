@@ -37,6 +37,12 @@ class JcrMcpAdapterTests(unittest.TestCase):
         self.assertEqual(row["status"], "found")
         self.assertFalse(row["passes_threshold"])
 
+    def test_ranking_lookup_needs_no_threshold(self):
+        row = lookup_source({"journal": "Nature Medicine"})
+        self.assertEqual(row["status"], "found")
+        self.assertEqual(row["impact_factor"], 52.5)
+        self.assertIsNone(row["passes_threshold"])
+
     def test_missing_journal_is_unknown(self):
         row = lookup_source({"journal": "No Such Journal"}, minimum=10)
         self.assertEqual(row["status"], "metric_unavailable")

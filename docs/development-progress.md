@@ -239,3 +239,13 @@ Validation used the existing base runtime in disposable containers without netwo
 Deleted the report keyword checker, its configuration and result model, the recheck CLI, and their strategy, build, and metadata hooks. The archived report parsers still recognize saved coverage sections. Literature search queries and article-supplied keyword metadata are outside this feature.
 
 A clean overlay install confirmed both deleted modules are absent. The old config flag has no effect, legacy report parsing still separates the old appendix from claims, and regenerated metadata omits the obsolete private fields. The focused installed suite passed 148 tests. The broader installed suite had 554 passes and 88 existing failures, with zero new failures versus the previous main. Both Compose files and whitespace checks passed. No deployment or saved-data migration was performed.
+
+### 2026-11-23 — remove free-text rules from prompt routing
+
+Audited the active LangGraph, synthesis, PubMed, Europe PMC, and SearXNG paths against the 5006 baseline `05da5b4`. Removed the shared IF regex and the two tool gates that depended on it. The lead and writer offer the existing source-bound JCR tool, and each model decides whether its request needs a lookup. Ranking-only requests can omit the threshold. The adapter reports a missing catalog without creating an empty database.
+
+PubMed and Europe PMC return the zero-hit outcome for the submitted search instead of constructing shortened searches from stopwords and fixed word windows. Removed PubMed's unused historical keyword and date-expansion helpers. The optional PubMed optimizer receives explicit scope-preservation instructions and falls back to the submitted query if its output is unusable. PubMed search syntax protection and explicit settings validation continue to apply.
+
+Validated in disposable containers based on the 5006 image. The focused suite passed 141 tests. The expanded suite passed 159 and failed two subagent handoff cases, both reproduced against `05da5b4`. An offline tool-calling smoke check confirmed equivalent tool exposure for wrapped, paraphrased, and explicit IF requests, a source-bound lookup using the host catalog, and a plain writer completion without accessing JCR. Tool-enabled writer callbacks deliver the completed text in one chunk. The smoke check used scripted model messages.
+
+The code is on the isolated `codex/remove-prompt-rules` worktree. Port 5006 has not been redeployed or rerun. A live IF regression still needs the JCR catalog staged for the service and successful model transport.

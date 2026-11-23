@@ -13,72 +13,8 @@ import copy
 import re
 
 
-def fallback_query_candidates(query: str, max_candidates: int = 4) -> list[str]:
-    """Return bounded lexical fallbacks when an exact biomedical query is empty.
-
-    Agent-generated queries often contain too many conjunctive terms, date
-    syntax, or field tags.  A zero-result response is not evidence that the
-    topic has no literature, so adapters may retry a few contiguous high-signal
-    term windows before surfacing an empty search.  This helper is topic
-    independent and does not select papers; the normal relevance stage still
-    receives and filters the broader candidates.
-    """
-    text = str(query or "")
-    # A fallback is allowed to broaden a plain-language query only.  Once the
-    # caller supplied Boolean, field, phrase, date, or grouping syntax, token
-    # extraction is lossy: in particular ``A NOT B`` used to become a positive
-    # search for both A and B.  Preserve the user's query (and its zero-result
-    # outcome) rather than silently changing its semantics.  Engine-specific
-    # date fallbacks may detach and re-apply a validated trailing date scope.
-    if has_structured_query_syntax(text):
-        return []
-    text = re.sub(r'"last\s+\d+\s+\w+"\s*\[[^]]+\]', " ", text, flags=re.I)
-    text = re.sub(r"\[[^]]+\]", " ", text)
-    text = text.replace('"', " ").replace("'", " ")
-    raw = re.findall(r"[A-Za-z][A-Za-z0-9_./+-]*|[0-9]+[A-Za-z]+|[\u3400-\u9fff]{2,}", text)
-    stop = {
-        "and", "or", "not", "the", "a", "an", "with", "from", "into",
-        "for", "of", "to", "by", "in", "on", "at", "as", "is", "are",
-        "was", "were", "how", "what", "whether", "should", "before",
-        "after", "using", "use", "study", "studies", "paper", "papers",
-    }
-    terms, seen = [], set()
-    for item in raw:
-        key = item.casefold()
-        if key in stop or (len(item) < 3 and not re.search(r'[\u3400-\u9fff]', item)) or key in seen:
-            continue
-        seen.add(key)
-        terms.append(item)
-    if not terms:
-        return []
-    candidates: list[str] = []
-    for width in (3, 2):
-        for start in range(max(0, len(terms) - width + 1)):
-            window = terms[start:start + width]
-            if any(len(term) >= 4 or any(ch.isdigit() for ch in term)
-                   or re.search(r'[\u3400-\u9fff]', term) for term in window):
-                candidate = " ".join(window)
-                if candidate.casefold() not in {item.casefold() for item in candidates}:
-                    candidates.append(candidate)
-            if len(candidates) >= max_candidates:
-                return candidates
-    if len(candidates) < max_candidates:
-        for term in terms:
-            if len(term) >= 4 and term.casefold() not in {item.casefold() for item in candidates}:
-                candidates.append(term)
-            if len(candidates) >= max_candidates:
-                break
-    return candidates
-
-
 def has_structured_query_syntax(query: str) -> bool:
-    """Return whether a query contains syntax that lexical broadening cannot preserve.
-
-    This is a syntax check, not a scientific intent classifier.  It deliberately
-    errs on the side of no fallback for operators, fields, quoted phrases,
-    parentheses, or date scopes.  Plain multilingual prose remains eligible for
-    the bounded lexical fallback above.
-    """
+    """Protect explicit search syntax and dates from query optimization."""
     value = str(query or "")
     if value.count('"') % 2:
         return True

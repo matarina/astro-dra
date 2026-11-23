@@ -39,7 +39,6 @@ def engine_class(file, name, **overrides):
     ns = {**vars(typing), "BaseSearchEngine": Base, "BaseLLM": object, "re": re,
           "ET": ET, "logger": logger, "SNIPPET_LENGTH_LONG": 1200, "os": os,
           "has_structured_query_syntax": retrieval.has_structured_query_syntax,
-          "fallback_query_candidates": retrieval.fallback_query_candidates,
           "Sensitivity": SimpleNamespace(NON_SENSITIVE=1),
           "Exposure": SimpleNamespace(EXPOSING=1), "html_text": retrieval.html_text,
           "academic_snippet": retrieval.academic_snippet,
@@ -83,7 +82,6 @@ def test_pubmed_preserves_explicit_scope_even_with_zero_results():
     engine._search_pubmed = lambda q: calls.append(q) or []
     assert engine._adaptive_search(query) == ([], "requested_scope")
     assert calls == [query]
-    assert engine._simplify_query(query) == query
 
 
 def test_optimizer_losing_year_or_quoted_entity_keeps_original():
@@ -117,9 +115,16 @@ def test_europepmc_has_correct_identity_and_complete_inline_abstract():
 
 def test_europepmc_distinguishes_zero_results_from_invalid_response():
     payload = {"hitCount": 0}
+    queries = []
+    def request(url, **kwargs):
+        queries.append(kwargs["params"]["query"])
+        return SimpleNamespace(json=lambda: payload)
+
     cls = engine_class("overlay/search_engine_europepmc.py", "EuropePMCSearchEngine",
-                       service_get=lambda *a, **k: SimpleNamespace(json=lambda: payload))
-    assert cls()._get_previews("nonexistent") == []
+                       service_get=request)
+    query = "specific tumor assay without prior treatment"
+    assert cls()._get_previews(query) == []
+    assert queries == [query]
     payload.clear()
     payload.update({"error": "Invalid query"})
     with pytest.raises(ValueError):

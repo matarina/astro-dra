@@ -9,14 +9,18 @@ from __future__ import annotations
 
 from functools import lru_cache
 import math
+from pathlib import Path
 import re
 from typing import Any
 
 from .jcr_mcp import JCRDatabase
+from .jcr_mcp.jcr_database import DATABASE_PATH
 
 
 @lru_cache(maxsize=1)
 def get_database() -> JCRDatabase:
+    if not Path(DATABASE_PATH).is_file():
+        raise FileNotFoundError("JCR catalog is missing")
     return JCRDatabase()
 
 
@@ -37,8 +41,8 @@ def _float_metric(value: Any) -> float | None:
     return number if math.isfinite(number) and number >= 0 else None
 
 
-def _passes(value: float | None, minimum: float, operator: str) -> bool | None:
-    if value is None:
+def _passes(value: float | None, minimum: float | None, operator: str) -> bool | None:
+    if value is None or minimum is None:
         return None
     if operator == ">":
         return value > minimum
@@ -52,7 +56,7 @@ def _passes(value: float | None, minimum: float, operator: str) -> bool | None:
 def lookup_source(
     source: dict[str, Any],
     *,
-    minimum: float,
+    minimum: float | None = None,
     operator: str = ">=",
     year: int | str | None = "latest",
 ) -> dict[str, Any]:
@@ -62,10 +66,13 @@ def lookup_source(
     ISSNs. We therefore require an exact normalized journal-name match among
     the returned records and return ``ambiguous`` instead of guessing.
     """
-    if isinstance(minimum, bool) or not isinstance(minimum, (int, float)):
-        return {"status": "invalid_input", "missing_reason": "minimum_if_invalid"}
-    minimum = float(minimum)
-    if not math.isfinite(minimum) or minimum < 0 or operator not in {">", ">=", "="}:
+    if minimum is not None:
+        if isinstance(minimum, bool) or not isinstance(minimum, (int, float)):
+            return {"status": "invalid_input", "missing_reason": "minimum_if_invalid"}
+        minimum = float(minimum)
+        if not math.isfinite(minimum) or minimum < 0:
+            return {"status": "invalid_input", "missing_reason": "threshold_invalid"}
+    if operator not in {">", ">=", "="}:
         return {"status": "invalid_input", "missing_reason": "threshold_invalid"}
     requested_year = str(year) if year not in (None, "") else "latest"
     journal = str(
@@ -148,7 +155,7 @@ def lookup_source(
         "requested_metric_year": requested_year,
         "passes_threshold": _passes(value, minimum, operator),
         "minimum_if": minimum,
-        "threshold_operator": operator,
+        "threshold_operator": operator if minimum is not None else None,
         "partition": row.partition,
         "category": row.category,
         "warning_status": row.warning_status,
