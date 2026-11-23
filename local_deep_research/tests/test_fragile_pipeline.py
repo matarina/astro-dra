@@ -61,6 +61,27 @@ def test_unavailable_source_selector_uses_the_end_of_the_candidate_pool():
     assert source_ids(SourceMaterial("[99]\nTitle: Embedded numeric text", {})) == []
 
 
+
+def test_selection_transport_failure_skips_subsequent_model_calls(monkeypatch):
+    from research_verify import generation
+
+    monkeypatch.setattr(generation, "SOURCE_SELECTION_BATCH_CHARS", 1000)
+    documents = [Document(page_content="Abstract. " * 70, metadata={"index": i, "title": str(i)})
+                 for i in range(1, 7)]
+    calls, receipts = [], []
+
+    def offline(prompt):
+        calls.append(prompt)
+        raise TimeoutError()
+
+    generation.format_source_documents(documents, "Question", selector=offline,
+                                       max_chars=3000, selection_receipts=receipts)
+    assert len(calls) == 1
+    assert receipts[0]["fallback_batches"] == 6
+    assert receipts[0]["batch_errors"][0]["error_type"] == "TimeoutError"
+    assert receipts[0]["batch_errors"][-1]["error_type"] == "selector_unavailable"
+
+
 def test_excerpting_keeps_acquired_appendix_and_reader_locates_a_short_count():
     body = "General introduction. " * 400 + "\n\nReferences\n\nAppendix\n\nMethods: Xenium, n=6 per arm."
     assert "n=6 per arm" in page_excerpts(body, "Xenium sample counts", budget=1800)
