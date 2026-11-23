@@ -249,3 +249,11 @@ PubMed and Europe PMC return the zero-hit outcome for the submitted search inste
 Validated in disposable containers based on the 5006 image. The focused suite passed 141 tests. The expanded suite passed 159 and failed two subagent handoff cases, both reproduced against `05da5b4`. An offline tool-calling smoke check confirmed equivalent tool exposure for wrapped, paraphrased, and explicit IF requests, a source-bound lookup using the host catalog, and a plain writer completion without accessing JCR. Tool-enabled writer callbacks deliver the completed text in one chunk. The smoke check used scripted model messages.
 
 The code is on the isolated `codex/remove-prompt-rules` worktree. Port 5006 has not been redeployed or rerun. A live IF regression still needs the JCR catalog staged for the service and successful model transport.
+
+### 2026-11-23 — deploy prompt routing and JCR catalog to 5006
+
+At 09:43 CST, switched the `astro-dra-5006` application service to `astro-dra:f5564c3-5006` (image digest `sha256:2c6401eca6c8e6c238800068c64b8dd63d20b4aa882cdccb16cb8eafb836cc7a`). The new image overlays the eight changed runtime files on the previously running image, retains its source-collection hook, and includes the host's read-only JCR catalog. A clean reconstruction from the Git checkout was rejected in preflight because the existing runtime imports `research_verify.pmc_identity` and the checkout does not package it. The first overlay image was also rejected because its staged directories excluded the app user. The deployed image passed the catalog integrity and tool-call checks as `ldruser`.
+
+Updated only the application image selection in the existing instance environment and recreated that service. The existing data and configuration mounts, original research trace, and model relay and SearXNG container identities were verified after startup. Docker reported healthy and the external login page returned HTTP 200. A live model smoke request returned in 1.6 seconds. A separate live writer test sent a wrapped Chinese IF request and performed a source-bound JCR lookup against the 2025 metrics with the requested strict threshold.
+
+The original 20-paper research job was not resubmitted during deployment. The short model checks do not establish long-context performance or address the prior relay idle timeout.
