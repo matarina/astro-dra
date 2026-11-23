@@ -26,6 +26,7 @@ from langgraph.errors import GraphRecursionError
 from loguru import logger
 
 from ...citation_handler import CitationHandler
+from ...exceptions import ResearchTerminatedException
 from ...security.egress import EngineClassification, classify_engine
 from ...security import sanitize_error_for_client
 from ...utilities.thread_context import get_search_context, search_context
@@ -2278,6 +2279,8 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                         {"phase": "agent_thinking", "iteration": iteration},
                     )
 
+        except ResearchTerminatedException:
+            raise
         except GraphRecursionError:
             logger.warning(
                 "LangGraph agent hit recursion limit, synthesizing partial results"
@@ -2435,7 +2438,10 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                     {"phase": "synthesis", "type": "milestone"},
                 )
 
+        from research_verify.generation import INCOMPLETE_SYNTHESIS_MESSAGE, IncompleteSynthesisError
+
         synthesized_content = final_answer
+        synthesis_error = None
         documents: list = []
 
         # Citation handling — only if we have results
@@ -2449,15 +2455,18 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                     previous_knowledge=final_answer,
                     nr_of_links=nr_of_links,
                 )
-                if isinstance(citation_result, dict):
-                    synthesized_content = citation_result.get(
-                        "content", citation_result.get("response", final_answer)
-                    )
-                    documents = citation_result.get("documents", [])
-            except Exception:
-                logger.warning(
-                    "Citation handler failed, using raw agent answer"
-                )
+                content = citation_result.get("content", citation_result.get("response"))
+                if not content or not content.strip():
+                    raise IncompleteSynthesisError("Citation writer produced no report")
+                synthesized_content = content
+                documents = citation_result.get("documents", [])
+                if citation_result.get("synthesis_error"):
+                    synthesis_error = INCOMPLETE_SYNTHESIS_MESSAGE
+            except ResearchTerminatedException:
+                raise
+            except Exception as exc:
+                logger.warning("Citation synthesis failed; preserving the draft ({})", type(exc).__name__)
+                synthesis_error = INCOMPLETE_SYNTHESIS_MESSAGE
 
             if not re.search(r"\[\d", synthesized_content or ""):
                 logger.warning(
@@ -2467,10 +2476,13 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                     f"query ('{query[:80]}')"
                 )
 
+        if synthesis_error:
+            synthesized_content = f"> **{synthesis_error}**\n\n{synthesized_content}"
+
         # Check the actual synthesis BEFORE bibliography/metadata are appended.
         # Every output below uses this same revised body, including findings
         # consumed by the detailed report generator.
-        checked_content, citation_checks = self._attach_citation_qc(
+        checked_content, _ = self._attach_citation_qc(
             synthesized_content, all_search_results
         )
         all_search_results = getattr(self, "_citation_evidence_sources", all_search_results)
@@ -2484,8 +2496,6 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         # Keep scope, identity, and optional fact-consistency results
         # in trace/metadata only.  The current biomedical flow deliberately
         # does not append rule-driven verification tables to the report body.
-        # The renderer methods remain available for explicit diagnostics and
-        # backwards-compatible callers, but are not part of publication text.
         current_knowledge = checked_content
         if isinstance(getattr(self, "_citation_audit", None), dict):
             self._citation_audit["sealed_content_sha256"] = hashlib.sha256(current_knowledge.encode()).hexdigest()
@@ -2508,9 +2518,10 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             reasoning_trace.append(entry)
 
         self._update_progress(
-            "Research complete",
-            100,
-            {"phase": "complete", "type": "milestone", "iterations": iteration},
+            synthesis_error or "Research complete",
+            95 if synthesis_error else 100,
+            {"phase": "synthesis_incomplete" if synthesis_error else "complete",
+             "type": "milestone", "iterations": iteration},
         )
 
         return {
@@ -2520,6 +2531,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                     "question": query,
                     "search_results": all_search_results,
                     "documents": documents,
+                    "synthesis_error": synthesis_error,
                 }
             ],
             "iterations": iteration,
@@ -2547,7 +2559,8 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             "search_results": all_search_results,
             "documents": documents,
             "reasoning_trace": reasoning_trace,
-            "error": None,
+            "error": synthesis_error,
+            "synthesis_error": synthesis_error,
             "citation_qc": [
                 c.model_dump() for c in getattr(self, "_citation_checks", [])
             ],

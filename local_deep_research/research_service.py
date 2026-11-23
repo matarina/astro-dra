@@ -6,9 +6,9 @@ import threading
 import time
 from datetime import datetime, UTC
 from pathlib import Path
-from urllib.parse import urlparse
 
 from loguru import logger
+from research_verify.generation import INCOMPLETE_SYNTHESIS_MESSAGE
 
 from ...exceptions import DuplicateResearchError, ResearchTerminatedException
 from ...config.llm_config import get_llm
@@ -1942,529 +1942,204 @@ def run_research_process(research_id, query, mode, **kwargs):
                 f"{error_message} (Error type: {error_type})"
             ) from search_error
 
-        # Generate output based on mode
+        report_error = results.get("synthesis_error")
+        if not report_error and results.get("error"):
+            report_error = INCOMPLETE_SYNTHESIS_MESSAGE
+        report_metadata = {}
+        formatter = None
         if mode == "quick":
-            # Quick Summary
-            if results.get("findings") or results.get("formatted_findings"):
-                raw_formatted_findings = results["formatted_findings"]
+            if not (results.get("findings") or results.get("formatted_findings")):
+                raise RuntimeError("No research findings were generated. Please try again.")
+            raw_formatted_findings = results["formatted_findings"]
 
-                # Check if formatted_findings contains an error message
-                if isinstance(
-                    raw_formatted_findings, str
-                ) and raw_formatted_findings.startswith("Error:"):
-                    logger.error(
-                        f"Detected error in formatted findings: {raw_formatted_findings[:100]}..."
+            # Check if formatted_findings contains an error message
+            if isinstance(
+                raw_formatted_findings, str
+            ) and raw_formatted_findings.startswith("Error:"):
+                logger.error(
+                    f"Detected error in formatted findings: {raw_formatted_findings[:100]}..."
+                )
+
+                error_message = raw_formatted_findings.lower()
+                error_types = (
+                    (("token limit", "context length"), "token_limit", "Synthesis hit token limits"),
+                    (("timeout", "timed out"), "timeout", "Synthesis timed out"),
+                    (("rate limit",), "rate_limit", "LLM rate limit reached"),
+                    (("connection", "network"), "connection", "Connection issue with LLM"),
+                    (("llm error", "final answer synthesis fail"), "llm_error", "LLM error during synthesis"),
+                )
+                error_type, message = next(
+                    ((kind, label) for phrases, kind, label in error_types
+                     if any(phrase in error_message for phrase in phrases)),
+                    ("unknown", "Error during synthesis"),
+                )
+                progress_callback(
+                    f"{message}. Attempting fallback...", 87,
+                    {"phase": "synthesis_error", "error_type": error_type},
+                )
+                report_error = INCOMPLETE_SYNTHESIS_MESSAGE
+
+                # Extract synthesized content from findings if available
+                synthesized_content = ""
+                for finding in results.get("findings", []):
+                    if finding.get("phase") == "Final synthesis":
+                        synthesized_content = finding.get("content", "")
+                        break
+
+                # Use synthesized content as fallback
+                if (
+                    synthesized_content
+                    and not synthesized_content.startswith("Error:")
+                ):
+                    logger.info(
+                        "Using existing synthesized content as fallback"
                     )
+                    raw_formatted_findings = synthesized_content
 
-                    # Determine error type for better user feedback
-                    error_type = "unknown"
-                    error_message = raw_formatted_findings.lower()
+                # Or use current_knowledge as another fallback
+                elif results.get("current_knowledge"):
+                    logger.info("Using current_knowledge as fallback")
+                    raw_formatted_findings = results["current_knowledge"]
 
-                    if (
-                        "token limit" in error_message
-                        or "context length" in error_message
-                    ):
-                        error_type = "token_limit"
-                        # Log specific error type
-                        logger.warning(
-                            "Detected token limit error in synthesis"
+                # Or combine all finding contents as last resort
+                elif results.get("findings"):
+                    logger.info("Combining all findings as fallback")
+                    # First try to use any findings that are not errors
+                    valid_findings = [
+                        f"## {finding.get('phase', 'Finding')}\n\n{finding.get('content', '')}"
+                        for finding in results.get("findings", [])
+                        if finding.get("content")
+                        and not finding.get("content", "").startswith(
+                            "Error:"
                         )
+                    ]
 
-                        # Update progress with specific error type
-                        progress_callback(
-                            "Synthesis hit token limits. Attempting fallback...",
-                            87,
-                            {
-                                "phase": "synthesis_error",
-                                "error_type": error_type,
-                            },
+                    synthesis_error = raw_formatted_findings
+                    if valid_findings:
+                        raw_formatted_findings = (
+                            "# Research Results (Fallback Mode)\n\n"
                         )
-                    elif (
-                        "timeout" in error_message
-                        or "timed out" in error_message
-                    ):
-                        error_type = "timeout"
-                        logger.warning("Detected timeout error in synthesis")
-                        progress_callback(
-                            "Synthesis timed out. Attempting fallback...",
-                            87,
-                            {
-                                "phase": "synthesis_error",
-                                "error_type": error_type,
-                            },
+                        raw_formatted_findings += "\n\n".join(
+                            valid_findings
                         )
-                    elif "rate limit" in error_message:
-                        error_type = "rate_limit"
-                        logger.warning("Detected rate limit error in synthesis")
-                        progress_callback(
-                            "LLM rate limit reached. Attempting fallback...",
-                            87,
-                            {
-                                "phase": "synthesis_error",
-                                "error_type": error_type,
-                            },
-                        )
-                    elif (
-                        "connection" in error_message
-                        or "network" in error_message
-                    ):
-                        error_type = "connection"
-                        logger.warning("Detected connection error in synthesis")
-                        progress_callback(
-                            "Connection issue with LLM. Attempting fallback...",
-                            87,
-                            {
-                                "phase": "synthesis_error",
-                                "error_type": error_type,
-                            },
-                        )
-                    elif (
-                        "llm error" in error_message
-                        or "final answer synthesis fail" in error_message
-                    ):
-                        error_type = "llm_error"
-                        logger.warning(
-                            "Detected general LLM error in synthesis"
-                        )
-                        progress_callback(
-                            "LLM error during synthesis. Attempting fallback...",
-                            87,
-                            {
-                                "phase": "synthesis_error",
-                                "error_type": error_type,
-                            },
+                        raw_formatted_findings += (
+                            f"\n\n## Error Information\n{synthesis_error}"
                         )
                     else:
-                        # Generic error
-                        logger.warning("Detected unknown error in synthesis")
-                        progress_callback(
-                            "Error during synthesis. Attempting fallback...",
-                            87,
-                            {
-                                "phase": "synthesis_error",
-                                "error_type": "unknown",
-                            },
+                        # Last resort: use everything including errors
+                        raw_formatted_findings = (
+                            "# Research Results (Emergency Fallback)\n\n"
                         )
-
-                    # Extract synthesized content from findings if available
-                    synthesized_content = ""
-                    for finding in results.get("findings", []):
-                        if finding.get("phase") == "Final synthesis":
-                            synthesized_content = finding.get("content", "")
-                            break
-
-                    # Use synthesized content as fallback
-                    if (
-                        synthesized_content
-                        and not synthesized_content.startswith("Error:")
-                    ):
-                        logger.info(
-                            "Using existing synthesized content as fallback"
-                        )
-                        raw_formatted_findings = synthesized_content
-
-                    # Or use current_knowledge as another fallback
-                    elif results.get("current_knowledge"):
-                        logger.info("Using current_knowledge as fallback")
-                        raw_formatted_findings = results["current_knowledge"]
-
-                    # Or combine all finding contents as last resort
-                    elif results.get("findings"):
-                        logger.info("Combining all findings as fallback")
-                        # First try to use any findings that are not errors
-                        valid_findings = [
+                        raw_formatted_findings += "The system encountered errors during final synthesis.\n\n"
+                        raw_formatted_findings += "\n\n".join(
                             f"## {finding.get('phase', 'Finding')}\n\n{finding.get('content', '')}"
                             for finding in results.get("findings", [])
                             if finding.get("content")
-                            and not finding.get("content", "").startswith(
-                                "Error:"
-                            )
-                        ]
+                        )
 
-                        synthesis_error = raw_formatted_findings
-                        if valid_findings:
-                            raw_formatted_findings = (
-                                "# Research Results (Fallback Mode)\n\n"
-                            )
-                            raw_formatted_findings += "\n\n".join(
-                                valid_findings
-                            )
-                            raw_formatted_findings += (
-                                f"\n\n## Error Information\n{synthesis_error}"
-                            )
-                        else:
-                            # Last resort: use everything including errors
-                            raw_formatted_findings = (
-                                "# Research Results (Emergency Fallback)\n\n"
-                            )
-                            raw_formatted_findings += "The system encountered errors during final synthesis.\n\n"
-                            raw_formatted_findings += "\n\n".join(
-                                f"## {finding.get('phase', 'Finding')}\n\n{finding.get('content', '')}"
-                                for finding in results.get("findings", [])
-                                if finding.get("content")
-                            )
+                progress_callback(
+                    f"Using fallback synthesis due to {error_type} error",
+                    88,
+                    {
+                        "phase": "synthesis_fallback",
+                        "error_type": error_type,
+                    },
+                )
 
-                    progress_callback(
-                        f"Using fallback synthesis due to {error_type} error",
-                        88,
-                        {
-                            "phase": "synthesis_fallback",
-                            "error_type": error_type,
-                        },
-                    )
+            logger.info(
+                "Found formatted_findings of length: {}",
+                len(str(raw_formatted_findings)),
+            )
+
+            # Check if we have an error in the findings and use enhanced error handling
+            if isinstance(
+                raw_formatted_findings, str
+            ) and raw_formatted_findings.startswith("Error:"):
+                logger.info(
+                    "Generating enhanced error report using ErrorReportGenerator"
+                )
+
+                # Generate comprehensive error report
+                # ErrorReportGenerator does not use LLM (kept for compat)
+                error_generator = ErrorReportGenerator()
+                clean_markdown = error_generator.generate_error_report(
+                    error_message=raw_formatted_findings,
+                    query=query,
+                    partial_results=results,
+                    search_iterations=results.get("iterations", 0),
+                    research_id=research_id,
+                )
 
                 logger.info(
-                    "Found formatted_findings of length: {}",
-                    len(str(raw_formatted_findings)),
+                    "Generated enhanced error report with {} characters",
+                    len(clean_markdown),
                 )
-
-                try:
-                    # Check if we have an error in the findings and use enhanced error handling
-                    if isinstance(
-                        raw_formatted_findings, str
-                    ) and raw_formatted_findings.startswith("Error:"):
-                        logger.info(
-                            "Generating enhanced error report using ErrorReportGenerator"
-                        )
-
-                        # Generate comprehensive error report
-                        # ErrorReportGenerator does not use LLM (kept for compat)
-                        error_generator = ErrorReportGenerator()
-                        clean_markdown = error_generator.generate_error_report(
-                            error_message=raw_formatted_findings,
-                            query=query,
-                            partial_results=results,
-                            search_iterations=results.get("iterations", 0),
-                            research_id=research_id,
-                        )
-
-                        logger.info(
-                            "Generated enhanced error report with {} characters",
-                            len(clean_markdown),
-                        )
-                    else:
-                        # report_content stores the synthesized answer
-                        # only (see _extract_synthesized_answer for the
-                        # full rationale). Fall back to the formatted
-                        # blob only when neither Final synthesis nor
-                        # current_knowledge is populated — leaks
-                        # sources, but at least we save *something*.
-                        clean_markdown = _extract_synthesized_answer(results)
-                        if not isinstance(results.get("final_report"), dict):
-                            clean_markdown = clean_markdown or raw_formatted_findings
-
-                    # Pull sources from the search-system's accumulated link
-                    # buffer first — same source the detailed-report path
-                    # uses at the equivalent point below. Wrapper
-                    # strategies (e.g. EnhancedContextualFollowUpStrategy,
-                    # IterativeRefinementStrategy) delegate the actual
-                    # search to an inner strategy that populates
-                    # `self.all_links_of_system`, but they don't bubble
-                    # that list back into the result dict's `findings`. So
-                    # the legacy `findings[*].search_results` extraction
-                    # below stays empty for chat follow-ups, leaving the
-                    # citation formatter with no urls to hyperlink. Prefer
-                    # the system-level accumulator; fall back to the
-                    # legacy extraction so direct strategies that bypass
-                    # the system buffer still work.
-                    all_links = list(
-                        getattr(system, "all_links_of_system", None) or []
-                    )
-                    if not all_links:
-                        for finding in results.get("findings", []):
-                            search_results = finding.get("search_results", [])
-                            if search_results:
-                                try:
-                                    links = extract_links_from_search_results(
-                                        search_results
-                                    )
-                                    all_links.extend(links)
-                                except Exception:
-                                    logger.exception(
-                                        "Error processing search results/links"
-                                    )
-
-                    logger.info(
-                        "Successfully converted to clean markdown of length: {}",
-                        len(clean_markdown),
-                    )
-
-                    final_object = results.get("final_report")
-                    final_qc = _trusted_final_report(final_object, clean_markdown)
-                    if final_qc is not None:
-                        all_links = final_object["sources_for_publication"]
-                    if final_qc is None:
-                        clean_markdown, final_qc = _ground_report_content(
-                            clean_markdown, all_links, getattr(system, "model", None)
-                        )
-
-                    # First send a progress update for generating the summary
-                    progress_callback(
-                        "Generating clean summary from research data...",
-                        90,
-                        {"phase": "output_generation"},
-                    )
-
-                    # Send progress update for saving report
-                    progress_callback(
-                        "Saving research report to database...",
-                        95,
-                        {"phase": "report_complete"},
-                    )
-
-                    # Keep only works cited by the answer, deduplicate them
-                    # at the paper level, and renumber in first-appearance
-                    # order before hyperlinking or saving anything.
-                    answer_with_links, all_links = _format_checked_answer(clean_markdown, all_links)
-
-                    # report_content stores ONLY the synthesized answer.
-                    # The legacy "answer + ## Sources + ## Research
-                    # Metrics" view is reconstructed at render time by
-                    # report_assembly_service.assemble_full_report.
-                    full_report_content = answer_with_links
-                    final_qc["claim_offsets_scope"] = "checked_body_before_citation_formatting"
-                    final_qc["display_citation_map"] = {s["index"]: s.get("original_indices", []) for s in all_links if isinstance(s, dict) and s.get("index")}
-
-                    # Save report FIRST, then sources:
-                    # a chat read between commits sees a report with no
-                    # sources (assembler renders just the answer) — better
-                    # failure mode than partial assembly with sources but
-                    # no answer body.
-                    from ...storage import get_report_storage
-
-                    with get_user_db_session(username) as db_session:
-                        storage = get_report_storage(session=db_session)
-
-                        # Prepare metadata
-                        metadata = {
-                            "iterations": results["iterations"],
-                            "generated_at": datetime.now(UTC).isoformat(),
-                            "citation_verification": final_qc,
-                            "saved_content_sha256": hashlib.sha256(full_report_content.encode()).hexdigest(),
-                        }
-
-                        # Save report using storage abstraction
-                        success = storage.save_report(
-                            research_id=research_id,
-                            content=full_report_content,
-                            metadata=metadata,
-                            username=username,
-                        )
-
-                        if not success:
-                            raise RuntimeError("Failed to save research report")  # noqa: TRY301 — triggers research failure handling in outer except
-
-                    # Save sources to database (non-fatal - report
-                    # already saved; sources missing is recoverable
-                    # because the assembler omits empty Sources blocks)
-                    try:
-                        from .research_sources_service import (
-                            ResearchSourcesService,
-                        )
-
-                        sources_service = ResearchSourcesService()
-                        if all_links:
-                            logger.info(
-                                f"Quick summary: Saving {len(all_links)} sources to database"
-                            )
-                            sources_saved = (
-                                sources_service.save_research_sources(
-                                    research_id=research_id,
-                                    sources=all_links,
-                                    username=username,
-                                )
-                            )
-                            logger.info(
-                                f"Quick summary: Saved {sources_saved} sources for research {research_id}"
-                            )
-                    except Exception:
-                        logger.exception(
-                            f"Failed to save sources for research {research_id} (continuing with report save)"
-                        )
-
-                    logger.info(f"Report saved for research_id: {research_id}")
-
-                    # Skip export to additional formats - we're storing in database only
-
-                    # Update research status in database
-                    completed_at = datetime.now(UTC).isoformat()
-
-                    with get_user_db_session(username) as db_session:
-                        research = (
-                            db_session.query(ResearchHistory)
-                            .filter_by(id=research_id)
-                            .first()
-                        )
-
-                        # Preserve existing metadata and update with new values
-                        metadata = _parse_research_metadata(
-                            research.research_meta
-                        )
-
-                        metadata.update(
-                            {
-                                "iterations": results["iterations"],
-                                "generated_at": datetime.now(UTC).isoformat(),
-                            }
-                        )
-
-                        # Use the helper function for consistent duration calculation
-                        duration_seconds = calculate_duration(
-                            research.created_at, completed_at
-                        )
-
-                        research.status = ResearchStatus.COMPLETED
-                        research.completed_at = completed_at
-                        research.duration_seconds = duration_seconds
-                        # report_content was already saved above via the report
-                        # storage abstraction; this block only updates
-                        # status/metadata. report_path is not used in the
-                        # encrypted-database version.
-
-                        # Generate headline and topics only for news searches
-                        if (
-                            metadata.get("is_news_search")
-                            or metadata.get("search_type") == "news_analysis"
-                        ):
-                            try:
-                                from ...news.utils.headline_generator import (
-                                    generate_headline,
-                                )
-                                from ...news.utils.topic_generator import (
-                                    generate_topics,
-                                )
-                                from ...search_system import (
-                                    ensure_snapshot_username,
-                                )
-
-                                # Scope the snapshot to this run's owner so
-                                # the LLM PEP resolves a per-user provider
-                                # and honors local-only policy, mirroring
-                                # the scheduler's _store_research_result fix
-                                # (background.py). Without it, headline/topic
-                                # generation silently no-ops for cloud-
-                                # provider users here (fails closed, not a
-                                # security hole, but inconsistent).
-                                headline_topic_snapshot = (
-                                    ensure_snapshot_username(
-                                        settings_snapshot, username
-                                    )
-                                )
-
-                                # Get the report content from database for better headline/topic generation
-                                report_content = ""
-                                try:
-                                    research = (
-                                        db_session.query(ResearchHistory)
-                                        .filter_by(id=research_id)
-                                        .first()
-                                    )
-                                    if research and research.report_content:
-                                        report_content = research.report_content
-                                        logger.info(
-                                            f"Retrieved {len(report_content)} chars from database for headline generation"
-                                        )
-                                    else:
-                                        logger.warning(
-                                            f"No report content found in database for research_id: {research_id}"
-                                        )
-                                except Exception:
-                                    logger.warning(
-                                        "Could not retrieve report content from database"
-                                    )
-
-                                # Generate headline
-                                logger.info(
-                                    f"Generating headline for query: {query[:100]}"
-                                )
-                                headline = generate_headline(
-                                    query,
-                                    report_content,
-                                    settings_snapshot=headline_topic_snapshot,
-                                )
-                                metadata["generated_headline"] = headline
-
-                                # Generate topics
-                                logger.info(
-                                    f"Generating topics with category: {metadata.get('category', 'News')}"
-                                )
-                                topics = generate_topics(
-                                    query=query,
-                                    findings=report_content,
-                                    category=metadata.get("category", "News"),
-                                    max_topics=6,
-                                    settings_snapshot=headline_topic_snapshot,
-                                )
-                                metadata["generated_topics"] = topics
-
-                                logger.info(f"Generated headline: {headline}")
-                                logger.info(f"Generated topics: {topics}")
-
-                            except Exception:
-                                logger.warning(
-                                    "Could not generate headline/topics"
-                                )
-
-                        research.research_meta = metadata
-
-                        db_session.commit()
-                        logger.info(
-                            f"Database commit completed for research_id: {research_id}"
-                        )
-
-                        # Update subscription if this was triggered by a subscription
-                        if metadata.get("subscription_id"):
-                            try:
-                                from ...news.subscription_runner import (
-                                    advance_refresh_schedule_by_id,
-                                )
-
-                                subscription_id = metadata["subscription_id"]
-                                if advance_refresh_schedule_by_id(
-                                    db_session, subscription_id
-                                ):
-                                    db_session.commit()
-                                    logger.info(
-                                        f"Updated subscription {subscription_id} refresh times"
-                                    )
-                            except Exception:
-                                logger.warning(
-                                    "Could not update subscription refresh time"
-                                )
-
-                    logger.info(
-                        f"Database updated successfully for research_id: {research_id}"
-                    )
-
-                    _maybe_save_chat_message(full_report_content)
-
-                    # Send the final completion message
-                    progress_callback(
-                        "Research completed successfully",
-                        100,
-                        {"phase": "complete"},
-                    )
-
-                    # Clean up resources
-                    logger.info(
-                        "Cleaning up resources for research_id: {}", research_id
-                    )
-                    cleanup_research_resources(
-                        research_id, username, user_password=user_password
-                    )
-                    logger.info(
-                        "Resources cleaned up for research_id: {}", research_id
-                    )
-
-                except Exception as inner_e:
-                    logger.exception("Error during quick summary generation")
-                    raise RuntimeError(
-                        f"Error generating quick summary: {inner_e!s}"
-                    )
             else:
-                raise RuntimeError(  # noqa: TRY301 — triggers research failure handling in outer except
-                    "No research findings were generated. Please try again."
+                # report_content stores the synthesized answer
+                # only (see _extract_synthesized_answer for the
+                # full rationale). Fall back to the formatted
+                # blob only when neither Final synthesis nor
+                # current_knowledge is populated — leaks
+                # sources, but at least we save *something*.
+                clean_markdown = _extract_synthesized_answer(results)
+                if not isinstance(results.get("final_report"), dict):
+                    clean_markdown = clean_markdown or raw_formatted_findings
+
+            # Pull sources from the search-system's accumulated link
+            # buffer first — same source the detailed-report path
+            # uses at the equivalent point below. Wrapper
+            # strategies (e.g. EnhancedContextualFollowUpStrategy,
+            # IterativeRefinementStrategy) delegate the actual
+            # search to an inner strategy that populates
+            # `self.all_links_of_system`, but they don't bubble
+            # that list back into the result dict's `findings`. So
+            # the legacy `findings[*].search_results` extraction
+            # below stays empty for chat follow-ups, leaving the
+            # citation formatter with no urls to hyperlink. Prefer
+            # the system-level accumulator; fall back to the
+            # legacy extraction so direct strategies that bypass
+            # the system buffer still work.
+            all_links = list(
+                getattr(system, "all_links_of_system", None) or []
+            )
+            if not all_links:
+                for finding in results.get("findings", []):
+                    search_results = finding.get("search_results", [])
+                    if search_results:
+                        try:
+                            links = extract_links_from_search_results(
+                                search_results
+                            )
+                            all_links.extend(links)
+                        except Exception:
+                            logger.exception(
+                                "Error processing search results/links"
+                            )
+
+            logger.info(
+                "Successfully converted to clean markdown of length: {}",
+                len(clean_markdown),
+            )
+
+            final_object = results.get("final_report")
+            final_qc = _trusted_final_report(final_object, clean_markdown)
+            if final_qc is not None:
+                all_links = final_object["sources_for_publication"]
+            if final_qc is None:
+                clean_markdown, final_qc = _ground_report_content(
+                    clean_markdown, all_links, getattr(system, "model", None)
                 )
+
+            # First send a progress update for generating the summary
+            progress_callback(
+                "Generating clean summary from research data...",
+                90,
+                {"phase": "output_generation"},
+            )
+
+            progress_callback(
+                "Saving research report to database...", 95, {"phase": "report_complete"},
+            )
         else:
             # Full Report
             progress_callback(
@@ -2502,9 +2177,12 @@ def run_research_process(research_id, query, mode, **kwargs):
                 results, query, progress_callback=report_progress_callback
             )
 
+            report_metadata = final_report["metadata"]
+            section_error = report_metadata.get("synthesis_error")
+            report_error = section_error or report_error
             progress_callback(
-                "Report generation complete",
-                _DETAILED_REPORT_PROGRESS_END,
+                report_error or "Report generation complete",
+                95 if report_error else _DETAILED_REPORT_PROGRESS_END,
                 {"phase": "report_complete"},
             )
 
@@ -2529,203 +2207,112 @@ def run_research_process(research_id, query, mode, **kwargs):
             except Exception:
                 logger.warning("Could not separate detailed-report bibliography")
                 answer_body = final_report["content"]
-            answer_body, final_qc = _ground_report_content(
+            if report_error and not section_error:
+                answer_body = f"> **{report_error}**\n\n{answer_body}"
+            clean_markdown, final_qc = _ground_report_content(
                 answer_body, all_links, getattr(report_generator, "model", None)
             )
-            final_report.setdefault("metadata", {})["citation_verification"] = final_qc
-            answer_with_links, all_links = _format_checked_answer(answer_body, all_links, formatter)
-            formatted_content = answer_with_links
-            final_qc["claim_offsets_scope"] = "checked_body_before_citation_formatting"
-            final_qc["display_citation_map"] = {s["index"]: s.get("original_indices", []) for s in all_links if isinstance(s, dict) and s.get("index")}
 
-            # Save report FIRST, sources after.
-            # See quick-summary path for rationale.
-            from ...storage import get_report_storage
+        # Persist the body before its sources so a concurrent read always sees
+        # the report, even if source storage is delayed or fails.
+        report_content, all_links = _format_checked_answer(clean_markdown, all_links, formatter)
+        if mode != "quick" and report_content != final_report["content"]:
+            # The web view stores the body and sources separately. The export
+            # envelope is sealed to the original, rendered report.
+            from research_verify.publication import KEY
 
-            with get_user_db_session(username) as db_session:
-                storage = get_report_storage(session=db_session)
+            report_metadata.pop(KEY, None)
+        final_qc["claim_offsets_scope"] = "checked_body_before_citation_formatting"
+        final_qc["display_citation_map"] = {
+            source["index"]: source.get("original_indices", []) for source in all_links
+            if isinstance(source, dict) and source.get("index")
+        }
+        report_metadata.update(
+            iterations=results["iterations"],
+            generated_at=datetime.now(UTC).isoformat(),
+            citation_verification=final_qc,
+            saved_content_sha256=hashlib.sha256(report_content.encode()).hexdigest(),
+        )
+        if report_error:
+            report_metadata.update(
+                synthesis_error=report_error, has_enhanced_report=True, error=report_error
+            )
 
-                # Update metadata. Include generated_at like the quick path so
-                # the detailed file backup's _metadata.json has parity with
-                # quick-mode (the detailed path previously omitted it).
-                metadata = final_report["metadata"]
-                metadata["saved_content_sha256"] = hashlib.sha256(formatted_content.encode()).hexdigest()
-                metadata["iterations"] = results["iterations"]
-                metadata["generated_at"] = datetime.now(UTC).isoformat()
+        from ...storage import get_report_storage
 
-                # Save the report through the storage abstraction, exactly as
-                # the quick-summary branch does, so detailed reports also honor
-                # the report.enable_file_backup setting. This previously did a
-                # raw ORM write of report_content that silently skipped the
-                # file backup, so a user who enabled file backup got it for
-                # quick research but never for detailed research.
-                success = storage.save_report(
-                    research_id=research_id,
-                    content=formatted_content,
-                    metadata=metadata,
-                    username=username,
-                )
+        with get_user_db_session(username) as db_session:
+            storage = get_report_storage(session=db_session)
+            if not storage.save_report(
+                research_id=research_id, content=report_content,
+                metadata=report_metadata, username=username,
+            ):
+                raise RuntimeError("Failed to save research report")
 
-                if not success:
-                    raise RuntimeError("Failed to save research report")  # noqa: TRY301 — triggers research failure handling in outer except
-
-                logger.info(
-                    f"Report saved to database for research_id: {research_id}"
-                )
-
-            # Save sources AFTER report (non-fatal; assembler omits
-            # empty Sources blocks if this fails).
+        if all_links:
             try:
                 from .research_sources_service import ResearchSourcesService
 
-                sources_service = ResearchSourcesService()
-                if all_links:
-                    logger.info(f"Saving {len(all_links)} sources to database")
-                    sources_saved = sources_service.save_research_sources(
-                        research_id=research_id,
-                        sources=all_links,
-                        username=username,
-                    )
-                    logger.info(
-                        f"Saved {sources_saved} sources for research {research_id}"
-                    )
+                saved = ResearchSourcesService().save_research_sources(
+                    research_id=research_id, sources=all_links, username=username,
+                )
+                logger.info("Saved {} sources for research {}", saved, research_id)
             except Exception:
-                logger.exception(
-                    f"Failed to save sources for research {research_id} (continuing)"
-                )
+                logger.exception("Failed to save sources for research {}", research_id)
 
-            # Update research status in database
-            completed_at = datetime.now(UTC).isoformat()
+        completed_at = datetime.now(UTC).isoformat()
+        status = ResearchStatus.FAILED if report_error else ResearchStatus.COMPLETED
+        with get_user_db_session(username) as db_session:
+            research = db_session.query(ResearchHistory).filter_by(id=research_id).first()
+            metadata = _parse_research_metadata(research.research_meta)
+            metadata.update(report_metadata)
+            research.status = status
+            research.completed_at = completed_at
+            research.duration_seconds = calculate_duration(research.created_at, completed_at)
+            if report_error:
+                research.error_message = report_error
+            elif metadata.get("is_news_search") or metadata.get("search_type") == "news_analysis":
+                try:
+                    from ...news.utils.headline_generator import generate_headline
+                    from ...news.utils.topic_generator import generate_topics
+                    from ...search_system import ensure_snapshot_username
 
-            with get_user_db_session(username) as db_session:
-                research = (
-                    db_session.query(ResearchHistory)
-                    .filter_by(id=research_id)
-                    .first()
-                )
+                    headline_settings = ensure_snapshot_username(settings_snapshot, username)
+                    metadata["generated_headline"] = generate_headline(
+                        query, report_content, settings_snapshot=headline_settings,
+                    )
+                    metadata["generated_topics"] = generate_topics(
+                        query=query, findings=report_content,
+                        category=metadata.get("category", "News"),
+                        settings_snapshot=headline_settings,
+                    )
+                except Exception:
+                    logger.warning("Could not generate headline/topics")
 
-                # Preserve existing metadata and merge with report metadata
-                metadata = _parse_research_metadata(research.research_meta)
+            research.research_meta = metadata
+            db_session.commit()
 
-                metadata.update(final_report["metadata"])
-                metadata["iterations"] = results["iterations"]
+            if subscription_id := metadata.get("subscription_id"):
+                try:
+                    from ...news.subscription_runner import (
+                        advance_refresh_schedule_by_id, mark_subscription_due_by_id,
+                    )
 
-                # Use the helper function for consistent duration calculation
-                duration_seconds = calculate_duration(
-                    research.created_at, completed_at
-                )
+                    update_schedule = mark_subscription_due_by_id if report_error else advance_refresh_schedule_by_id
+                    if update_schedule(db_session, subscription_id):
+                        db_session.commit()
+                except Exception:
+                    logger.warning("Could not update subscription refresh time")
 
-                research.status = ResearchStatus.COMPLETED
-                research.completed_at = completed_at
-                research.duration_seconds = duration_seconds
-                # report_content was already saved above via the report storage
-                # abstraction; this block only updates status/metadata.
-                # report_path is not used in the encrypted-database version.
-
-                # Generate headline and topics only for news searches
-                if (
-                    metadata.get("is_news_search")
-                    or metadata.get("search_type") == "news_analysis"
-                ):
-                    try:
-                        from ...news.utils.headline_generator import (
-                            generate_headline,  # type: ignore[no-redef]
-                        )
-                        from ...news.utils.topic_generator import (
-                            generate_topics,  # type: ignore[no-redef]
-                        )
-                        from ...search_system import (
-                            ensure_snapshot_username,
-                        )
-
-                        # Scope the snapshot to this run's owner so the LLM
-                        # PEP resolves a per-user provider and honors
-                        # local-only policy. Mirrors the quick-summary
-                        # branch above and the scheduler's
-                        # _store_research_result fix (background.py).
-                        headline_topic_snapshot = ensure_snapshot_username(
-                            settings_snapshot, username
-                        )
-
-                        # Get the report content from database for better headline/topic generation
-                        report_content = ""
-                        try:
-                            research = (
-                                db_session.query(ResearchHistory)
-                                .filter_by(id=research_id)
-                                .first()
-                            )
-                            if research and research.report_content:
-                                report_content = research.report_content
-                            else:
-                                logger.warning(
-                                    f"No report content found in database for research_id: {research_id}"
-                                )
-                        except Exception:
-                            logger.warning(
-                                "Could not retrieve report content from database"
-                            )
-
-                        # Generate headline
-                        headline = generate_headline(
-                            query,
-                            report_content,
-                            settings_snapshot=headline_topic_snapshot,
-                        )
-                        metadata["generated_headline"] = headline
-
-                        # Generate topics
-                        topics = generate_topics(
-                            query=query,
-                            findings=report_content,
-                            category=metadata.get("category", "News"),
-                            max_topics=6,
-                            settings_snapshot=headline_topic_snapshot,
-                        )
-                        metadata["generated_topics"] = topics
-
-                        logger.info(f"Generated headline: {headline}")
-                        logger.info(f"Generated topics: {topics}")
-
-                    except Exception:
-                        logger.warning("Could not generate headline/topics")
-
-                research.research_meta = metadata
-
-                db_session.commit()
-
-                # Update subscription if this was triggered by a subscription
-                if metadata.get("subscription_id"):
-                    try:
-                        from ...news.subscription_runner import (
-                            advance_refresh_schedule_by_id,
-                        )
-
-                        subscription_id = metadata["subscription_id"]
-                        if advance_refresh_schedule_by_id(
-                            db_session, subscription_id
-                        ):
-                            db_session.commit()
-                            logger.info(
-                                f"Updated subscription {subscription_id} refresh times"
-                            )
-                    except Exception:
-                        logger.warning(
-                            "Could not update subscription refresh time"
-                        )
-
-            _maybe_save_chat_message(formatted_content)
-
-            progress_callback(
-                "Research completed successfully",
-                100,
-                {"phase": "complete"},
-            )
-
-            # Clean up resources
-            cleanup_research_resources(
-                research_id, username, user_password=user_password
-            )
+        _maybe_save_chat_message(report_content)
+        progress_callback(
+            report_error or "Research completed successfully",
+            None if report_error else 100,
+            {"phase": "error", "error": report_error} if report_error else {"phase": "complete"},
+        )
+        cleanup_research_resources(
+            research_id, username, user_password=user_password,
+            final_status=status, error_message=report_error,
+        )
 
     except ResearchTerminatedException:
         logger.info(f"Research {research_id} terminated by user")
@@ -3176,6 +2763,7 @@ def cleanup_research_resources(
     username=None,
     user_password=None,
     final_status=ResearchStatus.COMPLETED,
+    error_message=None,
 ):
     """
     Clean up resources for a completed research.
@@ -3207,32 +2795,23 @@ def cleanup_research_resources(
         )
         time.sleep(5)
 
-    # The terminal status to report on the final socket message. This comes
-    # from the caller (which knows why the research ended) rather than a
-    # hard-coded COMPLETED, so termination (SUSPENDED) and error (FAILED)
-    # paths no longer emit a false "completed" signal to subscribers.
-    current_status = final_status
-
-    # NOTE: Queue processor already handles database updates from the main thread
-    # The notify_research_completed() method is called at the end of this function
-    # which safely updates the database status
-
-    # Notify queue processor that research completed
-    # This uses processor_v2 which handles database updates in the main thread
-    # avoiding the Flask request context issues that occur in background threads
     from ..queue.processor_v2 import queue_processor
 
     if username:
-        queue_processor.notify_research_completed(
-            username, research_id, user_password=user_password
-        )
-        logger.info(
-            f"Notified queue processor of completion for research {research_id} (user: {username})"
-        )
-    else:
-        logger.warning(
-            f"Cannot notify completion for research {research_id} - no username provided"
-        )
+        if final_status == ResearchStatus.COMPLETED:
+            queue_processor.notify_research_completed(username, research_id, user_password=user_password)
+        elif final_status == ResearchStatus.FAILED:
+            queue_processor.notify_research_failed(
+                username, research_id, error_message=error_message, user_password=user_password,
+            )
+        else:
+            from ...database.queue_service import UserQueueService
+
+            try:
+                with get_user_db_session(username, user_password) as session:
+                    UserQueueService(session).update_task_status(research_id, final_status)
+            except Exception:
+                logger.warning("Could not clear the queue entry for suspended research {}", research_id)
 
     # Remove from active research and termination flags atomically
     cleanup_research(research_id)
@@ -3245,13 +2824,13 @@ def cleanup_research_resources(
     try:
         # Send a final message to any remaining subscribers with explicit status
         # Use the proper status message based on database status
-        if current_status in (
+        if final_status in (
             ResearchStatus.SUSPENDED,
             ResearchStatus.FAILED,
         ):
             final_message = {
-                "status": current_status,
-                "message": f"Research was {current_status}",
+                "status": final_status,
+                "message": error_message or f"Research was {final_status}",
                 "progress": 0,  # For suspended research, show 0% not 100%
             }
         else:
@@ -3263,7 +2842,7 @@ def cleanup_research_resources(
 
         logger.info(
             "Sending final {} socket message for research {}",
-            current_status,
+            final_status,
             research_id,
         )
 

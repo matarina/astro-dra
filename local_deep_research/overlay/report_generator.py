@@ -320,6 +320,7 @@ class IntegratedReportGenerator:
         structure = self._determine_report_structure(initial_findings, query)
 
         # Step 2: Research and generate content for each section in one step
+        self._incomplete_sections = False
         sections = self._research_and_generate_sections(
             initial_findings,
             structure,
@@ -335,10 +336,18 @@ class IntegratedReportGenerator:
                 {"phase": "report_formatting"},
             )
         report = self._format_final_report(sections, structure, query)
+        synthesis_error = None
+        if self._incomplete_sections:
+            from research_verify.generation import INCOMPLETE_SYNTHESIS_MESSAGE
+            synthesis_error = INCOMPLETE_SYNTHESIS_MESSAGE
+            report["content"] = f"> **{synthesis_error}**\n\n{report['content']}"
+            report["metadata"]["synthesis_error"] = synthesis_error
 
         if progress_callback:
             progress_callback(
-                "Report complete", 100, {"phase": "report_complete"}
+                synthesis_error or "Report complete",
+                95 if synthesis_error else 100,
+                {"phase": "report_complete"},
             )
 
         from research_verify.publication import publish_report, collect_publication_sources
@@ -1078,6 +1087,7 @@ class IntegratedReportGenerator:
 
         for i, section in enumerate(structure, 1):
             if report_deadline is not None and time.monotonic() >= report_deadline:
+                self._incomplete_sections = True
                 logger.warning(
                     "Report generation total time limit reached before section %s; "
                     "finalizing partial report",
@@ -1121,6 +1131,7 @@ class IntegratedReportGenerator:
                         section.get("name", i),
                         subsection.get("name", j),
                     )
+                    self._incomplete_sections = True
                     stop_report_research = True
                     break
                 # Only add subsection header if there are multiple subsections
@@ -1268,6 +1279,8 @@ class IntegratedReportGenerator:
                     strategy._run_deadline = original_deadline
 
                 completed_subsections += 1
+                if subsection_results.get("synthesis_error") or subsection_results.get("error"):
+                    self._incomplete_sections = True
 
                 # Add the researched content for this subsection
                 if subsection_results.get("current_knowledge"):

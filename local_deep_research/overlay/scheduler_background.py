@@ -2189,26 +2189,13 @@ class BackgroundJobScheduler:
             from ..database.session_context import get_user_db_session
             from ..database.models import ResearchHistory
             from ..settings.manager import SettingsManager
-            import json
 
-            # Convert result to JSON-serializable format
-            def make_serializable(obj):
-                """Convert non-serializable objects to dictionaries."""
-                if hasattr(obj, "dict"):
-                    return obj.dict()
-                if hasattr(obj, "__dict__"):
-                    return {
-                        k: make_serializable(v)
-                        for k, v in obj.__dict__.items()
-                        if not k.startswith("_")
-                    }
-                if isinstance(obj, (list, tuple)):
-                    return [make_serializable(item) for item in obj]
-                if isinstance(obj, dict):
-                    return {k: make_serializable(v) for k, v in obj.items()}
-                return obj
-
-            serializable_result = make_serializable(result)
+            # The programmatic summary API includes strategy metadata in findings.
+            synthesis_error = next(
+                (finding["synthesis_error"] for finding in result.get("findings", [])
+                 if finding.get("synthesis_error")),
+                None,
+            )
 
             with get_user_db_session(username, password) as db:
                 # Get user settings to store in metadata
@@ -2227,9 +2214,9 @@ class BackgroundJobScheduler:
                 )
 
                 # Get the report content - check both 'report' and 'summary' fields
-                report_content = serializable_result.get(
+                report_content = result.get(
                     "report"
-                ) or serializable_result.get("summary")
+                ) or result.get("summary")
                 logger.debug(
                     f"Report content length: {len(report_content) if report_content else 0} chars"
                 )
@@ -2237,7 +2224,7 @@ class BackgroundJobScheduler:
                 # Extract sources/links from the result. They get
                 # persisted to research_resources AFTER history_entry
                 # commits below (FK requires research_id to exist).
-                sources = serializable_result.get("sources", [])
+                sources = result.get("sources", [])
 
                 # Check the raw final text before changing citation display.
                 from research_verify.publication import publish_report
@@ -2251,40 +2238,22 @@ class BackgroundJobScheduler:
                 sources = [dict(index=str(src.index), title=src.title, url=src.url,
                                 paper_id=src.paper_id) for src in publication.sources]
 
-                # Generate headline and topics for news searches
-                from ..news.utils.headline_generator import generate_headline
-                from ..news.utils.topic_generator import generate_topics
+                query_text = result.get("query", subscription.get("query", "News Update"))
+                generated_headline = None
+                generated_topics = []
+                if not synthesis_error:
+                    from ..news.utils.headline_generator import generate_headline
+                    from ..news.utils.topic_generator import generate_topics
 
-                query_text = result.get(
-                    "query", subscription.get("query", "News Update")
-                )
-
-                # Generate headline from the actual research findings
-                logger.info(
-                    f"Generating headline for subscription {subscription_id}"
-                )
-                generated_headline = generate_headline(
-                    query=query_text,
-                    findings=report_content,
-                    max_length=200,  # Allow longer headlines for news
-                    settings_snapshot=settings_snapshot,
-                )
-
-                # Generate topics from the findings
-                logger.info(
-                    f"Generating topics for subscription {subscription_id}"
-                )
-                generated_topics = generate_topics(
-                    query=query_text,
-                    findings=report_content,
-                    category=subscription.get("name", "News"),
-                    max_topics=6,
-                    settings_snapshot=settings_snapshot,
-                )
-
-                logger.info(
-                    f"Generated headline: {generated_headline}, topics: {generated_topics}"
-                )
+                    generated_headline = generate_headline(
+                        query=query_text, findings=report_content,
+                        max_length=200, settings_snapshot=settings_snapshot,
+                    )
+                    generated_topics = generate_topics(
+                        query=query_text, findings=report_content,
+                        category=subscription.get("name", "News"),
+                        max_topics=6, settings_snapshot=settings_snapshot,
+                    )
 
                 # Get subscription name for metadata
                 subscription_name = subscription.get("name", "")
@@ -2303,7 +2272,8 @@ class BackgroundJobScheduler:
                     id=research_id,
                     query=result.get("query", ""),
                     mode="news_subscription",
-                    status="completed",
+                    status="failed" if synthesis_error else "completed",
+                    error_message=synthesis_error,
                     created_at=datetime.now(UTC).isoformat(),
                     completed_at=datetime.now(UTC).isoformat(),
                     title=title,
@@ -2318,6 +2288,10 @@ class BackgroundJobScheduler:
                         "generated_topics": generated_topics,  # Store topics for categorization
                     },
                 )
+                if synthesis_error:
+                    history_entry.research_meta.update(
+                        synthesis_error=synthesis_error, error=synthesis_error, has_enhanced_report=True,
+                    )
                 db.add(history_entry)
                 db.commit()
 
