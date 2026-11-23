@@ -48,9 +48,11 @@ def _table_year(table_name: str) -> Optional[str]:
 class JCRDatabase:
     """JCR数据库管理类"""
 
-    def __init__(self, db_path: str = DATABASE_PATH):
+    def __init__(self, db_path: str = DATABASE_PATH, *, read_only: bool = False):
         self.db_path = db_path
-        self.init_database()
+        self.read_only = read_only
+        if not read_only:
+            self.init_database()
 
     def init_database(self):
         """初始化数据库"""
@@ -61,7 +63,8 @@ class JCRDatabase:
 
     def search_journal(self, journal_name: str, year: Optional[str] = None) -> List[JournalInfo]:
         """搜索期刊信息"""
-        conn = sqlite3.connect(self.db_path)
+        target = Path(self.db_path).absolute().as_uri() + "?mode=ro" if self.read_only else self.db_path
+        conn = sqlite3.connect(target, uri=self.read_only)
         cursor = conn.cursor()
 
         results = []

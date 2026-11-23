@@ -82,3 +82,11 @@ def test_match_empty_constraint_returns_neutral():
 
 def test_match_many_skips_when_empty():
     assert ConstraintMatcher().match_many([{"index": "1"}], ResearchConstraint()) == {}
+
+
+def test_match_evaluates_the_current_threshold_instead_of_the_cached_answer():
+    source = {"_jcr_check": {"status": "found", "impact_factor": 20,
+                            "minimum_if": 10, "threshold_operator": ">=", "passes_threshold": True}}
+    matcher = ConstraintMatcher()
+    assert matcher.match(source, ResearchConstraint(min_if=20, if_operator=">")).if_ok is False
+    assert matcher.match(source, ResearchConstraint(min_if=20, if_operator=">=")).if_ok is True

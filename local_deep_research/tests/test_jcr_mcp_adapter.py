@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
 
-from research_verify.jcr_adapter import JCRDatabase, lookup_source
+from research_verify.jcr_adapter import JCRDatabase, get_database, lookup_source
 
 
 class JcrMcpAdapterTests(unittest.TestCase):
@@ -47,6 +47,24 @@ class JcrMcpAdapterTests(unittest.TestCase):
         row = lookup_source({"journal": "No Such Journal"}, minimum=10)
         self.assertEqual(row["status"], "metric_unavailable")
         self.assertIsNone(row["passes_threshold"])
+
+
+def test_catalog_survives_a_rebuild_in_the_data_volume(tmp_path, monkeypatch):
+    monkeypatch.delenv("LDR_JCR_CATALOG_PATH", raising=False)
+    monkeypatch.setenv("LDR_DATA_DIR", str(tmp_path))
+    catalog = tmp_path / "journal_data" / "jcr.db"
+    catalog.parent.mkdir()
+    with sqlite3.connect(catalog) as db:
+        db.executescript("CREATE TABLE JCR2025 (Journal, IF); INSERT INTO JCR2025 VALUES ('Test Journal', 23);")
+    get_database.cache_clear()
+    try:
+        assert lookup_source({"journal": "Test Journal"})["impact_factor"] == 23
+        assert get_database().read_only
+        catalog.unlink()
+        assert lookup_source({"journal": "Test Journal"})["status"] == "metric_unavailable"
+        assert not catalog.exists()
+    finally:
+        get_database.cache_clear()
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 import math
+import os
 from pathlib import Path
 import re
 from typing import Any
@@ -19,9 +20,12 @@ from .jcr_mcp.jcr_database import DATABASE_PATH
 
 @lru_cache(maxsize=1)
 def get_database() -> JCRDatabase:
-    if not Path(DATABASE_PATH).is_file():
+    configured = os.environ.get("LDR_JCR_CATALOG_PATH")
+    volume_path = Path(os.environ.get("LDR_DATA_DIR", "/data")) / "journal_data" / "jcr.db"
+    path = Path(configured) if configured else volume_path if volume_path.is_file() else Path(DATABASE_PATH)
+    if not path.is_file():
         raise FileNotFoundError("JCR catalog is missing")
-    return JCRDatabase()
+    return JCRDatabase(str(path), read_only=True)
 
 
 def _norm(value: Any) -> str:
@@ -41,7 +45,8 @@ def _float_metric(value: Any) -> float | None:
     return number if math.isfinite(number) and number >= 0 else None
 
 
-def _passes(value: float | None, minimum: float | None, operator: str) -> bool | None:
+def passes_threshold(metric: Any, minimum: float | None, operator: str) -> bool | None:
+    value = _float_metric(metric)
     if value is None or minimum is None:
         return None
     if operator == ">":
@@ -94,7 +99,8 @@ def lookup_source(
     except Exception as exc:
         return {
             "status": "metric_unavailable",
-            "missing_reason": "jcr_mcp_initialization_failed",
+            "missing_reason": ("jcr_catalog_missing" if isinstance(exc, FileNotFoundError)
+                               else "jcr_mcp_initialization_failed"),
             "error_type": type(exc).__name__,
             "impact_factor": None,
             "passes_threshold": None,
@@ -153,7 +159,7 @@ def lookup_source(
         "impact_factor": value,
         "metric_year": metric_year,
         "requested_metric_year": requested_year,
-        "passes_threshold": _passes(value, minimum, operator),
+        "passes_threshold": passes_threshold(value, minimum, operator),
         "minimum_if": minimum,
         "threshold_operator": operator if minimum is not None else None,
         "partition": row.partition,

@@ -1,7 +1,10 @@
 """Advisory year, language, and model-selected jcr_mcp scope matching."""
 from __future__ import annotations
 
+import math
+
 from .config import VerifyConfig, get_config
+from .jcr_adapter import passes_threshold
 from .models import ConstraintMatch, ResearchConstraint
 from .research_spec import parse_research_spec
 from .textutil import first_nonempty, first_year
@@ -28,7 +31,7 @@ class ConstraintMatcher:
             except (TypeError, ValueError):
                 value = None
             operator = settings.get("if_operator", ">=")
-            if value is not None and value >= 0 and operator in {">", ">=", "="}:
+            if value is not None and math.isfinite(value) and value >= 0 and operator in {">", ">=", "="}:
                 c.min_if = value
                 c.if_operator = operator
                 c.min_if_inclusive = operator != ">"
@@ -57,8 +60,12 @@ class ConstraintMatcher:
                 result = {"status": "unverified", "missing_reason": "jcr_mcp_check_not_selected",
                           "impact_factor": None, "passes_threshold": None}
             m.detail["jcr_check"] = result
-            m.detail["if"] = result.get("impact_factor")
-            passes = result.get("passes_threshold")
+            metric = result.get("impact_factor")
+            m.detail["if"] = metric
+            # Older receipts did not carry a status. A numeric IF from such a
+            # receipt can still be compared against the current constraint.
+            passes = (passes_threshold(metric, c.min_if, c.if_operator)
+                      if result.get("status", "found") == "found" else None)
             if passes is None:
                 m.if_unknown = True
             elif passes is False:

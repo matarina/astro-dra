@@ -12,6 +12,7 @@
 **/node_modules
 **/*.log
 **/*.db
+!local_deep_research/research_verify/jcr_mcp/jcr.db
 **/*.sqlite*
 local-deep-research
 local_deep_research/tests
