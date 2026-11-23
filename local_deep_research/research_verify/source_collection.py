@@ -1,6 +1,33 @@
 """Small, topic-independent corrections to LDR source identity and feedback."""
+from contextlib import contextmanager
+from contextvars import ContextVar
+from time import monotonic
+
 from .retrieval import academic_snippet
 from .source_identity import with_identity
+
+
+_SOURCE_SCOPE: ContextVar[tuple[object, int | None, float] | None] = ContextVar(
+    "subagent_source_scope", default=None,
+)
+
+
+@contextmanager
+def subagent_source_scope(collector, generation, deadline):
+    token = _SOURCE_SCOPE.set((collector, generation, deadline))
+    try:
+        yield
+    finally:
+        _SOURCE_SCOPE.reset(token)
+
+
+def require_open_source_scope(collector: object, generation: int | None) -> None:
+    """Check under the collection lock before mutating shared evidence."""
+    scope = _SOURCE_SCOPE.get()
+    if scope is not None and scope[0] is collector:
+        _, opened_generation, deadline = scope
+        if opened_generation != generation or monotonic() >= deadline:
+            raise RuntimeError("Subagent source collection scope expired")
 
 
 def sources_for_draft(current, accumulated, draft):
@@ -83,6 +110,7 @@ class SourceCollectionMixin:
 
     def add_results(self, results, engine_name="web"):
         with self._lock:
+            require_open_source_scope(self, getattr(self, "_collection_generation", None))
             offset = CollectionOffset(len(self._all_links))
             offset.added = offset.reused = offset.excluded = 0
             offset.flagged = 0

@@ -137,6 +137,7 @@ class SearchResultsCollector:
         self._results: list[dict] = []
         self._sources: list[str] = []
         self._lock = threading.Lock()
+        self._collection_generation = 0
         self._all_links = all_links if all_links is not None else []
         self._max_results = max(10, int(max_results))
         self._identity_map: dict[str, dict] = {}
@@ -252,7 +253,10 @@ class SearchResultsCollector:
         if not results:
             return len(self._all_links)
 
+        from research_verify.source_collection import require_open_source_scope
+
         with self._lock:
+            require_open_source_scope(self, self._collection_generation)
             # Use global offset (all_links) not per-call offset (results)
             # so that indices are unique across sections in detailed reports.
             start_idx = len(self._all_links)
@@ -300,7 +304,10 @@ class SearchResultsCollector:
         lookup and append under one lock prevents two fetches of the same URL
         from allocating separate citation indices.
         """
+        from research_verify.source_collection import require_open_source_scope
+
         with self._lock:
+            require_open_source_scope(self, self._collection_generation)
             duplicate = self._find_duplicate(result)
             if duplicate is not None:
                 self._merge_duplicate(duplicate, result)
@@ -355,6 +362,7 @@ class SearchResultsCollector:
     def reset(self) -> None:
         """Clear per-call state.  ``_all_links`` is intentionally kept."""
         with self._lock:
+            self._collection_generation += 1
             self._results.clear()
             self._sources.clear()
 
@@ -1010,6 +1018,8 @@ def _make_research_subtopic_tool(
         # gap sibling strategies (source_based, focused_iteration) close with
         # @preserve_research_context; captured ONCE here on the lead thread.
         captured_search_context = get_search_context()
+        from research_verify.source_collection import subagent_source_scope
+        collection_generation = getattr(collector, "_collection_generation", None)
 
         # Worker lifecycle timestamps are written under a condition so the
         # drain loop wakes both when a queued task actually starts and when a
@@ -1022,12 +1032,14 @@ def _make_research_subtopic_tool(
 
         def _run_subagent_with_egress(task: tuple[int, str]) -> str:
             task_id, topic = task
+            started = time.monotonic()
             with task_state_changed:
-                task_start_times[task_id] = time.monotonic()
+                task_start_times[task_id] = started
                 task_state_changed.notify_all()
 
+            deadline = min(overall_deadline, started + SUBAGENT_TIMEOUT_SECONDS)
             try:
-                with thread_cleanup():
+                with thread_cleanup(), subagent_source_scope(collector, collection_generation, deadline):
                     # threading.local is NOT inherited by ThreadPoolExecutor
                     # workers, so re-arm the PEP-578 audit-hook backstop for the
                     # subagent's lifetime.
