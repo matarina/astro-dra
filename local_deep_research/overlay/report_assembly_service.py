@@ -13,7 +13,6 @@ silently re-introduce the regex over-strip class of bugs that
 answer-only storage avoids.
 """
 
-import re
 from typing import Any, Dict, List, Optional
 
 from loguru import logger
@@ -22,11 +21,6 @@ from sqlalchemy.orm import Session
 from ...database.models.research import ResearchHistory, ResearchResource
 from ...utilities.search_utilities import format_links_to_markdown
 from ...utilities.url_utils import canonical_url_key
-
-# Line-anchored regexes for the legacy-row guard. See `assemble_full_report`
-# for why a substring `in body` check is too loose.
-_LEGACY_SOURCES_RE = re.compile(r"^## Sources\b", re.MULTILINE)
-_LEGACY_METRICS_RE = re.compile(r"^## Research Metrics\b", re.MULTILINE)
 
 
 def assemble_full_report(
@@ -54,6 +48,7 @@ def assemble_full_report(
     body = research.report_content or ""
 
     from research_verify.publication import KEY, validate_publication, presentation_for_publication, format_sources
+    from research_verify.report_syntax import layout
     meta = research.research_meta if isinstance(research.research_meta, dict) else {}
     if KEY in meta:
         try:
@@ -63,25 +58,21 @@ def assemble_full_report(
             return body
         sources_md = format_sources(publication.sources)
         parts = [publication.content]
-        if sources_md and not _LEGACY_SOURCES_RE.search(publication.content):
+        if sources_md and not layout(publication.content, require_entries=True)[1]:
             parts.append("## Sources\n\n" + sources_md)
         metrics_md = _build_metrics_markdown(research)
         if metrics_md:
             parts.append("## Research Metrics\n" + metrics_md)
         return "\n\n".join(parts)
 
-    # Legacy-row guard: older rows already contain inline
-    # `## Sources` / `## Research Metrics` blocks in report_content. If
-    # we appended freshly-assembled sections to those rows we'd render
-    # the blocks twice. Match only at line-start to avoid false positives
-    # from prose that happens to contain the substring `## Sources` inline
-    # (e.g. an answer that quotes another markdown document).
-    has_legacy_sources = bool(_LEGACY_SOURCES_RE.search(body))
-    has_legacy_metrics = bool(_LEGACY_METRICS_RE.search(body))
+    blocks, bibliography = layout(body, require_entries=True)
+    has_legacy_metrics = any(block.kind == "heading_candidate"
+                             and body[block.start:block.end].strip() == "## Research Metrics"
+                             for block in blocks)
 
     parts = [body]
 
-    if not has_legacy_sources:
+    if not bibliography:
         # Let any failure propagate: the callers already wrap this in a
         # try/except that returns HTTP 500. Swallowing it here would emit a
         # report that looks complete but is silently missing all sources.

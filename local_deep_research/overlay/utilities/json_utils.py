@@ -99,79 +99,30 @@ def extract_json(
     if not text or not text.strip():
         return None
 
-    text = text.strip()
-    text = _strip_code_fences(text)
-    text = _remove_think_tags(text)
-
-    # Step 1: Try direct parse
     try:
-        result = json.loads(text)
-        if isinstance(result, (dict, list)):
-            if expected_type is None or isinstance(result, expected_type):
-                return result
-            # Type mismatch — fall through to bracket extraction
-    except (json.JSONDecodeError, ValueError):
-        pass
+        direct = json.loads(text)
+    except ValueError:
+        direct = None
+    if isinstance(direct, (dict, list)) and (expected_type is None or isinstance(direct, expected_type)):
+        return direct
 
-    # Step 2: Bracket extraction ordered by expected_type
-    if expected_type is list:
-        bracket_pairs = [("[", "]"), ("{", "}")]
-    elif expected_type is dict:
-        bracket_pairs = [("{", "}"), ("[", "]")]
-    else:
-        bracket_pairs = [("{", "}"), ("[", "]")]
-
-    for open_char, close_char in bracket_pairs:
-        extracted = _extract_by_brackets(text, open_char, close_char)
-        if extracted is None:
-            continue
-
-        # Try parsing the extracted substring
-        try:
-            result = json.loads(extracted)
-            if isinstance(result, (dict, list)):
-                if expected_type is None or isinstance(result, expected_type):
-                    return result
-        except (json.JSONDecodeError, ValueError):
-            pass
-
-        # Try cleaning LLM artifacts and retrying
-        cleaned = _clean_llm_json_artifacts(extracted)
-        if cleaned != extracted:
+    text = _remove_think_tags(text)
+    fence = re.search(r"(?ms)^ *```(?:json)?[ \t]*\r?\n(.*?)^ *```[ \t]*$", text, re.I)
+    if fence:
+        text = fence[1]
+    brackets = [("[", "]"), ("{", "}")] if expected_type is list else [("{", "}"), ("[", "]")]
+    for opening, closing in brackets:
+        extracted = _extract_by_brackets(text, opening, closing)
+        if extracted is not None:
             try:
-                result = json.loads(cleaned)
-                if isinstance(result, (dict, list)):
-                    if expected_type is None or isinstance(
-                        result, expected_type
-                    ):
-                        return result
-            except (json.JSONDecodeError, ValueError):
-                pass
+                parsed = json.loads(_clean_llm_json_artifacts(extracted))
+            except ValueError:
+                continue
+            if expected_type is None or isinstance(parsed, expected_type):
+                return parsed
 
     logger.debug("No valid JSON found in text")
     return None
-
-
-# ---------------------------------------------------------------------------
-# Private helpers
-# ---------------------------------------------------------------------------
-
-
-def _strip_code_fences(text: str) -> str:
-    """Remove markdown code fences from text.
-
-    Uses split-based extraction (not startswith) to handle fences
-    appearing mid-text with surrounding prose.
-    """
-    if "```json" in text:
-        parts = text.split("```json")
-        if len(parts) > 1:
-            return parts[1].split("```")[0].strip()
-    elif "```" in text:
-        parts = text.split("```")
-        if len(parts) >= 3:
-            return parts[1].strip()
-    return text
 
 
 def _extract_by_brackets(
@@ -190,30 +141,10 @@ def _extract_by_brackets(
 
 
 def _clean_llm_json_artifacts(text: str) -> str:
-    """Clean common LLM JSON artifacts from malformed JSON text.
-
-    Only called after json.loads has already failed, so the text is
-    already malformed. These regexes cannot corrupt valid JSON.
-
-    Handles:
-    - Trailing commas before ] or }
-    - Inline // comments
-    - Ellipsis entries (... or "...")
-    """
-    # Remove trailing commas
-    text = re.sub(r",\s*([}\]])", r"\1", text)
-    # Remove line comments only when ``//`` is outside a JSON string.  A
-    # regex cannot distinguish a comment from the scheme in a URL such as
-    # ``https://example.org/path``.  Preserve the raw response and make this
-    # bounded recovery conservative: escaped quotes and backslashes retain
-    # their JSON-string meaning; unterminated strings are left for json.loads
-    # to reject rather than silently deleting scientific evidence.
-    text = _strip_json_comments(text)
-    # Remove ellipsis entries, preserving comma separator when between items
-    text = re.sub(
-        r',\s*"?\.\.\.+"?\s*,', ",", text
-    )  # between items: keep one comma
-    return re.sub(r',?\s*"?\.\.\.+"?\s*', "", text)  # trailing/leading ellipsis
+    """Remove comments and trailing separators outside quoted strings."""
+    tokens = r'"(?:[^"\\]|\\.)*"|,\s*(?=[}\]])'
+    return re.sub(tokens, lambda token: token[0] if token[0].startswith('"') else "",
+                  _strip_json_comments(text), flags=re.S)
 
 
 def _strip_json_comments(text: str) -> str:

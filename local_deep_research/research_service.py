@@ -33,7 +33,6 @@ from ...utilities.thread_context import set_search_context
 from ...report_generator import IntegratedReportGenerator
 from ...search_system import AdvancedSearchSystem
 from ...text_optimization import CitationFormatter, CitationMode
-from ...utilities.url_utils import canonical_url_key
 from ...utilities.log_utils import log_for_research
 from ...utilities.search_utilities import extract_links_from_search_results
 from ...utilities.threading_utils import thread_context, thread_with_app_context
@@ -347,58 +346,6 @@ def get_citation_formatter():
     return CitationFormatter(mode=mode)
 
 
-# Citation processing is deliberately performed at the report boundary.  The
-# search system's ``all_links_of_system`` is a candidate pool shared by all
-# report sections; it is not a bibliography.  Keeping that distinction here
-# prevents thousands of merely-discovered URLs from being saved and rendered
-# as references.
-_INLINE_CITATION_RE = re.compile(
-    r"(?<![\[【])[\[【](\d+(?:\s*[,，]\s*\d+)*?)[\]】](?![\]】])"
-)
-
-
-def _citation_source_identity(source: dict) -> str:
-    """Return a conservative work identity for citation-level deduplication."""
-    doi = str(source.get("doi") or "").strip().lower()
-    doi = re.sub(r"^(?:https?://(?:dx\.)?doi\.org/|doi:\s*)", "", doi)
-    if doi:
-        return f"doi:{doi.rstrip('.') }"
-
-    for field in ("pmid", "pmcid", "arxiv_id"):
-        value = str(source.get(field) or "").strip().lower()
-        if value:
-            if field == "arxiv_id":
-                value = re.sub(r"v\d+$", "", value)
-            return f"{field}:{value}"
-
-    url = str(source.get("link") or source.get("url") or "").strip()
-    # Capture arXiv aliases even when the search engine did not populate an
-    # explicit arxiv_id field.  This also collapses /abs, /html and /pdf.
-    match = re.search(
-        r"arxiv\.org/(?:abs|html|pdf)/((?:[a-z-]+(?:\.[A-Z]+)?/\d{7}|\d{4}\.\d{4,5})(?:v\d+)?)(?:\.pdf)?",
-        url,
-        flags=re.IGNORECASE,
-    )
-    if match:
-        arxiv_id = re.sub(r"v\d+$", "", match.group(1).lower())
-        return f"arxiv_id:{arxiv_id}"
-
-    title = str(source.get("title") or source.get("name") or "").casefold()
-    title = re.sub(r"[^\w]+", " ", title, flags=re.UNICODE).strip()
-    year = str(
-        source.get("year")
-        or source.get("publication_year")
-        or source.get("published")
-        or source.get("publication_date")
-        or ""
-    )[:4]
-    if len(title) >= 20:
-        return f"title:{title}|{year}"
-
-    canonical = canonical_url_key(url)
-    return f"url:{canonical}" if canonical else f"object:{id(source)}"
-
-
 def _merge_citation_source(existing: dict, incoming: dict) -> None:
     """Keep the richest metadata while retaining the first cited source."""
     for field, value in incoming.items():
@@ -413,90 +360,60 @@ def _merge_citation_source(existing: dict, incoming: dict) -> None:
 
 
 def _compact_citations(
-    answer: str, sources: list[dict]
+    answer: str, sources: list[dict], formatter=None
 ) -> tuple[str, list[dict]]:
-    """Keep cited works only, deduplicate them, and renumber citations.
+    """Number resolved Markdown citations in first-use order."""
+    from research_verify.evidence import SourceLookup, paper_identity
+    from research_verify.report_syntax import citation_spans
+    from research_verify.source_identity import identity_fields
 
-    ``answer`` must be the report body without its generated Sources tail.
-    The returned source list is therefore exactly the set that can appear in
-    the final bibliography.
-    """
-    if not answer or not sources:
-        return answer or "", []
-
-    source_by_index: dict[str, dict] = {}
-    for position, source in enumerate(sources, start=1):
-        if not isinstance(source, dict):
+    lookup = SourceLookup([{"index": i, **source} for i, source in enumerate(sources, 1)
+                           if isinstance(source, dict)])
+    citations = citation_spans(answer, require_entries=True)
+    order = dict.fromkeys(i for citation in citations for i in citation.indices)
+    unresolved = {i for i in order if lookup.find_by_index(i) is None}
+    selected, mapping, identities = [], {}, {}
+    next_index = 1
+    for index in order:
+        if index in unresolved:
             continue
-        copied = dict(source)
-        raw_index = copied.get("index", position)
-        if isinstance(raw_index, bool) or not str(raw_index).isdigit() or int(raw_index) < 1:
-            continue
-        source_by_index.setdefault(str(int(raw_index)), copied)
-
-    identity_to_source: dict[str, dict] = {}
-    old_to_new_index: dict[str, str] = {}
-    selected: list[dict] = []
-
-    from research_verify.citation_qc import _strip_appendices
-    audit_start = re.search(r"(?im)^#{1,6}\s+(?:摘要支持情况|结论可溯源性核查|条件匹配核验|关键词覆盖核验|文献真实性核验)\s*$", answer)
-    if audit_start:
-        answer = answer[:audit_start.start()] + _INLINE_CITATION_RE.sub(
-            lambda m: "〔原引用" + m[1] + "〕", answer[audit_start.start():])
-    for match in _INLINE_CITATION_RE.finditer(_strip_appendices(answer)):
-        for raw_number in re.split(r"\s*[,，]\s*", match.group(1)):
-            old_index = str(int(raw_number))
-            source = source_by_index.get(old_index)
-            if source is None:
-                continue
-            identity = _citation_source_identity(source)
-            existing = identity_to_source.get(identity)
-            if existing is not None:
+        source = lookup.find_by_index(index)
+        key = paper_identity(source) or ("index", index)
+        incoming_ids = identity_fields(source)
+        for existing in identities.get(key, ()):
+            previous_ids = identity_fields(existing)
+            if all(previous_ids[k] == incoming_ids[k] for k in previous_ids.keys() & incoming_ids.keys()):
                 _merge_citation_source(existing, source)
-                if old_index not in existing["original_indices"]:
-                    existing["original_indices"].append(old_index)
-                old_to_new_index[old_index] = str(existing["index"])
-                continue
+                existing["original_indices"].append(str(index))
+                mapping[index] = existing
+                break
+        else:
+            while next_index in unresolved:
+                next_index += 1
+            entry = {**source, "index": str(next_index), "original_indices": [str(index)]}
+            identities.setdefault(key, []).append(entry)
+            selected.append(entry)
+            mapping[index] = entry
+            next_index += 1
 
-            new_index = str(len(selected) + 1)
-            source["index"] = new_index
-            source["original_indices"] = [old_index]
-            identity_to_source[identity] = source
-            old_to_new_index[old_index] = new_index
-            selected.append(source)
-
-    def replace_marker(match: re.Match) -> str:
-        mapped: list[str] = []
-        for raw_number in re.split(r"\s*[,，]\s*", match.group(1)):
-            new_index = old_to_new_index.get(str(int(raw_number)))
-            if new_index and new_index not in mapped:
-                mapped.append(new_index)
-        if not mapped:
-            return match.group(0)
-        return "[" + ", ".join(mapped) + "]"
-
-    rewritten = _INLINE_CITATION_RE.sub(replace_marker, answer)
-    logger.info(
-        "Citation compaction: {} candidate sources -> {} cited unique works",
-        len(sources),
-        len(selected),
-    )
-    return rewritten, selected
+    for citation in reversed(citations):
+        if not mapping.keys() & set(citation.indices):
+            continue
+        mapped = [mapping[i] for i in citation.indices if i in mapping]
+        indices = dict.fromkeys(mapping[i]["index"] if i in mapping else str(i) for i in citation.indices)
+        label = "[" + ", ".join(indices) + "]"
+        if formatter:
+            label = formatter.apply_inline_hyperlinks(label, mapped)
+        answer = answer[:citation.start] + label + answer[citation.end:]
+    return answer, selected
 
 
 def _format_checked_answer(content, sources, formatter=None):
-    """Keep checked text and its citation mapping together on every fallback."""
     try:
-        compacted, selected = _compact_citations(content, sources)
+        return _compact_citations(content, sources, formatter or get_citation_formatter())
     except Exception:
-        logger.warning("Citation compaction failed; preserving checked text and its original source mapping")
+        logger.exception("Citation formatting failed; preserving original text and source mapping")
         return content, sources
-    try:
-        formatter = formatter or get_citation_formatter()
-        return formatter.apply_inline_hyperlinks(compacted, selected), selected
-    except Exception:
-        logger.warning("Citation hyperlinking failed; preserving checked text with compacted citation indices")
-        return compacted, selected
 
 
 def export_report_to_memory(
@@ -1942,148 +1859,31 @@ def run_research_process(research_id, query, mode, **kwargs):
                 f"{error_message} (Error type: {error_type})"
             ) from search_error
 
+        strategy_error = results.get("error") or next(
+            (finding["content"] for finding in results.get("findings", [])
+             if finding.get("phase") == "Error" and finding.get("content")), None
+        )
         report_error = results.get("synthesis_error")
-        if not report_error and results.get("error"):
-            report_error = INCOMPLETE_SYNTHESIS_MESSAGE
+        if strategy_error:
+            report_error = report_error or INCOMPLETE_SYNTHESIS_MESSAGE
         report_metadata = {}
         formatter = None
         if mode == "quick":
-            if not (results.get("findings") or results.get("formatted_findings")):
-                raise RuntimeError("No research findings were generated. Please try again.")
-            raw_formatted_findings = results["formatted_findings"]
-
-            # Check if formatted_findings contains an error message
-            if isinstance(
-                raw_formatted_findings, str
-            ) and raw_formatted_findings.startswith("Error:"):
-                logger.error(
-                    f"Detected error in formatted findings: {raw_formatted_findings[:100]}..."
-                )
-
-                error_message = raw_formatted_findings.lower()
-                error_types = (
-                    (("token limit", "context length"), "token_limit", "Synthesis hit token limits"),
-                    (("timeout", "timed out"), "timeout", "Synthesis timed out"),
-                    (("rate limit",), "rate_limit", "LLM rate limit reached"),
-                    (("connection", "network"), "connection", "Connection issue with LLM"),
-                    (("llm error", "final answer synthesis fail"), "llm_error", "LLM error during synthesis"),
-                )
-                error_type, message = next(
-                    ((kind, label) for phrases, kind, label in error_types
-                     if any(phrase in error_message for phrase in phrases)),
-                    ("unknown", "Error during synthesis"),
-                )
-                progress_callback(
-                    f"{message}. Attempting fallback...", 87,
-                    {"phase": "synthesis_error", "error_type": error_type},
-                )
-                report_error = INCOMPLETE_SYNTHESIS_MESSAGE
-
-                # Extract synthesized content from findings if available
-                synthesized_content = ""
-                for finding in results.get("findings", []):
-                    if finding.get("phase") == "Final synthesis":
-                        synthesized_content = finding.get("content", "")
-                        break
-
-                # Use synthesized content as fallback
-                if (
-                    synthesized_content
-                    and not synthesized_content.startswith("Error:")
-                ):
-                    logger.info(
-                        "Using existing synthesized content as fallback"
-                    )
-                    raw_formatted_findings = synthesized_content
-
-                # Or use current_knowledge as another fallback
-                elif results.get("current_knowledge"):
-                    logger.info("Using current_knowledge as fallback")
-                    raw_formatted_findings = results["current_knowledge"]
-
-                # Or combine all finding contents as last resort
-                elif results.get("findings"):
-                    logger.info("Combining all findings as fallback")
-                    # First try to use any findings that are not errors
-                    valid_findings = [
-                        f"## {finding.get('phase', 'Finding')}\n\n{finding.get('content', '')}"
-                        for finding in results.get("findings", [])
-                        if finding.get("content")
-                        and not finding.get("content", "").startswith(
-                            "Error:"
-                        )
-                    ]
-
-                    synthesis_error = raw_formatted_findings
-                    if valid_findings:
-                        raw_formatted_findings = (
-                            "# Research Results (Fallback Mode)\n\n"
-                        )
-                        raw_formatted_findings += "\n\n".join(
-                            valid_findings
-                        )
-                        raw_formatted_findings += (
-                            f"\n\n## Error Information\n{synthesis_error}"
-                        )
-                    else:
-                        # Last resort: use everything including errors
-                        raw_formatted_findings = (
-                            "# Research Results (Emergency Fallback)\n\n"
-                        )
-                        raw_formatted_findings += "The system encountered errors during final synthesis.\n\n"
-                        raw_formatted_findings += "\n\n".join(
-                            f"## {finding.get('phase', 'Finding')}\n\n{finding.get('content', '')}"
-                            for finding in results.get("findings", [])
-                            if finding.get("content")
-                        )
-
-                progress_callback(
-                    f"Using fallback synthesis due to {error_type} error",
-                    88,
-                    {
-                        "phase": "synthesis_fallback",
-                        "error_type": error_type,
-                    },
-                )
-
-            logger.info(
-                "Found formatted_findings of length: {}",
-                len(str(raw_formatted_findings)),
-            )
-
-            # Check if we have an error in the findings and use enhanced error handling
-            if isinstance(
-                raw_formatted_findings, str
-            ) and raw_formatted_findings.startswith("Error:"):
-                logger.info(
-                    "Generating enhanced error report using ErrorReportGenerator"
-                )
-
-                # Generate comprehensive error report
-                # ErrorReportGenerator does not use LLM (kept for compat)
-                error_generator = ErrorReportGenerator()
-                clean_markdown = error_generator.generate_error_report(
-                    error_message=raw_formatted_findings,
+            clean_markdown = _extract_synthesized_answer(results)
+            if strategy_error and not results.get("final_report") and clean_markdown == strategy_error:
+                clean_markdown = ""
+            if strategy_error and not clean_markdown:
+                clean_markdown = ErrorReportGenerator().generate_error_report(
+                    error_message=strategy_error,
                     query=query,
                     partial_results=results,
                     search_iterations=results.get("iterations", 0),
                     research_id=research_id,
                 )
-
-                logger.info(
-                    "Generated enhanced error report with {} characters",
-                    len(clean_markdown),
-                )
-            else:
-                # report_content stores the synthesized answer
-                # only (see _extract_synthesized_answer for the
-                # full rationale). Fall back to the formatted
-                # blob only when neither Final synthesis nor
-                # current_knowledge is populated — leaks
-                # sources, but at least we save *something*.
-                clean_markdown = _extract_synthesized_answer(results)
-                if not isinstance(results.get("final_report"), dict):
-                    clean_markdown = clean_markdown or raw_formatted_findings
+            if not clean_markdown and not isinstance(results.get("final_report"), dict):
+                clean_markdown = results.get("formatted_findings") or ""
+                if not clean_markdown:
+                    raise RuntimeError("No research findings were generated. Please try again.")
 
             # Wrapped strategies accumulate links on the search system.
             # Some legacy findings also carry their own sources.
