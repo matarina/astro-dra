@@ -20,6 +20,7 @@ class JournalInfo:
     warning_status: Optional[str] = None
     ccf_level: Optional[str] = None
     year: Optional[str] = None
+    issns: tuple[str, ...] = ()
 
 def _table_year(table_name: str) -> Optional[str]:
     """从表名中提取年份，规则需与 _parse_journal_info 的分支顺序保持一致
@@ -58,7 +59,8 @@ class JCRDatabase:
             conn = sqlite3.connect(self.db_path)
             conn.close()
 
-    def search_journal(self, journal_name: str, year: Optional[str] = None) -> List[JournalInfo]:
+    def search_journal(self, journal_name: str, year: Optional[str] = None, *,
+                       issns: tuple[str, ...] = ()) -> List[JournalInfo]:
         """搜索期刊信息"""
         target = Path(self.db_path).absolute().as_uri() + "?mode=ro" if self.read_only else self.db_path
         conn = sqlite3.connect(target, uri=self.read_only)
@@ -83,9 +85,19 @@ class JCRDatabase:
                     if 'Journal' not in columns:
                         continue
 
-                    # 构建查询语句
-                    query = f"SELECT * FROM {table} WHERE Journal LIKE ? COLLATE NOCASE"
-                    cursor.execute(query, (f"%{journal_name}%",))
+                    if issns:
+                        id_columns = [col for col in columns if col.casefold() in {"issn", "eissn"}]
+                        if not id_columns or not table.startswith("JCR"):
+                            continue
+                        placeholders = ",".join("?" for _ in issns)
+                        where = " OR ".join(
+                            f"upper(replace(trim({col}), '-', '')) IN ({placeholders})"
+                            for col in id_columns
+                        )
+                        cursor.execute(f"SELECT * FROM {table} WHERE {where}", issns * len(id_columns))
+                    else:
+                        cursor.execute(f"SELECT * FROM {table} WHERE Journal LIKE ? COLLATE NOCASE",
+                                       (f"%{journal_name}%",))
 
                     rows = cursor.fetchall()
                     column_names = [description[0] for description in cursor.description]
@@ -232,7 +244,10 @@ class JCRDatabase:
                 category=category,
                 warning_status=warning_status,
                 ccf_level=ccf_level,
-                year=year
+                year=year,
+                issns=tuple(str(v).strip().replace("-", "").upper()
+                            for k, v in row_dict.items()
+                            if k.casefold() in {"issn", "eissn"} and _clean(v)),
             )
 
         except Exception:

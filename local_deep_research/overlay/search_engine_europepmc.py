@@ -54,7 +54,7 @@ class EuropePMCSearchEngine(BaseSearchEngine):
             if not identifier or not source:
                 continue
             abstract = html_text(record.get("abstractText"))
-            journal = record.get("journalInfo") or {}
+            journal = (record.get("journalInfo") or {}).get("journal") or {}
             title = html_text(record.get("title"))
             item = {
                 "id": identifier, "title": title,
@@ -63,8 +63,9 @@ class EuropePMCSearchEngine(BaseSearchEngine):
                 "link": f"https://europepmc.org/article/{source}/{identifier}",
                 "doi": record.get("doi") or "", "pmid": record.get("pmid") or (identifier if source == "MED" else ""),
                 "pmcid": record.get("pmcid") or (identifier if source == "PMC" else ""), "source": "Europe PMC",
-                "journal": (journal.get("journal") or {}).get("title") or "",
-                "journal_ref": (journal.get("journal") or {}).get("title") or None,
+                "journal": journal.get("title") or "",
+                "journal_ref": journal.get("title") or None,
+                "issn": journal.get("issn"), "eissn": journal.get("essn") or journal.get("eissn"),
                 "pubdate": record.get("firstPublicationDate") or record.get("pubYear") or "",
                 "language": record.get("language") or record.get("languageOfFullText") or "",
                 "publication_types": (record.get("pubTypeList") or {}).get("pubType") or [],

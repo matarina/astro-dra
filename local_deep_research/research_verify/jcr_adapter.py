@@ -65,12 +65,7 @@ def lookup_source(
     operator: str = ">=",
     year: int | str | None = "latest",
 ) -> dict[str, Any]:
-    """Return a structured jcr_mcp lookup bound to one collected source.
-
-    jcr_mcp's upstream schema is journal-name based and does not carry article
-    ISSNs. We therefore require an exact normalized journal-name match among
-    the returned records and return ``ambiguous`` instead of guessing.
-    """
+    """Resolve a collected journal by ISSN, or by an exact normalized title."""
     if minimum is not None:
         if isinstance(minimum, bool) or not isinstance(minimum, (int, float)):
             return {"status": "invalid_input", "missing_reason": "minimum_if_invalid"}
@@ -86,7 +81,12 @@ def lookup_source(
         or source.get("container_title")
         or ""
     ).strip()
-    if not journal:
+    issns = tuple(dict.fromkeys(
+        identifier for field in ("issn", "eissn", "essn")
+        if re.fullmatch(r"[0-9]{7}[0-9X]",
+                        identifier := str(source.get(field) or "").strip().replace("-", "").upper())
+    ))
+    if not journal and not issns:
         return {
             "status": "metric_unavailable",
             "missing_reason": "journal_identity_missing",
@@ -95,7 +95,12 @@ def lookup_source(
             "requested_metric_year": requested_year,
         }
     try:
-        rows = get_database().search_journal(journal)
+        database = get_database()
+        exact = database.search_journal(journal, issns=issns) if issns else []
+        match_method = "issn" if exact else "journal_title"
+        if not exact and journal:
+            exact = [row for row in database.search_journal(journal)
+                     if _norm(row.journal_name) == _norm(journal) and (not issns or not row.issns)]
     except Exception as exc:
         return {
             "status": "metric_unavailable",
@@ -106,7 +111,6 @@ def lookup_source(
             "passes_threshold": None,
             "requested_metric_year": requested_year,
         }
-    exact = [row for row in rows if _norm(row.journal_name) == _norm(journal)]
     if not exact:
         return {
             "status": "metric_unavailable",
@@ -117,13 +121,17 @@ def lookup_source(
             "requested_metric_year": requested_year,
         }
     metric_rows = [row for row in exact if _float_metric(row.impact_factor) is not None]
+    if match_method == "issn" and len({_norm(row.journal_name) for row in metric_rows}) > 1:
+        return {"status": "ambiguous", "missing_reason": "conflicting_journal_identifiers",
+                "query": journal, "impact_factor": None, "passes_threshold": None,
+                "requested_metric_year": requested_year}
     if requested_year != "latest":
         try:
             exact = [row for row in metric_rows if str(row.year) == str(int(requested_year))]
         except (TypeError, ValueError):
             exact = []
     else:
-        years = [int(row.year) for row in metric_rows if str(row.year).isdigit()]
+        years = [int(row.year) for row in metric_rows if row.year and row.year.isdigit()]
         if years:
             latest = max(years)
             exact = [row for row in metric_rows if str(row.year) == str(latest)]
@@ -136,9 +144,7 @@ def lookup_source(
             "passes_threshold": None,
             "requested_metric_year": requested_year,
         }
-    values = {_float_metric(row.impact_factor) for row in exact}
-    values.discard(None)
-    if len(exact) != 1 or len(values) > 1:
+    if len(exact) != 1:
         return {
             "status": "ambiguous",
             "missing_reason": "multiple_exact_jcr_records",
@@ -150,12 +156,13 @@ def lookup_source(
         }
     row = exact[0]
     value = _float_metric(row.impact_factor)
-    metric_year = int(row.year) if str(row.year).isdigit() else row.year
+    metric_year = int(row.year) if row.year and row.year.isdigit() else row.year
     return {
         "status": "found" if value is not None else "metric_unavailable",
         "missing_reason": None if value is not None else "metric_not_numeric",
         "query": journal,
         "journal": row.journal_name,
+        "journal_match": match_method,
         "impact_factor": value,
         "metric_year": metric_year,
         "requested_metric_year": requested_year,
