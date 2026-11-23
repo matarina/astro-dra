@@ -10,7 +10,6 @@ import re
 from bisect import bisect_right
 from dataclasses import replace
 from datetime import datetime, timezone
-from types import SimpleNamespace
 
 from .citation_display import cited_indices
 from .claims import extract_report_claims
@@ -702,13 +701,12 @@ def confirm_repairs(handler, answer, issues, material, question, trace, invoke=N
     if not eligible:return answer, [], unresolved
     texts = visible_texts(material)
     headers = visible_headers(material)
+    publication_relationships = re.findall(
+        r'^(?:Publication relation|Related version source index):.*', material, re.M,
+    )
     candidates = []
     for issue in eligible:
-        text = texts[int(issue['source_id'])]
-        quotes = issue['evidence_quote']
-        quote = quotes if isinstance(quotes,str) else (quotes[0] if quotes else '')
-        position = text.find(quote)
-        context = text
+        context = texts[int(issue['source_id'])]
         evidence_ids = issue.get('source_ids') or [issue['source_id']]
         # Evidence quotations select a reason for review, not the full citation
         # scope of the original/proposed text. Preserve other cited material so
@@ -733,13 +731,13 @@ def confirm_repairs(handler, answer, issues, material, question, trace, invoke=N
         candidates.append({'original':issue['statement'],'replacement':issue['replacement'],
             'status':issue['status'],
             'source_metadata':headers.get(int(issue['source_id']),''),
-            'source_id':issue['source_id'],'evidence_quote':quotes,'source_context':context,
+            'source_id':issue['source_id'],'evidence_quote':issue['evidence_quote'],'source_context':context,
             'source_ids':issue.get('source_ids') or [issue['source_id']],
             'evidence_sources':issue.get('evidence_sources') or [],
             'source_contexts':source_contexts,
             'section_context':headings,'destination_heading':issue.get('destination_heading'),
             'table_context':issue.get('table_context',''),
-            'publication_relationships':re.findall(r'^(?:Publication relation|Related version source index):.*',material,re.M)})
+            'publication_relationships':publication_relationships})
     prompt = f"""Independently validate proposed local report changes using ONLY the evidence below.
 Question: {question}
 Do not assume the earlier reviewer is right. Approve a replacement only if the
@@ -1262,8 +1260,10 @@ def synthesize(handler, question, sources, draft, trace, nr_of_links=0):
     except ValueError as exc:
         trace.record('evidence_plan_error',{'error_type':type(exc).__name__})
         trace.record('final_response',{'text':draft,'text_sha256':text_digest(draft),'status':'evidence_budget_unavailable'})
-        return {'content':draft,'documents':documents,'evidence_review':{'status':'evidence_budget_unavailable'}}
+        return {'content': draft, 'documents': documents, 'synthesis_error': 'evidence_budget_unavailable',
+                'evidence_review': {'status': 'evidence_budget_unavailable'}}
     answers, reports, used_documents = [], [], []
+    writer_incomplete = False
     writer_context_receipts = []
     checking = handler.is_fact_checking_enabled()
     network_state = {'fetcher':custom_fetcher}
@@ -1292,16 +1292,17 @@ def synthesize(handler, question, sources, draft, trace, nr_of_links=0):
             selector=lambda prompt: handler._invoke_text(prompt, trace=trace, stage='source_selection'),
             max_chars=budget, trace=trace, required_ids=required, reading_scope=reading_scope,
         )
+        visible_ids = source_ids(material)
         writer_context_receipts.append({
             'batch': number,
             'input_mode': 'draft_and_sources',
             'draft_sha256': text_digest(working),
             'prior_draft_available': bool(writing_draft),
-            'source_ids': source_ids(material),
+            'source_ids': visible_ids,
             'context_chars': len(material),
             'context_sha256': text_digest(material),
         })
-        trace.record('writer_sources',{'text':material,'source_ids':source_ids(material),'batch':number})
+        trace.record('writer_sources', {'text': material, 'source_ids': visible_ids, 'batch': number})
         trace.record('writer_reading_scope',{'sources':reading_scope,'batch':number,
                                           'purpose':'reading_limits_not_study_findings'})
         reading_notes = ''
@@ -1343,7 +1344,7 @@ Provide the answer with citations. Do not create the bibliography or invent sour
                                        'input_mode': 'draft_and_sources',
                                        'draft_sha256': text_digest(working),
                                        'source_context_sha256': text_digest(str(material)),
-                                       'source_ids': source_ids(material),
+                                       'source_ids': visible_ids,
                                        'prior_draft_available': bool(writing_draft)})
         writer_exposure = None
         if handler.get_setting('citation.include_writer_exposure_context', False):
@@ -1355,8 +1356,12 @@ Provide the answer with citations. Do not create the bibliography or invent sour
                 trace.record('writer_exposure_unavailable', {'batch': number, 'error_type': type(exc).__name__})
         # Buffer when reviewing: clients must not see a pre-repair answer that
         # differs from the final returned/stored text.
-        answer = (handler._invoke_text(prompt,trace=trace,stage='writer') if checking else
-                  handler._invoke_with_streaming(prompt,trace=trace,stage='writer'))
+        writer = handler._invoke_text if checking else handler._invoke_with_streaming
+        writer_options = {'trace': trace, 'stage': 'writer'}
+        if getattr(handler, '_writer_jcr_tool_factory', None) is not None:
+            writer_options['source_count'] = len(visible_ids)
+        answer = writer(prompt, **writer_options)
+        writer_incomplete |= getattr(handler, "_writer_incomplete", False)
         applied, unresolved = [], []
         # Tool-selected enrichments (for example a journal metric) update the
         # shared source records during writing. Refresh already-created review
@@ -1373,7 +1378,7 @@ Provide the answer with citations. Do not create the bibliography or invent sour
             trace.record('native_check_skipped',{'reason':'disabled'})
         answers.append(answer)
         reports.append({'applied':applied,'unresolved':unresolved})
-        used = set(source_ids(material)) | (reviewed_ids if checking else set())
+        used = set(visible_ids) | (reviewed_ids if checking else set())
         used_documents.extend(d for d in documents if int(d.metadata['index']) in used)
     final = '\n\n'.join(answers)
     trace.record('final_response',{'text':final,'text_sha256':text_digest(final),'parts':len(answers)})
@@ -1419,6 +1424,7 @@ Provide the answer with citations. Do not create the bibliography or invent sour
     # outer strategy may preserve only the report/document keys.
     handler.writer_context_receipts = writer_context_receipts
     return {'content':final,'documents':used_documents,
+            'synthesis_error': 'writer_incomplete' if writer_incomplete else None,
             'evidence_grounding': handler.evidence_grounding,
             'evidence_review':{'parts':reports,'status':status,
                                'writer_context_receipts': writer_context_receipts}}

@@ -189,6 +189,7 @@ def test_nonempty_length_stopped_structured_response_retries_but_writer_does_not
     prose_writer = handler(prose)
     assert prose_writer._invoke_text('writer prose', stage='writer') == '```json {"readings": ['
     assert prose.calls == 1 and prose.bound_tokens is None
+    assert prose_writer._writer_incomplete is True
 
 
 def test_source_snapshot_preserves_scope_and_evidence_metadata():

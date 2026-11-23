@@ -51,8 +51,12 @@ def collector():
 
 
 def handler(model):
+    from research_verify.generation import IncompleteSynthesisError
+
     ns = {**vars(typing), "ABC": ABC, "abstractmethod": abstractmethod,
           "Document": SimpleNamespace, "logger": logger,
+          "ResearchTerminatedException": type("ResearchTerminatedException", (Exception,), {}),
+          "IncompleteSynthesisError": IncompleteSynthesisError,
           "unwrap_setting": lambda value: value, "datetime": datetime, "timezone": timezone,
           "source_material": source_material, "format_source_documents": format_source_documents,
           "GROUNDING_INSTRUCTIONS": GROUNDING_INSTRUCTIONS,

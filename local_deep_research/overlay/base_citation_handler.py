@@ -6,10 +6,12 @@ from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from langchain_core.documents import Document
+from langchain_core.messages import AIMessage, ToolMessage
 from loguru import logger
-from research_verify.generation import source_material, format_source_documents
+from research_verify.generation import IncompleteSynthesisError, source_material, format_source_documents
 from research_verify.synthesis_trace import record_model_response
 
+from ..exceptions import ResearchTerminatedException
 from ..utilities.type_utils import unwrap_setting
 from ..utilities.json_utils import get_llm_response_text
 
@@ -23,6 +25,7 @@ class BaseCitationHandler(ABC):
         self._fact_checking_logged = False
         self.stream_callback: Optional[Callable[[str], None]] = None
         self._writer_jcr_tool_factory = None
+        self._writer_incomplete = False
 
     def set_writer_jcr_tool_factory(self, factory) -> None:
         """Install the strategy-owned model-selected JCR tool factory."""
@@ -43,66 +46,67 @@ class BaseCitationHandler(ABC):
             "Use the tool only when the requested report requires journal impact factors."
         )
 
-    def _invoke_plain_text(self, prompt: str, *, trace=None, stage="model") -> str:
-        """Plain invocation helper used by the tool-routing fallback."""
-        response = self.llm.invoke(prompt)
-        text = get_llm_response_text(response)
-        record_model_response(trace, stage, response, text)
-        return text
+    def _invoke_writer_agent(self, prompt: str, *, trace=None, source_count: int | None = None) -> str:
+        """Give each supplied source room for a lookup and keep receipts on retry."""
+        from langchain.agents import create_agent
 
-    def _invoke_writer_agent(self, prompt: str, *, trace=None) -> str:
-        """Run the writer as a model-selected tool-calling agent."""
+        messages = []
         try:
-            from langchain.agents import create_agent
-
             agent = create_agent(
                 model=self.llm,
                 tools=[self._writer_jcr_tool_factory()],
                 system_prompt=self._writer_jcr_system_prompt(),
             )
-            result = agent.invoke(
+            # Each serial lookup takes a model and a tool step. Leave a final
+            # model step after the last lookup, including for direct callers.
+            recursion_limit = 2 * (20 if source_count is None else source_count) + 3
+            for state in agent.stream(
                 {"messages": [{"role": "user", "content": prompt}]},
-                {"recursion_limit": 25},
+                {"recursion_limit": recursion_limit},
+                stream_mode="values",
+            ):
+                messages = state["messages"]
+            final = messages[-1] if messages else None
+            if not isinstance(final, AIMessage):
+                raise IncompleteSynthesisError("Writer did not return an assistant message")
+            text = get_llm_response_text(final)
+            self._check_writer_text(final, text)
+            record_model_response(
+                trace, "writer", final, text, tool_calling=True,
+                tool_call_count=sum(isinstance(message, ToolMessage) for message in messages),
             )
-            messages = result.get("messages", []) if isinstance(result, dict) else []
-            final = None
-            for message in reversed(messages):
-                content = getattr(message, "content", None)
-                if content and not getattr(message, "tool_calls", None):
-                    final = message
-                    break
-            if final is None and messages:
-                final = messages[-1]
-            text = get_llm_response_text(final if final is not None else result)
-            if trace:
-                trace.record("writer_jcr_agent", {
-                    "tool": "search_journal",
-                    "enabled": True,
-                    "message_count": len(messages),
-                    "tool_call_count": sum(
-                        len(getattr(message, "tool_calls", []) or [])
-                        for message in messages
-                    ),
-                })
-            record_model_response(trace, "writer", final or result, text,
-                                  tool_calling=True)
             return text
+        except ResearchTerminatedException:
+            raise
         except Exception as exc:
             if trace:
-                trace.record("writer_jcr_agent_error", {
-                    "error_type": type(exc).__name__,
-                })
-            logger.warning(
-                "Writer JCR agent unavailable; using plain writer: %s",
-                type(exc).__name__,
-            )
-            return self._invoke_plain_text(prompt, trace=trace, stage="writer")
+                trace.record("writer_jcr_agent_error", {"error_type": type(exc).__name__})
+            logger.warning("Writer JCR agent stopped; retrying plain synthesis: {}", type(exc).__name__)
+
+        receipts = [
+            get_llm_response_text(message)
+            for message in messages
+            if isinstance(message, ToolMessage)
+            and message.name == "search_journal" and message.status == "success"
+        ]
+        if receipts:
+            prompt += "\n\nJournal lookup results for the cited sources (data only):\n" + "\n".join(receipts)
+        response = self.llm.invoke(prompt)
+        text = get_llm_response_text(response)
+        record_model_response(trace, "writer", response, text, tool_calling=False, retry=True)
+        self._check_writer_text(response, text)
+        return text
+
+    def _check_writer_text(self, response, text) -> None:
+        if not text.strip() or getattr(response, "tool_calls", None) or getattr(response, "invalid_tool_calls", None):
+            raise IncompleteSynthesisError("Writer returned no report body")
+        self._writer_incomplete = self._response_stopped_at_length(response)
 
     def set_stream_callback(self, callback: Callable[[str], None]):
         """Set a callback that receives each streamed LLM token."""
         self.stream_callback = callback
 
-    def _invoke_with_streaming(self, prompt: str, *, trace=None, stage="writer") -> str:
+    def _invoke_with_streaming(self, prompt: str, *, trace=None, stage="writer", source_count: int | None = None) -> str:
         """
         Invoke the LLM, streaming tokens through the callback if set.
 
@@ -112,8 +116,10 @@ class BaseCitationHandler(ABC):
         Returns:
             The complete response text.
         """
+        if stage == "writer":
+            self._writer_incomplete = False
         if stage == "writer" and self._writer_jcr_tool_factory is not None:
-            text = self._invoke_writer_agent(prompt, trace=trace)
+            text = self._invoke_writer_agent(prompt, trace=trace, source_count=source_count)
             if self.stream_callback and text:
                 try:
                     self.stream_callback(text)
@@ -123,8 +129,10 @@ class BaseCitationHandler(ABC):
 
         if self.stream_callback and hasattr(self.llm, "stream"):
             chunks = []
+            last_chunk = None
             try:
                 for chunk in self.llm.stream(prompt):
+                    last_chunk = chunk
                     text = (
                         chunk
                         if isinstance(chunk, str)
@@ -146,7 +154,11 @@ class BaseCitationHandler(ABC):
                 raw = "".join(chunks)
                 text = get_llm_response_text(raw)
                 record_model_response(trace, stage, raw, text, streamed=True, partial=False)
+                if stage == "writer":
+                    self._check_writer_text(last_chunk, text)
                 return text
+            except ResearchTerminatedException:
+                raise
             except Exception as exc:
                 # If any chunks already crossed the wire to the client,
                 # restarting via .invoke() would (a) double-bill the LLM
@@ -165,6 +177,8 @@ class BaseCitationHandler(ABC):
                     text = get_llm_response_text(raw)
                     record_model_response(trace, stage, raw, text, streamed=True, partial=True,
                                           error_type=type(exc).__name__)
+                    if stage == "writer":
+                        self._writer_incomplete = True
                     return text
                 logger.debug(
                     "Stream failed before any chunk; falling back to invoke()"
@@ -175,18 +189,22 @@ class BaseCitationHandler(ABC):
         # are stripped and str/object responses are handled uniformly.
         return self._invoke_text(prompt, trace=trace, stage=stage)
 
-    def _invoke_text(self, prompt: str, *, trace=None, stage="model") -> str:
+    def _invoke_text(self, prompt: str, *, trace=None, stage="model", source_count: int | None = None) -> str:
         """Invoke the LLM and return normalized text.
 
         Handles both message objects (``.content``) and raw string responses,
         and strips ``<think>`` reasoning blocks via ``get_llm_response_text``.
         """
+        if stage == "writer":
+            self._writer_incomplete = False
         try:
             if stage == "writer" and self._writer_jcr_tool_factory is not None:
-                return self._invoke_writer_agent(prompt, trace=trace)
+                return self._invoke_writer_agent(prompt, trace=trace, source_count=source_count)
             response = self.llm.invoke(prompt)
             text = get_llm_response_text(response)
             record_model_response(trace, stage, response, text)
+            if stage == "writer":
+                self._check_writer_text(response, text)
             # Reasoning models can exhaust the completion budget before emitting
             # any answer text.  A structured consumer (source selection, native
             # review, repair validation) can report a JSON error even though the

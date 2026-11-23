@@ -159,6 +159,7 @@ def test_stream_partial_is_recorded_without_second_model_request(trace_root):
     with trace_context('stream'):
         result = writer.analyze_followup('Question', [source()], 'Draft', 0)
     assert result['content'] == ''.join(received) == 'Partial [17].'
+    assert result['synthesis_error'] == 'writer_incomplete'
     response = read_stages(trace_root)['writer_response'][0]
     assert response['partial'] is True and response['error_type'] == 'TimeoutError'
 
