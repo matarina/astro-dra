@@ -1,4 +1,3 @@
-import re
 import os
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -168,65 +167,9 @@ class PubMedSearchEngine(BaseSearchEngine):
             else:
                 # Opening quote
                 stack.append(i)
-        # stack holds unmatched opening quotes -> remove them as well
-        unmatched = set(stack)
         return "".join(
-            ch for i, ch in enumerate(query) if ch != '"' or (i in matched)
+            ch for i, ch in enumerate(query) if ch != '"' or i in matched
         )
-
-    def _get_result_count(self, query: str) -> int:
-        """
-        Get the total number of results for a query without retrieving the results themselves.
-
-        Args:
-            query: The search query
-
-        Returns:
-            Total number of matching results
-        """
-        try:
-            # Remove only unbalanced (stray) double quotes before sending to
-            # E-utilities, e.g. bacteria"[Title/Abstract]. Paired quotes such as
-            # the time filter "last 10 years"[pdat] are preserved — stripping
-            # them (as a naive replace would) makes the filter invalid and would
-            # itself cause "found 0 results".
-            query = self._remove_stray_quotes(query)
-
-            # Prepare search parameters
-            params = {
-                "db": "pubmed",
-                "term": query,
-                "retmode": "json",
-                "retmax": 0,  # Don't need actual results, just the count
-            }
-
-            # Add API key if available
-            if self.api_key:
-                params["api_key"] = self.api_key
-
-            self._last_wait_time = self.rate_tracker.apply_rate_limit(
-                self.engine_type
-            )
-
-            # Execute search request
-            response = safe_get(self.search_url, params=params, **_search_proxy_kwargs())
-            response.raise_for_status()
-
-            # Parse response
-            data = response.json()
-            count = int(data["esearchresult"]["count"])
-
-            logger.info(
-                "Query '{}' has {} total results in PubMed", query, count
-            )
-            return count
-
-        except Exception as e:
-            safe_msg = self._scrub_error(e)
-            logger.warning(
-                f"Error getting result count ({type(e).__name__}): {safe_msg}"
-            )
-            return 0
 
     def _optimize_query_for_pubmed(self, query: str) -> str:
         """

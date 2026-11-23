@@ -2085,23 +2085,9 @@ def run_research_process(research_id, query, mode, **kwargs):
                 if not isinstance(results.get("final_report"), dict):
                     clean_markdown = clean_markdown or raw_formatted_findings
 
-            # Pull sources from the search-system's accumulated link
-            # buffer first — same source the detailed-report path
-            # uses at the equivalent point below. Wrapper
-            # strategies (e.g. EnhancedContextualFollowUpStrategy,
-            # IterativeRefinementStrategy) delegate the actual
-            # search to an inner strategy that populates
-            # `self.all_links_of_system`, but they don't bubble
-            # that list back into the result dict's `findings`. So
-            # the legacy `findings[*].search_results` extraction
-            # below stays empty for chat follow-ups, leaving the
-            # citation formatter with no urls to hyperlink. Prefer
-            # the system-level accumulator; fall back to the
-            # legacy extraction so direct strategies that bypass
-            # the system buffer still work.
-            all_links = list(
-                getattr(system, "all_links_of_system", None) or []
-            )
+            # Wrapped strategies accumulate links on the search system.
+            # Some legacy findings also carry their own sources.
+            all_links = list(system.all_links_of_system)
             if not all_links:
                 for finding in results.get("findings", []):
                     search_results = finding.get("search_results", [])
@@ -2123,12 +2109,12 @@ def run_research_process(research_id, query, mode, **kwargs):
 
             final_object = results.get("final_report")
             final_qc = _trusted_final_report(final_object, clean_markdown)
-            if final_qc is not None:
-                all_links = final_object["sources_for_publication"]
             if final_qc is None:
                 clean_markdown, final_qc = _ground_report_content(
                     clean_markdown, all_links, getattr(system, "model", None)
                 )
+            else:
+                all_links = final_object["sources_for_publication"]
 
             # First send a progress update for generating the summary
             progress_callback(
@@ -2147,9 +2133,6 @@ def run_research_process(research_id, query, mode, **kwargs):
                 _DETAILED_REPORT_PROGRESS_START,
                 {"phase": "report_generation"},
             )
-
-            # Extract the search system from the results if available
-            search_system = results.get("search_system", None)
 
             # Wrapper that maps report generator's 0-100% to the configured
             # detailed-mode range and relays cancellation checks through the
@@ -2170,7 +2153,7 @@ def run_research_process(research_id, query, mode, **kwargs):
 
             # Pass the existing search system to maintain citation indices
             report_generator = IntegratedReportGenerator(
-                search_system=search_system,
+                search_system=system,
                 settings_snapshot=settings_snapshot,
             )
             final_report = report_generator.generate_report(
@@ -2190,10 +2173,7 @@ def run_research_process(research_id, query, mode, **kwargs):
             # assign new citation numbers in first-appearance order. The
             # generated Sources tail is intentionally discarded and rebuilt
             # from this compact list by report assembly.
-            all_links = list(
-                getattr(search_system, "all_links_of_system", None) or []
-            )
-            formatter = None
+            all_links = list(system.all_links_of_system)
             try:
                 formatter = get_citation_formatter()
                 source_start, _ = formatter._find_sources_section(

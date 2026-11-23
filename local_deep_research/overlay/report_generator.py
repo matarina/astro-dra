@@ -665,55 +665,8 @@ class IntegratedReportGenerator:
                 ):
                     norm_purpose = self._normalize_heading_text(purpose)
                     if norm_purpose:
-                        _stop_words = {
-                            "to",
-                            "the",
-                            "and",
-                            "for",
-                            "that",
-                            "this",
-                            "with",
-                            "from",
-                            "summarize",
-                            "summarise",
-                            "clarify",
-                            "examine",
-                            "outline",
-                            "provide",
-                            "describe",
-                            "detail",
-                            "analyze",
-                            "analyse",
-                            "explore",
-                            "present",
-                            "discuss",
-                            "evaluate",
-                            "investigate",
-                            "review",
-                            "assess",
-                            "aims",
-                            "designed",
-                            "section",
-                            "subsection",
-                        }
-                        purpose_words = {
-                            w
-                            for w in re.findall(
-                                r"\b[a-z0-9]{3,}\b", norm_purpose.lower()
-                            )
-                            if w not in _stop_words
-                        }
-                        italic_words = {
-                            w
-                            for w in re.findall(
-                                r"\b[a-z0-9]{3,}\b", norm_italic.lower()
-                            )
-                            if w not in _stop_words
-                        }
-                        # A shared purpose word is not proof that the italic
-                        # prose is generated boilerplate.  Preserve substantive
-                        # scientific prose unless it is an exact/near-exact
-                        # restatement or an explicitly marked boilerplate line.
+                        # Preserve substantive prose that merely shares words
+                        # with the purpose subtitle.
                         if (
                             self._heading_restates_name(italic_text, purpose)
                             or norm_italic.startswith(norm_purpose)
@@ -1346,19 +1299,6 @@ class IntegratedReportGenerator:
 
         return sections
 
-    def _generate_sections(
-        self,
-        initial_findings: Dict,
-        _section_research: Dict[str, List[Dict]],
-        structure: List[Dict],
-        query: str,
-    ) -> Dict[str, str]:
-        """
-        This method is kept for compatibility but no longer used.
-        The functionality has been moved to _research_and_generate_sections.
-        """
-        return {}
-
     def _format_final_report(
         self,
         sections: Dict[str, str],
@@ -1462,6 +1402,3 @@ class IntegratedReportGenerator:
 
         # Return both content and metadata
         return {"content": final_report_content, "metadata": metadata}
-
-    def _generate_error_report(self, query: str, error_msg: str) -> str:
-        return f"=== ERROR REPORT ===\nQuery: {query}\nError: {error_msg}"

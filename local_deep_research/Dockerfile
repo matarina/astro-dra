@@ -47,8 +47,8 @@ RUN /install/.venv/bin/python -c "import ast; ast.parse(open('/install/.venv/lib
 # PubMed query-quote fix (mirrors the Serper fix): LLM-generated/optimized
 # queries sometimes carry a stray closing quote right before a field tag
 # (e.g. bacteria"[Title/Abstract]), which PubMed's esearch parser rejects and
-# turns into "found 0 results". Strip double quotes from the query in both
-# _get_result_count and _search_pubmed before it reaches E-utilities.
+# turns into "found 0 results". The search engine removes unmatched quotes
+# before sending the query to E-utilities.
 COPY search_engine_pubmed.py /install/.venv/lib/python3.14/site-packages/local_deep_research/web_search_engines/engines/search_engine_pubmed.py
 RUN /install/.venv/bin/python -c "import ast; ast.parse(open('/install/.venv/lib/python3.14/site-packages/local_deep_research/web_search_engines/engines/search_engine_pubmed.py', encoding='utf-8').read()); print('search_engine_pubmed.py syntax OK')"
 

@@ -2628,68 +2628,23 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             src["_verify_badge"] = badge_for(vr)
         logger.info(f"doi_validation: verified {len(results)} sources")
 
-    @staticmethod
-    def _render_verify_section(sources: list[dict]) -> str:
-        """Render the '文献真实性核验' Markdown table (empty when no data)."""
-        rows = [s for s in sources if isinstance(s, dict) and s.get("_verify")]
-        if not rows:
-            return ""
-        lines = [
-            "### 文献真实性核验",
-            "",
-            "| # | 标题 | 状态 | 来源 | 备注 |",
-            "|---|------|------|------|------|",
-        ]
-        for s in rows:
-            v = s.get("_verify") or {}
-            badge = s.get("_verify_badge", "❓未能核验")
-            warnings = "; ".join(v.get("warnings") or []) or ""
-            warnings = warnings.replace("|", "/")[:160]
-            title = str(s.get("title", ""))[:80].replace("|", "/")
-            lines.append(
-                f"| {s.get('index', '?')} | {title} | {badge} | "
-                f"{v.get('source', '')} | {warnings} |"
-            )
-        return "\n".join(lines)
-
     def _attach_constraint_match(
         self, query: str, sources: list[dict]
-    ) -> bool:
-        """Requirement 2: parse user constraints and match each source.
-
-        Writes ``_constraint`` / ``_constraint_badge`` onto each source and
-        The result is an advisory annotation only.  It never removes a source,
-        changes the report body, or creates a publication gate.
-        """
-        try:
-            from research_verify import get_config
-            from research_verify.constraint_matcher import ConstraintMatcher
-            from research_verify.models import ResearchConstraint
-        except Exception as exc:
-            logger.warning(f"research_verify import failed: {exc}")
-            return False
+    ) -> None:
+        """Attach advisory annotations for explicitly supplied scope settings."""
+        from research_verify import get_config
+        from research_verify.constraint_matcher import ConstraintMatcher
+        from research_verify.research_spec import report_spec_settings
 
         cfg = get_config()
-        if not cfg.enable_verify or not cfg.module_enabled("constraint_match"):
-            return False
-        if not sources:
-            return False
+        if not sources or not cfg.enable_verify or not cfg.module_enabled("constraint_match"):
+            return
 
-        try:
-            from research_verify.research_spec import report_spec_settings
-            matcher = ConstraintMatcher(cfg)
-            settings = report_spec_settings(self.get_setting)
-            # Journal metrics are selected by the jcr_mcp tool. Finalization
-            # only records tool-produced annotations and does not infer a
-            # journal constraint from prompt text.
-            settings["min_if"] = None
-            constraint = matcher.parse(query, settings)
-            if constraint.is_empty:
-                return False
-            matches = matcher.match_many(sources, constraint)
-        except Exception as exc:
-            logger.warning(f"constraint_match skipped: {exc}")
-            return False
+        matcher = ConstraintMatcher(cfg)
+        constraint = matcher.parse(query, report_spec_settings(self.get_setting))
+        if constraint.is_empty:
+            return
+        matches = matcher.match_many(sources, constraint)
 
         flagged = 0
         for idx, m in matches.items():
@@ -2697,25 +2652,9 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             if src is None:
                 continue
             src["_constraint"] = m.model_dump()
-            if m.detail.get("jcr_check"):
-                src["_jcr_check"] = m.detail["jcr_check"]
-                result = m.detail["jcr_check"]
-                if result.get("status") == "found" and result.get("impact_factor") is not None:
-                    src["impact_factor"] = result.get("impact_factor")
-                    src["metric_year"] = result.get("metric_year")
-                    src["passes_threshold"] = result.get("passes_threshold")
-                    src["jcr_provenance"] = {
-                        "source": "jcr_mcp",
-                        "metric_year": result.get("metric_year"),
-                        "metric_source": result.get("metric_source"),
-                        "source_url": result.get("source_url"),
-                        "status": result.get("status"),
-                    }
             if m.excluded:
                 src["_constraint_badge"] = "⚠️范围外/需复核"
                 flagged += 1
-            elif m.if_unknown:
-                src["_constraint_badge"] = "⚠️JCR metric unavailable"
             elif m.detail.get("pending"):
                 src["_constraint_badge"] = "❓条件待核验"
             else:
@@ -2724,39 +2663,6 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         logger.info(
             f"constraint_match: {flagged}/{len(matches)} sources flagged for scope review"
         )
-        # Keep the historical return type for callers outside this class, but
-        # do not expose an all-excluded gate to finalization.
-        return False
-
-    @staticmethod
-    def _render_constraint_section(sources: list[dict]) -> str:
-        rows = [s for s in sources if isinstance(s, dict) and s.get("_constraint")]
-        if not rows:
-            return ""
-        lines = [
-            "### 条件范围提示（仅供写作参考）",
-            "",
-            "| # | 期刊 | 年份 | IF | 结论 | 说明 |",
-            "|---|------|------|----|------|------|",
-        ]
-        for s in rows:
-            m = s.get("_constraint") or {}
-            badge = s.get("_constraint_badge", "")
-            detail = m.get("detail") or {}
-            if_ = detail.get("if")
-            notes = []
-            if m.get("if_unknown"):
-                notes.append("期刊IF未收录")
-            if m.get("hard_violations"):
-                notes.append("范围提示:" + ",".join(m["hard_violations"]))
-            if detail.get("pending"):
-                notes.append("待核验:" + ",".join(detail["pending"]))
-            journal = str(s.get("journal", ""))[:40].replace("|", "/")
-            lines.append(
-                f"| {s.get('index', '?')} | {journal} | {s.get('year', '')} | "
-                f"{if_ if if_ is not None else '—'} | {badge} | {'; '.join(notes)} |"
-            )
-        return "\n".join(lines)
 
     def _attach_citation_qc(
         self, report_text: str, sources: list[dict]
