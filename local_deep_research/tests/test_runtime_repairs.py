@@ -1,6 +1,7 @@
 """Generic parser, article identity and generation-switch regression cases."""
 import ast
 from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError as FuturesTimeoutError
+from contextvars import copy_context
 from datetime import datetime, timezone
 import io
 import json
@@ -32,6 +33,7 @@ def relevance():
           '_unwrap_llm': lambda m: m, 'scrub_error': str, '_SNIPPET_CHAR_CAP': 800,
           'DEFAULT_MAX_FILTERED_RESULTS': 6, '_FILTER_WALL_TIMEOUT_S': 1,
           'ThreadPoolExecutor': ThreadPoolExecutor, 'as_completed': as_completed,
+          'copy_context': copy_context,
           'FuturesTimeoutError': FuturesTimeoutError, '_RELEVANCE_PROMPT_TEMPLATE': ast.literal_eval(prompt)}
     nodes = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in
              {'_parse_indices', '_invoke_text', '_run_batch', '_build_batch_prompt', 'filter_previews_for_relevance'}]

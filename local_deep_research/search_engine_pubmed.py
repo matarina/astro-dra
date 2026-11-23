@@ -10,7 +10,7 @@ from ...security.safe_requests import safe_get
 from ...security.secure_logging import logger
 from ..rate_limiting import RateLimitError
 from ..search_engine_base import BaseSearchEngine, Exposure, Sensitivity
-from research_verify.retrieval import has_structured_query_syntax, xml_text
+from research_verify.retrieval import has_structured_query_syntax, service_get, xml_text
 
 
 def _search_proxy_kwargs() -> dict:
@@ -137,40 +137,6 @@ class PubMedSearchEngine(BaseSearchEngine):
         # PMC base URL for full text
         self.pmc_url = "https://www.ncbi.nlm.nih.gov/pmc/articles/"
 
-    @staticmethod
-    def _remove_stray_quotes(query: str) -> str:
-        """Remove unbalanced (stray) double quotes, keeping paired quotes intact.
-
-        LLM-generated/optimized PubMed queries sometimes carry a stray closing
-        quote right before a field tag (e.g. bacteria"[Title/Abstract],
-        DRG"[Title/Abstract], diabetic"[Title/Abstract]). PubMed's esearch
-        parser rejects such queries and returns "found 0 results". However, we
-        must NOT strip every quote, because legitimate paired quotes are
-        required syntax — e.g. the time filter "last 10 years"[pdat] and quoted
-        phrases like "single-cell RNA sequencing"[Title/Abstract].
-
-        This uses bracket-style pairing: a quote preceded by a word character is
-        a closing quote (pops the innermost open quote); otherwise it is an
-        opening quote (pushed). Any quote left unmatched is removed.
-        """
-        stack = []  # positions of unmatched opening quotes
-        matched = set()  # positions of quotes that form a valid pair
-        for i, ch in enumerate(query):
-            if ch != '"':
-                continue
-            prev = query[i - 1] if i > 0 else ""
-            if prev.isalnum() or (prev and prev in "*?"):
-                # Closing quote: pair with innermost open quote if any
-                if stack:
-                    matched.add(stack.pop())
-                    matched.add(i)
-            else:
-                # Opening quote
-                stack.append(i)
-        return "".join(
-            ch for i, ch in enumerate(query) if ch != '"' or i in matched
-        )
-
     def _optimize_query_for_pubmed(self, query: str) -> str:
         """
         Optimize a natural language query for PubMed search.
@@ -211,109 +177,9 @@ EXAMPLE QUERIES:
 Return ONLY the search query without any explanations.
 """
 
-            # Get response from LLM
             response = self.llm.invoke(prompt)
-            raw_response = (
-                str(response.content)
-                if hasattr(response, "content")
-                else str(response)
-            ).strip()
-
-            # Clean up the query - extract only the actual query and remove any explanations
-            # First check if there are multiple lines and take the first non-empty line
-            lines = raw_response.split("\n")
-            cleaned_lines = [line.strip() for line in lines if line.strip()]
-
-            if cleaned_lines:
-                optimized_query = cleaned_lines[0]
-
-                # Remove any quotes that wrap the entire query
-                if optimized_query.startswith('"') and optimized_query.endswith(
-                    '"'
-                ):
-                    optimized_query = optimized_query[1:-1]
-
-                # Remove any explanation phrases that might be at the beginning
-                explanation_starters = [
-                    "here is",
-                    "here's",
-                    "this query",
-                    "the following",
-                ]
-                for starter in explanation_starters:
-                    if optimized_query.lower().startswith(starter):
-                        # Find the actual query part - typically after a colon
-                        colon_pos = optimized_query.find(":")
-                        if colon_pos > 0:
-                            optimized_query = optimized_query[
-                                colon_pos + 1 :
-                            ].strip()
-
-                # Check if the query still seems to contain explanations
-                if (
-                    len(optimized_query) > 200
-                    or "this query will" in optimized_query.lower()
-                ):
-                    # It's probably still an explanation - try to extract just the query part
-                    # Look for common patterns in the explanation like parentheses
-                    pattern = r"\([^)]+\)\s+AND\s+"
-                    import re
-
-                    matches = re.findall(pattern, optimized_query)
-                    if matches:
-                        # Extract just the query syntax parts
-                        query_parts = []
-                        for part in re.split(r"\.\s+", optimized_query):
-                            if (
-                                "(" in part
-                                and ")" in part
-                                and ("AND" in part or "OR" in part)
-                            ):
-                                query_parts.append(part)
-                        if query_parts:
-                            optimized_query = " ".join(query_parts)
-            else:
-                # Fall back to original query if cleaning fails
-                logger.warning(
-                    "Failed to extract a clean query from LLM response"
-                )
-                optimized_query = query
-
-            if not optimized_query.strip() or len(optimized_query.split()) > 30:
-                logger.warning("Invalid optimizer output, using the original PubMed query")
-                return query
-
-            # Basic cleanup: standardize field tag case for consistency
-            import re
-
-            optimized_query = re.sub(
-                r"\[mesh\]", "[Mesh]", optimized_query, flags=re.IGNORECASE
-            )
-            optimized_query = re.sub(
-                r"\[title/abstract\]",
-                "[Title/Abstract]",
-                optimized_query,
-                flags=re.IGNORECASE,
-            )
-            optimized_query = re.sub(
-                r"\[publication type\]",
-                "[Publication Type]",
-                optimized_query,
-                flags=re.IGNORECASE,
-            )
-
-            # Fix unclosed quotes followed by field tags
-            # Pattern: "term[Field] -> "term"[Field]
-            optimized_query = re.sub(r'"([^"]+)\[', r'"\1"[', optimized_query)
-
-            # Log original and optimized queries
-            logger.info("Original query: '{}'", query)
-            logger.info(f"Optimized for PubMed: '{optimized_query}'")
-            logger.debug(
-                f"Query optimization complete: '{query[:50]}...' -> '{optimized_query[:100]}...'"
-            )
-
-            return optimized_query
+            optimized = getattr(response, "content", response)
+            return optimized.strip() if isinstance(optimized, str) and optimized.strip() else query
 
         except Exception as e:
             safe_msg = self._scrub_error(e)
@@ -341,11 +207,6 @@ Return ONLY the search query without any explanations.
             List of PubMed IDs matching the query
         """
         try:
-            # Remove only unbalanced (stray) double quotes before sending to
-            # E-utilities (see _remove_stray_quotes). Preserves paired quotes
-            # like the time filter "last 10 years"[pdat].
-            query = self._remove_stray_quotes(query)
-
             # Prepare search parameters
             params = {
                 "db": "pubmed",
@@ -383,8 +244,9 @@ Return ONLY the search query without any explanations.
 
             # Execute search request
             logger.debug(f"Sending request to PubMed API: {self.search_url}")
-            response = safe_get(self.search_url, params=params, **_search_proxy_kwargs())
-            response.raise_for_status()
+            response = service_get(self.search_url, service="ncbi_eutils",
+                                   interval=0.11 if self.api_key else 0.35, get=safe_get,
+                                   params=params, **_search_proxy_kwargs())
             logger.debug(f"PubMed API response status: {response.status_code}")
 
             # Parse response
@@ -1151,8 +1013,9 @@ Return ONLY the search query without any explanations.
                 # Forward the print / linking ISSN so the reputation
                 # filter's Tier 2/3 lookups can key on it (faster and
                 # more reliable than fuzzy name matching). essn is the
-                # electronic ISSN; prefer it when issn is blank.
+                # electronic ISSN; retain both for a local JCR lookup.
                 "issn": summary.get("issn") or summary.get("essn") or None,
+                "eissn": summary.get("essn") or None,
                 "pubdate": summary.get("pubdate", ""),
                 "doi": summary.get("doi", ""),
                 "source": "PubMed",

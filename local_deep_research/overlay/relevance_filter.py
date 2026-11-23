@@ -31,6 +31,7 @@ from concurrent.futures import (
     TimeoutError as FuturesTimeoutError,
     as_completed,
 )
+from contextvars import copy_context
 from datetime import UTC, datetime
 from typing import Any, Dict, List, Optional
 
@@ -236,120 +237,46 @@ def filter_previews_for_relevance(
     )
 
     t0 = time.monotonic()
-    # None marks "batch never completed" (exception or timeout). A
-    # completed batch is List[int], possibly empty (valid "none relevant"
-    # judgment). We distinguish the two so an all-None outcome falls
-    # back to the capped-slice while all-[] is kept as a valid decision.
-    results_per_batch: List[Optional[List[int]]] = [None for _ in batches]
-
-    if workers == 1:
-        for i, batch in enumerate(batches):
-            try:
-                results_per_batch[i] = _run_batch(
-                    llm,
-                    batch,
-                    query,
-                    len(previews),
-                    engine_name,
-                    prompt_template,
-                )
-            except Exception as e:
-                safe_msg = scrub_error(e)
-                logger.exception(
-                    f"[{engine_name}] batch {i} failed — skipping its results ({type(e).__name__}): {safe_msg}"
-                )
-    else:
-        # Not using ``with ThreadPoolExecutor(...) as pool:`` on purpose.
-        # ``__exit__`` calls ``shutdown(wait=True)`` which blocks on any
-        # still-running worker — defeating the whole point of the
-        # timeout when a worker is stuck on an Ollama HTTP call. We
-        # manage the pool lifetime explicitly and always shut down with
-        # ``wait=False`` so timed-out batches are orphaned (they'll
-        # error out when the socket eventually fails) rather than
-        # blocking the caller.
-        pool = ThreadPoolExecutor(max_workers=workers)
+    results_per_batch: list[list[int] | None] = [None] * len(batches)
+    pool = ThreadPoolExecutor(max_workers=workers)
+    try:
+        futures = {
+            pool.submit(copy_context().run, _run_batch, llm, batch, query,
+                        len(previews), engine_name, prompt_template): i
+            for i, batch in enumerate(batches)
+        }
         try:
-            futures_to_idx = {
-                pool.submit(
-                    _run_batch,
-                    llm,
-                    batch,
-                    query,
-                    len(previews),
-                    engine_name,
-                    prompt_template,
-                ): i
-                for i, batch in enumerate(batches)
-            }
-            try:
-                for fut in as_completed(
-                    futures_to_idx, timeout=_FILTER_WALL_TIMEOUT_S
-                ):
-                    i = futures_to_idx[fut]
-                    try:
-                        results_per_batch[i] = fut.result()
-                    except Exception as e:
-                        safe_msg = scrub_error(e)
-                        logger.exception(
-                            f"[{engine_name}] batch {i} failed — skipping ({type(e).__name__}): {safe_msg}"
-                        )
-            except FuturesTimeoutError:
-                pending = [
-                    futures_to_idx[f] for f in futures_to_idx if not f.done()
-                ]
-                logger.warning(
-                    f"[{engine_name}] {len(pending)} batch(es) still "
-                    f"running after {_FILTER_WALL_TIMEOUT_S}s — abandoning "
-                    f"(pending indices: {pending})"
-                )
-        finally:
-            # ``cancel_futures=True`` only cancels queued futures the
-            # executor hasn't started yet; already-running workers stay
-            # alive until their blocking call returns. We accept that —
-            # the alternative is hanging forever.
-            pool.shutdown(wait=False, cancel_futures=True)
+            for future in as_completed(futures, timeout=_FILTER_WALL_TIMEOUT_S):
+                index = futures[future]
+                try:
+                    results_per_batch[index] = future.result()
+                except Exception as error:
+                    logger.warning(f"[{engine_name}] Relevance batch {index} unavailable "
+                                   f"({type(error).__name__}): {scrub_error(error)}")
+        except FuturesTimeoutError:
+            logger.warning(f"[{engine_name}] Relevance filter reached its wall timeout")
+    finally:
+        # Running transport calls retain their own timeout.
+        pool.shutdown(wait=False, cancel_futures=True)
     total_elapsed = time.monotonic() - t0
 
-    # If no batch even completed, fall back to an unfiltered capped slice
-    # — otherwise downstream would receive zero results from a filter
-    # outage rather than from a valid "all irrelevant" judgment.
-    if all(r is None for r in results_per_batch):
-        logger.error(
-            f"[{engine_name}] every relevance-filter batch failed — "
-            f"returning first {unavailable_cap} previews as fallback"
-        )
-        return [dict(p, relevance_filter_status="unavailable")
-                for p in previews[:unavailable_cap]]
-
-    # Normalise None → [] for the aggregation pass below; a batch that
-    # was cancelled or errored just contributes nothing. Assign to a
-    # new variable with a narrower type so mypy can prove the list
-    # elements are no longer Optional.
-    completed_batches: List[List[int]] = [
-        [] if r is None else r for r in results_per_batch
+    kept_indices = []
+    unavailable_indices = []
+    for batch_start, batch_result, batch in zip(batch_starts, results_per_batch, batches):
+        if batch_result is None or any(i >= len(batch) for i in batch_result):
+            unavailable_indices.extend(range(batch_start, batch_start + len(batch)))
+            continue
+        kept_indices.extend(batch_start + i for i in batch_result)
+    if unavailable_indices:
+        # Give a failed batch a slot even when earlier batches fill the cap.
+        # These candidates are still visible to the agent as unscreened.
+        fallback = unavailable_indices[:unavailable_cap]
+        kept_indices = [fallback[0], *kept_indices, *fallback[1:]]
+    unavailable = set(unavailable_indices)
+    ranked_results = [
+        dict(previews[i], relevance_filter_status="unavailable") if i in unavailable else previews[i]
+        for i in kept_indices
     ]
-
-    # Aggregate results in original batch order so the final list
-    # mirrors the input ordering across batches.
-    ranked_results: List[Dict[str, Any]] = []
-    kept_indices: List[int] = []
-    seen: set = set()
-
-    for batch_start, batch_result in zip(batch_starts, completed_batches):
-        batch_len = min(effective_batch, len(previews) - batch_start)
-        for li in batch_result:
-            if not (0 <= li < batch_len):
-                logger.warning(
-                    f"[{engine_name}] Relevance filter returned out-of-range index: "
-                    f"{li} for batch starting at {batch_start} (batch size {batch_len})"
-                )
-                continue
-            global_idx = batch_start + li
-            if global_idx in seen:
-                continue
-            seen.add(global_idx)
-            ranked_results.append(previews[global_idx])
-            kept_indices.append(global_idx)
 
     logger.info(
         f"[{engine_name}] LLM relevance filter took {total_elapsed:.1f}s "
@@ -357,43 +284,9 @@ def filter_previews_for_relevance(
         f"for {len(previews)} previews"
     )
 
-    if not ranked_results:
-        failed = sum(r is None for r in results_per_batch)
-        logger.info(f"[{engine_name}] No relevant candidates selected; "
-                    f"{failed} unavailable batch(es), {len(batches) - failed} completed batch(es)")
-
-    # Apply cap if set, keeping ranked_results and kept_indices aligned.
-    if (
-        max_filtered_results is not None
-        and len(ranked_results) > max_filtered_results
-    ):
-        ranked_results = ranked_results[:max_filtered_results]
-        kept_indices = kept_indices[:max_filtered_results]
-
-    # Log kept/removed/skipped. A preview is "skipped" when its batch
-    # raised or timed out — the judge never saw it — which is distinct
-    # from "removed" (judge returned a verdict that dropped it).
-    skipped_indices: set = set()
-    for i, (batch_start, r) in enumerate(zip(batch_starts, results_per_batch)):
-        if r is None:
-            batch_len = min(effective_batch, len(previews) - batch_start)
-            skipped_indices.update(range(batch_start, batch_start + batch_len))
-    removed_indices = (
-        set(range(len(previews))) - set(kept_indices) - skipped_indices
-    )
-    logger.info(
-        f"[{engine_name}] Relevance filter: "
-        f"kept {len(ranked_results)} of {len(previews)} results"
-    )
-    for idx in kept_indices:
-        title = previews[idx].get("title", "Untitled")[:80]
-        logger.debug(f"[{engine_name}] KEPT    [{idx}]: {title}")
-    for idx in sorted(removed_indices):
-        title = previews[idx].get("title", "Untitled")[:80]
-        logger.debug(f"[{engine_name}] REMOVED [{idx}]: {title}")
-    for idx in sorted(skipped_indices):
-        title = previews[idx].get("title", "Untitled")[:80]
-        logger.debug(f"[{engine_name}] SKIPPED [{idx}]: {title}")
+    ranked_results = ranked_results[:max_filtered_results]
+    logger.info(f"[{engine_name}] Relevance filter kept {len(ranked_results)} of "
+                f"{len(previews)} results ({len(unavailable)} unavailable before capping)")
 
     return ranked_results
 

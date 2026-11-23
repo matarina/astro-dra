@@ -14,19 +14,8 @@ import re
 
 
 def has_structured_query_syntax(query: str) -> bool:
-    """Protect explicit search syntax and dates from query optimization."""
-    value = str(query or "")
-    if value.count('"') % 2:
-        return True
-    if re.search(r'"[^"\n]+"', value):
-        return True
-    if re.search(r'\[[^\]\n]+\]', value):
-        return True
-    if re.search(r'\b(?:AND|OR|NOT)\b', value, flags=re.I):
-        return True
-    if any(char in value for char in '()'):
-        return True
-    return bool(re.search(r'\b(?:last\s+\d+\s+(?:days?|months?|years?)|\d{4}(?:/\d{1,2}){0,2})\b', value, flags=re.I))
+    """Preserve quoted terms, field tags and explicit Boolean operators."""
+    return bool(re.search(r'"|\[[^\]\n]+\]|\b(?:AND|OR|NOT)\b', query))
 
 
 def html_text(value):
@@ -185,7 +174,7 @@ EUROPEPMC_CONFIG = {
 }
 
 _LOCK = threading.Lock()
-_LAST = {}
+_LAST: dict[str, float] = {}
 
 
 def pace(service: str, interval: float, *, directory=None, clock=time.monotonic,
