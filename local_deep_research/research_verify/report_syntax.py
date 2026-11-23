@@ -37,7 +37,7 @@ class Citation:
 
 
 def _indices(match):
-    return tuple(int(x.strip()) for x in next(g for g in match.groups() if g is not None).split(","))
+    return tuple(int(x.strip()) for x in re.split(r"[,，]", next(g for g in match.groups() if g is not None)))
 
 
 def _parser():
@@ -80,7 +80,27 @@ def _plain_label(line):
     return line.casefold() in BIBLIOGRAPHY_LABELS
 
 
-def layout(report, *, include_env=False):
+_BIBLIOGRAPHY_ENTRY = re.compile(r"(?:[-*] +)?" + NUMERIC_LABEL.pattern + r"[ \t]+\S")
+_BIBLIOGRAPHY_FIELD = re.compile(r"(?:URL|DOI|PMID|Status|Identity):\s+\S")
+
+
+def _bibliography(report, start, heading_end, limit):
+    """Recognize a conventional heading followed by serialized entries."""
+    end = heading_end
+    has_entry = False
+    for line in report[heading_end:limit].splitlines(keepends=True):
+        value = line.strip()
+        if _BIBLIOGRAPHY_ENTRY.match(value):
+            has_entry = True
+        elif value and value != "**Sources with unconfirmed identity**":
+            if not has_entry or not _BIBLIOGRAPHY_FIELD.match(value):
+                break
+        end += len(line)
+    if has_entry:
+        return Bibliography(start, heading_end, end)
+
+
+def layout(report, *, include_env=False, require_entries=False):
     """Return leaf-block spans and conventional bibliography sections."""
     md = _parser()
     env = {}
@@ -94,18 +114,34 @@ def layout(report, *, include_env=False):
         offsets.append(offsets[-1]+len(line))
     blocks, sections = [], []
     skipped = None
+    if require_entries:
+        # Limit parsing to the next top-level heading, even when it is nested
+        # under the bibliography in the document's heading hierarchy.
+        headings = iter([offsets[t.map[0]] for t in tokens
+                         if t.type == "heading_open" and t.level == 0 and t.map])
+        next_heading = next(headings, len(report))
     table_depth, table_header = 0, ""
     for i, token in enumerate(tokens):
+        if token.map and require_entries:
+            start, end = (offsets[n] for n in token.map)
+            while next_heading <= start and next_heading < len(report):
+                next_heading = next(headings, len(report))
+            if sections and end <= sections[-1].end and start >= sections[-1].start:
+                continue
         if token.type == "heading_open" and token.map:
             start, end = (offsets[n] for n in token.map)
             level = int(token.tag[1:])
-            # Nested quoted/list headings do not change document section roles.
             root = token.level == 0
             if root and skipped and (skipped[0] is None or level <= skipped[0]):
                 sections.append(Bibliography(skipped[1], skipped[2], start))
                 skipped = None
             if root and skipped is None and _label(tokens[i+1]) in BIBLIOGRAPHY_LABELS:
-                skipped = (level, start, end)
+                if require_entries:
+                    if section := _bibliography(report, start, end, next_heading):
+                        sections.append(section)
+                        continue
+                else:
+                    skipped = (level, start, end)
             if skipped is None:
                 blocks.append(Block(start, end, "heading_candidate"))
         elif token.type == "table_open":
@@ -124,8 +160,15 @@ def layout(report, *, include_env=False):
                 continue
             start, end = (offsets[n] for n in token.map)
             if skipped is None and token.type == "inline" and token.level <= 1 and _plain_label(lines[token.map[0]]):
-                skipped = (None, start, offsets[token.map[0]+1])
-            if skipped is None:
+                heading_end = offsets[token.map[0]+1]
+                if require_entries:
+                    if section := _bibliography(report, start, heading_end, next_heading):
+                        sections.append(section)
+                else:
+                    skipped = (None, start, heading_end)
+            if require_entries and sections and sections[-1].start <= start < sections[-1].end:
+                start = sections[-1].end
+            if skipped is None and start < end:
                 if token.type != "html_block" or not token.content.lstrip().startswith("<!--"):
                     blocks.append(Block(start, end, "prose_candidate"))
     if skipped:
@@ -147,17 +190,21 @@ def inline_coordinates(text, env=None):
     return record
 
 
-def citations_in(text, env=None):
+_EXTENDED_NUMERIC_LABEL = re.compile(NUMERIC_LABEL.pattern.replace(r"\s*,\s*", r"\s*[,，]\s*"))
+
+
+def citations_in(text, env=None, *, extended=False):
     record = inline_coordinates(text, env)
     result = list(record["linked"])
-    for match in NUMERIC_LABEL.finditer(text):
+    labels = _EXTENDED_NUMERIC_LABEL if extended else NUMERIC_LABEL
+    for match in labels.finditer(text):
         if any(start < match.end() and match.start() < end for start, end in record["protected"]):
             continue
         result.append(Citation(match.start(), match.end(), _indices(match)))
     return sorted(result, key=lambda c:c.start)
 
 
-def citation_spans(report):
-    blocks, _, env = layout(report, include_env=True)
+def citation_spans(report, *, require_entries=False):
+    blocks, _, env = layout(report, include_env=True, require_entries=require_entries)
     return [Citation(block.start+c.start, block.start+c.end, c.indices)
-            for block in blocks for c in citations_in(report[block.start:block.end], env)]
+            for block in blocks for c in citations_in(report[block.start:block.end], env, extended=require_entries)]

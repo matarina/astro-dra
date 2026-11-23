@@ -142,7 +142,10 @@ def _version_review(approve_after_supplement):
                 if self.reviews==1:
                     return SimpleNamespace(content=json.dumps({'issues':[{'claim_id':0,'evidence_source_id':2,
                         'status':'insufficient_evidence','request':{'kind':'article','query':'Method detail'}}]}))
-                return SimpleNamespace(content='{"issues":[{"claim_id":0,"status":"supported","evidence_source_id":2}]}')
+                return SimpleNamespace(content=json.dumps({'issues':[{
+                    'claim_id':0, 'status':'supported', 'evidence_source_id':2,
+                    'evidence_quote':'The published procedure measures property Q.',
+                }]}))
             self.confirmations+=1
             approve=self.confirmations==2 and approve_after_supplement
             return SimpleNamespace(content=json.dumps({'decisions':[{'candidate_index':0,

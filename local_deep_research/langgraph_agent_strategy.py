@@ -37,7 +37,6 @@ from .base_strategy import (
     BaseSearchStrategy,
     CHECK_CONTEXT_AGENT_STREAM,
     CHECK_CONTEXT_ENTRY,
-    CHECK_CONTEXT_FALLBACK_SYNTHESIS,
 )
 from .primary_search_metadata import (
     NEUTRAL_PRIMARY_SEARCH_DESCRIPTION,
@@ -58,9 +57,7 @@ SUBAGENT_TIMEOUT_SECONDS = 1800  # 30 minutes per subagent, measured from
 # each subagent's *actual* start time (not from the drain-loop start, which
 # used to make queued subagents inherit the wall-clock of everything that
 # ran before them -- see #5014).
-# User-facing sentinel for "the agent produced nothing". _finalize must
-# not run the accumulated-sources citation pass over it — that would
-# dress the failure up as a cited synthesis instead of surfacing it.
+# User-facing text for an unsuccessful run without a draft or sources.
 NO_RESULTS_MESSAGE = (
     "Research could not produce results. Try a different query."
 )
@@ -532,9 +529,10 @@ def _make_web_search_tool(
             results = engine.run(query)
             if not isinstance(results, list) or not results:
                 return f"No results found for '{query}'. Try rephrasing."
-            start = collector.add_results(
-                results, engine_name=search_engine_name
-            )
+            for result in results:
+                if isinstance(result, dict):
+                    result.setdefault("_search_query", query)
+            start = collector.add_results(results, engine_name=search_engine_name)
             return _format_results(results, start)
         except Exception as exc:
             logger.exception("web_search tool error")
@@ -599,6 +597,9 @@ def _make_specialized_search_tool(
             results = engine.run(query)
             if not isinstance(results, list) or not results:
                 return f"No results from {engine_name} for '{query}'. Try rephrasing."
+            for result in results:
+                if isinstance(result, dict):
+                    result.setdefault("_search_query", query)
             start = collector.add_results(results, engine_name=engine_name)
             return _format_results(results, start)
         except Exception as exc:
@@ -1617,8 +1618,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             return f'🔬 Investigating subtopic: "{sub}"'
         # Search-style tool — query arg (or URL if query missing). Use a
         # loop-local name here — do NOT reassign the `query` parameter, which
-        # is still needed downstream by _synthesize_from_collector()/
-        # _finalize() as the original research question.
+        # is still needed downstream by _finalize() as the original research question.
         tc_query = _truncate_arg(
             str(
                 tc_args.get(
@@ -2282,70 +2282,15 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         except ResearchTerminatedException:
             raise
         except GraphRecursionError:
-            logger.warning(
-                "LangGraph agent hit recursion limit, synthesizing partial results"
-            )
-            if not final_content:
-                final_content = self._synthesize_from_collector(query)
+            logger.warning("LangGraph agent hit recursion limit; finalizing collected sources")
         except Exception as exc:
             logger.exception("LangGraph agent error")
-            if not final_content:
-                if self.collector.results:
-                    final_content = self._synthesize_from_collector(query)
-                else:
-                    return self._error_result(self._format_agent_error(exc))
+            if not final_content and not self.collector.results:
+                return self._error_result(self._format_agent_error(exc))
 
-        if not final_content:
-            if self.collector.results:
-                final_content = self._synthesize_from_collector(query)
-            else:
-                final_content = NO_RESULTS_MESSAGE
-
-        return self._finalize(
-            query, final_content, iteration, nr_of_links, agent_messages
-        )
-
-    # -- Helpers ------------------------------------------------------------
-
-    def _synthesize_from_collector(self, query: str) -> str:
-        """Fallback synthesis when the agent was cut short."""
-        # Check cancellation before any synthesis LLM work. This is the
-        # fallback path for when the agent stream errored out; without an
-        # early check, a cancel that arrived during the error path would
-        # have to wait for the synthesis LLM call to complete before
-        # terminating.
-        self.check_termination(CHECK_CONTEXT_FALLBACK_SYNTHESIS)
-
-        results = self.collector.results
-        if not results:
-            return "Research could not be completed within the iteration limit."
-        summaries = []
-        for r in results[:20]:
-            summaries.append(
-                f"[{r.get('index', '?')}] {r.get('title', '')}: "
-                f"{r.get('snippet', '')}"
-            )
-        prompt = (
-            f"Synthesize a comprehensive answer to: {query}\n\n"
-            "Use only the evidence in the sources below. Every factual claim "
-            "must have a nearby [N] citation. Do not invent missing details or "
-            "metadata; if a point cannot be verified from these snippets, say "
-            "it is unverified and leave it out.\n\n"
-            f"Based on these sources:\n" + "\n".join(summaries)
-        )
-        try:
-            response = self.model.invoke(prompt)
-            return (
-                response.content
-                if hasattr(response, "content")
-                else str(response)
-            )
-        except Exception as exc:
-            logger.exception("Fallback synthesis failed")
-            return _scrub_tool_error(
-                f"Research collected {len(results)} sources but "
-                f"synthesis failed: {exc}"
-            )
+        if not final_content and not self.collector.results:
+            return self._error_result(NO_RESULTS_MESSAGE)
+        return self._finalize(query, final_content, iteration, nr_of_links, agent_messages)
 
     def _finalize(
         self,
@@ -2444,8 +2389,10 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         synthesis_error = None
         documents: list = []
 
-        # Citation handling — only if we have results
-        if all_search_results:
+        deadline = getattr(self, "_run_deadline", None)
+        if deadline is not None and time.monotonic() >= deadline:
+            synthesis_error = INCOMPLETE_SYNTHESIS_MESSAGE
+        elif all_search_results:
             try:
                 scope_data = format_research_spec(research_spec)
                 writer_query = query + ("\n\n" + scope_data if scope_data else "")
@@ -2468,23 +2415,15 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                 logger.warning("Citation synthesis failed; preserving the draft ({})", type(exc).__name__)
                 synthesis_error = INCOMPLETE_SYNTHESIS_MESSAGE
 
-            if not re.search(r"\[\d", synthesized_content or ""):
-                logger.warning(
-                    f"Synthesis produced no inline [N] citation markers "
-                    f"despite {len(all_search_results)} available sources — "
-                    f"the report body will show no citations for this "
-                    f"query ('{query[:80]}')"
-                )
-
         if synthesis_error:
             synthesized_content = f"> **{synthesis_error}**\n\n{synthesized_content}"
 
         # Check the actual synthesis BEFORE bibliography/metadata are appended.
         # Every output below uses this same revised body, including findings
         # consumed by the detailed report generator.
-        checked_content, _ = self._attach_citation_qc(
-            synthesized_content, all_search_results
-        )
+        checked_content = synthesized_content
+        if deadline is None or time.monotonic() < deadline:
+            checked_content, _ = self._attach_citation_qc(synthesized_content, all_search_results)
         all_search_results = getattr(self, "_citation_evidence_sources", all_search_results)
         from research_verify.audit_io import publication_sources
         published_sources = publication_sources(all_search_results)

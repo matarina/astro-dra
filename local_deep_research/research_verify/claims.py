@@ -168,10 +168,10 @@ def extract_legacy_report_claims(report: str) -> list[Claim]:
     return claims
 
 
-def extract_report_claims(report: str) -> list[Claim]:
+def extract_report_claims(report: str, *, require_entries=False) -> list[Claim]:
     """Keep Markdown roles and exact raw spans; scientific meaning is unknown."""
     from .report_syntax import layout, citations_in, inline_coordinates
-    blocks, _, env = layout(report, include_env=True)
+    blocks, _, env = layout(report, include_env=True, require_entries=require_entries)
     result = []
     for block in blocks:
         text = report[block.start:block.end]

@@ -12,6 +12,7 @@ true.
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass
 import hashlib
 import math
@@ -122,12 +123,13 @@ def select_context_windows(text: str, query: str, *, window_chars: int,
                            selection_receipts: list[dict[str, Any]] | None = None,
                            adjacent_windows: bool = False,
                            compound_terms: bool = False,
+                           exclude_reference_tail: bool = True,
                            ) -> tuple[EvidenceWindow, ...]:
     if window_chars < 32 or max_windows < 1 or not 0 <= overlap_chars < window_chars:
         raise ValueError("invalid evidence-window budget")
     if not isinstance(text, str) or not text:
         return ()
-    cutoff = _REFERENCES.search(text)
+    cutoff = _REFERENCES.search(text) if exclude_reference_tail else None
     eligible_end = cutoff.start() if cutoff else len(text)
     candidates = []
     paragraphs = list(_paragraphs(text, eligible_end))
@@ -202,7 +204,8 @@ def select_context_windows(text: str, query: str, *, window_chars: int,
         method = "lexical_hint_with_structural_anchors"
     else:
         count = min(max_windows, len(candidates))
-        order = [round(i * (len(candidates) - 1) / max(1, count - 1)) for i in range(count)]
+        order = ([len(candidates) // 2] if count == 1 else
+                 [round(i * (len(candidates) - 1) / (count - 1)) for i in range(count)])
         method = "structural_sample_no_lexical_match"
     budget = context_chars if context_chars is not None else window_chars * max_windows
     selected: list[EvidenceWindow] = []
@@ -240,7 +243,7 @@ def select_context_windows(text: str, query: str, *, window_chars: int,
                 semantic_scores[index] if semantic_scores is not None else None,
             ))
             used += len(value)
-    selected = tuple(sorted(selected, key=lambda item: item.start))
+    selected.sort(key=lambda item: item.start)
     if selection_receipts is not None:
         context = "\n\n".join(item.text for item in selected)
         receipt = {
@@ -268,4 +271,4 @@ def select_context_windows(text: str, query: str, *, window_chars: int,
             receipt['compound_terms'] = True
             receipt['query_sha256'] = hashlib.sha256(query.encode()).hexdigest()
         selection_receipts.append(receipt)
-    return selected
+    return tuple(selected)

@@ -39,19 +39,20 @@ def _object(text):
     return candidates[0]
 
 
-def _located_quote(source_id, quote, texts, *, minimum=20, maximum=2000):
+def _located_quote(source_id, quote, texts):
     """Locate an original contiguous quote without judging its meaning."""
     index = _index(source_id)
     text = texts.get(index) if index is not None else None
     if not isinstance(text, str):
         return None, {"source_id": index, "reason": "source_not_supplied"}
-    if not isinstance(quote, str) or not minimum <= len(quote) <= maximum or quote not in text:
+    if not isinstance(quote, str) or not quote.strip() or (start := text.find(quote)) == -1:
         return None, {"source_id": index, "reason": "quote_not_in_supplied_text"}
-    if any(marker in quote for marker in ("[... source excerpt boundary ...]",
-                                          "ADDITIONAL ACQUIRED TEXT (selected excerpts):",
-                                          "ADDITIONAL RETRIEVED PAGE EXCERPT")):
+    if len(quote) > 2000:
+        return None, {"source_id": index, "reason": "quote_too_long"}
+    if any(marker in quote for marker in ("\n[... source excerpt boundary ...]\n",
+                                          "\nADDITIONAL ACQUIRED TEXT (selected excerpts):\n",
+                                          "\nADDITIONAL RETRIEVED PAGE EXCERPT")):
         return None, {"source_id": index, "reason": "quote_crosses_material_boundary"}
-    start = text.find(quote)
     return {"source_id": index, "quote": text[start:start + len(quote)],
             "start": start, "end": start + len(quote),
             "source_text_sha256": sha256(text.encode()).hexdigest()}, None
@@ -124,30 +125,24 @@ def build_reading_notes(content, texts, *, max_chars=NOTE_BUDGET, include_roles=
                 continue
             quote = item.get("quote")
             subject, state = item.get("subject_quote"), item.get("state_quote", "")
+            entry, error = _located_quote(index, quote, texts)
+            if error:
+                rejected.append(error)
+                continue
             reason = None
-            if not isinstance(quote, str) or not 20 <= len(quote) <= 2000 or quote not in text:
-                reason = "quote_not_in_supplied_text"
-            elif any(marker in quote for marker in ("[... source excerpt boundary ...]",
-                                                    "ADDITIONAL ACQUIRED TEXT (selected excerpts):",
-                                                    "ADDITIONAL RETRIEVED PAGE EXCERPT")):
-                reason = "quote_crosses_material_boundary"
-            elif not is_limit and (not isinstance(subject, str) or not subject.strip() or subject not in quote):
+            if not is_limit and (not isinstance(subject, str) or not subject.strip() or subject not in quote):
                 reason = "subject_not_in_quotation"
             elif not is_limit and (not isinstance(state, str) or state and state not in subject):
                 reason = "state_not_in_quoted_subject"
-            elif used + len(quote) > max(0, max_chars):
+            elif used + len(quote) > max_chars:
                 reason = "reading_note_budget"
             if reason:
                 rejected.append({"source_id": index, "reason": reason})
                 continue
-            start = text.find(quote)
-            key = (index, start, start+len(quote), subject, state, is_limit)
+            key = (index, entry["start"], entry["end"], subject, state, is_limit)
             if key in seen:
                 continue
             seen.add(key)
-            entry = {"source_id": index, "quote": text[start:start+len(quote)],
-                     "start": start, "end": start+len(quote),
-                     "source_text_sha256": sha256(text.encode()).hexdigest()}
             if is_limit:
                 limits.append(entry)
             else:

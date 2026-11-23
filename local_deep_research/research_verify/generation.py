@@ -10,9 +10,9 @@ import hashlib
 import math
 import re
 from itertools import zip_longest
+from typing import Any
 from loguru import logger
 
-from .passages import retrieve_passages
 
 
 INCOMPLETE_SYNTHESIS_MESSAGE = "Report synthesis was incomplete. Any available draft is shown below."
@@ -208,6 +208,8 @@ class SourceMaterial(str):
     legitimately occur inside a source body.
     """
 
+    views: dict[int, dict[str, Any]]
+
     def __new__(cls, value: str, views=None):
         obj = super().__new__(cls, value)
         obj.views = dict(views or {})
@@ -233,9 +235,13 @@ def page_excerpts(text: str, query: str, budget: int = 18_000, *, compound_terms
     """Search acquired text before limiting the model-facing view."""
     if len(text) <= budget:
         return text
-    windows = retrieve_passages(
-        text, query, window_chars=max(160, budget // 3), max_passages=3,
-        overlap_chars=200, compound_terms=compound_terms,
+    from .evidence_selection import select_context_windows
+
+    window_chars = max(160, budget // 3)
+    windows = select_context_windows(
+        text, query, window_chars=window_chars, max_windows=3,
+        overlap_chars=min(200, window_chars - 1), compound_terms=compound_terms,
+        exclude_reference_tail=False,
     )
     return "\n\n[... source excerpt boundary ...]\n\n".join(p.text for p in windows)
 
@@ -245,6 +251,8 @@ def _source_blocks(documents, query, views=None, *, complete_acquired=False,
     for doc in documents:
         meta = doc.metadata
         source_query = (source_queries or {}).get(int(meta['index']), query)
+        if search_query := meta.get("_search_query"):
+            source_query += "\n" + search_query
         text = doc.page_content or ""
         abstract = meta.get("abstract")
         abstract = abstract if isinstance(abstract, str) else ""
@@ -404,7 +412,7 @@ def _source_blocks(documents, query, views=None, *, complete_acquired=False,
                           "metadata": identity,
                           "text": text,
                           "block": block}
-            if source_queries is not None or compound_terms:
+            if source_queries is not None or compound_terms or meta.get("_search_query"):
                 view['selection_query_sha256'] = sha256(source_query.encode()).hexdigest()
                 view['selection_compound_terms'] = bool(compound_terms)
             views.append(view)
@@ -466,7 +474,7 @@ def format_source_documents(documents, query: str = "", *, selector=None,
     # Raw texts alone above budget cannot fit with their source metadata.
     # Check serialized size before returning: titles/notices also consume space.
     if sum(len(doc.page_content or "") for doc in documents) <= max_chars:
-        complete_views = []
+        complete_views: list[dict[str, Any]] = []
         complete_blocks = list(_source_blocks(documents, query, complete_views,
                                               complete_acquired=True,
                                               source_queries=source_queries, compound_terms=compound_terms))
@@ -496,7 +504,7 @@ def format_source_documents(documents, query: str = "", *, selector=None,
     # SourceMaterial's registry describes the actual supplied excerpt even
     # without an optional trace/scope collector. Callers use it to bind quotes
     # and source IDs; absence of tracing must not erase those bindings.
-    views = []
+    views: list[dict[str, Any]] = []
     blocks = list(_source_blocks(documents, query, views,
                                  source_queries=source_queries, compound_terms=compound_terms))
     if trace:
@@ -527,7 +535,9 @@ def format_source_documents(documents, query: str = "", *, selector=None,
         return material
 
     blocks = [(i, b) for i, b in blocks if int(i) not in required_ids]
-    batches, batch, size = [], [], 0
+    batches = []
+    batch: list[tuple[int | str, str]] = []
+    size = 0
     for item in blocks:
         if batch and size + len(item[1]) > SOURCE_SELECTION_BATCH_CHARS:
             batches.append(batch)
@@ -537,7 +547,8 @@ def format_source_documents(documents, query: str = "", *, selector=None,
     if batch:
         batches.append(batch)
 
-    ranked_batches, failures, batch_errors = [], 0, []
+    ranked_batches: list[list[tuple[int | str, str]]] = []
+    failures, batch_errors = 0, []
     # Reserve space for the selection notice. Candidate count affects source
     # selection, never the amount of original abstract shown for a paper.
     available = max(0, max_chars - 1000 - reserved)
@@ -573,7 +584,12 @@ Sources:
                                  "error": str(exc)[:300]})
             logger.warning("Source context selection batch {}/{} unavailable ({}); using bounded original candidates",
                            number, len(batches), type(exc).__name__)
-            ranked = batch[:count]
+            if count == 1:
+                ranked = [batch[len(batch) // 2]]
+            else:
+                interior = [batch[round(i * (len(batch) - 1) / (count - 1))]
+                            for i in range(1, count - 1)]
+                ranked = [batch[0], batch[-1], *interior]
             if trace:
                 trace.record("source_selection_result", {"batch": number,
                              "selected_ids": [int(index) for index, _ in ranked],

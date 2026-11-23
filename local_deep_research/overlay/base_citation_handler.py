@@ -355,6 +355,7 @@ class BaseCitationHandler(ABC):
                         metadata={
                             "source": result.get("link", f"source_{i + 1}"),
                             "title": result.get("title", f"Source {i + 1}"),
+                            "_search_query": result.get("_search_query"),
                             "index": doc_index,
                             "evidence_type": evidence_type,
                             "abstract": result.get("abstract"),

@@ -70,7 +70,7 @@ def review_units(answer):
     technology, journal or numeric-value rules decide what is reviewable.
     """
     from .report_syntax import layout, citations_in
-    blocks, _, env = layout(answer, include_env=True)
+    blocks, _, env = layout(answer, include_env=True, require_entries=True)
     # Blank lines alone do not delimit adjacent CommonMark list items. PDF
     # text also uses literal typographic bullets and page separators. Keep
     # these serialization boundaries without interpreting scientific text.
@@ -78,7 +78,7 @@ def review_units(answer):
         | {m.start() for m in re.finditer(r'(?m)^[ \t]*[•‣◦⁃][ \t]+', answer)}
         | {m.end() for m in re.finditer(r'\f', answer)})
     candidates=[]
-    for claim in extract_report_claims(answer):
+    for claim in extract_report_claims(answer, require_entries=True):
         cuts = ([claim.report_start] + boundaries[bisect_right(boundaries,claim.report_start):
                 bisect_right(boundaries,claim.report_end-1)] + [claim.report_end]
                 if claim.kind not in {'table_candidate','heading_candidate'} else [claim.report_start,claim.report_end])
@@ -188,7 +188,24 @@ def writing_batches(draft, documents, sources, query, budget=SOURCE_CONTEXT_CHAR
     return batches
 
 
-def parse_review(text, claims=None, *, include_checked=False):
+
+def _review_has_located_evidence(issue, material):
+    sources = issue.get("evidence_sources")
+    atoms = issue.get("atom_checks")
+    quotes = issue.get("evidence_quote")
+    pairs = [(issue.get("source_id"), quote)
+             for quote in (quotes if isinstance(quotes, list) else [quotes])]
+    for collection in (sources, atoms):
+        if isinstance(collection, list):
+            pairs.extend((pair.get("evidence_source_id", pair.get("source_id")),
+                          pair.get("evidence_quote", pair.get("quote")))
+                         for pair in collection if isinstance(pair, dict)
+                         and pair.get("result", "supported") == "supported")
+    return any(str(index).isdigit() and isinstance(quote, str) and quote.strip()
+               and quote in material.get(int(index), "") for index, quote in pairs)
+
+
+def parse_review(text, claims=None, *, include_checked=False, material=None):
     clean = re.sub(r'^```(?:json)?\s*|\s*```$', '', text.strip(), flags=re.I)
     obj = json.loads(clean)
     if not isinstance(obj,dict) or not isinstance(obj.get('issues'),list):
@@ -263,6 +280,9 @@ def parse_review(text, claims=None, *, include_checked=False):
                 checked.append(issue)
                 continue
         if issue.get('status') in {'correct','supported'}:
+            if material is not None and not _review_has_located_evidence(issue, material):
+                issues.append({**issue, 'status': 'review_support_unverified'})
+                continue
             checked.append(issue)
             continue
         issues.append(issue)
@@ -306,7 +326,7 @@ def visible_texts(material):
     change review identity or scope.
     """
     registry = getattr(material, 'views', None)
-    if isinstance(registry, dict) and registry:
+    if registry is not None:
         return {int(index): str(view.get('text') or '')
                 for index, view in registry.items()}
     return {int(m[1]):m[2] for m in re.finditer(
@@ -315,7 +335,7 @@ def visible_texts(material):
 
 def visible_headers(material):
     registry = getattr(material, 'views', None)
-    if isinstance(registry, dict) and registry:
+    if registry is not None:
         return {int(index): str(view.get('metadata') or '')
                 for index, view in registry.items()}
     return {int(m[1]):m[2].split('BEGIN SOURCE TEXT',1)[0] for m in re.finditer(
@@ -584,8 +604,8 @@ supplied material does not report the platform” or “unknown from the supplie
 records”), treat that as a scope assertion and use status supported when the
 provided source view likewise lacks the field. Do not turn a transparent
 reading-limit statement into an insufficiency claim about the full paper.
-Return one entry for EVERY claim_id, using status supported (no replacement,
-quote or request needed) when it is supported. Omitted claims are unchecked.
+Return one entry for EVERY claim_id. For supported claims include an exact
+quote and its source ID from the supplied evidence. Omitted claims are unchecked.
 A unit may contain several sentences with references attached to the paragraph.
 Check each distinct assertion and preserve that paragraph's citation scope.
 Keep the original Markdown structure in replacements. For a table row, return
@@ -1154,7 +1174,12 @@ def review_answer(handler, question, answer, documents, sources, trace, register
                 'structure_context_truncated':'"kind": "structure_context_truncated"' in prompt})
             try:
                 reply = invoke(prompt,trace=trace,stage='native_check')
-                issues,checked = parse_review(reply,claims,include_checked=True)
+                headers = visible_headers(material)
+                issues,checked = parse_review(
+                    reply, claims, include_checked=True,
+                    material={index: text + "\n" + headers.get(index, "")
+                              for index, text in visible_texts(material).items()},
+                )
                 versions=version_candidates(claims,sources,material)
                 issues.extend(v for v in versions if not any(i.get('statement')==v['statement']
                     and i.get('status')=='version_update' for i in issues))

@@ -46,7 +46,7 @@ def source_snapshot(sources):
 
 def source_ids(text):
     registry = getattr(text, 'views', None)
-    if isinstance(registry, dict) and registry:
+    if registry is not None:
         return sorted(int(index) for index in registry)
     return [int(n) for n in re.findall(r"^\[(\d+)\]\nTitle:", text, re.M)]
 
