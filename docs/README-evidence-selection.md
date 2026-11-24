@@ -1,6 +1,6 @@
 # DRA 文献检索与证据核查的开放问题
 
-截至 2026-11-24，以下问题来自隔离候选镜像 `astro-dra:coverage-e2e-final-kyynzo` 的实测。5006 线上仍运行 `astro-dra:evidence-selection-v14-5006`。本页以候选版为准，已修复项及其验证记录见[开发记录](development-progress.md)。各项“策略”均待实现或验证。
+截至 2026-11-24，以下问题来自隔离候选镜像 `astro-dra:coverage-e2e-final-kyynzo` 的实测。采集这两轮记录时，5006 线上运行 `astro-dra:evidence-selection-v14-5006`。本页以候选版为准，已修复项及其验证记录见[开发记录](development-progress.md)。各项“策略”均待实现或验证。
 
 | 原始任务 | 本轮实际验证范围 |
 | --- | --- |

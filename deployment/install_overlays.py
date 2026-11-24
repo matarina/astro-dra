@@ -44,6 +44,23 @@ def _format_results(results, start_idx):
 '''
 
 
+def reasoning_provider_patch(package):
+    """Patch the installed provider's two model factories, retaining its other behavior."""
+    target = package / "llm/providers/openai_base.py"
+    source = target.read_text(encoding="utf-8")
+    old = "        return ChatOpenAI(**llm_params)"
+    hook = ('        if cls.provider_key == "OPENAI_ENDPOINT":\n'
+            '            from research_verify.reasoning_transport import create_capture_model\n'
+            '            return create_capture_model(llm_params, settings_snapshot)\n' + old)
+    if source.count(hook) == 2:
+        return None
+    if source.count(old) != 2 or hook in source:
+        raise ValueError(f"Incompatible OpenAI-compatible provider factory: {target}")
+    content = source.replace(old, hook)
+    ast.parse(content, filename=str(target))
+    return target, content
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, required=True)
@@ -60,6 +77,11 @@ def main():
     if spec is None or not spec.submodule_search_locations:
         parser.error("local_deep_research must be installed first")
     package = Path(next(iter(spec.submodule_search_locations)))
+    verify_source = args.source / "research_verify"
+    verify_target = Path(sysconfig.get_path("purelib")) / "research_verify"
+    patch = None
+    if not any((args.ui_only, args.search_only, args.collection_only)) and (verify_source / "reasoning_transport.py").is_file():
+        patch = reasoning_provider_patch(package)
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     restricted = args.search_only or args.collection_only
     if restricted and set(manifest.values()) - SEARCH_MODULES:
@@ -105,8 +127,6 @@ def main():
         if not any(option["value"] == "europepmc" for option in options):
             options.append({"label": "Europe PMC", "value": "europepmc"})
         defaults["search.tool"]["options"] = options
-    verify_source = args.source / "research_verify"
-    verify_target = Path(sysconfig.get_path("purelib")) / "research_verify"
     if restricted and not (verify_target / "__init__.py").is_file():
         parser.error("search-only installation requires existing research_verify package")
     package_files = ["retrieval.py"] + (["source_collection.py"] if args.collection_only else [])
@@ -130,6 +150,8 @@ def main():
     else:
         shutil.copytree(verify_source, verify_target, dirs_exist_ok=True,
                         ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+    if patch:
+        patch[0].write_text(patch[1], encoding="utf-8")
     if not args.search_only and (verify_source / "source_collection.py").is_file():
         installed = collection_target.read_text(encoding="utf-8")
         if "# Source collection feedback and stable-identifier deduplication." not in installed:

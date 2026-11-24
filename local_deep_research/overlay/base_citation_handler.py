@@ -9,6 +9,7 @@ from langchain_core.documents import Document
 from loguru import logger
 from research_verify.generation import IncompleteSynthesisError, source_material, format_source_documents
 from research_verify.synthesis_trace import record_model_response
+from research_verify.model_call_context import model_call_stage, traced_model_stage
 
 from ..exceptions import ResearchTerminatedException
 from ..utilities.type_utils import unwrap_setting
@@ -34,6 +35,7 @@ class BaseCitationHandler(ABC):
         """Set a callback that receives each streamed LLM token."""
         self.stream_callback = callback
 
+    @traced_model_stage("writer")
     def _invoke_with_streaming(self, prompt: str, *, trace=None, stage="writer") -> str:
         """
         Invoke the LLM, streaming tokens through the callback if set.
@@ -116,6 +118,7 @@ class BaseCitationHandler(ABC):
         # are stripped and str/object responses are handled uniformly.
         return self._invoke_text(prompt, trace=trace, stage=stage)
 
+    @traced_model_stage("model")
     def _invoke_text(self, prompt: str, *, trace=None, stage="model") -> str:
         """Invoke the LLM and return normalized text.
 
@@ -158,7 +161,8 @@ class BaseCitationHandler(ABC):
                                    else "length_stop_structured_response"),
                     })
                 try:
-                    retry_response = self.llm.bind(max_tokens=retry_tokens).invoke(prompt)
+                    with model_call_stage(stage + "_retry", trace):
+                        retry_response = self.llm.bind(max_tokens=retry_tokens).invoke(prompt)
                     retry_text = get_llm_response_text(retry_response)
                     record_model_response(trace, stage + "_retry", retry_response, retry_text,
                                           retry_of=("length_stop_without_text"
@@ -198,7 +202,8 @@ class BaseCitationHandler(ABC):
                 f"{text[-4000:]}\nExact anchor to repeat:\n{anchor}"
             )
             try:
-                response = self.llm.invoke(request)
+                with model_call_stage("writer_continuation", trace):
+                    response = self.llm.invoke(request)
                 continuation = get_llm_response_text(response)
                 record_model_response(trace, "writer_continuation", response, continuation, attempt=attempt)
             except ResearchTerminatedException:

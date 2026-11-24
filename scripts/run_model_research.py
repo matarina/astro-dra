@@ -29,6 +29,7 @@ def main(config):
     from research_verify.synthesis_trace import trace_context,source_snapshot
     from research_verify.publication import publish_report,collect_publication_sources
     from research_verify.config import VerifyConfig
+    from research_verify.reasoning_capture import reasoning_capture_enabled
 
     defaults=Path(local_deep_research.__file__).parent/'defaults/default_settings.json'
     snapshot=apply_environment_overrides_to_snapshot({k:v.get('value') for k,v in json.loads(defaults.read_text()).items()})
@@ -36,9 +37,10 @@ def main(config):
     public_keys=['llm.model','llm.provider','llm.temperature','llm.max_tokens','search.tool',
         'search.search_strategy','search.iterations','search.questions_per_iteration',
         'langgraph_agent.max_unique_sources','search.engine.web.pubmed.default_params.get_full_text',
-        'general.enable_fact_checking','search.fetch.mode']
+        'general.enable_fact_checking','search.fetch.mode','app.debug']
     (output/'manifest.json').write_text(json.dumps({'query':config['question'],
         'settings':{k:snapshot.get(k) for k in public_keys},'task_id':config['task_id'],
+        'provider_reasoning_capture_enabled':reasoning_capture_enabled(snapshot),
         'scope':'Fresh full research with installed defaults; programmatic mode, no per-user overrides'},ensure_ascii=False,indent=2))
     started=time.monotonic()
     def progress(message,percent,metadata):
@@ -48,7 +50,7 @@ def main(config):
         (output/'status.json').write_text(json.dumps(row,ensure_ascii=False))
     system=None
     try:
-        with settings_context(SimpleNamespace(username=None,get_setting=lambda k,d=None:snapshot.get(k,d))):
+        with trace_context(config['task_id']), settings_context(SimpleNamespace(username=None,get_setting=lambda k,d=None:snapshot.get(k,d))):
             model=get_llm(settings_snapshot=snapshot)
             search=get_search(search_tool=snapshot['search.tool'],llm_instance=model,
                 settings_snapshot=snapshot,programmatic_mode=True)
@@ -58,11 +60,10 @@ def main(config):
             if 'include_sub_research' in config and hasattr(system.strategy, 'include_sub_research'):
                 system.strategy.include_sub_research = bool(config['include_sub_research'])
             system.set_progress_callback(progress)
-            with trace_context(config['task_id']):
-                result=system.analyze_topic(config['question'])
-                body=_extract_synthesized_answer(result) or result.get('formatted_findings') or ''
-                sources=collect_publication_sources(system,system.all_links_of_system)
-                publication=publish_report(body,sources,cfg=VerifyConfig(enable_citation_qc=False))
+            result=system.analyze_topic(config['question'])
+            body=_extract_synthesized_answer(result) or result.get('formatted_findings') or ''
+            sources=collect_publication_sources(system,system.all_links_of_system)
+            publication=publish_report(body,sources,cfg=VerifyConfig(enable_citation_qc=False))
             (output/'sources.json').write_text(json.dumps(source_snapshot(sources),ensure_ascii=False,indent=2))
             (output/'result.json').write_text(json.dumps({'body':body,'error':result.get('error'),
                 'iterations':result.get('iterations'),'metadata':publication.metadata()},ensure_ascii=False,default=str,indent=2))

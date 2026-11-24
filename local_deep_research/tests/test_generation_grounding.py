@@ -19,6 +19,7 @@ from research_verify.generation import (
 )
 from research_verify.evidence import source_artifacts
 from research_verify.evidence_flow import visible_texts
+from research_verify.model_call_context import model_call_stage, traced_model_stage
 from research_verify.publication import publish_report
 from research_verify.config import VerifyConfig
 from research_verify.retrieval import xml_text
@@ -62,6 +63,7 @@ def handler(model):
           "GROUNDING_INSTRUCTIONS": GROUNDING_INSTRUCTIONS,
           "start_trace": start_trace, "source_snapshot": source_snapshot,
           "source_ids": source_ids, "text_digest": text_digest,
+          "traced_model_stage": traced_model_stage, "model_call_stage": model_call_stage,
           "consistency_prompt": consistency_prompt, "record_model_response": record_model_response,
           "get_llm_response_text": lambda response: response if isinstance(response, str) else response.content}
     definitions("overlay/base_citation_handler.py", {"BaseCitationHandler"}, ns)
