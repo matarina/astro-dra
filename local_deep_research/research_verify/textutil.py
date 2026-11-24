@@ -48,7 +48,14 @@ def normalize_year(value: Any) -> int | None:
     # Only parse a typed year/date-shaped field.  Searching arbitrary titles,
     # DOI suffixes, or prose can manufacture a publication year.
     m = _YEAR_RE.fullmatch(text)
-    return int(text[:4]) if m else None
+    if m:
+        return int(text[:4])
+    for shape in ("%Y %b %d", "%Y %b", "%Y %B %d", "%Y %B"):
+        try:
+            return datetime.strptime(text, shape).year
+        except ValueError:
+            continue
+    return None
 
 
 def first_year(source: dict, keys: Iterable[str] = (

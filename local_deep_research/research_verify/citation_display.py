@@ -18,9 +18,9 @@ _REFERENCES = re.compile(
 )
 
 
-def cited_indices(body: str) -> list[int]:
+def cited_indices(body: str, *, expand_ranges=True) -> list[int]:
     """First appearance in prose; bibliography labels and code are not citations."""
-    return list(dict.fromkeys(i for citation in citation_spans(body) for i in citation.indices))
+    return list(dict.fromkeys(i for citation in citation_spans(body, expand_ranges=expand_ranges) for i in citation.indices))
 
 
 def legacy_cited_indices(body: str) -> list[int]:
@@ -111,10 +111,10 @@ def render_report(body: str, sources) -> str:
     return body
 
 
-def render_report_current(body: str, sources) -> str:
+def render_report_current(body: str, sources, *, expand_ranges=True) -> str:
     """2.2 citation formatting preserves code, destinations and original prose."""
     mapped = {old: source for source in sources for old in source.original_indices}
-    for citation in reversed(citation_spans(body)):
+    for citation in reversed(citation_spans(body, expand_ranges=expand_ranges)):
         if not any(i in mapped for i in citation.indices):
             continue  # Retain the literal unresolved label/link; never guess.
         labels = []

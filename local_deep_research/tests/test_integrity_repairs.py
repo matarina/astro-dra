@@ -10,7 +10,8 @@ import xml.etree.ElementTree as ET
 import pytest
 
 from research_verify.generation import prepare_draft_for_writing
-from research_verify.retrieval import has_structured_query_syntax, xml_text
+from research_verify.retrieval import xml_text
+from research_verify.task_plan import DatabaseSearch
 
 
 ROOT = Path(__file__).parents[1]
@@ -24,7 +25,6 @@ def adapter_methods(*names, response=None):
     nodes = [n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name in names]
     nodes.extend(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_search_proxy_kwargs")
     ns = dict(os=os, List=List, Dict=Dict, Tuple=Tuple, ET=ET, re=re, xml_text=xml_text,
-              has_structured_query_syntax=has_structured_query_syntax,
               logger=SimpleNamespace(**{k: lambda *a, **kw: None for k in ("debug", "info", "warning")}),
               safe_get=lambda *a, **kw: response)
     exec(compile(ast.Module(body=nodes, type_ignores=[]), "pubmed_overlay", "exec"), ns)
@@ -71,12 +71,12 @@ def test_pubmed_queries_are_not_broadened_on_zero_hits(query):
     names = ("_optimize_query_for_pubmed", "_adaptive_search", "_get_previews")
     methods = adapter_methods(*names)
     obj = SimpleNamespace(llm=SimpleNamespace(invoke=lambda *a: pytest.fail("unexpected model call")),
-                          optimize_queries=has_structured_query_syntax(query))
+                          optimize_queries=True)
     calls = []
     obj._search_pubmed = lambda q: calls.append(q) or []
     for name in names:
         setattr(obj, name, lambda *a, _name=name: methods[_name](obj, *a))
-    assert obj._get_previews(query) == []
+    assert obj._get_previews(DatabaseSearch(query, "pubmed")) == []
     assert calls == [query]
 
 

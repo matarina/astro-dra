@@ -88,7 +88,9 @@ def bibliography(content):
 def document(content, title, bib_content):
     entries = bibliography_entries(content)
     body = content
-    for citation in reversed(citation_spans(content)):
+    # Export exactly the labels present in the published Markdown. New reports
+    # already expanded ranges; older reports only guaranteed their endpoints.
+    for citation in reversed(citation_spans(content, expand_ranges=False)):
         if not all(i in entries for i in citation.indices):
             continue
         refs = "; ".join("@ref" + str(i) for i in dict.fromkeys(citation.indices))

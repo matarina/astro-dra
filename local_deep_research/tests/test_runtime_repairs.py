@@ -25,32 +25,24 @@ ROOT = Path(__file__).parents[1]
 
 
 def relevance():
-    tree = ast.parse((ROOT / 'overlay/relevance_filter.py').read_text())
-    prompt = next(n.value for n in tree.body if isinstance(n, ast.Assign)
-                  and any(isinstance(t, ast.Name) and t.id == '_RELEVANCE_PROMPT_TEMPLATE' for t in n.targets))
-    ns = {**vars(typing), 'json': json, 're': re, 'time': time, 'logger': logger,
-          'datetime': datetime, 'UTC': timezone.utc, 'ChatOllama': type('Ollama', (), {}),
-          '_unwrap_llm': lambda m: m, 'scrub_error': str, '_SNIPPET_CHAR_CAP': 800,
-          'DEFAULT_MAX_FILTERED_RESULTS': 6, '_FILTER_WALL_TIMEOUT_S': 1,
-          'ThreadPoolExecutor': ThreadPoolExecutor, 'as_completed': as_completed,
-          'copy_context': copy_context,
-          'FuturesTimeoutError': FuturesTimeoutError, '_RELEVANCE_PROMPT_TEMPLATE': ast.literal_eval(prompt)}
-    nodes = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name in
-             {'_parse_indices', '_invoke_text', '_run_batch', '_build_batch_prompt', 'filter_previews_for_relevance'}]
-    exec(compile(ast.Module(body=nodes, type_ignores=[]), 'relevance_filter', 'exec'), ns)
-    return ns
+    from local_deep_research.web_search_engines.relevance_filter import filter_previews_for_relevance
+    return {'filter_previews_for_relevance': filter_previews_for_relevance}
 
 
-@pytest.mark.parametrize('response', ['`[0, 2]`', '```JSON\n[0, 2]\n```',
-                                      '{"indices": ["0", 2, 2]}', '<think>ignore 99</think>[0, 2]'])
+@pytest.mark.parametrize('response', [
+    '```JSON\n{"selected_source_ids": [0, 2]}\n```',
+    '{"selected_source_ids": [0, 2, 2]}',
+    '<think>ignore 99</think>{"selected_source_ids": [0, 2]}',
+])
 def test_only_explicit_selections_are_normalized(response):
-    assert relevance()['_parse_indices'](response) == [0, 2]
+    from research_verify.structured_output import source_ids
+    assert source_ids(response, range(3)) == [0, 2]
 
 
 def test_valid_empty_selection_is_not_an_error_or_retried():
     messages = io.StringIO(); sink = logger.add(messages)
     calls = []
-    model = SimpleNamespace(invoke=lambda p: calls.append(p) or SimpleNamespace(content='[]'))
+    model = SimpleNamespace(invoke=lambda p: calls.append(p) or SimpleNamespace(content='{"selected_source_ids": []}'))
     try:
         result = relevance()['filter_previews_for_relevance'](model, [{'title': 'Example'}] * 3, 'query')
     finally:
@@ -60,18 +52,18 @@ def test_valid_empty_selection_is_not_an_error_or_retried():
 
 
 def test_bad_format_retries_once_without_mining_explanation_numbers():
-    outputs = iter(['Reject 0 and 1 from 2024.', '[1]']); calls = []
+    outputs = iter(['Reject 0 and 1 from 2024.', '{"selected_source_ids": [1]}']); calls = []
     model = SimpleNamespace(invoke=lambda p: calls.append(p) or SimpleNamespace(content=next(outputs)))
     rows = [{'title': 'First'}, {'title': 'Second'}]
     result = relevance()['filter_previews_for_relevance'](model, rows, 'query')
-    assert result == [rows[1]] and len(calls) == 2
+    assert result == [dict(rows[1], relevance_filter_status='screened')] and len(calls) == 2
 
 
 def test_two_invalid_responses_are_labeled_unavailable_not_irrelevant():
     calls = []
     model = SimpleNamespace(invoke=lambda p: calls.append(p) or SimpleNamespace(content='Reject 0.'))
     result = relevance()['filter_previews_for_relevance'](model, [{'title': 'Example'}], 'query')
-    assert len(calls) == 2 and result[0]['relevance_filter_status'] == 'unavailable'
+    assert len(calls) == 2 and result[0]['relevance_filter_status'] == 'screening_incomplete'
 
 
 def downloader():
@@ -115,7 +107,7 @@ def test_fulltext_identity_is_checked_in_front_metadata_not_references():
     assert 'No improvement.' in article_text(correct, {'pmcid': 'PMC456'}, pmid='123')
 
 
-def test_native_consistency_reviews_actual_final_writer_output():
+def test_native_consistency_reviews_actual_final_writer_output(native_review_only):
     calls = []
     def invoke(prompt):
         calls.append(prompt)
@@ -159,11 +151,11 @@ def test_empty_length_response_retries_with_larger_completion_budget():
     model = LengthThenText()
     writer = handler(model)
     writer.settings_snapshot['citation.empty_response_retry_max_tokens'] = 12000
-    assert writer._invoke_text('structured review', stage='native_check') == '{"issues": []}'
+    assert writer._invoke_text('structured review', stage='source_reading') == '{"issues": []}'
     assert model.calls == 2 and model.bound_tokens == 12000
 
 
-def test_nonempty_length_stopped_structured_response_retries_but_writer_does_not():
+def test_source_reading_retries_and_writer_rejects_unanchored_continuation():
     class LengthThenComplete:
         def __init__(self):
             self.calls = 0
@@ -190,7 +182,7 @@ def test_nonempty_length_stopped_structured_response_retries_but_writer_does_not
     prose = LengthThenComplete()
     prose_writer = handler(prose)
     assert prose_writer._invoke_text('writer prose', stage='writer') == '```json {"readings": ['
-    assert prose.calls == 1 and prose.bound_tokens is None
+    assert prose.calls == 2 and prose.bound_tokens is None
     assert prose_writer._writer_incomplete is True
 
 

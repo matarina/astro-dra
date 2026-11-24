@@ -193,7 +193,7 @@ def inline_coordinates(text, env=None):
 _EXTENDED_NUMERIC_LABEL = re.compile(NUMERIC_LABEL.pattern.replace(r"\s*,\s*", r"\s*[,，]\s*"))
 
 
-def citations_in(text, env=None, *, extended=False):
+def citations_in(text, env=None, *, extended=False, expand_ranges=True):
     record = inline_coordinates(text, env)
     result = list(record["linked"])
     labels = _EXTENDED_NUMERIC_LABEL if extended else NUMERIC_LABEL
@@ -201,10 +201,27 @@ def citations_in(text, env=None, *, extended=False):
         if any(start < match.end() and match.start() < end for start, end in record["protected"]):
             continue
         result.append(Citation(match.start(), match.end(), _indices(match)))
-    return sorted(result, key=lambda c:c.start)
+    # Only join citations already identified by the Markdown parser. Literal
+    # examples, link destinations and bibliography labels keep their semantics.
+    result.sort(key=lambda item: item.start)
+    if not expand_ranges:
+        return result
+    grouped = []
+    for citation in result:
+        if grouped and len(grouped[-1].indices) == len(citation.indices) == 1:
+            previous = grouped[-1]
+            first, last = previous.indices[0], citation.indices[0]
+            separator = text[previous.end:citation.start]
+            if re.fullmatch(r"[ \t]*[-–—][ \t]*", separator):
+                # Avoid expanding an unbounded integer interval from model text.
+                if 0 <= last - first < 10_000:
+                    grouped[-1] = Citation(previous.start, citation.end, tuple(range(first, last + 1)))
+                    continue
+        grouped.append(citation)
+    return grouped
 
 
-def citation_spans(report, *, require_entries=False):
+def citation_spans(report, *, require_entries=False, expand_ranges=True):
     blocks, _, env = layout(report, include_env=True, require_entries=require_entries)
     return [Citation(block.start+c.start, block.start+c.end, c.indices)
-            for block in blocks for c in citations_in(report[block.start:block.end], env, extended=require_entries)]
+            for block in blocks for c in citations_in(report[block.start:block.end], env, extended=require_entries, expand_ranges=expand_ranges)]

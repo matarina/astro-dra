@@ -167,7 +167,7 @@ def test_declined_version_candidate_survives_a_supported_general_rereview():
     assert result['content']=='The procedure measures property Q [1][2].'
 
 
-def test_version_candidate_is_reconsidered_after_new_evidence_and_can_resolve():
+def test_version_candidate_is_reconsidered_after_new_evidence_and_can_resolve(native_review_only):
     result,model,fetch=_version_review(True)
     assert model.confirmations==2 and fetch.calls==1
     assert result['content']=='The procedure measures property Q [2].'

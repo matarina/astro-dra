@@ -13,11 +13,6 @@ import copy
 import re
 
 
-def has_structured_query_syntax(query: str) -> bool:
-    """Preserve quoted terms, field tags and explicit Boolean operators."""
-    return bool(re.search(r'"|\[[^\]\n]+\]|\b(?:AND|OR|NOT)\b', query))
-
-
 def html_text(value):
     """Read inline scientific markup without losing text after nested tags."""
     class Text(HTMLParser):
@@ -158,11 +153,9 @@ EUROPEPMC_CONFIG = {
     "class_name": "EuropePMCSearchEngine",
     "display_name": "Europe PMC",
     "description": (
-        "Search Europe PMC life-sciences publications and abstracts. Use its "
-        "query syntax, e.g. Visium AND FIRST_PDATE:[2022-01-01 TO 2026-12-31]. "
-        "Keep named platforms and date constraints required; use OR only for "
-        "equivalent terms. PubMed field tags are not Europe PMC syntax. "
-        "Results include publication types; an abstract is not a full paper."
+        "Search Europe PMC life-sciences publications and abstracts. Use Europe PMC "
+        "Boolean and field syntax (FIRST_PDATE for publication dates). Apply restrictions "
+        "according to the request. Results include publication types and abstracts."
     ),
     "requires_api_key": False,
     "requires_llm": True,
@@ -209,7 +202,7 @@ def pace(service: str, interval: float, *, directory=None, clock=time.monotonic,
             _LAST[service] = now
 
 
-def _retry_delay(response, attempt):
+def _retry_delay(response, attempt, maximum=15.0):
     value = response.headers.get("Retry-After", "")
     try:
         delay = float(value)
@@ -218,7 +211,7 @@ def _retry_delay(response, attempt):
             delay = email.utils.parsedate_to_datetime(value).timestamp() - time.time()
         except (TypeError, ValueError, OverflowError):
             delay = 2 ** attempt
-    return min(15.0, max(0.0, delay))
+    return max(0.0, delay) if maximum is None else min(maximum, max(0.0, delay))
 
 
 def service_get(url, *, service, interval, get=None, sleep=time.sleep, **kwargs):

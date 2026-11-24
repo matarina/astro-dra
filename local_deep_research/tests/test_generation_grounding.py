@@ -100,13 +100,14 @@ def test_writer_sees_original_abstract_identity_scope_and_unverified_draft():
     assert len(model.prompts) == 1
 
 
-def test_writer_sees_unknown_impact_factor_metadata_instead_of_an_inferred_value():
+def test_writer_keeps_a_requested_journal_metric_unverified_without_a_receipt():
     model = Capture()
     writer = handler(model)
     source = {"index": "17", "title": "Study A", "link": "https://example.com/a",
               "abstract": "An association was observed; causality could not be determined."}
-    writer.analyze_followup("What was observed?", [source], "", 0)
-    assert "Impact-factor metadata: unknown/not supplied" in model.prompts[0]
+    writer.analyze_followup("What is this journal's impact factor?", [source], "", 0)
+    assert "values as unverified" in model.prompts[0]
+    assert "Impact-factor metadata" not in model.prompts[0]
 
 
 def test_claim_directed_source_query_is_opt_in_and_preserves_untrusted_draft_boundary():

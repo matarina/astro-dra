@@ -5,6 +5,9 @@ candidate text and its source offsets; neither card is a support verdict.
 """
 from __future__ import annotations
 
+import json
+import re
+
 
 from .source_identity import classify_source
 
@@ -31,9 +34,62 @@ def _present(value):
     return value not in (None, "", [], {})
 
 
+# Flat provider records also carry article text, identity, and application state.
+# These have their own evidence channels; never render them as study fields.
+_RECORD_FIELDS = set("""
+    index link url source engine source_engine title authors authorString author_string
+    journal journal_ref year language languages lang doi pmid pmcid issn eissn essn
+    abstract snippet body content full_content fetched_content raw_content raw_content_sha256
+    content_type evidence_type source_kind document_type publication_status identity_status
+    canonical_url formal_citation_allowed publication_status_reason publication_state
+    peer_review_status relevance_status evidence_scope temporal_validity contradiction_status
+    authority_status version_resolution publication_versions related_articles related_notices
+    identity_provenance peer_review_status_provenance relevance_filter_status
+    impact_factor impact_factor_value journal_impact_factor jif metric_year passes_threshold
+    jcr_provenance jcr_check_status impact_factor_provenance jif_provenance
+    platform technology population sample_size groups outcome
+    headers settings settings_snapshot request response raw metadata additional_source_metadata
+    connection session cookies full_text html text score rank payload raw_payload raw_response
+    records request_params config debug trace fulltext raw_html pdf pdf_text
+""".split())
+_PRIVATE_KEY = re.compile(
+    r"password|secret|credential|authorization|api.?key|token|cookie|session|header|connection|"
+    r"(?:^|_)(?:user_?id|username|private|internal|settings|auth)(?:_|$)", re.I
+)
+
+
+def _plain_metadata(value, depth=0):
+    if depth > 8:
+        return False
+    if type(value) in (str, int, float, bool) or value is None:
+        return True
+    if isinstance(value, (list, tuple)):
+        return all(_plain_metadata(item, depth + 1) for item in value)
+    if isinstance(value, dict):
+        return all(isinstance(key, str) and not key.startswith("_") and not _PRIVATE_KEY.search(key)
+                   and _plain_metadata(item, depth + 1)
+                   for key, item in value.items())
+    return False
+
+
 def additional_source_metadata(source):
-    """Retain supplied values under original schema keys, without field binding."""
-    return {key: source[key] for key in ADDITIONAL_METADATA_FIELDS if _present(source.get(key))}
+    """Carry supplied public study fields with their original names and units."""
+    fields = {key: source[key] for key in ADDITIONAL_METADATA_FIELDS if _present(source.get(key))}
+    supplied = source.get("additional_source_metadata")
+    if isinstance(supplied, dict):
+        candidates = {**supplied, **source}
+    else:
+        candidates = source
+    for key, value in candidates.items():
+        if not isinstance(key, str) or key.startswith("_") or key in fields or key in _RECORD_FIELDS:
+            continue
+        if _PRIVATE_KEY.search(key) or not _present(value):
+            continue
+        if not _plain_metadata(value):
+            continue
+        if len(json.dumps(value, ensure_ascii=False)) <= 4096:
+            fields[key] = value
+    return fields
 
 
 def _value(source, field):

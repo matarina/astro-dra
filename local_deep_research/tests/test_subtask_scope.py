@@ -109,7 +109,7 @@ def test_reading_inventory_excludes_sources_not_selected_for_the_writer():
     scope = []
     docs = [document(i, "Original abstract. " * 65, abstract="Original abstract. " * 65)
             for i in range(1, 5)]
-    material = format_source_documents(docs, "Question", selector=lambda _: "[3]",
+    material = format_source_documents(docs, "Question", selector=lambda _: '{"selected_source_ids": [3]}',
                                        max_chars=4200, required_ids={2}, reading_scope=scope)
     assert {v["index"] for v in scope} == {2, 3}
     assert "[1]\nTitle:" not in material and "[4]\nTitle:" not in material

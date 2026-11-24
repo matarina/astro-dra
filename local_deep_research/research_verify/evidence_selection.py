@@ -124,6 +124,8 @@ def select_context_windows(text: str, query: str, *, window_chars: int,
                            adjacent_windows: bool = False,
                            compound_terms: bool = False,
                            exclude_reference_tail: bool = True,
+                           semantic_anchor_count: int | None = None,
+                           compact_paragraphs: bool = False,
                            ) -> tuple[EvidenceWindow, ...]:
     if window_chars < 32 or max_windows < 1 or not 0 <= overlap_chars < window_chars:
         raise ValueError("invalid evidence-window budget")
@@ -133,6 +135,14 @@ def select_context_windows(text: str, query: str, *, window_chars: int,
     eligible_end = cutoff.start() if cutoff else len(text)
     candidates = []
     paragraphs = list(_paragraphs(text, eligible_end))
+    if compact_paragraphs:
+        grouped = []
+        for begin, finish in paragraphs:
+            if grouped and finish - grouped[-1][0] <= window_chars:
+                grouped[-1] = grouped[-1][0], finish
+            else:
+                grouped.append((begin, finish))
+        paragraphs = grouped
     for begin, finish in paragraphs:
         if adjacent_windows:
             # A factual passage can begin in one paragraph and finish in the
@@ -191,13 +201,14 @@ def select_context_windows(text: str, query: str, *, window_chars: int,
         # coverage of long sources whose decisive paragraph may rank poorly.
         ranked_order = sorted(range(len(candidates)),
                               key=lambda i: (-semantic_scores[i], -scores[i], candidates[i][0]))
-        anchor_count = min(max_windows // 2, len(candidates))
+        anchor_count = min(max_windows // 2 if semantic_anchor_count is None
+                           else semantic_anchor_count, len(candidates))
         if anchor_count:
             structural_anchor_indices = [
                 round(i * (len(candidates) - 1) / max(1, anchor_count - 1))
                 for i in range(anchor_count)
             ]
-        order = ranked_order[:max_windows - anchor_count] + structural_anchor_indices
+        order = ranked_order[:max_windows - anchor_count] + structural_anchor_indices + ranked_order
         method = "semantic_ranker_with_structural_anchors"
     elif matched:
         order = sorted(range(len(candidates)), key=lambda i: (-scores[i], candidates[i][0]))

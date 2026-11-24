@@ -215,41 +215,40 @@ class IntegratedReportGenerator:
         2. Identifying main themes and logical groupings
         3. Considering the depth and breadth of the research
 
-        Return a table of contents structure in this exact format:
-        STRUCTURE
-        1. [Section Name]
-           - [Subsection] | [purpose]
-        2. [Section Name]
-           - [Subsection] | [purpose]
-        ...
-        END_STRUCTURE
+        Return only a JSON object with an ordered "sections" list. Each section
+        has a non-empty "name" and a "subsections" list. Each subsection has a
+        "name" and a "purpose". Empty subsection lists are allowed. Example:
+        {{"sections": [{{"name": "Findings", "subsections": [
+            {{"name": "Results", "purpose": "Compare the observed outcomes"}}
+        ]}}]}}
+        Supply titles without display numbering.
 
         Make the structure specific to the content, not generic.
-        Each subsection must include its purpose after the | symbol.
         DO NOT include sections about sources, citations, references, or methodology.
-        {"For field extraction, prefer one compact table-oriented section and avoid background discussion or a broad review." if getattr(getattr(self, "_research_spec", None), "output_mode", "") == "field_extraction" else ""}
+        {"For field extraction, prefer one compact section with the requested fields and avoid background discussion or a broad review." if getattr(getattr(self, "_research_spec", None), "output_mode", "") == "field_extraction" else ""}
         """
 
-        response = get_llm_response_text(self.model.invoke(prompt))
+        from research_verify.structured_output import object_reply
 
-        lines = response.strip().splitlines()
-        if "STRUCTURE" in lines:
-            lines = lines[lines.index("STRUCTURE") + 1:]
-        structure = []
-        for line in lines:
-            line = line.strip().strip("*")
-            if line == "END_STRUCTURE":
-                break
-            if section := re.fullmatch(r"[0-9]+[.)]\s+(.+)", line):
-                structure.append({"name": section[1].strip("* "), "subsections": []})
-            elif structure and line.startswith("- "):
-                name, _, purpose = line[2:].partition("|")
-                if name.strip():
-                    structure[-1]["subsections"].append(
-                        {"name": name.strip(), "purpose": purpose.strip() or name.strip()}
-                    )
-
-        return structure or [{"name": "Findings", "subsections": []}]
+        try:
+            sections = object_reply(get_llm_response_text(self.model.invoke(prompt))).get("sections")
+            if not isinstance(sections, list) or not sections:
+                raise ValueError("outline requires at least one section")
+            for section in sections:
+                if not isinstance(section, dict) or not isinstance(section.get("name"), str) or not section["name"].strip():
+                    raise ValueError("outline section requires a name")
+                if not isinstance(section.get("subsections"), list):
+                    raise ValueError("subsections must be a list")
+                for child in section["subsections"]:
+                    if not isinstance(child, dict) or any(
+                        not isinstance(child.get(key), str) or not child[key].strip()
+                        for key in ("name", "purpose")
+                    ):
+                        raise ValueError("outline subsection requires a name and purpose")
+        except ValueError as error:
+            logger.warning("Using generic report outline: {}", error)
+            return [{"name": "Findings", "subsections": []}]
+        return sections
 
     def _truncate_at_sentence_boundary(self, text: str, max_chars: int) -> str:
         """Truncate text at a sentence boundary to preserve readability.
@@ -439,25 +438,13 @@ class IntegratedReportGenerator:
 
             section_content.append(f"# {i}. {section['name']}\n")
 
-            # If section has no subsections, create one from the section itself
-            if not section["subsections"]:
-                # Parse section name for purpose
-                if "|" in section["name"]:
-                    parts = section["name"].split("|", 1)
-                    section["subsections"] = [
-                        {"name": parts[0].strip(), "purpose": parts[1].strip()}
-                    ]
-                else:
-                    # No purpose provided - use section name as subsection
-                    section["subsections"] = [
-                        {
-                            "name": section["name"],
-                            "purpose": f"Provide comprehensive content for {section['name']}",
-                        }
-                    ]
+            subsections = section["subsections"] or [{
+                "name": section["name"],
+                "purpose": f"Cover {section['name']}",
+            }]
 
             # Process each subsection by directly researching it
-            for j, subsection in enumerate(section["subsections"], 1):
+            for j, subsection in enumerate(subsections, 1):
                 if report_deadline is not None and time.monotonic() >= report_deadline:
                     logger.warning(
                         "Report generation total time limit reached during %s > %s; "
@@ -469,14 +456,14 @@ class IntegratedReportGenerator:
                     stop_report_research = True
                     break
                 # Only add subsection header if there are multiple subsections
-                if len(section["subsections"]) > 1:
+                if len(subsections) > 1:
                     section_content.append(f"## {i}.{j} {subsection['name']}\n")
                     section_content.append(f"_{subsection['purpose']}_\n\n")
 
                 # Get other subsections in this section for context
                 other_subsections = [
                     f"- {s['name']}: {s['purpose']}"
-                    for s in section["subsections"]
+                    for s in subsections
                     if s["name"] != subsection["name"]
                 ]
                 other_subsections_text = (
@@ -496,7 +483,7 @@ class IntegratedReportGenerator:
                 )
 
                 # Check if this is actually a section-level content (only one subsection, likely auto-created)
-                is_section_level = len(section["subsections"]) == 1
+                is_section_level = len(subsections) == 1
 
                 # Build context from previously generated sections to avoid repetition
                 previous_context_section = self._build_previous_context(
@@ -669,10 +656,10 @@ class IntegratedReportGenerator:
 
         # Add a summary of the research.  Field-extraction requests need a
         # compact scope marker; generic boilerplate makes them look like a
-        # broad review and competes with the requested evidence table.
+        # broad review and competes with the requested fields.
         report_parts.append("# Research Summary")
         if getattr(getattr(self, "_research_spec", None), "output_mode", "") == "field_extraction":
-            report_parts.append("The table below reports only fields available in the supplied source material.")
+            report_parts.append("The report presents the requested fields where the supplied sources support them.")
         else:
             report_parts.append("This report was researched using an advanced search system.")
             report_parts.append("Research included targeted searches for each section and subsection.")

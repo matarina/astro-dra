@@ -93,6 +93,17 @@ class SourceCollectionMixin:
             if relation not in relations:
                 relations.append(relation)
         super()._merge_duplicate(existing, incoming)
+        if incoming.get("_screened_task") and incoming.get("relevance_filter_status") == "screened":
+            existing["_screened_task"] = incoming["_screened_task"]
+            existing["relevance_filter_status"] = "screened"
+        if passages := incoming.get("_evidence_passages"):
+            from .semantic_evidence import merge_passages
+            existing["_evidence_passages"] = merge_passages(
+                existing.get("_evidence_passages", []), passages)
+        if status := incoming.get("_body_acquisition"):
+            existing["_body_acquisition"] = status
+        if attempts := incoming.get("_body_attempts"):
+            existing["_body_attempts"] = [*existing.get("_body_attempts", []), *attempts]
         # Fetch tools use find_or_add_result, which also calls this hook while
         # holding the collector lock. A duplicate after reset is evidence for
         # the current call too; reuse its ID and return the retained record.
@@ -169,7 +180,7 @@ def format_collection_results(results, offset, original_formatter):
     if pending:
         status += " because the source budget is full"
     lines = [f"Search hits: {offset.added} newly registered, {offset.reused} already registered, {status}."]
-    if any(r.get("relevance_filter_status") == "unavailable" for r in results):
+    if any(r.get("relevance_filter_status") in {"unavailable", "screening_incomplete"} for r in results):
         lines.append("Some candidates were returned while relevance screening was unavailable; "
                      "they have not passed that screening.")
     if results:

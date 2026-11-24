@@ -284,12 +284,14 @@ class DoiValidator:
 
     # -- batch --------------------------------------------------------------
     async def verify_many(
-        self, sources: list[dict], concurrency: int | None = None
+        self, sources: list[dict], concurrency: int | None = None,
+        *, timeout: float | None = None,
     ) -> dict[int, VerifyResult]:
         """Verify all sources that carry a 1-based ``index``.
 
         Returns ``{index: VerifyResult}``. The concurrency is bounded by the
-        shared :class:`HttpClient` semaphore, so no extra pool is created here.
+        shared :class:`HttpClient` semaphore. A time budget returns completed
+        checks and cancels the remaining ones before the client closes.
         """
         targets: list[tuple[int, dict]] = []
         for src in sources:
@@ -310,8 +312,19 @@ class DoiValidator:
                 logger.warning("doi_validation failed for index {}: {}", idx, exc)
                 return idx, VerifyResult(verified=None, source="unavailable", verified_at=now_iso())
 
-        results = await asyncio.gather(*(_one(i, s) for i, s in targets))
-        return {idx: res for idx, res in results}
+        if timeout is None:
+            return dict(await asyncio.gather(*(_one(i, s) for i, s in targets)))
+        if not targets:
+            return {}
+        tasks = [asyncio.create_task(_one(i, s)) for i, s in targets]
+        try:
+            done, _ = await asyncio.wait(tasks, timeout=timeout)
+            return dict(task.result() for task in tasks if task in done)
+        finally:
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
 
 
 # --------------------------------------------------------------------------- #

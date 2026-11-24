@@ -16,7 +16,7 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
-from typing import Any, Dict, Optional
+from typing import Annotated, Any, Dict, Literal, Optional
 from urllib.parse import urlparse
 
 from langchain_core.language_models import BaseChatModel
@@ -139,6 +139,10 @@ class SearchResultsCollector:
         self._all_links = all_links if all_links is not None else []
         self._max_results = max(10, int(max_results))
         self._identity_map: dict[str, dict] = {}
+        self.task_question = ""
+        self.task_plan: dict = {}
+        self.journal_checks: dict[int, dict[str, dict]] = {}
+        self.journal_selection: dict = {}
         for tracked in self._all_links:
             if isinstance(tracked, dict):
                 for key in self._identity_keys(tracked):
@@ -363,6 +367,23 @@ class SearchResultsCollector:
             self._collection_generation += 1
             self._results.clear()
             self._sources.clear()
+            self.task_plan = {}
+            self.journal_checks = {}
+            self.journal_selection = {}
+
+    def record_task_requirements(self, requirements: dict) -> None:
+        from research_verify.task_plan import validate_task_plan
+
+        with self._lock:
+            inferred = validate_task_plan(self.task_question, requirements)
+            for key, value in inferred.items():
+                if key in {"eligibility", "questions", "requirements"}:
+                    entries = self.task_plan.setdefault(key, [])
+                    for entry in value:
+                        if entry not in entries:
+                            entries.append(entry)
+                else:
+                    self.task_plan.setdefault(key, value)
 
     def snapshot(self, indices):
         """Capture citation evidence under the same lock used by writers."""
@@ -483,6 +504,13 @@ def _format_results(results: list[dict], start_idx: int) -> str:
     return "\n\n".join(lines) if lines else "No results."
 
 
+TaskRequirements = Annotated[
+    dict | None,
+    "Record all applicable user requirements. Put inclusion criteria in eligibility, "
+    "requested facts in questions, and deliverables such as counts or format in requirements.",
+]
+
+
 def _make_web_search_tool(
     search_engine_name: str,
     model: BaseChatModel,
@@ -494,13 +522,19 @@ def _make_web_search_tool(
     """Create a ``web_search`` tool that instantiates a fresh engine per call."""
 
     @tool
-    def web_search(query: str) -> str:
-        """Search the selected source and return result snippets with source indices."""
+    def web_search(query: str = "", concepts: list[list[str]] | None = None,
+                   native_query: bool = False, task_requirements: TaskRequirements = None) -> str:
+        """Search the selected engine. For a literature database, pass concepts
+        as groups of synonyms and use query for the topic. Set native_query only
+        when query is explicitly written in the target database's syntax."""
+        from research_verify.task_plan import compile_search, search_scope
         from local_deep_research.utilities.resource_utils import safe_close
         from ...config.thread_settings import get_setting_from_snapshot
         from local_deep_research.web_search_engines.search_engine_factory import (
             create_search_engine,
         )
+        if task_requirements and isinstance(collector, SearchResultsCollector):
+            collector.record_task_requirements(task_requirements)
 
         max_results = int(
             get_setting_from_snapshot(
@@ -526,7 +560,10 @@ def _make_web_search_tool(
         if engine is None:
             return f"Failed to create search engine '{search_engine_name}'."
         try:
-            results = engine.run(query)
+            lookup = compile_search(search_engine_name, query, concepts,
+                                    getattr(collector, "task_plan", {}), native_query)
+            with search_scope(collector):
+                results = engine.run(lookup)
             if not isinstance(results, list) or not results:
                 return f"No results found for '{query}'. Try rephrasing."
             for result in results:
@@ -562,13 +599,17 @@ def _make_specialized_search_tool(
     """Create a ``search_{engine}`` tool for a specific search engine."""
 
     @tool
-    def specialized_search(query: str) -> str:
+    def specialized_search(query: str = "", concepts: list[list[str]] | None = None,
+                           native_query: bool = False, task_requirements: TaskRequirements = None) -> str:
         """Search a specialized engine."""  # overridden below
+        from research_verify.task_plan import compile_search, search_scope
         from local_deep_research.utilities.resource_utils import safe_close
         from ...config.thread_settings import get_setting_from_snapshot
         from local_deep_research.web_search_engines.search_engine_factory import (
             create_search_engine,
         )
+        if task_requirements and isinstance(collector, SearchResultsCollector):
+            collector.record_task_requirements(task_requirements)
 
         max_results = int(
             get_setting_from_snapshot(
@@ -594,7 +635,10 @@ def _make_specialized_search_tool(
         if engine is None:
             return f"Failed to create {engine_name} engine."
         try:
-            results = engine.run(query)
+            lookup = compile_search(engine_name, query, concepts,
+                                    getattr(collector, "task_plan", {}), native_query)
+            with search_scope(collector):
+                results = engine.run(lookup)
             if not isinstance(results, list) or not results:
                 return f"No results from {engine_name} for '{query}'. Try rephrasing."
             for result in results:
@@ -610,7 +654,10 @@ def _make_specialized_search_tool(
 
     # Override name and description after decoration
     specialized_search.name = f"search_{engine_name}"
-    specialized_search.description = description
+    specialized_search.description = (
+        description + " For literature databases pass concepts as groups of synonyms. "
+        "Use native_query=true only for a query already in this engine's native syntax."
+    )
     return specialized_search
 
 
@@ -815,21 +862,76 @@ def _make_research_subtopic_tool(
     library / citation URLs fall through to the egress gate unchanged.
     """
 
+    from concurrent.futures import FIRST_COMPLETED, wait
+    from contextvars import copy_context
+
+    pool_state = {}
+    handoff_lock = threading.Lock()
+    handoff_wait_seconds = 45
+
+    def drain_subtopics(wait_for):
+        with handoff_lock:
+            if not pool_state:
+                return "No delegated subtopics are pending."
+            executor = pool_state["executor"]
+            pending = pool_state["pending"]
+            deadline = pool_state["deadline"]
+            now = time.monotonic()
+            desired = [future for future, topic in pending.items()
+                       if not wait_for or topic in wait_for]
+            if desired and not any(future.done() for future in pending):
+                wait(desired, timeout=max(0, min(handoff_wait_seconds, deadline - now)),
+                     return_when=FIRST_COMPLETED)
+            parts = []
+            for future, topic in list(pending.items()):
+                if future.done():
+                    pending.pop(future)
+                    delivered = False
+                    if future.cancelled():
+                        result = "Research work expired before it completed."
+                    elif error := future.exception():
+                        result = f"Research work ended ({type(error).__name__})."
+                    else:
+                        delivered, result = future.result()
+                    parts.append(f"## {topic}\n{result}")
+                    if progress_callback:
+                        action = "Subtopic evidence delivered" if delivered else "Subtopic verification incomplete"
+                        progress_callback(f"{action}: {topic}", None, {
+                            "phase": "subtopic_handoff", "subtopic": topic,
+                            "status": "delivered" if delivered else "incomplete",
+                        })
+            if time.monotonic() >= deadline:
+                parts.extend(f"## {topic}\nResearch timed out at the deadline. Verification remains incomplete."
+                             for topic in pending.values())
+                pending.clear()
+            if pending:
+                parts.append("Still pending: " + json.dumps(list(pending.values()), ensure_ascii=False)
+                             + ". Continue using finished evidence. Call research_subtopic with "
+                               "wait_for only if a pending question is critical.")
+            else:
+                executor.shutdown(wait=False, cancel_futures=True)
+                pool_state.clear()
+            if pool_state.get("overflow"):
+                parts.append(f"{pool_state['overflow']} additional subtopics were queued.")
+            return "\n\n---\n\n".join(parts)
+
     @tool(
         description=(
             f"Delegate parallel research on multiple subtopics. Each subtopic is "
             f"investigated by a separate agent. Pass 2-{MAX_SUBTOPICS} focused "
             f"research questions. Batches up to {MAX_SUBTOPICS_HARD_LIMIT} are "
             f"accepted with surplus questions queued; larger batches are "
-            f"rejected without starting any subagents."
+            f"rejected without starting any subagents. Completed evidence is handed "
+            "back as it becomes available. To collect particular pending work, pass its "
+            "exact question in wait_for. An empty call polls pending work."
         )
     )
-    def research_subtopic(subtopics: list[str]) -> str:
-        """Description passed via ``@tool(description=...)`` above — f-strings can't be docstrings."""
+    def research_subtopic(subtopics: list[str] | None = None, wait_for: list[str] | None = None) -> str:
+        """Delegate new questions or collect outstanding research."""
         from langchain.agents import create_agent
 
-        if not subtopics:
-            return "No subtopics provided."
+        if not subtopics or pool_state:
+            return drain_subtopics(wait_for)
 
         requested_count = len(subtopics)
         if requested_count > MAX_SUBTOPICS_HARD_LIMIT:
@@ -869,6 +971,8 @@ def _make_research_subtopic_tool(
         # lock-protected, so sharing the tool objects across pool workers
         # is safe. ``research_subtopic`` is itself excluded so subagents
         # cannot recurse.
+        from research_verify.subtask_research import SubtaskCollector
+        worker_collector = SubtaskCollector(collector)
         sub_tools: list = []
         if search_enabled:
             sub_tools.append(
@@ -876,14 +980,14 @@ def _make_research_subtopic_tool(
                     search_engine_name,
                     model,
                     settings_snapshot,
-                    collector,
+                    worker_collector,
                     programmatic_mode=programmatic_mode,
                     description=web_search_description,
                 )
             )
         sub_fetch = build_fetch_tool(
             fetch_mode,
-            collector,
+            worker_collector,
             model=model,
             overall_query=overall_query,
             settings_snapshot=settings_snapshot,
@@ -905,7 +1009,7 @@ def _make_research_subtopic_tool(
                 search_engine_name if search_enabled else None,
                 model,
                 settings_snapshot,
-                collector,
+                worker_collector,
                 programmatic_mode=programmatic_mode,
                 egress_context=egress_context,
             )
@@ -953,15 +1057,18 @@ def _make_research_subtopic_tool(
                 meta,
             )
 
+        from research_verify.subtask_handoff import SUBTASK_HANDOFF_INSTRUCTIONS
+
         current_date = datetime.now(UTC).strftime("%Y-%m-%d")
         subagent_prompt = (
             f"You are a focused research assistant. Today's date: {current_date}. "
-            "Search thoroughly and return a concise factual summary. "
+            "Search thoroughly and provide original source selections. "
             "Reference sources by their [N] index numbers. "
             "Cite every factual sentence and table row individually; do not put the only citation "
             "in a heading or at the end of a multi-sentence paragraph. "
             "Do NOT ask clarifying questions — provide your findings directly."
         )
+        subagent_prompt += "\n" + SUBTASK_HANDOFF_INSTRUCTIONS
         specialized_names = [
             t.name
             for t in sub_tools
@@ -978,38 +1085,14 @@ def _make_research_subtopic_tool(
             )
 
         def run_subagent(topic: str) -> str:
-            try:
-                # create_agent() calls model.bind_tools(); ProcessingLLMWrapper
-                # (config/llm_config.py) overrides bind_tools to re-wrap the
-                # bound model, so the wrapper's <think>-tag stripping survives
-                # the agent loop and runs on every model call here (fix #4804).
-                # Scope note: other Runnable transforms still escape the wrapper
-                # — with_config/bind/stream delegate via __getattr__ to the
-                # unwrapped base model (silent, unstripped), and `|` raises
-                # TypeError (the wrapper defines no __or__). None are on this
-                # create_agent path. Closing that whole class would need a full
-                # Runnable-subclass wrapper.
-                agent = create_agent(
-                    model=model,
-                    tools=sub_tools,
-                    system_prompt=subagent_prompt,
-                )
-                result = agent.invoke(
-                    {"messages": [{"role": "user", "content": topic}]},
-                    {"recursion_limit": max_sub_iterations * 2 + 1},
-                )
-                messages = result.get("messages", [])
-                if messages:
-                    last = messages[-1]
-                    content = getattr(last, "content", str(last))
-                    if content:
-                        return content
-                return f"No findings for: {topic}"
-            except GraphRecursionError:
-                return f"Research on '{topic}' reached iteration limit. Partial findings above."
-            except Exception as exc:
-                logger.exception(f"Subagent failed for: {topic[:80]}")
-                return _scrub_tool_error(f"Research on '{topic}' failed: {exc}")
+            from research_verify.subtask_research import run_subtask, track_sources
+            from research_verify.synthesis_trace import start_trace
+
+            trace = start_trace("subtask")
+            trace.record("subtask_request", {"topic": topic, "max_rounds": max_sub_iterations})
+            agent = create_agent(model=model, tools=sub_tools, system_prompt=subagent_prompt)
+            with track_sources(trace) as acquired:
+                return run_subtask(agent, model, topic, max_sub_iterations, acquired, trace)
 
         # Capture the lead thread's search context (it carries the user's DB
         # password) so each pool worker can open the per-user ENCRYPTED database
@@ -1023,219 +1106,39 @@ def _make_research_subtopic_tool(
         from research_verify.source_collection import subagent_source_scope
         collection_generation = getattr(collector, "_collection_generation", None)
 
-        # Worker lifecycle timestamps are written under a condition so the
-        # drain loop wakes both when a queued task actually starts and when a
-        # running task finishes. Submit time is deliberately not tracked: it
-        # includes time spent waiting for a free worker and caused #5014. Task
-        # IDs keep duplicate subtopic strings independent.
-        task_state_changed = threading.Condition()
-        task_start_times: dict[int, float] = {}
-        task_end_times: dict[int, float] = {}
-
-        def _run_subagent_with_egress(task: tuple[int, str]) -> str:
-            task_id, topic = task
-            started = time.monotonic()
-            with task_state_changed:
-                task_start_times[task_id] = started
-                task_state_changed.notify_all()
-
-            deadline = min(overall_deadline, started + SUBAGENT_TIMEOUT_SECONDS)
-            try:
-                with thread_cleanup(), subagent_source_scope(collector, collection_generation, deadline):
-                    # threading.local is NOT inherited by ThreadPoolExecutor
-                    # workers, so re-arm the PEP-578 audit-hook backstop for the
-                    # subagent's lifetime.
-                    from ...security.egress.audit_hook import (
-                        active_egress_context,
-                    )
-
-                    with active_egress_context(egress_context):
-                        # search_context sets the password ContextVar for this
-                        # worker and clears it on exit, preventing pool reuse from
-                        # leaking credentials between tasks.
-                        if captured_search_context is not None:
-                            with search_context(captured_search_context):
-                                return run_subagent(topic)
-                        return run_subagent(topic)
-            finally:
-                with task_state_changed:
-                    task_end_times[task_id] = time.monotonic()
-                    task_state_changed.notify_all()
-
-        ordered_results: dict[int, str] = {}
-        # Overall safety cap for the drain loop. Sized to cover the worst-
-        # case queue wait (ceil(subtopics/workers) waves) plus slack. This is
-        # only a backstop; each started task has its own earlier deadline.
         overall_timeout_seconds = (
             SUBAGENT_TIMEOUT_SECONDS
             * max(1, math.ceil(len(subtopics) / effective_workers))
             * SUBAGENT_TIMEOUT_OVERALL_MULTIPLIER
         )
-        drain_start = time.monotonic()
-        overall_deadline = drain_start + overall_timeout_seconds
+        overall_deadline = min(time.monotonic() + overall_timeout_seconds,
+                               getattr(collector, "run_deadline", float("inf")))
+        def run_scoped(topic):
+            started = time.monotonic()
+            deadline = min(overall_deadline, started + SUBAGENT_TIMEOUT_SECONDS)
+            with thread_cleanup(), subagent_source_scope(collector, collection_generation, deadline):
+                from ...security.egress.audit_hook import active_egress_context
 
-        def _record_per_task_timeout(
-            task_id: int, topic: str, elapsed: float
-        ) -> None:
-            logger.warning(
-                f"Subagent timed out (per-task): {topic[:80]} "
-                f"ran {elapsed:.1f}s of "
-                f"{SUBAGENT_TIMEOUT_SECONDS}s budget"
-            )
-            ordered_results[task_id] = (
-                f"Research on '{topic}' timed out after {elapsed:.1f}s "
-                f"(per-subagent budget is {SUBAGENT_TIMEOUT_SECONDS}s)."
-            )
+                with active_egress_context(egress_context):
+                    if captured_search_context is not None:
+                        with search_context(captured_search_context):
+                            content = run_subagent(topic)
+                    else:
+                        content = run_subagent(topic)
+                    if time.monotonic() >= deadline:
+                        return False, "Verification incomplete at the subtopic deadline."
+                    return True, content
 
-        executor = ThreadPoolExecutor(max_workers=effective_workers)
-        futures = {}
-        try:
-            futures = {
-                executor.submit(_run_subagent_with_egress, (task_id, topic)): (
-                    task_id,
-                    topic,
-                )
-                for task_id, topic in enumerate(subtopics)
-            }
-            pending = set(futures)
-
-            while pending:
-                completed = []
-                expired = []
-                overall_expired = False
-
-                with task_state_changed:
-                    while True:
-                        now = time.monotonic()
-                        completed = [
-                            future
-                            for future in pending
-                            if futures[future][0] in task_end_times
-                        ]
-                        if completed:
-                            break
-
-                        expired = [
-                            future
-                            for future in pending
-                            if (
-                                futures[future][0] in task_start_times
-                                and now - task_start_times[futures[future][0]]
-                                >= SUBAGENT_TIMEOUT_SECONDS
-                            )
-                        ]
-                        if expired:
-                            break
-
-                        if now >= overall_deadline:
-                            overall_expired = True
-                            break
-
-                        deadlines = [overall_deadline]
-                        deadlines.extend(
-                            task_start_times[futures[future][0]]
-                            + SUBAGENT_TIMEOUT_SECONDS
-                            for future in pending
-                            if futures[future][0] in task_start_times
-                        )
-                        task_state_changed.wait(
-                            timeout=max(0.0, min(deadlines) - now)
-                        )
-
-                # A completed future can still have exceeded its own budget.
-                # Check the worker-recorded duration before accepting its
-                # result; future.result(timeout=...) cannot do this after a
-                # completion iterator has already yielded the future.
-                for future in completed:
-                    pending.remove(future)
-                    task_id, topic = futures[future]
-                    start = task_start_times[task_id]
-                    elapsed = max(0.0, task_end_times[task_id] - start)
-                    if elapsed >= SUBAGENT_TIMEOUT_SECONDS:
-                        _record_per_task_timeout(task_id, topic, elapsed)
-                        continue
-                    try:
-                        ordered_results[task_id] = future.result()
-                    except Exception as exc:
-                        logger.exception(f"Subagent failed for: {topic[:80]}")
-                        ordered_results[task_id] = _scrub_tool_error(
-                            f"Research on '{topic}' failed: {exc}"
-                        )
-
-                # These futures are still running, but their individual
-                # deadline has arrived. ThreadPoolExecutor cannot preempt a
-                # running Python callable, so ignore its eventual result and
-                # let shutdown(wait=False) release the lead agent promptly.
-                now = time.monotonic()
-                for future in expired:
-                    pending.remove(future)
-                    task_id, topic = futures[future]
-                    elapsed = max(0.0, now - task_start_times[task_id])
-                    _record_per_task_timeout(task_id, topic, elapsed)
-                    future.cancel()
-
-                if overall_expired:
-                    now = time.monotonic()
-                    for future in pending:
-                        task_id, topic = futures[future]
-                        start = task_start_times.get(task_id)
-                        if start is None:
-                            queued_elapsed = max(0.0, now - drain_start)
-                            logger.warning(
-                                f"Subagent exceeded overall safety cap: "
-                                f"{topic[:80]} remained queued for "
-                                f"{queued_elapsed:.1f}s and never started"
-                            )
-                            ordered_results[task_id] = (
-                                f"Research on '{topic}' did not start before "
-                                f"the overall safety budget of "
-                                f"{overall_timeout_seconds}s expired "
-                                f"(queued for {queued_elapsed:.1f}s; its "
-                                f"{SUBAGENT_TIMEOUT_SECONDS}s per-subagent "
-                                f"budget begins at task start)."
-                            )
-                        else:
-                            elapsed = max(0.0, now - start)
-                            logger.warning(
-                                f"Subagent exceeded overall safety cap: "
-                                f"{topic[:80]} ran {elapsed:.1f}s of "
-                                f"{overall_timeout_seconds}s overall / "
-                                f"{SUBAGENT_TIMEOUT_SECONDS}s per-task budget"
-                            )
-                            ordered_results[task_id] = (
-                                f"Research on '{topic}' did not finish within "
-                                f"the overall safety budget of "
-                                f"{overall_timeout_seconds}s (ran "
-                                f"{elapsed:.1f}s; per-subagent budget is "
-                                f"{SUBAGENT_TIMEOUT_SECONDS}s)."
-                            )
-                        future.cancel()
-                    pending.clear()
-        finally:
-            for future in futures:
-                if not future.done():
-                    future.cancel()
-            executor.shutdown(wait=False, cancel_futures=True)
-
-        # Return results in original order
-        parts = []
-        for task_id, topic in enumerate(subtopics):
-            parts.append(
-                f"## {topic}\n{ordered_results.get(task_id, 'No results')}"
-            )
-        result_text = "\n\n---\n\n".join(parts)
-
-        # Tell the lead agent how an over-budget but bounded request was handled.
-        # Every queued topic has a result section above, including timeout/error
-        # text when its worker did not complete successfully.
-        if overflow_count:
-            result_text += (
-                f"\n\nOverflow handling: {overflow_count} subtopic(s) beyond "
-                f"the preferred per-call limit of {MAX_SUBTOPICS} were queued "
-                f"for processing instead of being dropped; each appears in "
-                f"the results above."
-            )
-        return result_text
+        with handoff_lock:
+            if not pool_state:
+                executor = ThreadPoolExecutor(max_workers=effective_workers)
+                pending = {executor.submit(copy_context().run, run_scoped, topic): topic
+                           for topic in subtopics}
+                pool_state.update(executor=executor, pending=pending,
+                                  deadline=overall_deadline, overflow=overflow_count)
+                collector.pending_subtopics = pending
+                collector.close_subtopic_pool = lambda: executor.shutdown(wait=False, cancel_futures=True)
+        return drain_subtopics(wait_for)
 
     return research_subtopic
 
@@ -1246,17 +1149,38 @@ def _make_jcr_tool(collector):
     def search_journal(
         journal_name: str,
         source_index: int,
-        minimum_if: float | None = None,
+        use: Annotated[
+            Literal["display", "filter", "rank", "filter_and_rank"],
+            "Use display only for papers already chosen for the report. Use filter for an IF cutoff, "
+            "rank for an IF sort, and filter_and_rank when the request specifies both.",
+        ],
+        minimum_if: Annotated[float | None, "Include the user's IF cutoff when one is requested."] = None,
         year: str = "latest",
-        operator: str = ">=",
+        operator: Annotated[str | None, "Supply > for a strict cutoff, >= for an inclusive cutoff, or =."] = None,
+        order: Annotated[Literal["ascending", "descending"] | None, "Include the requested IF sort order."] = None,
     ) -> str:
         """Look up a collected paper's journal impact factor using its exact source_index.
 
-        Use when the user requests journal impact factors or ranking by them.
-        Pass minimum_if and operator only for a requested threshold. Use latest
-        unless the user specifies a JCR metric year. The lookup uses the
-        journal recorded for that source.
+        Use when the user's original request needs IF. For filtering or ranking,
+        check relevant candidates before deciding the list. For display only,
+        first select the report's papers based on relevance and evidence, then
+        look up only their source IDs. Pass minimum_if and operator
+        only for a threshold, using > for strictly greater and >= for inclusive
+        wording such as "at least" or "以上". Pass order only for ranking.
+        Keep the filtering/ranking parameters consistent across candidates.
+        Use latest unless the user specifies a JCR metric year. The lookup
+        uses the recorded source journal.
         """
+        filtering = use in {"filter", "filter_and_rank"}
+        ranking = use in {"rank", "filter_and_rank"}
+        if (filtering and (minimum_if is None or operator is None)) or (ranking and order is None):
+            return json.dumps({
+                "status": "invalid_input", "source_index": source_index,
+                "missing_reason": "Pass minimum_if and operator for filtering, and order for ranking as requested.",
+            })
+        minimum_if = minimum_if if filtering else None
+        operator = operator if filtering else ">="
+        order = order if ranking else None
         try:
             from research_verify.jcr_adapter import lookup_source
             source = collector.find_by_index(int(source_index))
@@ -1267,28 +1191,22 @@ def _make_jcr_tool(collector):
                           "minimum_if": minimum_if,
                           "threshold_operator": operator}
             else:
-                result = lookup_source(source, minimum=minimum_if,
-                                       operator=operator, year=year)
-                result["source_index"] = int(source_index)
-                source["_jcr_check"] = result
-                source["jcr_check_status"] = result.get("status")
-                source["jcr_provenance"] = {
-                    "source": "jcr_mcp",
-                    "metric_year": result.get("metric_year"),
-                    "metric_source": result.get("metric_source"),
-                    "source_url": result.get("source_url"),
-                    "status": result.get("status"),
-                    "missing_reason": result.get("missing_reason"),
-                    "requested_minimum_if": result.get("minimum_if"),
-                    "threshold_operator": result.get("threshold_operator"),
-                }
-                if result.get("status") == "found":
-                    source["impact_factor"] = result.get("impact_factor")
-                    source["metric_year"] = result.get("metric_year")
-                    source["passes_threshold"] = result.get("passes_threshold")
+                with collector._lock:
+                    result = lookup_source(source, minimum=minimum_if, operator=operator, year=year)
+                    result["source_index"] = source_index
+                    if result["status"] != "invalid_input":
+                        metric_year = result["requested_metric_year"]
+                        collector.journal_checks.setdefault(source_index, {})[metric_year] = result
+                        if minimum_if is not None or order:
+                            selection = collector.journal_selection
+                            if selection.setdefault("year", metric_year) == metric_year:
+                                if minimum_if is not None and "minimum" not in selection:
+                                    selection.update(minimum=minimum_if, operator=operator)
+                                if order:
+                                    selection.setdefault("order", order)
             return json.dumps(result, ensure_ascii=False, sort_keys=True)
         except Exception as exc:
-            logger.warning("jcr_mcp tool failed: %s", type(exc).__name__)
+            logger.warning("jcr_mcp tool failed: {}", type(exc).__name__)
             return json.dumps({"status": "metric_unavailable",
                                "missing_reason": "jcr_mcp_tool_failed",
                                "error_type": type(exc).__name__},
@@ -1370,14 +1288,6 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         self.collector = SearchResultsCollector(
             self.all_links_of_system, max_results=self.max_unique_sources
         )
-        # The final citation writer may need to make its own model-selected
-        # source-bound JCR lookup.  Keep the factory on the writer handler so
-        # it uses the same collector/index space as the research agent.
-        writer_handler = getattr(self.citation_handler, "_handler", self.citation_handler)
-        if hasattr(writer_handler, "set_writer_jcr_tool_factory"):
-            writer_handler.set_writer_jcr_tool_factory(
-                lambda: _make_jcr_tool(self.collector)
-            )
         # research_verify: last parsed constraint (set by _attach_constraint_match)
         self._constraint_spec = None
         self._citation_checks: list = []
@@ -1579,7 +1489,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         emoji + argument-extraction can be unit-tested without driving the full
         LangGraph stream. Behavior is preserved from the original inline block.
 
-        - ``fetch_content`` → ``📖 Reading the page: "<url>"`` (URL arg).
+        - ``fetch_content`` shows the source ID or URL.
         - ``research_subtopic`` → ``🔬 Investigating subtopic: "<…>"``
           (accepts ``subtopics`` list, ``subtopic``, or ``query`` for
           forward-compat with older signatures).
@@ -1599,11 +1509,16 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         # arg. Either way, show the meaningful arg in quotes so the user
         # sees what the agent is actually looking up.
         if raw_name == "fetch_content":
+            if source_id := tc_args.get("source_id"):
+                return f"📖 Reading source [{source_id}]"
             target = _truncate_arg(str(tc_args.get("url", "")))
             return f'📖 Reading {display_name}: "{target}"'
         if raw_name == "research_subtopic":
-            # Tool signature is `subtopics: list[str]`. Accept either key for
-            # forward-compat and stringify a list as a comma list.
+            if not tc_args.get("subtopics") and not any(tc_args.get(k) for k in ("subtopic", "query")):
+                if pending := tc_args.get("wait_for"):
+                    topics = ", ".join(_truncate_arg(str(topic)) for topic in pending)
+                    return f"🔬 Checking pending subtopic evidence: {topics}"
+                return "🔬 Checking pending subtopic evidence"
             raw_sub = tc_args.get(
                 "subtopics",
                 tc_args.get(
@@ -1616,6 +1531,11 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             else:
                 sub = _truncate_arg(str(raw_sub))
             return f'🔬 Investigating subtopic: "{sub}"'
+        if raw_name == "search_journal":
+            target = _truncate_arg(str(tc_args.get("journal_name") or ""))
+            if source_id := tc_args.get("source_index"):
+                return f"🔍 Checking journal metric for source [{source_id}] {target}".rstrip()
+            return f"🔍 Checking journal metric for {target}".rstrip()
         # Search-style tool — query arg (or URL if query missing). Use a
         # loop-local name here — do NOT reassign the `query` parameter, which
         # is still needed downstream by _finalize() as the original research question.
@@ -1996,6 +1916,13 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         )
         self.check_termination(CHECK_CONTEXT_ENTRY)
 
+        from research_verify.task_plan import TASK_REQUIREMENTS_GUIDANCE
+
+        self.collector.task_question = query
+        self.collector.screening_cache = {}
+        self.collector.run_deadline = getattr(self, "_run_deadline", None) or float("inf")
+        self.collector.pending_subtopics = {}
+        self.collector.close_subtopic_pool = None
         # Build tools (overall_query feeds summary-mode fetch tools)
         tools = self._build_tools(overall_query=query)
         if not tools:
@@ -2017,7 +1944,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             )
         elif self.fetch_mode in ("summary_focus", "summary_focus_query"):
             fetch_line = (
-                "3. Use fetch_content(url, focus) when snippets aren't enough; "
+                "3. Use fetch_content(source_id, focus) for indexed papers and fetch_content(url, focus) for new web pages; "
                 "always pass the specific question or claim you want answered "
                 "as ``focus`` so the tool returns only the relevant facts.\n"
             )
@@ -2086,6 +2013,8 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             f"larger batches are rejected without doing work).\n"
             f"{fetch_line}"
             "4. When available, use specialized search_[engine] tools for domain-specific searches "
+            "with concepts as groups of synonyms and query as topic. "
+            "For a database-native expression explicitly specify native_query=true. "
             "(search_arxiv for science, search_pubmed for medical, etc.).\n"
             "5. Evidence policy: every factual claim, number, date, journal, "
             "method, or comparison must be supported by the retrieved sources "
@@ -2094,9 +2023,19 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             "factor or publication status unless a source explicitly states it. "
             "If the sources do not establish a claim, say that it could not be "
             "verified and omit the claim rather than guessing.\n"
-            "If the user's request requires journal impact factors, use search_journal "
-            "for relevant papers by source index. Use its reported metric and year, "
-            "and mark unavailable or ambiguous results as unverified.\n"
+            "When the original request needs journal impact factors, use search_journal "
+            "by source index. For an IF threshold or ranking, get receipts for relevant "
+            "candidates before deciding the list. For display only, select which "
+            "papers to include based on relevance and evidence before calling "
+            "search_journal. Call it only for those papers, for example one lookup "
+            "for a requested one-paper report. Set use to display for those calls. "
+            "If the user asks for an IF cutoff, use filter and pass both minimum_if "
+            "and operator, using > for strictly "
+            "greater and >= for inclusive wording such as at least or 以上. "
+            "For IF ordering, use rank and pass order. Use filter_and_rank and "
+            "supply both sets of arguments when both are requested. Leave the cutoff unset for display or ranking "
+            "alone. Use the returned value and year, and mark missing, ambiguous or "
+            "unchecked metrics as unverified. Other tasks need no journal lookup.\n"
             "6. When you have enough information, provide a comprehensive answer "
             "citing sources as [1], [2], etc. Keep each citation close to the "
             "claim it supports; one citation must not be used to imply support "
@@ -2106,7 +2045,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             "or at the end of a multi-sentence paragraph. Abstracts guide initial "
             "checks; obtain body evidence for detailed claims. Do not describe "
             "an abstract or search snippet as a verified full-text reading.\n"
-            f"{policy_addendum}"
+            f"{policy_addendum}\n{TASK_REQUIREMENTS_GUIDANCE}"
         )
 
         # Create agent — may fail if model doesn't support tool calling.
@@ -2138,6 +2077,11 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         iteration = 0
         final_content = ""
         agent_messages: list = []
+        no_progress_rounds = 0
+        prior_progress = None
+        seen_actions = set()
+        actions = set()
+
 
         try:
             for chunk in agent.stream(
@@ -2212,6 +2156,8 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                                     },
                                 )
 
+                            actions = {(call["name"], json.dumps(call.get("args", {}), sort_keys=True))
+                                       for call in tool_calls}
                             if tool_calls:
                                 for tc in tool_calls:
                                     raw_name = tc.get("name", "")
@@ -2258,6 +2204,29 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                             ),
                             obs_metadata,
                         )
+                    state = (
+                        tuple((record.get("index"), len(record.get("fetched_content") or ""),
+                               len(record.get("_evidence_passages") or []))
+                              for record in self.collector.results),
+                        tuple((index, year, receipt["status"])
+                              for index, receipts in self.collector.journal_checks.items()
+                              for year, receipt in receipts.items()),
+                    )
+                    if state != prior_progress:
+                        no_progress_rounds = 0
+                        seen_actions.clear()
+                    elif actions and actions <= seen_actions:
+                        no_progress_rounds += 1
+                    else:
+                        no_progress_rounds = 0
+                    seen_actions.update(actions)
+                    prior_progress = state
+                    pending = any(not f.done() for f in self.collector.pending_subtopics)
+                    if no_progress_rounds >= 3 and not pending:
+                        logger.info("Research reached a repeated-action stall; synthesizing collected evidence")
+                        self._update_progress("No new evidence from repeated tool actions", 85,
+                                              {"phase": "research_stall", "iteration": iteration})
+                        break
                     # After every tool result, the agent immediately re-
                     # invokes the model to decide the next step. For
                     # thinking-mode LLMs (Qwen 3.x, deepseek-r1, etc.)
@@ -2301,6 +2270,14 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         agent_messages: list,
     ) -> Dict[str, Any]:
         """Apply citation handling and build the return dict."""
+        pending = [topic for future, topic in getattr(self.collector, "pending_subtopics", {}).items()
+                   if not future.done() and not future.cancel()]
+        if pending:
+            logger.info("Subtopic verification incomplete at synthesis: {}", pending)
+        if close_pool := getattr(self.collector, "close_subtopic_pool", None):
+            close_pool()
+            with self.collector._lock:
+                self.collector._collection_generation += 1
         from research_verify.source_collection import sources_for_draft
         all_search_results, source_recovery = sources_for_draft(
             self.collector.results, self.all_links_of_system, final_answer
@@ -2315,7 +2292,6 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                 from research_verify.source_evidence import prepare_selected_evidence
                 field_evidence_preparation = prepare_selected_evidence(
                     all_search_results,
-                    limit=min(research_spec.requested_count or 6, 20),
                     egress_context=(
                         self._build_egress_context()
                         if hasattr(self, "_build_egress_context") else None
@@ -2323,7 +2299,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                 )
                 from research_verify.evidence_cards import build_source_cards
                 field_evidence_preparation["cards"] = build_source_cards(
-                    all_search_results[:min(research_spec.requested_count or 6, 20)],
+                    all_search_results[:field_evidence_preparation["requested_sources"]],
                     requested_fields=research_spec.requested_fields,
                 )
             except Exception as exc:
@@ -2342,6 +2318,11 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         # turn a search miss into a publication gate or an instruction to
         # suppress otherwise useful evidence.
         self._attach_constraint_match(query, all_search_results)
+        from research_verify.jcr_adapter import sources_with_journal_receipts
+        journal_selection = getattr(self.collector, "journal_selection", {})
+        all_search_results = list(sources_with_journal_receipts(
+            all_search_results, getattr(self.collector, "journal_checks", {}), journal_selection,
+        ))
 
         # Reuse only explicitly cited prior records. Missing/ambiguous labels
         # stay unresolved; neither the whole archive nor a guessed source is
@@ -2396,6 +2377,12 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
             try:
                 scope_data = format_research_spec(research_spec)
                 writer_query = query + ("\n\n" + scope_data if scope_data else "")
+                if pending:
+                    writer_query += "\nDelegated evidence searches still incomplete: " + json.dumps(pending, ensure_ascii=False)
+                writer_handler = getattr(self.citation_handler, "_handler", self.citation_handler)
+                writer_handler.task_question = query
+                writer_handler.task_plan = getattr(self.collector, "task_plan", {})
+                writer_handler.journal_selection = journal_selection
                 citation_result = self.citation_handler.analyze_followup(
                     writer_query,
                     all_search_results,
@@ -2551,7 +2538,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
         async def _run():
             context = self._build_egress_context() if hasattr(self, "_build_egress_context") else None
             async with HttpClient(cfg, egress_context=context) as http:
-                return await DoiValidator(http, cfg).verify_many(sources)
+                return await DoiValidator(http, cfg).verify_many(sources, timeout=30)
 
         try:
             results = self._run_async(_run())
@@ -2565,7 +2552,7 @@ class LangGraphAgentStrategy(BaseSearchStrategy):
                 continue
             src["_verify"] = vr.model_dump()
             src["_verify_badge"] = badge_for(vr)
-        logger.info(f"doi_validation: verified {len(results)} sources")
+        logger.info("doi_validation: completed {} of {} source checks", len(results), len(sources))
 
     def _attach_constraint_match(
         self, query: str, sources: list[dict]

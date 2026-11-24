@@ -124,6 +124,11 @@ def article_text(xml, record, pmid=None, *, require_body=False, include_graphic_
     for abstract in abstracts:
         parts.extend(["Abstract", *paragraphs(abstract)])
     parts.extend(body_parts)
+    back = next((e for e in root if local(e) == "back"), None)
+    if back is not None:
+        for node in back:
+            if local(node) in {"app-group", "sec", "supplementary-material"}:
+                parts.extend(paragraphs(node))
     return "\n\n".join(parts) or None
 
 
@@ -198,3 +203,54 @@ def article_graphics(xml, record, pmid=None):
     return dict(xml_sha256=hashlib.sha256(raw).hexdigest(), own_article_ids=own_ids, figures=figures,
                 unresolved_references=unresolved, semantic_verification='not_performed',
                 visual_content_status='not_inspected_or_transcribed')
+
+
+
+def publisher_article_ids(page):
+    """Read article identifiers and publisher links from bibliographic metadata."""
+    from html.parser import HTMLParser
+    from .source_identity import identity_fields
+
+    class Metadata(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.ids, self.links = {}, []
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            if tag == "meta":
+                name = attrs.get("name", "").lower()
+                if name in {"citation_doi", "citation_pmid", "citation_pmcid"}:
+                    self.ids[name.removeprefix("citation_")] = attrs.get("content")
+                if name == "citation_fulltext_html_url" and attrs.get("content"):
+                    self.links.append(attrs["content"])
+            elif tag == "link" and attrs.get("rel") == "canonical":
+                pmid, pmcid = academic_url_ids(attrs.get("href", ""))
+                if pmid:
+                    self.ids.setdefault("pmid", pmid)
+                if pmcid:
+                    self.ids.setdefault("pmcid", pmcid)
+            elif tag == "a" and "link-item" in attrs.get("class", "").split():
+                href = attrs.get("href", "")
+                if href.startswith("https://"):
+                    self.links.append(href)
+
+    metadata = Metadata()
+    metadata.feed(page)
+    return identity_fields(metadata.ids), metadata.links
+
+
+def publisher_article_text(page):
+    """Keep article blocks, captions and whole tables from verified HTML."""
+    from bs4 import BeautifulSoup
+    from .retrieval import html_text
+
+    document = BeautifulSoup(page, "html.parser")
+    article = document.find("article") or document.find("main") or document
+    parts = []
+    for element in article.find_all(("h1", "h2", "h3", "h4", "p", "table", "figcaption", "caption")):
+        if element.find_parent(("table", "figcaption", "p")):
+            continue
+        if text := html_text(str(element)):
+            parts.append(text)
+    return "\n\n".join(parts) if parts else html_text(str(article))

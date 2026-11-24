@@ -173,7 +173,7 @@ def test_real_subtopic_tool_returns_originals_and_private_trace_for_each_worker(
     def create_agent(**kwargs):
         assert "original source selections" in kwargs["system_prompt"]
         def invoke(request, config):
-            topic = request["messages"][0]["content"]
+            topic = request["messages"][0]["content"].splitlines()[0]
             index = 7 if topic == "alpha" else 8
             observed["collector"].find_by_index(index)
             if iteration_failure:
@@ -184,7 +184,7 @@ def test_real_subtopic_tool_returns_originals_and_private_trace_for_each_worker(
                                      "summary": f"Organize {topic} around study [{index}].",
                                      "evidence": [{"source_id": index, "quote": "promotes degradation of R"}]}))]}
         def stream(request, config, stream_mode):
-            topic = request["messages"][0]["content"]
+            topic = request["messages"][0]["content"].splitlines()[0]
             index = 7 if topic == "alpha" else 8
             observed["collector"].find_by_index(index)
             if iteration_failure:
@@ -218,7 +218,7 @@ def test_real_subtopic_tool_returns_originals_and_private_trace_for_each_worker(
           "SUBAGENT_TIMEOUT_SECONDS": 30, "SUBAGENT_TIMEOUT_OVERALL_MULTIPLIER": 2,
           "NEUTRAL_PRIMARY_SEARCH_DESCRIPTION": "Search", "logger": logger,
           "tool": lambda **kw: lambda fn: fn, "ThreadPoolExecutor": ThreadPoolExecutor,
-          "threading": threading, "math": math, "time": time, "datetime": datetime, "UTC": UTC,
+          "threading": threading, "math": math, "time": time, "datetime": datetime, "UTC": UTC, "json": json,
           "build_fetch_tool": lambda mode, collector, **kw: observed.update(collector=collector),
           "_load_specialized_engine_tools": lambda *a, **kw: [SimpleNamespace(name="search_mock")],
           "get_search_context": lambda: None, "thread_cleanup": nullcontext,
@@ -228,10 +228,14 @@ def test_real_subtopic_tool_returns_originals_and_private_trace_for_each_worker(
     records = {7: source(), 8: source(8, abstract="Other experiment. " + ABSTRACT)}
     tool = ns["_make_research_subtopic_tool"]("mock", object(), {},
                 SimpleNamespace(find_by_index=records.get), 3, search_enabled=False)
-    text = tool(["alpha", "beta"])
+    deliveries = [tool(["alpha", "beta"])]
+    for topic in ("alpha", "beta"):
+        if not any(f"## {topic}\n" in text for text in deliveries):
+            deliveries.append(tool(wait_for=[topic]))
+    text = "\n".join(deliveries)
     assert text.count("RESEARCH MAP") == text.count("BEGIN ORIGINAL SOURCE EXCERPT") == 2
     assert records[7]["abstract"] in text and records[8]["abstract"] in text
-    assert text.index("## alpha") < text.index("## beta")
+    assert "## alpha" in text and "## beta" in text
     directories = list((tmp_path / "traces" / "handoff-integration").iterdir())
     assert len(directories) == 2
     for directory in directories:

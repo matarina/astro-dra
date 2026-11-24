@@ -31,7 +31,10 @@ from typing import Any
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import tool
 from loguru import logger
+from research_verify.evidence_fetch import EvidenceFetcher
 from research_verify.generation import page_excerpts
+from research_verify.semantic_evidence import semantic_passages
+from research_verify.source_identity import identity_fields
 
 from local_deep_research.utilities.js_rendering import (
     read_js_rendering_setting as _read_js_rendering_setting,
@@ -80,6 +83,9 @@ def _register_in_collector(
     title: str,
     snippet_source: str,
     raw_content: str | None = None,
+    evidence: list | None = None,
+    status: str | None = None,
+    **identity,
 ) -> int:
     """Register a fetched URL in the collector and return its 1-based citation index.
 
@@ -129,7 +135,11 @@ def _register_in_collector(
             f"Failed to register fetched URL in collector: {redact_url_for_log(url)}"
         )
 
-    record = {"title": title, "link": url, "snippet": snippet}
+    record = {"title": title, "link": url, "snippet": snippet, **identity}
+    if evidence:
+        record["_evidence_passages"] = [dict(passage, url=url) for passage in evidence]
+    if status:
+        record["_body_acquisition"] = status
     if isinstance(raw_content, str) and raw_content.strip():
         # Preserve acquired text separately from the model-produced focus
         # summary. Its completeness/type is not established by ContentFetcher.
@@ -317,6 +327,39 @@ def _fetch_raw_content(
     """
     from local_deep_research.content_fetcher import ContentFetcher
 
+    source = _resolve_citation_reference(url, collector)
+    if source is None and hasattr(collector, "find_by_index"):
+        index = collector.find_by_url(url)
+        if index:
+            source = collector.find_by_index(index)
+    if source and (identity := identity_fields(source)):
+        held = source.get("fetched_content")
+        acquisition = source.get("_body_acquisition", "")
+        if not held or acquisition in {"full_text_unavailable", ""}:
+            client = EvidenceFetcher({**(settings_snapshot or {}),
+                                      "_egress_context": egress_context}, seconds=24, requests=6)
+            article = client.source_article(source)
+            for attempt in client.events:
+                logger.info("Article retrieval source={} {}", source.get("index"), attempt)
+            updated = {"index": source.get("index"), **identity,
+                       "link": source.get("link") or source.get("url"),
+                       "title": source.get("title") or "",
+                       "_body_acquisition": article["status"] if article else "full_text_unavailable",
+                       "_body_attempts": client.events}
+            if article:
+                updated["fetched_content"] = article["body"]
+                updated["_body_url"] = article["url"]
+            collector.find_or_add_result(updated, engine_name="fetch")
+            held = article["body"] if article else None
+        if held:
+            return {"status": "success", "content": held, "title": source.get("title"),
+                    "identity": identity, "body_status": source.get("_body_acquisition")}, (
+                        source.get("_body_url") or source["link"]), None
+        if source.get("abstract"):
+            return {"status": "success", "content": source["abstract"], "title": source.get("title"),
+                    "identity": identity, "body_status": "full_text_unavailable"}, source["link"], None
+        return None, url, "Full text could not be verified for this source ID."
+
     pre = _try_resolve_url(url, library_resolver, collector)
     result: dict | None = None
     if pre is not None:
@@ -336,6 +379,12 @@ def _fetch_raw_content(
             url = payload
 
     if result is None:
+        if hasattr(collector, "find_by_index"):
+            index = collector.find_by_url(url)
+            cached = collector.find_by_index(index) if index else None
+            if cached and cached.get("fetched_content"):
+                return {"status": "success", "content": cached["fetched_content"],
+                        "title": cached.get("title")}, url, None
         # Either no pre-resolution or a citation-marker rewrite —
         # run the normal HTTP path. Per-URL egress gate (pre-fetch)
         # + ContentFetcher's own per-redirect gate both raise
@@ -360,12 +409,17 @@ def _make_full_fetch_tool(
     egress_context: Any = None,
     library_resolver: Any = None,
     overall_query: str = "",
+    model: BaseChatModel | None = None,
 ):
     mode_label = "full"
 
     @tool
-    def fetch_content(url: str) -> str:
-        """Download and read the full text content from a URL. Use when search snippets aren't detailed enough."""
+    def fetch_content(url: str = "", source_id: int | None = None) -> str:
+        """Read collected paper by source_id, or acquire a new web page by URL."""
+        if source_id is not None:
+            url = f"[{source_id}]"
+        if not url:
+            return "Supply source_id or url."
         from local_deep_research.security.egress.policy import (
             PolicyDeniedError,
         )
@@ -385,11 +439,20 @@ def _make_full_fetch_tool(
             if result.get("status") == "success":
                 title = result.get("title", "")
                 content = result.get("content", "")
+                status = result.get("body_status") or "acquired_text"
+                evidence = None
+                if model is not None:
+                    evidence, selected = semantic_passages(content, overall_query, model.invoke)
+                    view = "\n\n".join(passage["text"] for passage in evidence)
+                    scope = f"Body availability: {status}. Passage selection: {selected}.\n\n"
+                else:
+                    view = page_excerpts(content, "")
+                    scope = f"Body availability: {status}. Other acquired text is stored.\n\n"
                 cite_idx = _register_in_collector(
-                    collector, url, title, content, raw_content=content
+                    collector, url, title, content,
+                    raw_content=content if status != "full_text_unavailable" else None,
+                    evidence=evidence, status=status, **(result.get("identity") or {}),
                 )
-                view = page_excerpts(content, overall_query)
-                scope = "Selected original excerpts; other acquired text is stored.\n\n" if view != content else ""
                 return f"[{cite_idx}] Title: {title}\nURL: {url}\n\n{scope}{view}"
             # result['error'] comes from ContentFetcher, which returns a
             # raw str(exception) — scrub it (and the url) before this
@@ -447,11 +510,15 @@ def _make_summary_fetch_tool(
     mode_label = "summary_focus_query" if use_query else "summary_focus"
 
     @tool
-    def fetch_content(url: str, focus: str) -> str:
-        """Fetch a URL and return only the spans of text relevant to ``focus``.
-        Pass the specific question or claim you want answered as ``focus`` —
-        the tool will quote relevant facts verbatim and discard unrelated content.
+    def fetch_content(url: str = "", focus: str = "", source_id: int | None = None) -> str:
+        """Read a known paper by source_id, or a new web page by URL.
+        For papers pass the existing numeric ID. Pass the precise evidence gap
+        as focus, such as the original experiment groups or a claim to check.
         """
+        if source_id is not None:
+            url = f"[{source_id}]"
+        if not url or not focus:
+            return "Supply source_id or url and a specific focus."
         from local_deep_research.security.egress.policy import (
             PolicyDeniedError,
         )
@@ -479,7 +546,11 @@ def _make_summary_fetch_tool(
 
             title = result.get("title") or ""
             raw_content = result.get("content") or ""
-            content = page_excerpts(raw_content, f"{overall_query or ''}\n{focus}")
+            evidence_query = f"{overall_query or ''}\nSpecific evidence question: {focus}"
+            evidence, selection = semantic_passages(raw_content, evidence_query, model.invoke)
+            content = "\n\n[... source excerpt boundary ...]\n\n".join(
+                passage["text"] for passage in evidence
+            )
 
             # Guard 1 — empty page content (paywalls, JS-only SPAs that
             # static fetch can't render, deleted pages with HTTP 200).
@@ -535,7 +606,7 @@ def _make_summary_fetch_tool(
             log_lines.extend(
                 [
                     f"[FETCH] title: {title}",
-                    f"[FETCH] acquired_text ({len(raw_content)} chars); model_view ({len(content)} chars):",
+                    f"[FETCH] acquired_text ({len(raw_content)} chars); model_view ({len(content)} chars); selection={selection}:",
                     content,
                     f"[FETCH] summary returned ({len(summary)} chars):",
                     summary or "(empty)",
@@ -544,19 +615,17 @@ def _make_summary_fetch_tool(
             )
             logger.info("\n".join(log_lines))
 
-            # Guard 2 — empty LLM summary. The model decided nothing on
-            # the page answers the focus (or it returned a malformed/empty
-            # response). Treat as NOT RELEVANT and skip collector
-            # registration: the agent should be free to re-fetch the URL
-            # later with a different focus instead of seeing it as
-            # already-cached with an empty body.
-            if not summary:
-                return f"NOT RELEVANT (no spans matched focus at {url})"
-
+            body_status = result.get("body_status") or "acquired_text"
             cite_idx = _register_in_collector(
-                collector, url, title, summary, raw_content=raw_content
+                collector, url, title, summary,
+                raw_content=raw_content if body_status != "full_text_unavailable" else None,
+                evidence=evidence, status=body_status, **(result.get("identity") or {}),
             )
-            return f"[{cite_idx}] Title: {title}\nURL: {url}\n\n{summary}"
+            scope = f"Body availability: {body_status}. Passage selection: {selection}."
+            if not summary or summary.upper().startswith("NOT RELEVANT"):
+                return (f"[{cite_idx}] {scope} Focus evidence was not located in the supplied "
+                        "passages. Paper-wide absence and exclusion are unverified.")
+            return f"[{cite_idx}] Title: {title}\nURL: {url}\n{scope}\n\n{summary}"
         except PolicyDeniedError as exc:
             # Recoverable per-URL denial — return a tool message so both the
             # lead agent and pooled subagents handle it identically and the
@@ -627,6 +696,7 @@ def build_fetch_tool(
             egress_context=egress_context,
             library_resolver=library_resolver,
             overall_query=overall_query,
+            model=model,
         )
     if mode == "summary_focus":
         if model is None:

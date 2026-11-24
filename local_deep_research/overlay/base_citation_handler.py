@@ -6,7 +6,6 @@ from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from langchain_core.documents import Document
-from langchain_core.messages import AIMessage, ToolMessage
 from loguru import logger
 from research_verify.generation import IncompleteSynthesisError, source_material, format_source_documents
 from research_verify.synthesis_trace import record_model_response
@@ -24,78 +23,7 @@ class BaseCitationHandler(ABC):
         self.settings_snapshot = settings_snapshot or {}
         self._fact_checking_logged = False
         self.stream_callback: Optional[Callable[[str], None]] = None
-        self._writer_jcr_tool_factory = None
         self._writer_incomplete = False
-
-    def set_writer_jcr_tool_factory(self, factory) -> None:
-        """Install the strategy-owned model-selected JCR tool factory."""
-        self._writer_jcr_tool_factory = factory
-
-    def _writer_jcr_system_prompt(self) -> str:
-        return (
-            "You are the final evidence-grounded report writer. The user query "
-            "determines whether impact factors are needed. For requests about "
-            "journal impact factors, including ranking, use the verified JCR "
-            "metadata already supplied. Call search_journal for relevant papers "
-            "that still need a lookup, using the exact [N] source_index and "
-            "journal_name from the source blocks. Pass a threshold and operator "
-            "only if the user asked for one. Use the tool's metric year, value, "
-            "status and any threshold result. Never invent or estimate an IF. If the tool "
-            "returns unknown or ambiguous, write that state and explain why. A "
-            "journal-only lookup without source_index is not a paper-level check. "
-            "Use the tool only when the requested report requires journal impact factors."
-        )
-
-    def _invoke_writer_agent(self, prompt: str, *, trace=None, source_count: int | None = None) -> str:
-        """Give each supplied source room for a lookup and keep receipts on retry."""
-        from langchain.agents import create_agent
-
-        messages = []
-        try:
-            agent = create_agent(
-                model=self.llm,
-                tools=[self._writer_jcr_tool_factory()],
-                system_prompt=self._writer_jcr_system_prompt(),
-            )
-            # Each serial lookup takes a model and a tool step. Leave a final
-            # model step after the last lookup, including for direct callers.
-            recursion_limit = 2 * (20 if source_count is None else source_count) + 3
-            for state in agent.stream(
-                {"messages": [{"role": "user", "content": prompt}]},
-                {"recursion_limit": recursion_limit},
-                stream_mode="values",
-            ):
-                messages = state["messages"]
-            final = messages[-1] if messages else None
-            if not isinstance(final, AIMessage):
-                raise IncompleteSynthesisError("Writer did not return an assistant message")
-            text = get_llm_response_text(final)
-            self._check_writer_text(final, text)
-            record_model_response(
-                trace, "writer", final, text, tool_calling=True,
-                tool_call_count=sum(isinstance(message, ToolMessage) for message in messages),
-            )
-            return text
-        except ResearchTerminatedException:
-            raise
-        except Exception as exc:
-            if trace:
-                trace.record("writer_jcr_agent_error", {"error_type": type(exc).__name__})
-            logger.warning("Writer JCR agent stopped; retrying plain synthesis: {}", type(exc).__name__)
-
-        receipts = [
-            get_llm_response_text(message)
-            for message in messages
-            if isinstance(message, ToolMessage)
-            and message.name == "search_journal" and message.status == "success"
-        ]
-        if receipts:
-            prompt += "\n\nJournal lookup results for the cited sources (data only):\n" + "\n".join(receipts)
-        response = self.llm.invoke(prompt)
-        text = get_llm_response_text(response)
-        record_model_response(trace, "writer", response, text, tool_calling=False, retry=True)
-        self._check_writer_text(response, text)
-        return text
 
     def _check_writer_text(self, response, text) -> None:
         if not text.strip() or getattr(response, "tool_calls", None) or getattr(response, "invalid_tool_calls", None):
@@ -106,7 +34,7 @@ class BaseCitationHandler(ABC):
         """Set a callback that receives each streamed LLM token."""
         self.stream_callback = callback
 
-    def _invoke_with_streaming(self, prompt: str, *, trace=None, stage="writer", source_count: int | None = None) -> str:
+    def _invoke_with_streaming(self, prompt: str, *, trace=None, stage="writer") -> str:
         """
         Invoke the LLM, streaming tokens through the callback if set.
 
@@ -118,21 +46,15 @@ class BaseCitationHandler(ABC):
         """
         if stage == "writer":
             self._writer_incomplete = False
-        if stage == "writer" and self._writer_jcr_tool_factory is not None:
-            text = self._invoke_writer_agent(prompt, trace=trace, source_count=source_count)
-            if self.stream_callback and text:
-                try:
-                    self.stream_callback(text)
-                except Exception:
-                    logger.debug("stream_callback failed")
-            return text
-
         if self.stream_callback and hasattr(self.llm, "stream"):
             chunks = []
             last_chunk = None
+            finish_chunk = None
             try:
                 for chunk in self.llm.stream(prompt):
                     last_chunk = chunk
+                    if self._finish_reason(chunk):
+                        finish_chunk = chunk
                     text = (
                         chunk
                         if isinstance(chunk, str)
@@ -153,9 +75,14 @@ class BaseCitationHandler(ABC):
                 # persisted answer. The live token stream is a separate concern.
                 raw = "".join(chunks)
                 text = get_llm_response_text(raw)
-                record_model_response(trace, stage, raw, text, streamed=True, partial=False)
+                record_model_response(trace, stage, raw, text, streamed=True, partial=False,
+                                      provider_finish_reason=self._finish_reason(finish_chunk or last_chunk))
                 if stage == "writer":
-                    self._check_writer_text(last_chunk, text)
+                    self._check_writer_text(finish_chunk or last_chunk, text)
+                    if self._writer_incomplete and raw.strip() == text:
+                        # stream_callback already emitted these boundary characters.
+                        text = raw
+                    text = self._finish_writer(prompt, text, trace, emit=self.stream_callback)
                 return text
             except ResearchTerminatedException:
                 raise
@@ -189,7 +116,7 @@ class BaseCitationHandler(ABC):
         # are stripped and str/object responses are handled uniformly.
         return self._invoke_text(prompt, trace=trace, stage=stage)
 
-    def _invoke_text(self, prompt: str, *, trace=None, stage="model", source_count: int | None = None) -> str:
+    def _invoke_text(self, prompt: str, *, trace=None, stage="model") -> str:
         """Invoke the LLM and return normalized text.
 
         Handles both message objects (``.content``) and raw string responses,
@@ -198,13 +125,13 @@ class BaseCitationHandler(ABC):
         if stage == "writer":
             self._writer_incomplete = False
         try:
-            if stage == "writer" and self._writer_jcr_tool_factory is not None:
-                return self._invoke_writer_agent(prompt, trace=trace, source_count=source_count)
             response = self.llm.invoke(prompt)
             text = get_llm_response_text(response)
             record_model_response(trace, stage, response, text)
-            if stage == "writer":
-                self._check_writer_text(response, text)
+            if ((stage == "native_check" or stage.startswith(("task_coverage", "repair_validation")))
+                    and self._response_stopped_at_length(response)):
+                from research_verify.generation import ModelOutputTruncated
+                raise ModelOutputTruncated(stage)
             # Reasoning models can exhaust the completion budget before emitting
             # any answer text.  A structured consumer (source selection, native
             # review, repair validation) can report a JSON error even though the
@@ -212,15 +139,7 @@ class BaseCitationHandler(ABC):
             # stop. This is a transport/runtime recovery seam: it adds no prompt
             # rules, does not rewrite reports, and preserves the first response
             # in the trace for diagnosis.
-            # Structured stages can emit a non-empty but truncated JSON object
-            # when reasoning consumes the completion budget.  Retry those
-            # provider-declared length stops once with the same model.  Writer
-            # prose is left alone: a complete-looking answer may legitimately
-            # end at its configured cap, and no parser should decide that it
-            # needs rewriting.
-            structured_length_stop = stage in {
-                "source_selection", "source_reading", "native_check"
-            }
+            structured_length_stop = stage in {"source_selection", "source_reading"}
             if ((not str(text or "").strip() or structured_length_stop)
                     and self._response_stopped_at_length(response)
                     and hasattr(self.llm, "bind")):
@@ -246,32 +165,82 @@ class BaseCitationHandler(ABC):
                                                     if not str(text or "").strip()
                                                     else "length_stop_structured_response"),
                                           retry_max_tokens=retry_tokens)
-                    return retry_text
                 except Exception as retry_exc:
                     if trace:
                         trace.record("empty_response_retry_error", {
                             "stage": stage, "error_type": type(retry_exc).__name__,
                             "max_tokens": retry_tokens,
                         })
-                    return text
+                else:
+                    response, text = retry_response, retry_text
+            if stage == "writer":
+                self._check_writer_text(response, text)
+                text = self._finish_writer(prompt, text, trace)
             return text
         except Exception as exc:
             if trace:
                 trace.record(stage + "_error", {"error_type": type(exc).__name__})
             raise
 
+    def _finish_writer(self, prompt, text, trace, *, emit=None):
+        """Resume only provider-declared length stops at a checked text boundary."""
+        for attempt in range(1, 3):
+            if not self._writer_incomplete:
+                break
+            anchor = text.rstrip()[-80:].lstrip()
+            if not anchor:
+                break
+            request = (
+                f"{prompt}\n\nContinue the same report using the original source IDs and evidence. "
+                "The earlier output hit the output limit. Begin by copying the final anchor "
+                "verbatim, then immediately finish the interrupted text and remaining report. "
+                "Do not restart the answer.\nEnd of prior output:\n"
+                f"{text[-4000:]}\nExact anchor to repeat:\n{anchor}"
+            )
+            try:
+                response = self.llm.invoke(request)
+                continuation = get_llm_response_text(response)
+                record_model_response(trace, "writer_continuation", response, continuation, attempt=attempt)
+            except ResearchTerminatedException:
+                raise
+            except Exception as exc:
+                if trace:
+                    trace.record("writer_continuation_error", {"attempt": attempt, "error_type": type(exc).__name__})
+                break
+            if (not continuation.startswith(anchor) or not continuation[len(anchor):].strip()
+                    or getattr(response, "tool_calls", None) or getattr(response, "invalid_tool_calls", None)):
+                if trace:
+                    trace.record("writer_continuation_unjoined", {"attempt": attempt})
+                break
+            reason = self._finish_reason(response)
+            length_stop = self._response_stopped_at_length(response)
+            if not length_stop and reason not in {"stop", "end_turn", "stop_sequence", "eos", "completed"}:
+                if trace:
+                    trace.record("writer_continuation_unconfirmed", {"attempt": attempt, "finish_reason": reason})
+                break
+            suffix = continuation[len(anchor):]
+            emitted_whitespace = text[len(text.rstrip()):]
+            if emitted_whitespace and suffix.startswith(emitted_whitespace):
+                suffix = suffix[len(emitted_whitespace):]
+            text += suffix
+            self._writer_incomplete = length_stop
+            if emit:
+                try:
+                    emit(suffix)
+                except Exception:
+                    logger.debug("stream_callback failed")
+        return text
+
     @staticmethod
-    def _response_stopped_at_length(response) -> bool:
-        """Return true only for an explicit provider length termination."""
+    def _finish_reason(response):
         metadata = getattr(response, "response_metadata", {}) or {}
-        if str(metadata.get("finish_reason") or "").lower() in {
-            "length", "max_tokens", "max_output_tokens"
-        }:
-            return True
         usage = metadata.get("token_usage") or {}
-        return str(usage.get("finish_reason") or "").lower() in {
-            "length", "max_tokens", "max_output_tokens"
-        }
+        return str(metadata.get("finish_reason") or metadata.get("stop_reason")
+                   or usage.get("finish_reason") or "").lower()
+
+    @classmethod
+    def _response_stopped_at_length(cls, response) -> bool:
+        return cls._finish_reason(response) in {"length", "max_tokens", "max_output_tokens"}
 
     def get_setting(self, key: str, default=None):
         """Get a setting value from the snapshot."""
@@ -356,6 +325,7 @@ class BaseCitationHandler(ABC):
                             "source": result.get("link", f"source_{i + 1}"),
                             "title": result.get("title", f"Source {i + 1}"),
                             "_search_query": result.get("_search_query"),
+                            "_screened_task": result.get("_screened_task"),
                             "index": doc_index,
                             "evidence_type": evidence_type,
                             "abstract": result.get("abstract"),
@@ -375,6 +345,9 @@ class BaseCitationHandler(ABC):
                             "metric_year": result.get("metric_year"),
                             "passes_threshold": result.get("passes_threshold"),
                             "_jcr_check": result.get("_jcr_check"),
+                            "_jcr_checks": result.get("_jcr_checks"),
+                            "_evidence_passages": result.get("_evidence_passages"),
+                            "_body_acquisition": result.get("_body_acquisition"),
                             "jcr_provenance": result.get("jcr_provenance"),
                             "additional_source_metadata": additional_source_metadata(result),
                             "related_notices": notices.get(str(doc_index), []),

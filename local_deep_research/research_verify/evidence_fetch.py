@@ -5,6 +5,8 @@ source IDs and text; no DOI replacement or silent mixing of text versions.
 """
 from __future__ import annotations
 
+import xml.etree.ElementTree as ET
+
 import time
 from urllib.parse import urlsplit
 
@@ -23,7 +25,7 @@ class EvidenceFetcher:
         self.events = []
         self.article_cache = {}
         self.remaining = requests
-        self._context = None
+        self._context = self.settings.get('_egress_context')
 
     def permit(self, engine=None, url=None):
         if self.get is not None:  # Explicit transport injection for offline tests.
@@ -39,11 +41,13 @@ class EvidenceFetcher:
         if not decision.allowed:
             raise PermissionError('Evidence retrieval denied: '+decision.reason)
 
-    def read(self, url, *, params=None, limit=2_000_000, service=None, internal=False):
+    def read(self, url, *, params=None, limit=2_000_000, service=None, internal=False,
+             request_seconds=5):
         return self.read_bytes(url,params=params,limit=limit,service=service,
-                               internal=internal).decode('utf-8',errors='replace')
+                               internal=internal, request_seconds=request_seconds).decode('utf-8',errors='replace')
 
-    def read_bytes(self, url, *, params=None, limit=2_000_000, service=None, internal=False):
+    def read_bytes(self, url, *, params=None, limit=2_000_000, service=None, internal=False,
+                   request_seconds=5):
         """Preserve binary primary documents under the same policy and budgets."""
         if self.remaining <= 0 or self.seconds_left <= 0:
             raise TimeoutError("Evidence retrieval budget exhausted")
@@ -61,7 +65,7 @@ class EvidenceFetcher:
                 get = safe_get
             else:
                 get = self.get
-            timeout = max(.1, min(5, self.deadline - time.monotonic()))
+            timeout = max(.1, min(request_seconds, self.deadline - time.monotonic()))
             options = {'allow_private_ips':True} if internal else {}
             if not internal:
                 import os
@@ -70,6 +74,22 @@ class EvidenceFetcher:
                 if proxy:
                     options['proxies'] = {'http': proxy, 'https': proxy}
             response = get(url, params=params, timeout=(min(3, timeout), timeout), stream=True, **options)
+            if service and getattr(response, "status_code", None) == 429 and self.remaining:
+                from .retrieval import _retry_delay
+                delay = _retry_delay(response, 0, maximum=None)
+                if delay < self.deadline - time.monotonic():
+                    self.events.append({"host": urlsplit(url).hostname,
+                                        "status": "rate_limited", "retry_after": delay})
+                    response.close()
+                    response = None
+                    self.remaining -= 1
+                    time.sleep(delay)
+                    pace(service, .35)
+                    timeout = min(request_seconds, self.deadline - time.monotonic())
+                    if timeout <= 0:
+                        raise TimeoutError("Evidence retrieval budget exhausted")
+                    response = get(url, params=params, timeout=(min(3, timeout), timeout),
+                                   stream=True, **options)
             response.raise_for_status()
             chunks, size = [], 0
             for chunk in response.iter_content(16384):
@@ -162,6 +182,109 @@ class EvidenceFetcher:
         text = article_text(xml, record, pmid=source.get('pmid'), require_body=True,
                             include_graphic_refs=self.settings.get('citation.preserve_article_graphic_links') is True)
         return text[:500_000] if text else None
+
+    def source_article(self, source):
+        """Read a body from the paper's identifiers and authoritative links."""
+        from urllib.parse import quote
+        from .pmc_identity import publisher_article_ids, publisher_article_text
+
+        known = identity_fields(source)
+        if not known:
+            return None
+        record = None
+        endpoint = "https://www.ebi.ac.uk/europepmc/webservices/rest"
+        pmcid = known.get("pmcid")
+        if not pmcid:
+            try:
+                record = self.record(source)
+            except (OSError, ValueError, ET.ParseError):
+                pass
+            pmcid = (record or {}).get("pmcid")
+        if pmcid:
+            known.setdefault("pmcid", pmcid)
+        if pmcid:
+            url = f"{endpoint}/{pmcid}/fullTextXML"
+            try:
+                self.permit(engine="europepmc")
+                xml = self.read(url, service="europepmc")
+                text = article_text(xml, {**(record or {}), **known, "pmcid": pmcid},
+                                    pmid=known.get("pmid"), require_body=True)
+                if text:
+                    return {"url": url, "body": text[:500_000], "status": "retrieved_full_text",
+                            "pmcid": pmcid}
+                self.events.append({"url": url, "status": "body_or_identity_unavailable"})
+            except (OSError, ValueError, ET.ParseError):
+                pass
+
+        links = []
+        if pmcid:
+            links.append(f"https://pmc.ncbi.nlm.nih.gov/articles/{pmcid}/")
+        if known.get("doi"):
+            links.append(f"https://doi.org/{quote(known['doi'], safe='/')}")
+        for item in (record or {}).get("fullTextUrlList", {}).get("fullTextUrl", []):
+            if item.get("documentStyle") == "html" and item.get("url"):
+                links.append(item["url"])
+        if known.get("pmid"):
+            try:
+                pubmed = self.read(f"https://pubmed.ncbi.nlm.nih.gov/{known['pmid']}/",
+                                   service="pubmed")
+                _, publishers = publisher_article_ids(pubmed)
+                links.extend(publishers)
+            except (OSError, ValueError, ET.ParseError):
+                pass
+        for url in dict.fromkeys(links):
+            if not self.remaining or self.seconds_left <= 0:
+                break
+            try:
+                page = self.read(url, request_seconds=9)
+            except (OSError, ValueError, ET.ParseError):
+                continue
+            actual, _ = publisher_article_ids(page)
+            common = known.keys() & actual.keys()
+            if not common:
+                self.events.append({"url": url, "status": "identity_unverified"})
+                continue
+            if any(known[key] != actual[key] for key in common):
+                self.events.append({"url": url, "status": "identity_mismatch"})
+                continue
+            if text := publisher_article_text(page):
+                return {"url": url, "body": text[:500_000], "status": "retrieved_publisher_text",
+                        "pmcid": pmcid}
+        return None
+
+    def supplements(self, pmcid):
+        """Read bounded primary supplementary files provided by Europe PMC."""
+        from io import BytesIO
+        from pathlib import PurePosixPath
+        from zipfile import BadZipFile, ZipFile
+        from .retrieval import html_text
+
+        self.permit(engine="europepmc")
+        url = f"https://www.ebi.ac.uk/europepmc/webservices/rest/{pmcid}/supplementaryFiles"
+        try:
+            raw = self.read_bytes(url, limit=5_000_000, service="europepmc")
+            with ZipFile(BytesIO(raw)) as archive:
+                total = 0
+                for info in archive.infolist():
+                    suffix = PurePosixPath(info.filename).suffix.casefold()
+                    if suffix not in {".txt", ".csv", ".tsv", ".xml", ".html", ".pdf"}:
+                        continue
+                    if info.file_size > 3_000_000 or total + info.file_size > 8_000_000:
+                        continue
+                    total += info.file_size
+                    body = archive.read(info)
+                    if suffix == ".pdf":
+                        from pymupdf import open as open_pdf
+                        with open_pdf(stream=body, filetype="pdf") as pdf:
+                            text = "\n\n".join(page.get_text() for page in pdf)
+                    else:
+                        text = body.decode("utf-8", errors="replace")
+                        if suffix in {".xml", ".html"}:
+                            text = html_text(text)
+                    if text.strip():
+                        yield f"{url}#{PurePosixPath(info.filename).name}", text[:150_000]
+        except (OSError, ValueError, BadZipFile):
+            return
 
     def web(self, query, domain='', url=''):
         """Search candidate primary documentation; origin is visible, not certified."""

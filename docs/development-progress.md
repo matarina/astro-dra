@@ -295,3 +295,130 @@ Commit `d096d3e` stops further optional model selection after an invocation erro
 Built and deployed `astro-dra:34dc260-5006` from a clean archive of commit `34dc260c500e0c8ce776331a0f6edfc897553418`, over the previously deployed runtime. The image digest is `sha256:250c48ddb0de4876d75dddce1cd2b11695d52579da996f91c154d08b3bae6f83`. The prior task was terminal before restart. Preserved the 5006 data and configuration mounts and the existing SearXNG container. Changed the private model relay idle budget from 120 to 600 seconds to allow long requests to reach the model response. The prior instance configuration is backed up under `/tmp/astro-dra-5006-rollback.LmyIEF`.
 
 Validated the image and running process, the login page response, model health via the relay, and an authenticated short model completion in 0.87 seconds. The running application account resolved Cell Reports Medicine's JCR record by its electronic ISSN. The old report remains accessible. Submitted a new quick research job, `8917393a-634d-452e-88fc-6f68064c7f51`, at 12:54:46 CST. Compared the application start log to the exact prompt copied from the user's message. The new run started successfully. Its final synthesis and eligibility count have yet to be verified.
+
+### 2026-11-23 — 原文选段方案和匹配规则盘点
+
+用户确认按论文结构保留材料、按字段语义排序、对缺证字段扩大阅读的方向。先写入[原文选段 README](README-evidence-selection.md)，留待后续实现。以 5006 实际安装的 `34dc260` 核对网页取证、writer、原生核查、搜索查询路由、模型索引格式、来源去重和可选路径。用运行容器中的实际函数回放显式约束、PubMed 括号识别、两套模型索引解析和来源身份去重，经合成 trace 确认第 4、10 批位置回退。旧逐引用 QC 配置为关闭。当前主链的词面选段集中在取证、写作组装和核查组装。下一步按 README 的固定原文案例比较证据覆盖和耗时。此轮仅改文档，应用、配置与部署未改。
+
+
+## 2026-11-23 · README evidence-selection implementation and 5006 replay
+
+Implemented structured task requirements, explicit PubMed/Europe PMC query plans, ordered report outlines, structured source selection with one format retry, article retrieval bound to stable identifiers, retained semantic source passages, focused rereading, per-assertion evidence receipts, task coverage, journal/year JCR reuse, shared eligibility counts, duplicate screening reuse, and partial subtask delivery.
+
+Deployed `astro-dra:evidence-selection-5006` and submitted the exact saved `d4399cbe` prompt. Its plan described the IF requirement in prose but lacked the structured metric. That run, `14e0e10f-0ca1-4636-bdea-e75ef0de4f1d`, was suspended through the research API. The follow-up validates the fixed metric schema, recovers literal spans across copy/paste whitespace, and gives an omitted or malformed metric one narrowly scoped retry.
+
+5006 now runs `astro-dra:evidence-selection-v2-5006`. Exact-prompt replay `6eef6482-7e81-4fb8-8bbe-a9947613cb06` is being monitored. Source snapshot replay preserved nine Xenium mentions from the acquired gastric paper and all four Visium mentions from the acquired melanoma paper in the same writer/reviewer passages. The two Nature Communications source IDs 31 and 59 share the 2025 catalog result of 18.1. The initial source tree and both deployment rollback configs are retained.
+
+The v2 run confirmed that the original query maps to 2020–2026 search dates, 2026 report eligibility, IF ≥ 10, and a target of 20. Europe PMC reused 11 of 12 screening decisions in a repeat query. A production transport replay exposed an XML timeout on the iCCA article while the official PMC HTML returned the same DOI and article text. Added a verified PMC HTML fallback with structural paragraphs and gave fresh screened candidates priority before the result cap. The v2 probe was suspended through the API. V3 is healthy on 5006 and its exact-prompt run `816f9570-ed80-4623-968b-1c80306f9e18` is monitored. In the same isolated test setup, baseline 574 passed / 88 failed and V3 588 passed / 85 failed, with no new failing test IDs.
+
+### 2026-11-24 · Live synthesis follow-up
+
+The exact-prompt research stopped issuing new searches after repeated actions produced no new evidence, then handed 112 collected records and an empty lead draft to synthesis. The trace exposed a task-plan assignment onto the citation facade instead of the delegated writer. Fixed the handoff and staged a checkpoint replay against the same source snapshot and inference service. A local catalog check matched 93 of the 112 source records, of which 73 meet the requested IF threshold.
+
+In the live run, one of six source-selection batches reached the inference queue deadline and preserved 17 unresolved candidates. The original material pack admitted no fresh selection because the earlier article views exhausted the context. A fixed-input replay preserved 35 source records under the same 200,000-character limit, including 10 fresh selections and the primary Xenium evidence from source 98. Additional repairs bound DOI validation to the existing egress policy and a batch timeout, and removed leftover title-delimiter parsing and table-specific wording in the detailed report. The 5006 job and separately launched writer checkpoint are being followed through output.
+
+The live checkpoint's first evidence-gap pass selected all eight targets from source IDs 2–15 because the planning prompt admitted full blocks until it ran out of space. Candidate previews now share the planning budget across all eligible leads. Regression checks verify independent claim states in prose, list, and table formats and allow the last of 100 candidates to be selected for rereading. On the isolated comparison harness, v10 recorded 600 passed and 85 failed, with no new failure IDs against the 574-pass / 88-failure baseline.
+
+Deployed `astro-dra:evidence-selection-v10-5006` at 01:51 CST and verified the app, inference health, and model list. The relay had twice closed the same source-reading request after 600 seconds without upstream bytes, while the backend queue can wait for 30 minutes. Updated the instance-specific relay idle timeout to 2,700 seconds. Suspended the obsolete v3 web job via the application API after preserving its source checkpoint. The six selection receipts and eight reread results from the isolated intermediate replay are reused using the same input digest. The final v10 checkpoint `a278becd-97e5-40b8-a312-29e419d1699d` reflects the latest writer and reviewer, with 40 original source views including the missing gastric paper. The two Compose files can be restored from `/tmp/astro-dra-5006-evidence-v10-rollback-q2iqYQ`.
+
+The v10 checkpoint produced a 17-entry draft. The admission ledger was consistent for the historical gastric and false-platform cases, but the writer did not receive some of the validating quotes, and cumulative source size caused two review groups to be skipped. v12 attaches original admission quotes to source views and budgets every cited source in a review group. A single oversized claim can safely reuse the exact source-scoped writer views. The saved draft replays as seven review groups within the 52,000-character evidence budget and restores 12 omitted exact quotes. The deployed application is `astro-dra:evidence-selection-v12-5006`, with rollback `/tmp/astro-dra-5006-evidence-v12-rollback-6J4GEX`. The shared relay remained online. Integration checks show 603 tests passed / 85 baseline failures (zero new IDs), and final checkpoint `61dbc850-2620-408e-b5ea-be7cab43477c` is monitored through writing and consistency review.
+
+The v10 intermediate replay finished with 17 citations and incomplete review. Three groups hit the old packing failure. The native reviewer and independent repair verifier did correct source 6, whose draft put training and validation datasets into the Xenium cohort column. v12 completed its writer call in approximately 691 seconds with the updated relay and produced 19 ranked records. Source 52 was independently verified after v13 switched joint criteria to separately located original quotes. v13 is healthy on 5006, with rollback `/tmp/astro-dra-5006-evidence-v13-rollback-ya0rL0`. The comparable suite now shows 604 passed / 85 original unchanged failures. The combined report preflight resolves 20 distinct paper DOIs including source 52 at rank 10, pending the v12 native review and final audit.
+
+The v12 synthesis and task-coverage replay completed at 04:20 CST after about 5,884 seconds. All seven native review groups and their 21 units were processed without a material-budget skip. Four source-supported repairs were applied. The raw report contains 19 cited papers and preserves four unresolved review receipts. The separately verified v13 source 52 was added to the audited report at rank 10. The combined audit validates 20 distinct 2026 DOIs, descending 2025 JCR IF from 81.2 to 10.8, and explicit labels for unverified sample counts. The v13 application and its 2,700-second instance relay remained healthy. Final artifacts are in `/tmp/astro-dra-evidence-EBXZpQ/checkpoint/`.
+
+The v14 coverage-only replay finished after 151.5 seconds with six answered checks, one partial grouping check and one unchecked sample-size check. Like source admission, coverage now accepts independently located exact spans, preserving unverified field states. The report independently verifies the count, dates and descending IF, and 12 rows explicitly mark at least one unavailable field. v14 is healthy on 5006. Its application-only rollback directory is `/tmp/astro-dra-5006-evidence-v14-rollback-tRzMXf`.
+
+### 2026-11-24 · 通用任务条件复核
+
+按用户要求先记录方案。静态检查确认了 IF 缺省触发规划重试、篇数控制写作前纳入核查，以及 IF 缺省进入工具写作流程。另记录既有 JCR 元数据影响纳入、排序和补读的边界。在[原文选段 README](README-evidence-selection.md)的「通用文献检索的任务条件解耦」一节列出位置、拟修复方向及跨学科验收场景。本轮更新文档，代码、测试和部署未改。待用户安排后实施与回放。
+
+### 2026-11-24 · README 更新为当前版本问题
+
+应用户要求，[原文选段 README](README-evidence-selection.md)现以 5006 的 v14 为准，仅保留当前版本问题与验证缺口。核对运行镜像和工作树的五个相关模块哈希，并在运行容器中用固定输入复现 IF 规划重试、篇数耦合、写作工具分支和已有 IF 门槛影响纳入。核查现有覆盖回放仍有分组和样本数缺口，尚待 v14 端到端复跑。历史故障及对应修复见前面的进度记录。本轮为文档更新。
+
+### 2026-11-24 · 去掉检索前的独立任务规划调用
+
+主智能体直接读取原问题，按需在正常搜索工具调用中提交有原话依据的纳入条件、提取问题、搜索范围及交付要求。PubMed 的查询改写只整理数据库所需的概念和年份。目标篇数不再触发纳入核查。JCR 查询、门槛与排序依据本次明确条件；带 IF 标记的旧来源在一般任务中不会因该标记影响纳入、补读或排序。
+
+真实模型复现了将门槛和排序引文用省略号拼接导致的结构化 IF 丢失。要求引用一段连续原话，并在模型已声明指标但字段不完整或引文无法定位时，于写作前尝试一次定向核实。归一化成功后，JCR 检查结果和逐篇失败原因进入综合跟踪及 writer。常规任务直接写作。
+
+使用候选镜像 `astro-dra:conditional-task-conditions-check` 验证。开放式教育问题的首个真实模型工具调用省略任务条件。原肿瘤提示词的首个调用识别出 IF ≥10、降序、目标 20 篇及独立搜索和报告年份。使用相同候选镜像对本任务 112 条存档来源查本地 JCR，73 条达到 IF 门槛，20 条有指标但低于门槛，19 条未查到。该计数只衡量 IF。固定模型回归验证了写作前实际查期刊、达到门槛的条目不足目标时根据实数输出，以及无篇数的纳入核查。离线全量测试为 608 通过、85 个既有失败，无新增失败用例 ID。Ruff、Python 编译、Git 空白检查及四个核心模块的定向 mypy 通过。generation.py 仍有四个可在基线复现的类型注解错误。
+
+代码、回归测试和候选镜像已准备。5006 当前运行 v14，本轮验证范围为真实模型首个检索调用和固定输入回放。完整实时检索到报告生成仍待验证。
+
+### 2026-11-24 · 篇数作为普通交付要求
+
+从上一候选版移除 `goal` 和专用 `eligible_count` 字段、资格名单的篇数截断及正文计数占位符。核查入口仍由实际纳入条件决定，删除 `assess_eligibility()` 内重复的提前返回。确认与待核名单保留全部判定，篇数通过普通交付要求和用户原话交给 writer。显式报告设置中的篇数仍可传给 writer，字段取证使用既有准备预算。用交付 1 篇的设置确认字段取证仍处理默认的 6 条候选。
+
+候选镜像 `astro-dra:delivery-count-only-check` 用三条指定提示跑固定来源回归，3 项全部通过。真实模型试验也复核了首轮工具参数和固定来源报告。只要随机对照试验触发纳入核查并列出 6 篇。给我 5 篇代表性论文跳过专项核查并列出 5 篇。给我 5 篇随机对照试验触发核查，6 个已确认 ID 均传给 writer，报告列出 5 篇。两次随机对照试验报告都在排除说明里提到观察性研究，合格名单里没有该研究。初次真实模型漏交了并存的设计与篇数，后续加固搜索工具参数说明及通用写作交付说明。此验证使用固定来源，未跑线上端到端数据库检索。
+
+离线全量测试 611 项通过，85 个失败用例 ID 与上一候选版本完全一致。定向 Ruff、mypy、编译和空白检查通过。改动已同步到 h100 工作树。5006 在线版本仍为 v14。
+
+### 2026-11-24 · 跨题目泛化审查
+
+对照 5006 v14 的已安装代码和 h100 候选工作树，沿检索、纳入、取证、写作、核查及发布入口审查。固定输入复现：年份和研究设计引用同一段用户原话时，观察性来源可被仅按年份确认为合格；候选工作树两次工具调用先后提交同类纳入条件，仅保留第一次的列表；仅有权威页面 URL 的来源跳过定向补读；布尔检索编译仅保留前 8 个概念组、每组前 8 个词；条件匹配器对德法语或列表形态的英语返回未知。在 v14 的 writer 来源块上复现了仅存在于结构化字段的敏感度、特异度和随访时间未传入，平台与样本量可见。线上默认检索工具说明与通用 writer 提示包含具体空间组学示例，属于提示偏向，未测量跨任务质量差值。现有 18 题冻结来源的对照可验证写作，仍需覆盖从新检索到报告的异题评测。本次只做审查，未改服务代码或部署。
+
+### 2026-11-24 · JCR 按需调用与交付篇数合并验证
+
+删除任务计划里的专用 IF 字段、合成前的 IF 补问和全量查询，以及按 IF 切换 writer 的工具循环。研究智能体在现有 `search_journal` 调用里声明展示、筛选、排序或两者。参数校验随同工具调用执行；筛选要求显式门槛和操作符，排序要求显式方向。实际查证回执随来源交给普通 writer。缓存按期刊身份和指标年份保存值，门槛按本次工具用途重新计算。旧回执不参与另一任务的纳入、补读或排序。
+
+在候选容器里回放 README 的示例。开放式教育问题的真实模型回放有零次期刊查询。展示型验证在固定候选集的检索后回放中只查 [1]，没有设置门槛。用明确的严格大于 10 的真实模型测试，工具收到大于比较符和降序，18.1 达标，10.0 与 7.9 均不达标。指定年份缺失保留 `metric_year_unavailable` 并交给 writer。本地实际 JCR 表同一期刊两次查询只读库一次，均得到 2025 年的 18.1，第二次严格比较等值不达标。三条篇数与研究设计提示的回归继续通过，公立学校与随访示例也确认了独立纳入及按字段补读。
+
+原肿瘤提示词的三篇固定来源回放取得 18.1、10.0、7.9 的回执并输出两篇、说明少 18 篇。真实模型仍可能把长提示词的筛选和排序当作展示调用，由 writer 根据原话与回执比较。较早的并列相关候选回放也出现展示一篇但查询三篇的现象。加固工具用途后，检索后展示回放查询一篇。测试范围为固定数据及工具回放，完整线上检索尚未复跑。
+
+离线全量 613 项通过、85 个失败用例 ID 与去 `goal` 候选版一致。定向 Ruff、mypy、编译及空白检查通过。相对上一候选版，手写生产代码新增 145 行、删除 278 行，净减 133 行；测试新增 123 行、删除 140 行。代码同步到 h100 工作树，候选镜像已构建。5006 在线镜像仍为 `astro-dra:evidence-selection-v14-5006`。
+
+### 2026-11-24 · 多条件纳入与跨主题元数据交接
+
+纳入核查分别检查已登记的条件，即便它们引用用户同一句话。多次检索可以补充纳入条件、待回答问题和交付要求，同一条目重复提交仅保留一份。来源中的额外结构化数据以原字段名和来源编号进入 writer 材料、子任务来源快照及回放；新扩展字段限可序列化的普通数据、最多 8 层及每个值 4096 个 JSON 字符，排除内部状态和凭据类字段。删除 PubMed、Europe PMC 默认说明的 Visium 和固定年份示例，以及 writer 公共提示里的具名单细胞平台示例。
+
+在独立镜像中验证，三个新增回归在改前均失败，改后全部通过。相同命令和隔离环境下，全套项目补丁测试从 613 通过、85 失败变为 616 通过、85 失败，失败 ID 集合一致。另从安装后的候选包串联检索条件、资格核查和来源快照到 writer 的材料组装，复核部署默认提示。候选镜像为 `astro-dra:cross-topic-generalization-mczhjv`，日志在 `/tmp/astro-general-validation.mczhJV/`。5006 仍运行 v14，本轮未进行新联网检索或生产部署。
+
+### 2026-11-24 · 旧 IF 标记隔离与顺序验收
+
+将 JCR 缓存从单个来源收集器移到进程内的数据库版本，共用期刊身份和指标年份对应的值。工具门槛比较按本次调用计算，工具回执仅写入当前任务状态。旧来源即使仅保存了扁平的 `passes_threshold`，进入 writer 前也会清理旧门槛及关联指标字段。定向补读与 writer 已读材料优先级不依据该字段。确认名单跨写作批次沿用原候选顺序，只有收到明确 IF 排序方向才排序，并将保序要求交给 writer。合并时保留并行工作对任务要求合并及纳入条件核查的改动。
+
+用 PubMed 的 INTER-ACT 随机对照试验（PMID 40466885）及本地实际 JCR 库验收。该刊 2025 年 IF 为 7.9。三个独立收集器依次得到排除、确认纳入并进入随机分组定向补读、确认纳入。三轮实际查库次数依次为 1、0、0。补读以固定 PubMed 摘要片段回放。材料预算测试比较了带旧扁平标记与基线的选材，来源、原文和优先级一致。多批写作中，仅设 IF ≥7 保留 7.9、18.1、10.0 的原顺序，附加 IF 降序要求后得到 18.1、10.0、7.9。另验证本地 JCR 库新增指标年份后 latest 缓存会刷新。
+
+合并工作树构建的 `astro-dra:if-scope-isolation-check` 全量 619 项通过、85 个既有失败，失败用例 ID 与 JCR 按需候选版一致。定向 Ruff、mypy、编译与空白检查通过。5006 在线仍为 v14。
+
+### 2026-11-24 · 通用任务覆盖核查与按需补查
+
+`task_coverage()` 逐条定位报告引文，保留匹配、不匹配、重复匹配及可确定的来源范围。第二步仅以已定位片段为回答证据，按问题需要的范围判断是否采信模型原判。逐来源覆盖按范围和可定位的出处核对；一段明确适用于多个来源的原文可支撑整个范围。
+
+对未回答、部分回答、明确缺证及待核问题，将问题、涉及来源、当前报告、已定位片段和先前查阅记录提供给模型。沿用 article/web 补查能力，模型可选择工具或停止。每份报告至多补查一轮；拿到新证据时只提出局部补全，并复用独立修订核查。报告依据来源证据区分现有材料未核实与原文明确未报告。没有新证据或修订未获支持时，保留原报告和缺口。
+
+使用 v14 的存档模型输出和 20 篇报告复测。混合引文项保留两个精确匹配，各自记录位置，另一条单列不匹配。真实模型在整份存档重放中判为部分覆盖；最终候选镜像的单题重放确认范围为 20 篇，只确认来源 20 被有效回答，仍为部分覆盖。跨问题回归覆盖教育材料、档案政策、标准和技术文档，验证完整、多来源部分覆盖、拒绝虚假全覆盖，以及文章补读、网页补查和停止补查。重现了有精确原文支持的明确未报告，以及新材料仍不能支持该断言的情况。
+
+候选镜像为 `astro-dra:task-coverage-check`。离线全量 626 项通过、85 个既有失败，失败用例 ID 与上一个候选版本一致。定向 Ruff、mypy、Python 编译与空白检查通过。代码已同步 h100 工作树；5006 当前仍运行 v14，验证范围为存档重放和隔离回归。
+
+### 2026-11-24 · 核查范围由模型按任务判断
+
+将用户原话从 LangGraph 传入报告覆盖核查。模型结合原话、报告和定位证据选择核查范围，可合并相关问题。任务笔记提供参考。去掉按来源编号集合决定核查是否完整的分支。程序保留每条引文的位置和状态，对模型引用的片段编号及来源编号核对出处。模型说明实际核查的范围及未决问题，交给已有原文和网页补查。模型可在报告格式允许、正文未交代缺口时加简短的核查范围说明。
+
+候选镜像 `astro-dra:semantic-coverage-check` 用原始提问和 v14 存档重新核查样本数问题。两条报告引文精确匹配，一条未匹配。模型判为部分覆盖，仅指出第 1 篇与第 20 篇报告片段中的部分样本信息，并保留其余缺口。隔离回归验证了同样的来源编号可以对应不同的覆盖结论、多个问题可合并核查，以及自主补查或说明范围。全量 628 项通过、85 个既有失败，失败用例 ID 集合与上一候选版一致。定向 Ruff、mypy、编译及空白检查通过。改动已同步 h100 工作树和 README，5006 仍运行 v14。验证使用存档回放及固定数据，未触发从检索开始的整题新跑。
+
+### 2026-11-24 · 覆盖核查修正与跨题端到端实测
+
+修正三处交接。补证修订含多个引用时，确认器读取新证据以及原句、替换句涉及的来源，材料无法装入则保留待核。即使任务计划没有子问题，也把用户原话送入覆盖核查。核查器产生的范围说明随核查记录保存，未经确认的说明不会写入成稿。覆盖核查与其他审阅步骤共享调用预算。候选镜像为 `astro-dra:coverage-e2e-final-kyynzo`。定向回归 5 项通过，全量 628 项通过、85 项失败，与修改前基线的失败用例集合一致。5006 仍运行 v14。
+
+取六条原始提示词中的第 6 条 Xenium 和第 2 条 RNA 质检，按此顺序用隔离容器、实际检索和线上同款模型测试。第 6 条从检索到生成用时 27 分 20 秒，取回 14 条来源。测试设置的最大输出 4096 tokens 截断了初稿与覆盖核查 JSON，原始报告标为合成未完成。复用这轮归档的 14 条写作输入，将输出上限调至 16384，重跑撰写、核查与报告输出，用时约 25 分 22 秒。重写正常结束，正文引用对应 14 条参考来源。覆盖核查给出 1 项已回答、3 项部分覆盖、2 项证据缺口。原文一致性复核仍有 4 项未决。该补跑验证下游恢复能力，未从头重复检索。
+
+第 2 条 RNA 质检使用 16384 tokens 上限，从检索到成稿用时 60 分 08 秒。取回 9 条来源，成稿引用 5 条，程序正常完成。报告给出了有条件的继续测序建议；覆盖核查把当前样本的决策判为部分回答，把杂峰身份及污染阈值判为证据缺口。补查决策返回空请求。原文一致性复核有 3 项未决。首句保留“通常可以继续测序”，同时正文承认样本放行条件缺乏直接验证。一次事实核查达到 16384 tokens 上限并触发重试。两题均未使用按主题定制的验收关键词。
+
+RNA 成稿还复现了独立的引用范围问题。初稿证据范围说明指向原编号 [1]–[3]；这三条来源在发表版依次改为 [1]、[4]、[5]。成稿只重排区间端点，显示 [1]–[5]，多指向两条材料。逐个链接与文末条目都匹配，单查链接无法检出集合变化。回归应比较重排前后引用指向的来源集合。该问题保留为本次实测发现。
+
+### 2026-11-24 · 更新候选版开放问题清单
+
+重写 [证据选择 README](README-evidence-selection.md)，移除已在候选版修复的待办。对照两题的成稿、检索与核查记录，整理引用重编号、结论力度、检索相关性、目录取证、核查范围和输出截断六项问题，各自附原因、通用策略和验收办法。保留原肿瘤题的端到端验收缺口。已核对文档中的相对链接和运行版本。本次仅更新文档。
+
+按两题实测的用户影响重新排列 README 的六项问题，将过强建议和引用集合变化列在最前，其后为输出截断、检索缺少直接证据、目录读取受限、核查范围扩大。
+
+### 2026-11-24 · 引用区间重编号与截断恢复
+
+在候选镜像 `astro-dra:citation-range-recovery` 中修正旧清单第 2、3 项。新报告按来源身份展开 `[1]–[3]` 这类两端带方括号的引用区间，保存格式为 2.3。旧 2.2 仍用原规则校验，Quarto 按成稿中已有的引用导出。用 RNA 题的原始发布输入复现，原三篇在修复后显示为 1、4、5。
+
+writer 收到长度终止时最多续写两次，续写必须复现前段末尾才能拼接，无法确认则保留已有正文和未完成状态。真实模型在原 4,096 token 配置下对 Xenium 存档续写一次并以 stop 结束，可见正文从 2,577 增至 3,540 字符，原前缀完整。事实核查收到长度终止时分拆未完成的论断组，已完成结果保留。单条再截断或共享预算耗尽时记录未决。覆盖定位截断时改传段落编号，范围核查截断时拆分问题。固定回归覆盖流式拼接、旧版兼容、截断回执、引用身份与共享预算。全量 641 项通过，85 项失败，用例 ID 与上一候选完全一致。测试与回放脚本在 h100 的 `/tmp/dra-citation-recovery.eSrc4c/`。未重新从检索开始运行两题，线上 5006 仍为 v14。
+
+核实了 RNA 首段的来源及保存路径。存档的 0024 写作请求要求优先回答决策，0025 初稿给出条件性“通常可以继续测序”。0028 的核查包含首段，0029 和 0031 都在长度上限停止，0032 将这组记为无有效核查结果。0066 把样本决策判为部分回答，0068 补查请求为空，0069 的正文哈希与 0025 相同。本次隔离运行使用普通 synthesis trace，writer 的 raw_content 等于可见正文；未发现本次请求的独立原始响应采集回执。问题 1 继续保留。

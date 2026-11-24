@@ -333,7 +333,7 @@ def build_evidence_grounding(
                           "index", "title", "link", "url", "doi", "pmid", "pmcid", "journal",
                           "publication_date", "pubdate", "language", "publication_types",
                           "impact_factor", "metric_year", "passes_threshold", "jcr_check_status",
-                          "jcr_provenance", "enrichment_conflicts", "enrichment_provenance"}},
+                          "jcr_provenance", "_jcr_checks", "enrichment_conflicts", "enrichment_provenance"}},
         ))
 
     checks = list(checks or [])

@@ -38,7 +38,6 @@ def engine_class(file, name, **overrides):
     cls = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == name)
     ns = {**vars(typing), "BaseSearchEngine": Base, "BaseLLM": object, "re": re,
           "ET": ET, "logger": logger, "SNIPPET_LENGTH_LONG": 1200, "os": os,
-          "has_structured_query_syntax": retrieval.has_structured_query_syntax,
           "Sensitivity": SimpleNamespace(NON_SENSITIVE=1),
           "Exposure": SimpleNamespace(EXPOSING=1), "html_text": retrieval.html_text,
           "academic_snippet": retrieval.academic_snippet,
@@ -77,14 +76,15 @@ def test_pubmed_preserves_explicit_scope_even_with_zero_results():
     model = SimpleNamespace(invoke=lambda prompt: pytest.fail("Structured query must not be rewritten"))
     engine = cls(llm=model)
     query = '"Visium HD"[Title/Abstract] AND ("2022/01/01"[dp] : "2026/10/19"[dp])'
-    assert engine._optimize_query_for_pubmed(query) == query
+    from research_verify.task_plan import DatabaseSearch
+    assert engine._optimize_query_for_pubmed(DatabaseSearch(query, "pubmed")) == query
     calls = []
     engine._search_pubmed = lambda q: calls.append(q) or []
     assert engine._adaptive_search(query) == ([], "requested_scope")
     assert calls == [query]
 
 
-def test_optimizer_losing_year_or_quoted_entity_keeps_original():
+def test_malformed_structured_optimizer_keeps_natural_query():
     cls = engine_class("search_engine_pubmed.py", "PubMedSearchEngine")
     engine = cls(llm=SimpleNamespace(invoke=lambda p: SimpleNamespace(content='spatial transcriptomics')))
     query = 'Find "Visium HD" studies from 2022 to 2026'
@@ -132,21 +132,14 @@ def test_europepmc_distinguishes_zero_results_from_invalid_response():
 
 
 def test_relevance_parser_never_selects_indices_from_rejected_prose():
-    import json
-    tree = ast.parse((ROOT / "overlay/relevance_filter.py").read_text())
-    node = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == "_parse_indices")
-    ns = {"json": json, "re": re, "List": typing.List}
-    exec(compile(ast.Module(body=[node], type_ignores=[]), "relevance_filter", "exec"), ns)
-    parse = ns["_parse_indices"]
-    assert parse("[]") == []
-    assert parse("NONE") == []
-    assert parse("[0, 2]") == [0, 2]
-    assert parse("```json\n[1]\n```") == [1]
-    assert parse("0, 2") == [0, 2]
-    assert parse('["1"]') == [1]
-    for invalid in ("Reject 0, 1 and 2: unrelated sports from 2024.", "[true]", "[-1]", '{}', ''):
+    from research_verify.structured_output import source_ids
+
+    assert source_ids('{"selected_source_ids": []}', range(3)) == []
+    assert source_ids('{"selected_source_ids": [0, 2, 2]}', range(3)) == [0, 2]
+    for invalid in ('Reject 0, 1 and 2: unrelated results.', '{"selected_source_ids": [true]}',
+                    '{"selected_source_ids": ["[1]"]}', '{"selected_source_ids": [3]}', '{}'):
         with pytest.raises(ValueError):
-            parse(invalid)
+            source_ids(invalid, range(3))
 
 
 def test_screening_sees_assay_past_the_display_snippet():

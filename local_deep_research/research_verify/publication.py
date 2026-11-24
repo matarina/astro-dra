@@ -43,7 +43,7 @@ class PublishedSource(BaseModel):
     contradiction_status: str = "unknown"
 
 class Publication(BaseModel):
-    schema_version: Literal["1.0", "2.0", "2.1", "2.2"] = "2.2"
+    schema_version: Literal["1.0", "2.0", "2.1", "2.2", "2.3"] = "2.3"
     status: Literal["unverified", "traceability_checked", "partial", "withheld"]
     content: str
     content_sha256: str
@@ -160,14 +160,15 @@ def publish_report(draft: str, sources: list[dict], model=None, cfg: VerifyConfi
         return result
 
 
-def _publish_report(draft: str, sources: list[dict], model=None, cfg: VerifyConfig | None=None, *, _schema_version="2.2",
+def _publish_report(draft: str, sources: list[dict], model=None, cfg: VerifyConfig | None=None, *, _schema_version="2.3",
                     research_spec=None, writer_context=None, pending_findings=None,
                     proposed_changes=None) -> Publication:
     """Number/link citations and optionally audit; no semantic rewriting or QC gate."""
     from .source_identity import classify_source, reconcile_identities
     collector = SourceCollector(reconcile_identities(sources))
     selected, warnings, identities = [], [], {}
-    order = cited_indices(draft) if _schema_version == "2.2" else legacy_cited_indices(draft)
+    modern = _schema_version in {"2.2", "2.3"}
+    order = cited_indices(draft, expand_ranges=_schema_version == "2.3") if modern else legacy_cited_indices(draft)
     missing = {index for index in order if collector.find_by_index(index) is None}
     next_index = 1
     for index in order:
@@ -227,7 +228,8 @@ def _publish_report(draft: str, sources: list[dict], model=None, cfg: VerifyConf
     except Exception:
         audit_status = "unavailable"
         warnings.append("citation_audit_error")
-    content = (render_report_current if _schema_version == "2.2" else render_report)(draft, selected)
+    content = (render_report_current(draft, selected, expand_ranges=_schema_version == "2.3")
+               if modern else render_report(draft, selected))
     grounding = build_evidence_grounding(draft, list(collector.sources.values()), checks=checks,
                                          research_spec=research_spec,
                                          writer_context=writer_context,
@@ -286,7 +288,7 @@ def validate_publication(content: str, metadata: dict | None) -> Publication:
         EvidenceGroundingV1.model_validate(publication.evidence_grounding)
     if content!=publication.content or digest(content)!=publication.content_sha256:
         raise ValueError("publication_content_mismatch")
-    if publication.schema_version in {"2.0", "2.1", "2.2"}:
+    if publication.schema_version in {"2.0", "2.1", "2.2", "2.3"}:
         if publication.status != "unverified" or publication.revision is not None or publication.verified_body:
             raise ValueError("advisory_publication_state_mismatch")
         indices = [source.index for source in publication.sources]
@@ -294,8 +296,11 @@ def validate_publication(content: str, metadata: dict | None) -> Publication:
             raise ValueError("duplicate_source_index")
         cited = {int(n) for m in CITE_RE.finditer(publication.report_body)
                  for n in re.split(r"\s*,\s*", m.group(1))}
-        if publication.schema_version in {"2.1", "2.2"}:
-            cited = set((cited_indices if publication.schema_version == "2.2" else legacy_cited_indices)(publication.report_body))
+        modern = publication.schema_version in {"2.2", "2.3"}
+        expand_ranges = publication.schema_version == "2.3"
+        if modern or publication.schema_version == "2.1":
+            cited = set(cited_indices(publication.report_body, expand_ranges=expand_ranges)
+                        if modern else legacy_cited_indices(publication.report_body))
             originals = [old for source in publication.sources for old in source.original_indices]
             if len(originals) != len(set(originals)) or not set(originals) <= cited:
                 raise ValueError("uncited_source_mapping")
@@ -303,8 +308,12 @@ def validate_publication(content: str, metadata: dict | None) -> Publication:
             raise ValueError("uncited_source_mapping")
         if any(source.url != safe_url(source.url) for source in publication.sources):
             raise ValueError("publication_url_invalid")
-        renderer = render_report_current if publication.schema_version == "2.2" else render_report if publication.schema_version == "2.1" else _render_report_v2
-        if content != renderer(publication.report_body, publication.sources):
+        if modern:
+            rendered = render_report_current(publication.report_body, publication.sources, expand_ranges=expand_ranges)
+        else:
+            renderer = render_report if publication.schema_version == "2.1" else _render_report_v2
+            rendered = renderer(publication.report_body, publication.sources)
+        if content != rendered:
             raise ValueError("publication_render_mismatch")
         return publication
     # Read-only compatibility validation for reports written before rule removal.

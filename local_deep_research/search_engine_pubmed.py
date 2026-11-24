@@ -10,7 +10,7 @@ from ...security.safe_requests import safe_get
 from ...security.secure_logging import logger
 from ..rate_limiting import RateLimitError
 from ..search_engine_base import BaseSearchEngine, Exposure, Sensitivity
-from research_verify.retrieval import has_structured_query_syntax, service_get, xml_text
+from research_verify.retrieval import service_get, xml_text
 
 
 def _search_proxy_kwargs() -> dict:
@@ -138,56 +138,30 @@ class PubMedSearchEngine(BaseSearchEngine):
         self.pmc_url = "https://www.ncbi.nlm.nih.gov/pmc/articles/"
 
     def _optimize_query_for_pubmed(self, query: str) -> str:
-        """
-        Optimize a natural language query for PubMed search.
-        Uses LLM to transform questions into effective keyword-based queries.
+        """Rewrite a natural-language lookup using only PubMed query fields."""
+        from research_verify.structured_output import object_reply
+        from research_verify.task_plan import ACTIVE_PLAN, DatabaseSearch, compile_search, validate_task_plan
 
-        Args:
-            query: Natural language query
-
-        Returns:
-            Optimized query string for PubMed
-        """
-        if not self.llm or not self.optimize_queries or has_structured_query_syntax(query):
-            # Return original query if no LLM available or optimization disabled
+        if not self.llm or not self.optimize_queries or (
+            isinstance(query, DatabaseSearch) and query.engine == "pubmed"
+        ):
             return query
+        prompt = """Rewrite the topic for PubMed. Return only a JSON object
+with concepts as groups of synonymous search terms. Include publication_years
+with integer start, end, and exact user_quote only if the topic specifies
+publication dates.
 
+Topic:
+""" + query
         try:
-            # Prompt for query optimization
-            prompt = f"""Transform this natural language question into an optimized PubMed search query.
-
-Original query: "{query}"
-
-CRITICAL RULES:
-1. ONLY RETURN THE EXACT SEARCH QUERY - NO EXPLANATIONS, NO COMMENTS
-2. DO NOT wrap the entire query in quotes
-3. Preserve any requested publication dates and other explicit limits. Do not add limits the user did not request.
-4. Use parentheses around OR statements: (term1[Field] OR term2[Field])
-5. Use only BASIC MeSH terms - stick to broad categories like "Vaccines"[Mesh]
-6. KEEP IT SIMPLE - use 2-3 main concepts maximum
-7. Focus on Title/Abstract searches for reliability: term[Title/Abstract]
-8. Use wildcards for variations: vaccin*[Title/Abstract]
-
-EXAMPLE QUERIES:
-✓ GOOD: (mRNA[Title/Abstract] OR "messenger RNA"[Title/Abstract]) AND vaccin*[Title/Abstract]
-✓ GOOD: (influenza[Title/Abstract] OR flu[Title/Abstract]) AND treatment[Title/Abstract]
-✗ BAD: (mRNA[Title/Abstract]) AND "specific disease"[Mesh] AND treatment[Title/Abstract] AND 2023[dp]
-✗ BAD: "Here's a query to find articles about vaccines..."
-
-Return ONLY the search query without any explanations.
-"""
-
-            response = self.llm.invoke(prompt)
-            optimized = getattr(response, "content", response)
-            return optimized.strip() if isinstance(optimized, str) and optimized.strip() else query
-
-        except Exception as e:
-            safe_msg = self._scrub_error(e)
-            logger.exception(
-                f"Error optimizing query ({type(e).__name__}): {safe_msg}"
-            )
-            logger.debug(f"Falling back to original query: '{query}'")
-            return query  # Fall back to original query on error
+            plan = validate_task_plan(query, object_reply(self.llm.invoke(prompt)))
+        except Exception:
+            plan = {}
+        collector = ACTIVE_PLAN.get()
+        if collector is not None and collector.task_plan.get("publication_years"):
+            plan.setdefault("publication_years", collector.task_plan["publication_years"])
+        lookup = compile_search("pubmed", "", plan.get("concepts"), plan)
+        return lookup or query
 
     def _adaptive_search(self, query: str) -> Tuple[List[str], str]:
         """Search within caller scope; an operator's days_limit still applies.

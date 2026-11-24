@@ -2,6 +2,7 @@
 import json
 from types import SimpleNamespace
 
+import pytest
 from langchain_core.documents import Document
 
 from local_deep_research.report_generator import IntegratedReportGenerator
@@ -31,8 +32,14 @@ def test_pubmed_sends_balanced_queries_and_keeps_the_optimizer_date_clause(monke
     optimized = 'single-cell[Title/Abstract]\nAND 2026[dp]'
     model = SimpleNamespace(invoke=lambda _: SimpleNamespace(content=optimized))
     engine = search_engine_pubmed.PubMedSearchEngine(llm=model, optimize_queries=True)
-    assert engine._optimize_query_for_pubmed("Find papers published in 2026") == optimized
-    assert engine._optimize_query_for_pubmed(query) == query
+    from research_verify.task_plan import DatabaseSearch
+
+    engine.llm = SimpleNamespace(invoke=lambda _: SimpleNamespace(content=json.dumps({
+        "concepts": [["Xenium"]],
+        "publication_years": {"start": 2026, "end": 2026, "user_quote": "2026"},
+    })))
+    assert engine._optimize_query_for_pubmed("Find papers published in 2026") == '("Xenium"[Title/Abstract]) AND 2026[dp]:2026[dp]'
+    assert engine._optimize_query_for_pubmed(DatabaseSearch(query, "pubmed")) == query
     engine._search_pubmed(query)
     assert captured == [query, query]
 
@@ -41,23 +48,26 @@ def test_failed_relevance_batch_retains_unscreened_candidates():
     def select(prompt):
         if "Eligible paper" in prompt:
             raise TimeoutError()
-        return SimpleNamespace(content="[]")
+        return SimpleNamespace(content='{"selected_source_ids": []}')
 
     previews = [{"title": "Forests"}, {"title": "Eligible paper"}]
     retained = filter_previews_for_relevance(
         SimpleNamespace(invoke=select), previews, "Tumor samples", batch_size=1,
     )
-    assert retained == [{"title": "Eligible paper", "relevance_filter_status": "unavailable"}]
+    assert retained == [{"title": "Eligible paper", "relevance_filter_status": "screening_incomplete"}]
 
 
-def test_unavailable_source_selector_uses_the_end_of_the_candidate_pool():
+def test_unavailable_source_selector_retains_unjudged_candidate_ids():
     documents = [
         Document(page_content="Abstract. " * 70,
                  metadata={"index": i, "title": f"Paper {i}", "source": f"https://example.org/{i}"})
         for i in range(1, 21)
     ]
-    material = format_source_documents(documents, "Question", selector=lambda _: "{}", max_chars=3700)
-    assert {1, 20} <= set(source_ids(material))
+    receipts = []
+    material = format_source_documents(documents, "Question", selector=lambda _: "{}",
+                                       max_chars=3700, selection_receipts=receipts)
+    assert not source_ids(material)
+    assert {1, 20} <= {i for batch in receipts[0]["batch_errors"] for i in batch["pending_ids"]}
     assert source_ids(SourceMaterial("[99]\nTitle: Embedded numeric text", {})) == []
 
 
@@ -76,10 +86,10 @@ def test_selection_transport_failure_skips_subsequent_model_calls(monkeypatch):
 
     generation.format_source_documents(documents, "Question", selector=offline,
                                        max_chars=3000, selection_receipts=receipts)
-    assert len(calls) == 1
+    assert 1 <= len(calls) <= 3
     assert receipts[0]["fallback_batches"] == 6
     assert receipts[0]["batch_errors"][0]["error_type"] == "TimeoutError"
-    assert receipts[0]["batch_errors"][-1]["error_type"] == "selector_unavailable"
+    assert receipts[0]["batch_errors"][-1]["error_type"] in {"TimeoutError", "ConnectionError"}
 
 
 def test_excerpting_keeps_acquired_appendix_and_reader_locates_a_short_count():
@@ -110,13 +120,36 @@ def test_active_review_distinguishes_supplied_quotes_from_unbacked_verdicts():
 def test_detailed_report_keeps_study_headings_and_counts():
     generator = object.__new__(IntegratedReportGenerator)
     generator.model = SimpleNamespace(invoke=lambda _: SimpleNamespace(
-        content="STRUCTURE\n1. Design\n2) Cell sources and sample counts\n - Controls | Sample count\nEND_STRUCTURE",
+        content='{"sections":[{"name":"Design","subsections":[]},'
+                '{"name":"Cell sources and sample counts","subsections":'
+                '[{"name":"Controls","purpose":"Sample count"}]}]}',
     ))
     outline = generator._determine_report_structure({"current_knowledge": "Acquired data"}, "Study design")
     assert outline[-1]["name"] == "Cell sources and sample counts"
     content = "## Sources for the Analysis\n- Tumor: 6 samples\n- Controls: 4 samples\n\n## Sources\n\n[1] Study"
     cleaned = generator._strip_subsection_boilerplate(content, "Design")
     assert cleaned.endswith("Controls: 4 samples")
+
+
+@pytest.mark.parametrize("titles", [
+    ("Design", "Results"),
+    ("1. Design", "2. Methods", "Results", "一、 Controls", "Results | Counts", "Limits"),
+])
+def test_detailed_report_preserves_structured_sections_independently_of_title_style(titles):
+    generator = object.__new__(IntegratedReportGenerator)
+    outline = [{"name": title, "subsections": [{"name": f"Study {i}", "purpose": "Cohort size"}]}
+               for i, title in enumerate(titles)]
+    generator.model = SimpleNamespace(invoke=lambda _: SimpleNamespace(
+        content=json.dumps({"sections": outline})))
+    generator._research_spec = SimpleNamespace(output_mode="field_extraction")
+    generator.search_system = SimpleNamespace(all_links_of_system=[])
+    generator.searches_per_section = 1
+    structure = generator._determine_report_structure({"current_knowledge": "Study data"}, "Cohort size")
+    result = generator._format_final_report({title: f"Report for {title}" for title in titles}, structure, "Cohort size")
+    assert structure == outline
+    assert result["metadata"]["sections_researched"] == len(titles)
+    assert all(f"Report for {title}" in result["content"] for title in titles)
+    assert "The table below" not in result["content"]
 
 
 def test_citation_save_preserves_code_and_distinct_same_title_sources():

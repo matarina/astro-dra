@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 import httpx
 import pytest
 import respx
@@ -113,6 +115,25 @@ async def test_verify_many_indexes_results_and_survives_one_failure():
         out = await DoiValidator(http).verify_many(sources)
     assert set(out) == {1, 2}
     assert out[1].verified is True and out[2].verified is None
+
+
+@pytest.mark.asyncio
+async def test_verify_many_retains_completed_checks_on_timeout(monkeypatch):
+    validator = DoiValidator(HttpClient(_cosmetic_config()))
+    cancelled = asyncio.Event()
+    result = object()
+
+    async def verify(source):
+        if source["index"] == 1:
+            return result
+        try:
+            await asyncio.Future()
+        finally:
+            cancelled.set()
+
+    monkeypatch.setattr(validator, "verify", verify)
+    assert await validator.verify_many([{"index": 1}, {"index": 2}], timeout=0.02) == {1: result}
+    assert cancelled.is_set()
 
 
 @pytest.mark.asyncio

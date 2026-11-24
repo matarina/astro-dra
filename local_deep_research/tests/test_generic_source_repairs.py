@@ -98,7 +98,7 @@ def test_notice_stays_with_selected_article_even_when_not_selected_itself():
                 'snippet': 'Correction published. No abstract available.', 'content_type': 'metadata'},
                {'index': 11, 'title': 'Other study', 'abstract': 'Other original material. ' * 220}]
     docs = handler(SimpleNamespace())._create_documents(sources)
-    text = format_source_documents(docs, 'Question', selector=lambda _: '[9]', max_chars=4000)
+    text = format_source_documents(docs, 'Question', selector=lambda _: '{"selected_source_ids": [9]}', max_chars=4000)
     assert '[9]\nTitle: Original' in text and '[10]\nTitle:' not in text
     assert 'RELATED PUBLICATION NOTICE' in text and 'Notice source index: 10' in text
     assert 'https://pubmed.ncbi.nlm.nih.gov/200/' in text and 'metadata only' in text

@@ -46,7 +46,7 @@ def source():
             'password': 'do-not-save', 'settings_snapshot': {'api_key': 'do-not-save'}}
 
 
-def test_actual_draft_evidence_review_writer_and_citation_map_are_joinable(trace_root):
+def test_actual_draft_evidence_review_writer_and_citation_map_are_joinable(trace_root, native_review_only):
     model = ReviewThenWrite()
     writer = handler(model)
     writer.settings_snapshot = {'general.enable_fact_checking': True}

@@ -28,6 +28,12 @@ def get_database() -> JCRDatabase:
     return JCRDatabase(str(path), read_only=True)
 
 
+@lru_cache(maxsize=1)
+def _catalog_metrics(database: JCRDatabase, revision: tuple[int, int, int]) -> dict:
+    """Share verified values for one catalog revision across research tasks."""
+    return {}
+
+
 def _norm(value: Any) -> str:
     return re.sub(r"[^a-z0-9]+", " ", str(value or "").casefold()).strip()
 
@@ -64,6 +70,7 @@ def lookup_source(
     minimum: float | None = None,
     operator: str = ">=",
     year: int | str | None = "latest",
+    cache: dict | None = None,
 ) -> dict[str, Any]:
     """Resolve a collected journal by ISSN, or by an exact normalized title."""
     if minimum is not None:
@@ -94,8 +101,16 @@ def lookup_source(
             "passes_threshold": None,
             "requested_metric_year": requested_year,
         }
+    # Reuse only an unambiguous resolved identity. A different supplied ISSN
+    # or year must be verified independently by the catalog.
+    key = (requested_year, tuple(sorted(issns)), "" if issns else _norm(journal))
     try:
         database = get_database()
+        if cache is None:
+            stat = os.stat(database.db_path)
+            cache = _catalog_metrics(database, (stat.st_ino, stat.st_mtime_ns, stat.st_size))
+        if confirmed := cache.get(key):
+            return _with_threshold(dict(confirmed, requested_metric_year=requested_year), minimum, operator)
         exact = database.search_journal(journal, issns=issns) if issns else []
         match_method = "issn" if exact else "journal_title"
         if not exact and journal:
@@ -157,7 +172,7 @@ def lookup_source(
     row = exact[0]
     value = _float_metric(row.impact_factor)
     metric_year = int(row.year) if row.year and row.year.isdigit() else row.year
-    return {
+    result = {
         "status": "found" if value is not None else "metric_unavailable",
         "missing_reason": None if value is not None else "metric_not_numeric",
         "query": journal,
@@ -166,12 +181,63 @@ def lookup_source(
         "impact_factor": value,
         "metric_year": metric_year,
         "requested_metric_year": requested_year,
-        "passes_threshold": passes_threshold(value, minimum, operator),
-        "minimum_if": minimum,
-        "threshold_operator": operator if minimum is not None else None,
         "partition": row.partition,
         "category": row.category,
         "warning_status": row.warning_status,
         "metric_source": "jcr_mcp ShowJCR JCR table",
         "source_url": "https://github.com/hitfyd/ShowJCR",
     }
+    if value is not None:
+        cache[key] = result
+        if match_method == "journal_title":
+            cache[(str(metric_year), (), _norm(row.journal_name))] = result
+        row_ids = tuple(sorted(set(row.issns)))
+        # All identifiers are on the same verified journal row.
+        for ids in [(item,) for item in row_ids] + ([row_ids] if row_ids else []):
+            cache[(requested_year, ids, "")] = result
+            cache[(str(metric_year), ids, "")] = result
+    return _with_threshold(result, minimum, operator)
+
+
+def _with_threshold(result, minimum, operator):
+    return {
+        **result,
+        "passes_threshold": passes_threshold(result["impact_factor"], minimum, operator),
+        "minimum_if": minimum,
+        "threshold_operator": operator if minimum is not None else None,
+    }
+
+
+def _set_source_metric(source, result):
+    source["_jcr_check"] = result
+    source["jcr_check_status"] = result["status"]
+    source["jcr_provenance"] = {
+        "source": "jcr_mcp",
+        **{key: result.get(key) for key in ("metric_year", "metric_source", "source_url",
+                                           "status", "missing_reason", "threshold_operator")},
+        "requested_minimum_if": result.get("minimum_if"),
+    }
+    if result["status"] == "found":
+        source.update({key: result[key] for key in ("impact_factor", "metric_year", "passes_threshold")})
+
+
+def sources_with_journal_receipts(sources, checks, selection):
+    """Supply this task's receipts without exposing an earlier task's verdicts."""
+    receipt_fields = ("_jcr_check", "_jcr_checks", "jcr_check_status", "jcr_provenance", "passes_threshold")
+    requested_year = selection.get("year")
+    for source in sources:
+        receipts = checks.get(int(source["index"]), {})
+        if not receipts and not any(key in source for key in receipt_fields):
+            yield source
+            continue
+        scoped = dict(source)
+        for key in (*receipt_fields, "impact_factor", "metric_year"):
+            scoped.pop(key, None)
+        receipt = receipts.get(requested_year) if requested_year else next(reversed(receipts.values()), None)
+        if receipt:
+            _set_source_metric(scoped, _with_threshold(receipt, selection.get("minimum"),
+                                                       selection.get("operator", ">=")))
+        other_years = [_with_threshold(item, None, ">=") for item in receipts.values() if item is not receipt]
+        if other_years:
+            scoped["_jcr_checks"] = other_years
+        yield scoped

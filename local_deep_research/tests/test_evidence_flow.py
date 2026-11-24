@@ -21,7 +21,7 @@ def doc(i, text):
 
 def test_existing_draft_citations_reserve_original_material_before_selection():
     docs=[doc(1,'Original supporting abstract. '*15),doc(2,'Other candidate. '*60)]
-    text=format_source_documents(docs,'Question',selector=lambda _:'[2]',max_chars=1800,required_ids=[1])
+    text=format_source_documents(docs,'Question',selector=lambda _:'{"selected_source_ids": [2]}',max_chars=1800,required_ids=[1])
     assert '[1]\nTitle:' in text and docs[0].page_content in text
     assert len(text)<=1800
 
@@ -67,7 +67,7 @@ def test_supported_original_or_different_analysis_prevents_repair():
         out,applied,_=confirm_repairs(model,text,[issue],material,'Question',DISABLED)
         assert out==text and not applied
 
-def test_final_check_reads_the_actual_writer_text_and_repairs_only_quoted_issue():
+def test_final_check_reads_the_actual_writer_text_and_repairs_only_quoted_issue(native_review_only):
     class Model:
         def __init__(self):self.prompts=[]
         def invoke(self,prompt):
@@ -210,6 +210,37 @@ def test_review_groups_preserve_uncited_assertions_and_table_context():
     assert row['table_context']=='| Measure | Finding |' and row['section_context']==['## Group A']
 
 
+def test_review_groups_budget_all_new_and_previously_included_sources():
+    first = "Exact original evidence for study A. " * 110
+    second = "Exact original evidence for study B. " * 110
+    sources = [{"index": 1}, {"index": 2}]
+    documents = [doc(1, first), doc(2, second)]
+    text = "Study A measured cohort size [1].\n\nStudy B measured cohort size [2]."
+    prompts = []
+    events = []
+    trace = SimpleNamespace(record=lambda stage, payload: events.append(stage))
+    handler = SimpleNamespace(_invoke_text=lambda prompt, **kw: prompts.append(prompt) or '{"issues":[]}')
+
+    reviewed = review_answer(handler, "What did the studies measure?", text, documents,
+                             sources, trace, None, 1, 7000, {}, {"remaining": 3})
+    assert len(prompts) == 2 and reviewed[4] == {1, 2}
+    assert first[:200] in prompts[0] and second[:200] in prompts[1]
+    assert "review_material_unavailable" not in events
+
+
+def test_one_large_cited_claim_reuses_its_scoped_writer_material():
+    sources = [{"index": 1}, {"index": 2}]
+    documents = [doc(1, "Detailed study A sources. " * 200), doc(2, "Detailed study B sources. " * 200)]
+    writer = format_source_documents([doc(1, "Study A original."), doc(2, "Study B original.")])
+    prompts = []
+    handler = SimpleNamespace(_invoke_text=lambda prompt, **kw: prompts.append(prompt) or '{"issues":[]}')
+    report = "The independent observations were consistent [1, 2]."
+    reviewed = review_answer(handler, "Compare", report, documents, sources, DISABLED, None,
+                             1, 7000, {}, {"remaining": 3}, writer_material=writer)
+    assert reviewed[4] == {1, 2}
+    assert "Study A original." in prompts[0] and "Study B original." in prompts[0]
+
+
 @pytest.mark.parametrize('header, row, budget, expected', [
     ('| Run [1] | Result [2] |', '| A | 14 |', 60000, [1, 2]),
     ('| Run [1] | Result |', '| A | 14 [2] |', 60000, [2, 1]),
@@ -288,6 +319,96 @@ def test_owned_full_text_can_be_used_after_network_budget_is_exhausted():
     result=supplement([{'status':'insufficient_evidence','source_id':7,'request':{'kind':'article'}}],
         sources,Fetch(),register=None,trace=DISABLED)
     assert result==[7] and sources[0]['fetched_content']=='Already retrieved primary evidence.'
+
+
+@pytest.mark.parametrize("tool_kind", ["article", "web", "skip", "unsupported_nonreporting"])
+def test_open_coverage_questions_reuse_evidence_tools_and_only_apply_supported_completions(monkeypatch, tool_kind):
+    from research_verify import evidence_flow
+
+    question = "How often does the device require calibration?"
+    gap = ("{\"interval\":null}" if tool_kind == "skip" else
+           "The interval is not verified in the supplied material [7].")
+    original_request = "Tell me how often the device needs to be calibrated."
+    scope_note = "The review checked the report's calibration discussion. The interval remains unverified."
+    nonreporting = "The calibration interval was not reported."
+    interval = "Calibrate the device every twelve months."
+    source_id = 8 if tool_kind == "web" else 7
+    exact = interval if tool_kind in {"web", "unsupported_nonreporting"} else nonreporting
+    replacement = f"{gap} Calibration is required every twelve months [{source_id}]." if tool_kind == "web" else (
+        f"The original explicitly states that the calibration interval was not reported [{source_id}]."
+    )
+    calls = []
+
+    class Fetcher:
+        events = [{"stage": "full_text", "status": "timeout"}]
+
+        def source_article(self, source):
+            calls.append(("article", int(source["index"])))
+            return {"body": exact, "url": source["link"], "status": "retrieved_full_text"}
+
+        def web(self, query, domain, url):
+            calls.append(("web", query))
+            return [{"link": "https://example.org/manual", "title": "Primary manual", "abstract": exact}]
+
+    stages = []
+    def invoke(prompt, *, trace, stage):
+        stages.append(stage)
+        if stage == "writer":
+            assert "mark it unverified in the supplied material" in prompt
+            return gap
+        if stage == "task_coverage":
+            answered = replacement in prompt
+            assert original_request in prompt
+            return json.dumps({"questions": [{"question": question,
+                "status": "answered" if answered else "evidence_gap",
+                "report_quotes": [replacement if answered else gap]}]})
+        if stage == "task_coverage_scope":
+            assert original_request in prompt
+            answered = replacement in prompt
+            return json.dumps({"questions": [{"id": 1, "status": "answered" if answered else "evidence_gap",
+                "reviewed_scope": "Report's statement about the interval",
+                "open_scope": "" if answered else "Find the device's interval in the original", "quote_ids": [1],
+                "user_note": scope_note if tool_kind == "skip" else ""}]})
+        if stage == "task_coverage_followup":
+            assert question in prompt and gap in prompt and "timeout" in prompt
+            assert original_request in prompt and "Find the device's interval in the original" in prompt
+            assert "The supplied abstract discusses calibration." in prompt
+            if tool_kind == "skip":
+                return '{"requests":[]}'
+            return json.dumps({"requests": [{"question_id": 1, "kind": "web" if tool_kind == "web" else "article",
+                                             "source_ids": [7], "query": question}]})
+        if stage == "task_coverage_completion":
+            assert exact in prompt
+            return json.dumps({"edits": [{"question_id": 1, "statement": gap, "replacement": replacement,
+                "source_id": source_id, "evidence_quote": exact}]})
+        assert stage == "repair_validation" and "coverage_question" in prompt
+        supported = tool_kind != "unsupported_nonreporting"
+        return json.dumps({"decisions": [{"candidate_index": 0, "replacement_supported": supported,
+                                         "same_analysis": True, "completes_requested_scope": supported}]})
+
+    writer = handler(None)
+    writer._invoke_text = invoke
+    writer.evidence_fetcher = Fetcher()
+    writer.task_question = original_request
+    writer.task_plan = {} if tool_kind == "skip" else {"questions": [{"question": question}]}
+    writer.settings_snapshot = {"general.enable_fact_checking": True, "citation.enable_source_reading": False}
+    monkeypatch.setattr(evidence_flow, "resolve_source_identities", lambda *a, **kw: None)
+    monkeypatch.setattr(evidence_flow, "resolve_versions", lambda *a, **kw: None)
+    monkeypatch.setattr(evidence_flow, "review_answer",
+                        lambda handler, query, answer, docs, *a, **kw: (answer, docs, [], [], set()))
+    source = {"index": 7, "link": "https://example.org/paper", "pmid": "7",
+              "abstract": "The supplied abstract discusses calibration."}
+    result = writer.analyze_followup(question, [source], "", 0)
+    can_complete = tool_kind in {"article", "web"}
+    expected = replacement if can_complete else gap
+    if tool_kind == "skip":
+        assert json.loads(result["content"]) == {"interval": None}
+        assert result["evidence_review"]["task_coverage"][1]["user_note"] == scope_note
+    assert result["content"] == expected
+    assert result["evidence_review"]["status"] == ("review_completed" if can_complete else "review_incomplete")
+    assert stages.count("task_coverage_followup") == 1
+    assert ("repair_validation" in stages) is (tool_kind != "skip")
+    assert calls == ([] if tool_kind == "skip" else [("web", question)] if tool_kind == "web" else [("article", 7)])
 
 
 def test_review_call_budget_keeps_report_when_confirmation_is_unavailable():
@@ -465,7 +586,7 @@ def test_stream_callback_receives_only_the_final_repaired_text():
     assert seen==[result['content']]==['Object A was measured [7].']
 
 
-def test_insufficient_evidence_can_be_supplemented_once_then_rechecked():
+def test_insufficient_evidence_can_be_supplemented_once_then_rechecked(native_review_only):
     class Fetch:
         remaining=4
         def article(self,source):self.remaining-=1;return 'Detailed methods used measurement system Q for all samples.'

@@ -40,7 +40,7 @@ def test_large_pool_is_batched_then_writer_gets_original_abstracts_with_sparse_i
         prompts.append(prompt)
         ids = list(map(int, re.findall(r'^\[(\d+)\]$', prompt, re.M)))
         assert all(docs[i - 1].metadata['abstract'] in prompt for i in ids)
-        return json.dumps(ids[-4:][::-1])
+        return json.dumps({"selected_source_ids": ids[-4:][::-1]})
     rendered = format_source_documents(docs, 'Question', selector=select)
     ids = list(map(int, re.findall(r'^\[(\d+)\]$', rendered, re.M)))
     assert len(prompts) > 1 and 0 < len(ids) < 500
@@ -51,12 +51,13 @@ def test_large_pool_is_batched_then_writer_gets_original_abstracts_with_sparse_i
     assert all(len(p) < 52000 for p in prompts)
 
 
-@pytest.mark.parametrize('reply', ['I select 999.', '[999]', '[true]', '[]'])
+@pytest.mark.parametrize('reply', ['I select 999.', '{"selected_source_ids": [999]}',
+                                   '{"selected_source_ids": [true]}', '{"selected_source_ids": []}'])
 def test_selection_outage_cannot_invent_sources_or_shorten_abstracts(reply):
     docs = documents(12, 1200)
     rendered = format_source_documents(docs, 'Question', selector=lambda p: reply, max_chars=6000)
     ids = list(map(int, re.findall(r'^\[(\d+)\]$', rendered, re.M)))
-    assert ids and all(1 <= i <= 12 for i in ids)
+    assert not ids
     assert len(rendered) <= 6000
     assert all(docs[i - 1].metadata['abstract'] in rendered for i in ids)
 

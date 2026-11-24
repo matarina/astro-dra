@@ -19,17 +19,20 @@ from loguru import logger
 _research_id = ContextVar("synthesis_trace_research_id", default=None)
 _SENSITIVE = re.compile(r"api[_-]?key|password|secret|authorization|credential|access[_-]?token", re.I)
 _SOURCE_FIELDS = ("index", "title", "link", "url", "doi", "pmid", "pmcid", "journal",
+                  "issn", "eissn", "essn",
                   "journal_ref", "pubdate", "publication_date", "year", "authors",
                   "language", "languages", "lang", "platform", "technology",
                   "population", "sample_size", "groups", "outcome",
                   "impact_factor", "impact_factor_value", "journal_impact_factor", "jif",
                   "impact_factor_provenance", "jif_provenance",
-                  "_jcr_check", "jcr_provenance", "jcr_check_status",
+                  "_jcr_check", "_jcr_checks", "jcr_provenance", "jcr_check_status",
                   "metric_year", "passes_threshold",
                   "abstract", "snippet", "content", "body", "full_content",
                   "fetched_content", "content_type", "evidence_type", "engine", "source_engine",
                   "related_articles", "publication_types", "publication_versions",
-                  "version_resolution", "authority_status")
+                  "version_resolution", "authority_status", "_evidence_passages",
+                  "_body_acquisition", "_body_url", "_body_pmcid", "_body_attempts",
+                  "relevance_filter_status")
 
 
 def text_digest(text):
@@ -37,11 +40,21 @@ def text_digest(text):
 
 
 def source_snapshot(sources):
-    """Explicit allowlist: no settings, HTTP headers, or connection objects."""
-    if not isinstance(sources, (list, tuple)):
-        return []
-    return [{key: source[key] for key in _SOURCE_FIELDS if key in source}
-            for source in sources if isinstance(source, dict)]
+    """Retain evidence text and the same public metadata used in the source view."""
+    from .evidence_cards import additional_source_metadata
+
+    records = []
+    for source in sources if isinstance(sources, (list, tuple)) else ():
+        if not isinstance(source, dict):
+            continue
+        record = {key: source[key] for key in _SOURCE_FIELDS if key in source}
+        extra = additional_source_metadata(source)
+        if extra:
+            record["additional_source_metadata"] = extra
+        if source.get("_screened_task"):
+            record["_screened_task"] = True
+        records.append(record)
+    return records
 
 
 def source_ids(text):

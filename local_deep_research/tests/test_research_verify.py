@@ -15,6 +15,8 @@ whole verification chain depends on).
 
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import httpx
 import pytest
 import respx
@@ -96,3 +98,35 @@ async def test_get_transport_error_is_unverified_not_crash():
     assert res.transport_error
     assert not res.ok
     assert res.status is None
+
+
+@pytest.mark.asyncio
+async def test_doi_http_client_checks_egress_on_redirects(monkeypatch):
+    from local_deep_research.security.egress import policy
+
+    initial = "https://api.crossref.org/works/test"
+    denied = "https://other.example/target"
+    ctx = object()
+    checks = []
+    sent = []
+
+    def decide(url, context):
+        assert context is ctx
+        checks.append(url)
+        return SimpleNamespace(allowed=url == initial, reason="scope_mismatch")
+
+    def redirect(request):
+        sent.append(str(request.url))
+        return httpx.Response(302, headers={"Location": denied})
+
+    client = httpx.AsyncClient
+    monkeypatch.setattr(policy, "evaluate_url", decide)
+    monkeypatch.setattr(httpx, "AsyncClient", lambda **options: client(
+        transport=httpx.MockTransport(redirect), **options))
+
+    async with HttpClient(VerifyConfig(), egress_context=ctx) as http:
+        result = await http.get(initial)
+
+    assert checks == [initial, denied]
+    assert result.transport_error and result.error == "egress_denied:scope_mismatch"
+    assert sent == [initial]
